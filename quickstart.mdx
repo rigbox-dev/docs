@@ -1,0 +1,188 @@
+---
+title: Quickstart
+description: Launch your first workspace and app with production-safe API steps
+---
+
+# Quickstart
+
+This guide walks you through creating a workspace, starting it, reconciling template apps, and validating live routing.
+
+## Prerequisites
+
+- A Rigbox account ([sign up here](https://rigbox.dev/signup))
+- An API key (get one from **Settings → API Keys** in the dashboard)
+- `jq` installed locally for parsing JSON in shell examples
+
+## Step 1: Quick Deploy an OpenClaw Workspace
+
+Quick Deploy creates a workspace with template defaults. For OpenClaw, this provisions an `openclaw` image workspace.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/quick-deploy \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "template_id": "openclaw",
+    "name": "my-bot"
+  }'
+```
+
+```python Python
+import requests
+
+resp = requests.post(
+    "https://api.rigbox.dev/api/quick-deploy",
+    headers={"Authorization": "Bearer YOUR_API_KEY"},
+    json={"template_id": "openclaw", "name": "my-bot"}
+)
+print(resp.json())
+```
+
+```javascript JavaScript
+const resp = await fetch("https://api.rigbox.dev/api/quick-deploy", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    template_id: "openclaw",
+    name: "my-bot"
+  })
+});
+const data = await resp.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+Example response:
+
+```json
+{
+  "workspace": {
+    "id": "ws-a1b2c3d4",
+    "name": "my-bot",
+    "image": "openclaw",
+    "status": "provisioned",
+    "ram_mb": 4096,
+    "disk_size_mb": 10240,
+    "vcpu_count": 2,
+    "created_at": "2025-01-15T10:30:00Z",
+    "updated_at": "2025-01-15T10:30:00Z"
+  },
+  "message": "Workspace 'my-bot' created from template 'OpenClaw Bot'. Start it to begin working.",
+  "installed_apps": [],
+  "expected_apps": []
+}
+```
+
+## Step 2: Start the Workspace
+
+```bash
+WORKSPACE_ID="ws-a1b2c3d4"
+
+curl -X POST "https://api.rigbox.dev/api/workspaces/${WORKSPACE_ID}/start" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Step 3: Poll Until Running
+
+```bash
+for i in {1..60}; do
+  STATUS=$(curl -s "https://api.rigbox.dev/api/workspaces/${WORKSPACE_ID}" \
+    -H "Authorization: Bearer YOUR_API_KEY" | jq -r '.vm.status')
+
+  echo "status=${STATUS}"
+  if [ "${STATUS}" = "running" ]; then
+    break
+  fi
+
+  sleep 2
+done
+```
+
+## Step 4: Reconcile Template Apps
+
+Ensure expected template apps (for example OpenClaw gateway) exist:
+
+```bash
+curl -X POST "https://api.rigbox.dev/api/workspaces/${WORKSPACE_ID}/reconcile-apps" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Step 5: List Apps and Validate Live Health
+
+List apps:
+
+```bash
+curl https://api.rigbox.dev/api/apps \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Check a specific app is reachable before surfacing its URL in your own UI:
+
+```bash
+APP_ID="app-x1y2z3"
+
+curl "https://api.rigbox.dev/api/apps/${APP_ID}/health" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Expected response:
+
+```json
+{
+  "live": true,
+  "service_status": "running",
+  "port_open": true
+}
+```
+
+## Optional: Configure AI Settings
+
+For workspaces with AI integration, use the typed config endpoint:
+
+```bash
+curl -X PUT "https://api.rigbox.dev/api/workspaces/${WORKSPACE_ID}/ai-config" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "managed",
+    "provider": "google",
+    "model": "google/gemini-2.5-pro"
+  }'
+```
+
+Use `null` on nullable fields (for example `api_key`) to explicitly clear values. Omitted fields keep their existing values.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Workspace API" icon="server" href="/api-reference/workspaces/list">
+    Full workspace lifecycle management
+  </Card>
+  <Card title="App Management" icon="globe" href="/api-reference/apps/list">
+    Port exposure, visibility controls, and health checks
+  </Card>
+  <Card title="Snapshots" icon="camera" href="/api-reference/snapshots/list">
+    Save and restore workspace state
+  </Card>
+  <Card title="AI Configuration" icon="sparkles" href="/api-reference/ai/get-workspace-ai-config">
+    Manage AI provider settings and credits
+  </Card>
+  <Card title="Tools" icon="wrench" href="/api-reference/tools/list">
+    Install and manage workspace tools
+  </Card>
+  <Card title="Setup Scripts" icon="scroll" href="/api-reference/setup-scripts/list">
+    Automate workspace initialization
+  </Card>
+  <Card title="API Keys" icon="key" href="/api-reference/api-keys/list">
+    Manage programmatic access
+  </Card>
+  <Card title="Clawd API Surface" icon="sparkles" href="/clawd-api-surface">
+    See the exact endpoint groups used by clawd.rigbox.dev
+  </Card>
+</CardGroup>

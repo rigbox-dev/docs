@@ -1,0 +1,94 @@
+---
+title: Clawd Runtime Services
+description: Separate Clawd-specific runtime services from core Rigbox control-plane APIs
+---
+
+# Clawd Runtime Services
+
+This page documents Clawd-specific runtime behavior as a separate service layer so readers do not conflate it with core Rigbox APIs.
+
+## Service Boundary Model
+
+| Layer | Primary responsibility | Typical caller |
+| --- | --- | --- |
+| Core Rigbox Control Plane (`/api`) | Workspaces, apps, snapshots, metrics, logs, tools, tasks | Any Rigbox client |
+| AI Config API (`/api/workspaces/{id}/ai-config`) | Typed AI provider config patch + normalization | Clawd UI, Clawd-like apps |
+| Managed AI Proxy Service (`AI_PROXY_URL`) | Provider key injection, usage metering, credit enforcement | AI runtime inside workspace (opt-in) |
+| Credits + Billing APIs | Plan and managed-credit UX | Clawd settings/billing UI |
+
+## Managed AI Proxy (Clawd Runtime)
+
+In managed mode, the workspace does not hold provider API keys in the VM. Instead it sends requests to the internal proxy URL (`AI_PROXY_URL`, default `http://172.16.0.1:9090`).
+
+The proxy service handles:
+
+1. Provider routing (`google`, `openai`, `anthropic`).
+2. Provider API key injection server-side.
+3. Workspace/user attribution.
+4. Credit checks before forwarding.
+5. Credit decrement after successful responses.
+
+<Warning>
+  The managed AI proxy is opt-in per workspace. The proxy endpoint shape is a runtime-internal service contract. Treat it as internal unless you intentionally expose it behind your own backend.
+</Warning>
+
+## Config Injection Service Contract
+
+Use typed config updates for AI-enabled workspaces:
+
+```bash
+curl -X PUT https://api.rigbox.dev/api/workspaces/ws-a1b2c3d4/ai-config \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "byok",
+    "provider": "openai",
+    "api_key": "sk-...",
+    "model": "openai/gpt-4o"
+  }'
+```
+
+Accepted fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `mode` | `"managed"` or `"byok"` | AI proxy mode |
+| `provider` | `"google"`, `"openai"`, `"anthropic"` | AI provider |
+| `api_key` | `string` or `null` | BYOK provider key (null to clear) |
+| `model` | `string` or `null` | Model identifier (null to clear) |
+
+Semantics:
+
+- Omitted field: keep existing value.
+- `null`: clear/remove value.
+- Unknown fields: rejected with `400` (strict schema).
+
+For legacy generic updates, `POST /workspaces/{id}/env` remains available, but should not be your primary config path.
+
+## Credits Service Contract
+
+Read managed-credit state from:
+
+```bash
+curl https://api.rigbox.dev/api/users/me/credits \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Example:
+
+```json
+{
+  "remaining": 1800,
+  "total": 2000,
+  "mode": "managed"
+}
+```
+
+## Recommended Architecture for Clawd-Like Apps
+
+1. Keep UI calls on core Rigbox APIs for workspace/app management.
+2. Route AI setting changes through `PUT /workspaces/{id}/ai-config`.
+3. Treat AI proxy behavior and credits as a separate runtime service boundary.
+4. Keep billing APIs separate from your core VM/app CRUD logic.
+
+For endpoint-level mapping, see [/clawd-api-surface](/clawd-api-surface).

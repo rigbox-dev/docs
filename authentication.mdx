@@ -1,0 +1,80 @@
+---
+title: Authentication
+description: Authentication patterns for API clients, dashboards, and Clawd-like apps
+---
+
+# Authentication
+
+Rigbox APIs support multiple authentication methods. Use API keys for server-to-server traffic and user bearer tokens for browser sessions.
+
+## API Keys
+
+API keys are the simplest option for scripts, CI, agents, and backend services. Generate one from the [dashboard](https://rigbox.dev) or via the API.
+
+Include your API key in the `Authorization` header:
+
+```bash
+curl https://api.rigbox.dev/api/workspaces \
+  -H "Authorization: Bearer rb_your_api_key_here"
+```
+
+<Warning>
+  API keys grant full access to your account. Keep them secret and never commit them to version control.
+</Warning>
+
+### Recommended API Key Pattern (Server-Side)
+
+Do not expose personal Rigbox API keys in browser JavaScript. Keep them in your backend and call Rigbox from there.
+
+```bash
+export RIGBOX_API_KEY="rb_your_api_key_here"
+
+curl https://api.rigbox.dev/api/workspaces \
+  -H "Authorization: Bearer ${RIGBOX_API_KEY}"
+```
+
+### Key Prefixes
+
+| Prefix | Type | Description |
+|--------|------|-------------|
+| `rb_` | Personal API Key | Full account access, created via dashboard or API |
+
+## Bearer Token (JWT)
+
+If you signed in through the dashboard, you can call APIs with your session JWT:
+
+```bash
+curl https://api.rigbox.dev/api/workspaces \
+  -H "Authorization: Bearer eyJhbG..."
+```
+
+JWTs expire after a set period. Use the login endpoint to get a fresh token.
+
+## Clerk Session Token
+
+If using the Clerk-powered dashboard (`rigbox.dev` or `clawd.rigbox.dev`), the `__session` cookie or Clerk JWT is automatically used for authenticated requests.
+
+## Auth Choice by App Type
+
+| Client Type | Recommended Auth | Why |
+| --- | --- | --- |
+| Backend service / cron / worker | API key | Stable and easy to rotate |
+| First-party dashboard on Rigbox domains | Clerk session/JWT | User-scoped access |
+| Third-party web app integrating Rigbox | Your backend + API key or user token relay | Avoid key leakage in browser |
+
+## Access Control
+
+Rigbox supports fine-grained RBAC via the [Access Control API](/api-reference/access-control/list-bindings). This feature is currently gated behind a feature flag and available to select accounts.
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `401 Unauthorized` | Missing or invalid authentication |
+| `403 Forbidden` | Valid auth but insufficient permissions (e.g., accessing another user's resource) |
+
+```json
+{
+  "message": "Missing Authorization header"
+}
+```

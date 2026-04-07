@@ -1,0 +1,234 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Rigbox API",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#0b74ff",
+    "light": "#38bdf8",
+    "dark": "#0f172a"
+  },
+  "openapi": [
+    "https://api.rigbox.dev/api-docs/openapi.json",
+    "https://api.rigbox.dev/api-docs/auth/openapi.json"
+  ],
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "authentication",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Clawd Integration",
+            "pages": [
+              "clawd-api-surface",
+              "clawd-runtime-services"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Workspaces",
+            "pages": [
+              "api-reference/workspaces/list",
+              "api-reference/workspaces/create",
+              "api-reference/workspaces/get",
+              "api-reference/workspaces/delete",
+              "api-reference/workspaces/start",
+              "api-reference/workspaces/stop",
+              "api-reference/workspaces/update-env",
+              "api-reference/workspaces/update-resources",
+              "api-reference/workspaces/get-metrics",
+              "api-reference/workspaces/get-logs",
+              "api-reference/workspaces/stream-logs",
+              "api-reference/workspaces/tasks"
+            ]
+          },
+          {
+            "group": "Apps",
+            "pages": [
+              "api-reference/apps/list",
+              "api-reference/apps/create",
+              "api-reference/apps/get",
+              "api-reference/apps/update",
+              "api-reference/apps/delete",
+              "api-reference/apps/start",
+              "api-reference/apps/stop",
+              "api-reference/apps/restart",
+              "api-reference/apps/get-params",
+              "api-reference/apps/update-params",
+              "api-reference/apps/update-visibility",
+              "api-reference/apps/update-status",
+              "api-reference/apps/health-check",
+              "api-reference/apps/expose-port",
+              "api-reference/apps/reconcile",
+              "api-reference/apps/listening-ports"
+            ]
+          },
+          {
+            "group": "App Logs",
+            "pages": [
+              "api-reference/app-logs/get-logs",
+              "api-reference/app-logs/stream-logs",
+              "api-reference/app-logs/list-sources",
+              "api-reference/app-logs/create-source",
+              "api-reference/app-logs/update-source",
+              "api-reference/app-logs/delete-source"
+            ]
+          },
+          {
+            "group": "Snapshots",
+            "pages": [
+              "api-reference/snapshots/list",
+              "api-reference/snapshots/create",
+              "api-reference/snapshots/delete",
+              "api-reference/snapshots/restore",
+              "api-reference/snapshots/list-all",
+              "api-reference/snapshots/delete-by-id",
+              "api-reference/snapshots/restore-by-id"
+            ]
+          },
+          {
+            "group": "SSH Keys",
+            "pages": [
+              "api-reference/ssh-keys/list",
+              "api-reference/ssh-keys/add",
+              "api-reference/ssh-keys/delete",
+              "api-reference/ssh-keys/list-workspace",
+              "api-reference/ssh-keys/sync-workspace"
+            ]
+          },
+          {
+            "group": "Templates",
+            "pages": [
+              "api-reference/templates/list",
+              "api-reference/templates/quick-deploy"
+            ]
+          },
+          {
+            "group": "AI",
+            "pages": [
+              "api-reference/ai/get-credits",
+              "api-reference/ai/get-limits",
+              "api-reference/ai/get-usage",
+              "api-reference/ai/get-defaults",
+              "api-reference/ai/update-defaults",
+              "api-reference/ai/update-mode",
+              "api-reference/ai/get-workspace-ai-config",
+              "api-reference/ai/update-workspace-ai-config"
+            ]
+          },
+          {
+            "group": "Tools",
+            "pages": [
+              "api-reference/tools/list",
+              "api-reference/tools/status",
+              "api-reference/tools/launch",
+              "api-reference/tools/stop",
+              "api-reference/tools/install",
+              "api-reference/tools/install-status"
+            ]
+          },
+          {
+            "group": "Setup Scripts",
+            "pages": [
+              "api-reference/setup-scripts/list",
+              "api-reference/setup-scripts/create",
+              "api-reference/setup-scripts/get",
+              "api-reference/setup-scripts/update",
+              "api-reference/setup-scripts/delete"
+            ]
+          },
+          {
+            "group": "Service Specs",
+            "pages": [
+              "api-reference/service-specs/list",
+              "api-reference/service-specs/create",
+              "api-reference/service-specs/get",
+              "api-reference/service-specs/update",
+              "api-reference/service-specs/delete"
+            ]
+          },
+          {
+            "group": "App Catalog",
+            "pages": [
+              "api-reference/app-catalog/list",
+              "api-reference/app-catalog/install",
+              "api-reference/app-catalog/job-status"
+            ]
+          },
+          {
+            "group": "Roadmap",
+            "pages": [
+              "api-reference/roadmap/get-votes",
+              "api-reference/roadmap/toggle-vote"
+            ]
+          },
+          {
+            "group": "System",
+            "pages": [
+              "api-reference/system/feature-flags"
+            ]
+          },
+          {
+            "group": "User Settings",
+            "pages": [
+              "api-reference/users/get-settings",
+              "api-reference/users/update-settings",
+              "api-reference/users/list-regions"
+            ]
+          },
+          {
+            "group": "Access Control",
+            "pages": [
+              "api-reference/access-control/search-principals",
+              "api-reference/access-control/list-bindings",
+              "api-reference/access-control/create-binding",
+              "api-reference/access-control/update-binding",
+              "api-reference/access-control/delete-binding",
+              "api-reference/access-control/get-tags",
+              "api-reference/access-control/put-tags",
+              "api-reference/access-control/get-throttle-binding",
+              "api-reference/access-control/put-throttle-binding",
+              "api-reference/access-control/list-throttle-presets",
+              "api-reference/access-control/list-role-presets",
+              "api-reference/access-control/simulate"
+            ]
+          },
+          {
+            "group": "API Keys",
+            "pages": [
+              "api-reference/api-keys/list",
+              "api-reference/api-keys/create",
+              "api-reference/api-keys/delete"
+            ]
+          },
+          {
+            "group": "Other",
+            "pages": [
+              "api-reference/other/capacity",
+              "api-reference/other/images"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "api": {
+    "baseUrl": "https://api.rigbox.dev/api"
+  }
+}

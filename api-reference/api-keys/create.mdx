@@ -1,0 +1,35 @@
+---
+title: Create API Key
+api: POST /api-keys
+description: Generate a new API key
+---
+
+# Create API Key
+
+Creates a new API key. The full key is only returned once — store it securely.
+
+## Request Body
+
+<ParamField body="name" type="string">Optional name for the key (e.g., "Production")</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/api-keys \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Production Bot"}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json 201
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "key": "rb_live_abc123def456..."
+}
+```
+</ResponseExample>
+
+<Warning>
+  The full API key (`key` field) is shown only once. Store it in a secure location immediately.
+</Warning>

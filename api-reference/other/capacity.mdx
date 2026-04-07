@@ -1,0 +1,29 @@
+---
+title: Server Capacity
+api: GET /capacity
+description: Check current server capacity and availability
+---
+
+# Server Capacity
+
+Returns current server capacity information. This endpoint is **public** — no authentication required.
+
+<RequestExample>
+```bash cURL
+curl https://api.rigbox.dev/api/capacity
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "available": true,
+  "total": 50,
+  "used": 12
+}
+```
+</ResponseExample>
+
+<ResponseField name="available" type="boolean">Whether the platform has capacity for new workspaces</ResponseField>
+<ResponseField name="total" type="integer">Total workspace slots on the platform</ResponseField>
+<ResponseField name="used" type="integer">Currently occupied workspace slots</ResponseField>

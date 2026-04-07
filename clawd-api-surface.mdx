@@ -1,0 +1,81 @@
+---
+title: Clawd API Surface
+description: Which APIs power clawd.rigbox.dev and how to reuse them in your own app
+---
+
+# Clawd API Surface
+
+`clawd.rigbox.dev` is built on top of the same Rigbox API base (`https://api.rigbox.dev/api`), plus Clawd-specific behavior for OpenClaw bots, AI credits, and billing UX.
+
+Use this guide as an API map when building your own Clawd-like experience.
+
+## API Groups
+
+| Group | What it does | Should you use it in your own app? |
+| --- | --- | --- |
+| Core Rigbox APIs | Workspaces, apps, routing, logs, metrics, snapshots, tools, tasks | Yes, these are the foundation |
+| AI Config APIs | AI provider settings, managed/BYOK state, credits, usage | Yes, if you integrate AI providers |
+| Clawd billing/plan APIs | Checkout, plan switching, portal sessions | Optional; use your own billing stack if preferred |
+
+## Core Rigbox APIs Used by Clawd
+
+| Endpoint | Used for |
+| --- | --- |
+| `GET /workspaces`, `GET /workspaces/{id}` | Workspace list/detail state |
+| `POST /workspaces/{id}/start`, `POST /workspaces/{id}/stop` | Lifecycle controls |
+| `PUT /workspaces/{id}/resources` | Resize workspace RAM/vCPU/disk |
+| `GET /workspaces/{id}/metrics` | Runtime usage cards/graphs |
+| `GET /workspaces/{id}/logs` | Workspace-level logs |
+| `POST /quick-deploy` | One-shot template provisioning |
+| `POST /workspaces/{id}/reconcile-apps` | Ensure template apps exist |
+| `GET /apps`, `POST /apps`, `PATCH /apps/{id}`, `DELETE /apps/{id}` | App CRUD + rename |
+| `PUT /apps/{id}/visibility` | Public/private/privileged app access |
+| `GET /apps/{id}/health` | Live URL health validation |
+| `GET /apps/{id}/log-sources`, `GET /apps/{id}/logs`, `GET /apps/{id}/logs/stream` | App logs UI |
+| `GET /users/me/limits` | Plan limits and usage |
+| `GET /capacity` | Capacity checks before create flows |
+| `GET /api-keys`, `POST /api-keys`, `DELETE /api-keys/{id}` | Programmatic access management |
+| `GET /workspaces/{id}/tools`, `POST /workspaces/{id}/tools/{tool}/install` | Tool management |
+| `GET /workspaces/{id}/tasks` | Task sync and display |
+| `GET /setup-scripts`, `POST /setup-scripts` | Workspace initialization automation |
+| `GET /service-specs`, `POST /service-specs` | Service configuration templates |
+
+## AI Config APIs Used by Clawd
+
+These are the APIs that manage AI provider configuration:
+
+| Endpoint | Responsibility |
+| --- | --- |
+| `GET /workspaces/{id}/ai-config` | Read current AI provider configuration |
+| `PUT /workspaces/{id}/ai-config` | Update AI config (mode/provider/api_key/model) |
+| `POST /workspaces/{id}/env` | Generic env writes (legacy/fallback path) |
+| `GET /users/me/credits` | Managed AI credit balance |
+| `GET /users/me/ai-usage` | AI usage history |
+| `GET /users/me/ai-defaults` | Default AI provider settings |
+| `PUT /users/me/ai-defaults` | Update default AI settings |
+
+<Note>
+  Prefer `PUT /workspaces/{id}/ai-config` for AI provider changes. It is normalized and safer than raw env mutation.
+</Note>
+
+## Billing and Subscription APIs Used by Clawd UI
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /auth/create-checkout-session` | Start Stripe checkout |
+| `GET /auth/subscription-status` | Resolve active plan status |
+| `POST /auth/create-portal-session` | Open Stripe customer portal |
+| `POST /auth/switch-plan` | Plan switch workflow |
+
+If you build your own dashboard, you can replace these with your own billing backend while still using the same core Rigbox APIs.
+
+## Minimal Clawd-Like Integration Flow
+
+1. Call `POST /quick-deploy` with `template_id: "openclaw"`.
+2. Start and poll workspace state until running.
+3. Call `POST /workspaces/{id}/reconcile-apps`.
+4. Use `GET /apps/{id}/health` before surfacing app URLs as live.
+5. Save AI settings through `PUT /workspaces/{id}/ai-config`.
+6. Show plan/credit context with `GET /users/me/limits` and `GET /users/me/credits`.
+
+For runtime internals (AI proxy and credit enforcement pipeline), continue to [/clawd-runtime-services](/clawd-runtime-services).

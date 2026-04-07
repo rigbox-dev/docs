@@ -1,0 +1,53 @@
+---
+title: List Images
+api: GET /images
+description: List available VM images
+---
+
+# List Images
+
+Returns all available VM images that can be used when creating workspaces.
+
+<RequestExample>
+```bash cURL
+curl https://api.rigbox.dev/api/images \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "images": [
+    {
+      "name": "base",
+      "display_name": "Base",
+      "description": "Minimal Debian-based VM with development tools",
+      "default_ram_mb": 4096
+    },
+    {
+      "name": "openclaw",
+      "display_name": "OpenClaw",
+      "description": "AI agent sandbox with pre-installed OpenClaw gateway",
+      "default_ram_mb": 4096
+    },
+    {
+      "name": "dev",
+      "display_name": "Dev",
+      "description": "Full development environment with Rust, Go, Docker CLI, and build tools",
+      "default_ram_mb": 4096
+    }
+  ]
+}
+```
+</ResponseExample>
+
+<ResponseField name="images" type="array">
+  Array of available image objects
+  <Expandable title="Image Object">
+    <ResponseField name="name" type="string">Image identifier used in workspace creation (e.g., `base`, `openclaw`, `dev`)</ResponseField>
+    <ResponseField name="display_name" type="string">Human-readable image name</ResponseField>
+    <ResponseField name="description" type="string">Brief description of what the image includes</ResponseField>
+    <ResponseField name="default_ram_mb" type="integer">Default RAM allocation in MB when using this image</ResponseField>
+  </Expandable>
+</ResponseField>

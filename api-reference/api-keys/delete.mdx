@@ -1,0 +1,26 @@
+---
+title: Delete API Key
+api: DELETE /api-keys/{id}
+description: Revoke an API key
+---
+
+# Delete API Key
+
+Permanently revokes an API key. Any requests using this key will immediately fail.
+
+<ParamField path="id" type="string" required>API key UUID</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X DELETE https://api.rigbox.dev/api/api-keys/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "message": "API key deleted"
+}
+```
+</ResponseExample>
