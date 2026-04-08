@@ -1,4 +1,7 @@
 ---
 title: Delete Workspace
 openapi: DELETE /api/workspaces/{id}
+description: Permanently delete a workspace and all associated data.
 ---
+
+<Warning>This is irreversible. All apps, snapshots, and data in the workspace will be destroyed.</Warning>

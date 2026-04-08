@@ -1,77 +1,87 @@
 ---
 title: Introduction
-description: Build, deploy, and manage Firecracker micro-VMs with clear API boundaries
+description: Rigbox is a platform for running code in isolated Firecracker micro-VMs with full API control over workspaces, apps, and AI configuration.
 ---
 
-# Welcome to Rigbox
+# Rigbox
 
-Rigbox provides secure, isolated Firecracker micro-VM workspaces for running AI agents, web services, and development environments. Each workspace is a full Linux VM with SSH access, app routing, snapshots, tools, and live metrics.
+Rigbox is an open platform for running untrusted code in secure, isolated [Firecracker](https://firecracker-microvm.github.io/) micro-VMs. Each workspace is a full Linux VM with SSH access, app routing, snapshots, and live metrics — provisioned and managed entirely through the API.
 
-## What you can do
+<Tip>
+  New to Rigbox? Start with the [Quickstart](/quickstart) to deploy your first workspace in under a minute.
+</Tip>
+
+## Key capabilities
 
 <CardGroup cols={2}>
-  <Card title="Create Workspaces" icon="server" href="/api-reference/workspaces/create">
-    Spin up isolated Firecracker VMs with configurable RAM, disk, and vCPUs
+  <Card title="Workspaces" icon="server" href="/api-reference/workspaces/create">
+    Provision isolated Firecracker VMs with configurable CPU, memory, and disk. Start, stop, snapshot, and delete through the API.
   </Card>
-  <Card title="Expose Apps" icon="globe" href="/api-reference/apps/create">
-    Map ports from your workspace to public subdomains on rigbox.dev
-  </Card>
-  <Card title="Manage Snapshots" icon="camera" href="/api-reference/snapshots/create">
-    Save and restore workspace state instantly
-  </Card>
-  <Card title="Quick Deploy" icon="rocket" href="/api-reference/templates/quick-deploy">
-    Deploy pre-configured templates in one call
+  <Card title="Apps & Routing" icon="globe" href="/api-reference/apps/create">
+    Expose ports from inside your workspace as public subdomains on `rigbox.dev`. Control visibility and monitor health.
   </Card>
   <Card title="AI Configuration" icon="sparkles" href="/api-reference/ai/get-workspace-ai-config">
-    Configure managed or BYOK AI providers per workspace
+    Run AI workloads with managed API keys or bring your own. Credit tracking, provider routing, and usage analytics built in.
   </Card>
-  <Card title="Tools" icon="wrench" href="/api-reference/tools/list">
-    Install and manage development tools in your workspaces
+  <Card title="Quick Deploy" icon="rocket" href="/api-reference/templates/quick-deploy">
+    Go from zero to a running workspace in one API call using pre-configured templates.
+  </Card>
+  <Card title="Tools & Automation" icon="wrench" href="/api-reference/tools/list">
+    Install development tools into workspaces. Define setup scripts and service specs to automate initialization.
+  </Card>
+  <Card title="Snapshots" icon="camera" href="/api-reference/snapshots/create">
+    Capture and restore full workspace state. Useful for checkpointing long-running work or creating reproducible environments.
   </Card>
 </CardGroup>
 
-## API Surface at a Glance
+## Architecture
 
-| API Surface | Purpose | Start Here |
-| --- | --- | --- |
-| Core Rigbox APIs | Provision workspaces, map apps, snapshots, logs, metrics, tools, tasks | [/quickstart](/quickstart) |
-| AI & Config APIs | AI provider settings, credits, setup scripts, service specs | [/api-reference/ai/get-workspace-ai-config](/api-reference/ai/get-workspace-ai-config) |
-| Access Control APIs | RBAC bindings, throttle profiles, role presets | [/api-reference/access-control/list-bindings](/api-reference/access-control/list-bindings) |
-| Sandbox Integration | Workspace lifecycle, app management, log streaming, terminal | [/sandbox-api-surface](/sandbox-api-surface) |
-| Clawd Integration | OpenClaw bot settings, gateway token usage, plan/credit UX | [/clawd-api-surface](/clawd-api-surface) |
-| Clawd Runtime Services | Managed AI proxy, credit enforcement, config injection | [/clawd-runtime-services](/clawd-runtime-services) |
+Rigbox uses a two-zone security model:
+
+- **Control Plane** — holds agent runtimes, API keys, and user state. Runs the API gateway, auth service, and admin portal.
+- **Data Plane** — runs untrusted generated code in Firecracker VMs with no access to platform secrets.
+
+All communication between zones goes through authenticated internal APIs over a Tailscale mesh.
+
+## Integration guides
+
+Building on top of Rigbox? These guides map exactly which API endpoints power each frontend:
+
+<CardGroup cols={3}>
+  <Card title="Sandbox" icon="terminal" href="/sandbox-api-surface">
+    How `sandbox.rigbox.dev` uses the API for workspace lifecycle, terminal access, and log streaming
+  </Card>
+  <Card title="Clawd" icon="message-square" href="/clawd-api-surface">
+    How `clawd.rigbox.dev` uses the API for AI bot deployment, billing, and managed proxy
+  </Card>
+  <Card title="Clawd Runtime" icon="cpu" href="/clawd-runtime-services">
+    Internal service contracts for the managed AI proxy, credit enforcement, and config injection
+  </Card>
+</CardGroup>
 
 ## Base URL
-
-All API requests are made to:
 
 ```bash
 https://api.rigbox.dev/api
 ```
 
-## Authentication
+All endpoints are relative to this base. Authentication is required for most endpoints — see [Authentication](/authentication) for details.
 
-Most endpoints require authentication via API key or Bearer token. Public endpoints include `/capacity` and `/templates`.
+## Response format
 
-```bash
-curl https://api.rigbox.dev/api/workspaces \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-<Note>
-  Get your API key from the [Rigbox Dashboard](https://rigbox.dev) under **Settings → API Keys**.
-</Note>
-
-## Rate Limits
-
-The API is rate-limited per user. If you receive `429 Too Many Requests`, retry with backoff.
-
-## Response Format
-
-All responses are JSON. Successful responses return `2xx` status codes. Errors return appropriate `4xx`/`5xx` codes with a message:
+All responses are JSON. Errors include a `message` field:
 
 ```json
 {
   "message": "Workspace not found"
 }
 ```
+
+| Status | Meaning |
+| --- | --- |
+| `2xx` | Success |
+| `401` | Missing or invalid authentication |
+| `403` | Insufficient permissions |
+| `404` | Resource not found |
+| `429` | Rate limited — retry with exponential backoff |
+| `5xx` | Server error |

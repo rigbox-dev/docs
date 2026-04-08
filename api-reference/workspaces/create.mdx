@@ -1,4 +1,7 @@
 ---
 title: Create Workspace
 openapi: POST /api/workspaces
+description: Provision a new Firecracker micro-VM workspace with custom resources.
 ---
+
+The workspace starts in `provisioned` status. Call [Start Workspace](/api-reference/workspaces/start) to boot it.

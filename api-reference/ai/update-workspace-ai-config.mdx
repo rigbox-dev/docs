@@ -1,4 +1,7 @@
 ---
 title: Update Workspace AI Config
 openapi: PUT /api/workspaces/{id}/ai-config
+description: Update AI provider settings for a workspace.
 ---
+
+Accepts `mode`, `provider`, `api_key`, and `model`. Omitted fields keep their current value. Set a field to `null` to clear it.

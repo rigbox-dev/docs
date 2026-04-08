@@ -1,4 +1,7 @@
 ---
 title: Stream App Logs
 openapi: GET /api/apps/{id}/logs/stream
+description: Stream app logs in real-time via Server-Sent Events.
 ---
+
+Set `Accept: text/event-stream` and consume the response as an SSE stream. Supports `lines` and `interval_ms` query parameters.

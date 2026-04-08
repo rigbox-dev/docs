@@ -1,17 +1,15 @@
 ---
 title: Authentication
-description: Authentication patterns for API clients, dashboards, and Clawd-like apps
+description: How to authenticate with the Rigbox API using API keys, JWTs, or Clerk session tokens.
 ---
 
 # Authentication
 
-Rigbox APIs support multiple authentication methods. Use API keys for server-to-server traffic and user bearer tokens for browser sessions.
+Every request to the Rigbox API (except [public endpoints](#public-endpoints)) must include an `Authorization` header with a valid credential.
 
-## API Keys
+## API keys
 
-API keys are the simplest option for scripts, CI, agents, and backend services. Generate one from the [dashboard](https://rigbox.dev) or via the API.
-
-Include your API key in the `Authorization` header:
+The simplest way to authenticate. Create one from the [dashboard](https://rigbox.dev) under **Settings → API Keys**, or via the [Create API Key](/api-reference/api-keys/create) endpoint.
 
 ```bash
 curl https://api.rigbox.dev/api/workspaces \
@@ -19,59 +17,58 @@ curl https://api.rigbox.dev/api/workspaces \
 ```
 
 <Warning>
-  API keys grant full access to your account. Keep them secret and never commit them to version control.
+  API keys grant full access to your account. Store them in environment variables or a secrets manager — never commit them to source control.
 </Warning>
 
-### Recommended API Key Pattern (Server-Side)
-
-Do not expose personal Rigbox API keys in browser JavaScript. Keep them in your backend and call Rigbox from there.
+All API keys use the `rb_` prefix:
 
 ```bash
-export RIGBOX_API_KEY="rb_your_api_key_here"
+export RIGBOX_API_KEY="rb_..."
 
 curl https://api.rigbox.dev/api/workspaces \
   -H "Authorization: Bearer ${RIGBOX_API_KEY}"
 ```
 
-### Key Prefixes
+## Bearer tokens (JWT)
 
-| Prefix | Type | Description |
-|--------|------|-------------|
-| `rb_` | Personal API Key | Full account access, created via dashboard or API |
-
-## Bearer Token (JWT)
-
-If you signed in through the dashboard, you can call APIs with your session JWT:
+If you authenticate through the dashboard login flow, you receive a JWT that can be used directly:
 
 ```bash
 curl https://api.rigbox.dev/api/workspaces \
   -H "Authorization: Bearer eyJhbG..."
 ```
 
-JWTs expire after a set period. Use the login endpoint to get a fresh token.
+JWTs expire after a set period. The dashboard handles refresh automatically.
 
-## Clerk Session Token
+## Clerk session tokens
 
-If using the Clerk-powered dashboard (`rigbox.dev` or `clawd.rigbox.dev`), the `__session` cookie or Clerk JWT is automatically used for authenticated requests.
+The Rigbox frontends (`rigbox.dev`, `clawd.rigbox.dev`, `sandbox.rigbox.dev`) use [Clerk](https://clerk.com) for authentication. The `__session` cookie or Clerk-issued JWT is sent automatically — no extra setup needed for first-party UIs.
 
-## Auth Choice by App Type
+## Choosing an auth method
 
-| Client Type | Recommended Auth | Why |
+| Client type | Recommended | Why |
 | --- | --- | --- |
-| Backend service / cron / worker | API key | Stable and easy to rotate |
-| First-party dashboard on Rigbox domains | Clerk session/JWT | User-scoped access |
-| Third-party web app integrating Rigbox | Your backend + API key or user token relay | Avoid key leakage in browser |
+| Backend service, CI, agent | API key | Stable, easy to rotate, no expiry |
+| First-party dashboard | Clerk session | User-scoped, automatic refresh |
+| Third-party web app | Your backend + API key | Keep keys server-side, proxy requests |
 
-## Access Control
+## Public endpoints
 
-Rigbox supports fine-grained RBAC via the [Access Control API](/api-reference/access-control/list-bindings). This feature is currently gated behind a feature flag and available to select accounts.
+These endpoints do not require authentication:
 
-## Error Responses
+- `GET /capacity` — check platform availability
+- `GET /templates` — list available workspace templates
+
+## Access control
+
+Rigbox supports fine-grained RBAC for multi-user accounts via the [Access Control API](/api-reference/access-control/list-bindings). This feature is currently in preview and available to select accounts.
+
+## Error responses
 
 | Status | Description |
-|--------|-------------|
-| `401 Unauthorized` | Missing or invalid authentication |
-| `403 Forbidden` | Valid auth but insufficient permissions (e.g., accessing another user's resource) |
+| --- | --- |
+| `401 Unauthorized` | Missing, expired, or invalid credential |
+| `403 Forbidden` | Valid auth but insufficient permissions for the requested resource |
 
 ```json
 {

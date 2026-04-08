@@ -1,4 +1,7 @@
 ---
 title: Restore Workspace Snapshot
 openapi: POST /api/workspaces/{id}/snapshots/{snapshot_id}/restore
+description: Restore a workspace to a previous snapshot state.
 ---
+
+This overwrites the current workspace state. The workspace must be stopped.

@@ -1,4 +1,7 @@
 ---
 title: Check App Health
 openapi: GET /api/apps/{id}/health
+description: Check if an app is live and its port is reachable.
 ---
+
+Use this before surfacing an app URL in your UI to confirm the service is actually responding.

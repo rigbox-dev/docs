@@ -1,4 +1,7 @@
 ---
 title: Install Tool
 openapi: POST /api/workspaces/{id}/tools/{tool}/install
+description: Install a tool into a workspace. Returns a job ID for tracking progress.
 ---
+
+Installation runs asynchronously. Use [Get Install Status](/api-reference/tools/install-status) to poll for completion.
