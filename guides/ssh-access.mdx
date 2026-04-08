@@ -5,11 +5,7 @@ description: Connect to your workspaces via SSH for terminal access, file transf
 
 # SSH Access
 
-Rigbox provides SSH access to your workspaces through a dedicated SSH gateway on port 2200. You can open a terminal session, transfer files, and even access an interactive TUI dashboard — all over SSH.
-
-<Warning>
-  Rigbox uses port **2200** for SSH, not the standard port 22. Make sure to specify `-p 2200` in all SSH commands.
-</Warning>
+Every Rigbox workspace is a full Linux VM with SSH access. Connect from any terminal to get a shell, transfer files, or use the interactive TUI dashboard.
 
 ## Prerequisites
 
@@ -33,8 +29,6 @@ To connect via SSH, you first need to register your public key with Rigbox.
 
 ### Via the API
 
-Send your public key to the SSH keys endpoint:
-
 <CodeGroup>
 
 ```bash cURL
@@ -45,23 +39,6 @@ curl -X POST https://api.rigbox.dev/api/ssh-keys \
     "name": "laptop",
     "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your-email@example.com"
   }'
-```
-
-```javascript JavaScript
-const response = await fetch("https://api.rigbox.dev/api/ssh-keys", {
-  method: "POST",
-  headers: {
-    "Authorization": "Bearer YOUR_API_KEY",
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    name: "laptop",
-    public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your-email@example.com",
-  }),
-});
-
-const key = await response.json();
-console.log("Registered key:", key.id);
 ```
 
 ```python Python
@@ -100,23 +77,13 @@ This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it au
 
 ## Sync Keys to a Workspace
 
-When you create a workspace, your registered SSH keys are typically synced automatically. However, if you add a new key while a workspace is already running, you need to sync it manually.
+When you create a workspace, your registered SSH keys are typically synced automatically. If you add a new key while a workspace is already running, sync it manually:
 
 <CodeGroup>
 
 ```bash cURL
 curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/ssh-keys/sync \
   -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-```javascript JavaScript
-await fetch(
-  `https://api.rigbox.dev/api/workspaces/${workspaceId}/ssh-keys/sync`,
-  {
-    method: "POST",
-    headers: { "Authorization": "Bearer YOUR_API_KEY" },
-  }
-);
 ```
 
 ```python Python
@@ -138,20 +105,30 @@ This copies all your registered public keys into the workspace VM's `~/.ssh/auth
 
 ## Connect to a Workspace
 
-Once your key is registered and synced, connect as the `developer` user:
+When you create a workspace, Rigbox gives you an SSH command in this format:
 
 ```bash
-ssh developer@rigbox.dev -p 2200
+ssh {workspace-name}-{workspace-id}@eu-west-1.rigbox.dev
 ```
 
-The SSH gateway identifies you by your key and routes the connection to your workspace. If you have multiple workspaces, the gateway connects you to the most recently active one.
+For example, if your workspace is named `my-project` with ID `ws-ctbxi8lb`:
+
+```bash
+ssh my-project-ctbxi8lb@eu-west-1.rigbox.dev
+```
+
+The SSH server identifies you by your registered key and routes the connection directly to your workspace VM.
+
+<Tip>
+  The SSH command is shown in the dashboard when you create a workspace. You can also construct it from the workspace name and ID (strip the `ws-` prefix from the ID).
+</Tip>
 
 ### Specify an identity file
 
 If your key is not in the default location, specify it explicitly:
 
 ```bash
-ssh -i ~/.ssh/my_rigbox_key developer@rigbox.dev -p 2200
+ssh -i ~/.ssh/my_rigbox_key my-project-ctbxi8lb@eu-west-1.rigbox.dev
 ```
 
 ### SSH config shortcut
@@ -159,27 +136,26 @@ ssh -i ~/.ssh/my_rigbox_key developer@rigbox.dev -p 2200
 Add this to your `~/.ssh/config` for easier access:
 
 ```ssh-config
-Host rigbox
-  HostName rigbox.dev
-  User developer
-  Port 2200
+Host my-project
+  HostName eu-west-1.rigbox.dev
+  User my-project-ctbxi8lb
   IdentityFile ~/.ssh/id_ed25519
 ```
 
 Then connect with:
 
 ```bash
-ssh rigbox
+ssh my-project
 ```
 
 ---
 
 ## TUI Dashboard
 
-Rigbox includes an interactive terminal dashboard accessible over SSH. Connect as the `rig` user instead of `developer`:
+Rigbox includes an interactive terminal dashboard accessible over SSH. Connect as the `rig` user:
 
 ```bash
-ssh rig@rigbox.dev -p 2200
+ssh rig@eu-west-1.rigbox.dev
 ```
 
 The TUI dashboard shows:
@@ -199,24 +175,24 @@ Navigate with arrow keys, press Enter to select, and `q` to quit.
 
 ## File Transfer
 
-Use `scp` to transfer files between your local machine and a workspace. Remember to specify port 2200 with the `-P` flag (uppercase for `scp`).
+Use `scp` to transfer files between your local machine and a workspace.
 
 ### Upload a file
 
 ```bash
-scp -P 2200 ./local-file.txt developer@rigbox.dev:/home/developer/
+scp ./local-file.txt my-project-ctbxi8lb@eu-west-1.rigbox.dev:/home/developer/
 ```
 
 ### Download a file
 
 ```bash
-scp -P 2200 developer@rigbox.dev:/home/developer/output.txt ./
+scp my-project-ctbxi8lb@eu-west-1.rigbox.dev:/home/developer/output.txt ./
 ```
 
 ### Upload a directory
 
 ```bash
-scp -P 2200 -r ./my-project developer@rigbox.dev:/home/developer/
+scp -r ./my-project my-project-ctbxi8lb@eu-west-1.rigbox.dev:/home/developer/
 ```
 
 ### Using rsync
@@ -224,12 +200,8 @@ scp -P 2200 -r ./my-project developer@rigbox.dev:/home/developer/
 For larger transfers or syncing directories, `rsync` is more efficient:
 
 ```bash
-rsync -avz -e "ssh -p 2200" ./my-project/ developer@rigbox.dev:/home/developer/my-project/
+rsync -avz ./my-project/ my-project-ctbxi8lb@eu-west-1.rigbox.dev:/home/developer/my-project/
 ```
-
-<Warning>
-  The SSH gateway routes based on your key. If you have multiple workspaces, make sure you are connected to the correct one before transferring files.
-</Warning>
 
 ---
 
@@ -250,25 +222,6 @@ rig ssh-key ls
 
 </CodeGroup>
 
-Response:
-
-```json
-[
-  {
-    "id": "key_abc123",
-    "name": "laptop",
-    "fingerprint": "SHA256:...",
-    "created_at": "2026-03-15T10:30:00Z"
-  },
-  {
-    "id": "key_def456",
-    "name": "desktop",
-    "fingerprint": "SHA256:...",
-    "created_at": "2026-04-01T14:20:00Z"
-  }
-]
-```
-
 ### List keys synced to a workspace
 
 ```bash
@@ -276,7 +229,7 @@ curl https://api.rigbox.dev/api/workspaces/{workspace_id}/ssh-keys \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-This returns the keys currently in the workspace's `authorized_keys` file, which may differ from your registered keys if you haven't synced recently.
+This returns the keys currently in the workspace's `authorized_keys` file.
 
 ### Remove a key
 
@@ -294,7 +247,7 @@ rig ssh-key rm laptop
 </CodeGroup>
 
 <Warning>
-  Removing a key from the API does not immediately remove it from running workspaces. The key will be removed the next time the workspace restarts or you manually trigger a sync. To revoke access immediately, sync keys after deletion.
+  Removing a key from the API does not immediately remove it from running workspaces. The key will be removed the next time the workspace restarts or you manually trigger a sync.
 </Warning>
 
 ---
@@ -305,9 +258,9 @@ rig ssh-key rm laptop
 
 If you get `Connection refused`, verify:
 
-1. You are using port 2200: `ssh -p 2200 developer@rigbox.dev`
-2. Your workspace is running (check with `GET /api/workspaces/{id}` or `rig ls`)
-3. Your SSH key is registered and synced
+1. Your workspace is running (check with `GET /api/workspaces/{id}` or `rig ls`)
+2. Your SSH key is registered and synced
+3. You're using the correct username format: `{workspace-name}-{id}@eu-west-1.rigbox.dev`
 
 ### Permission denied
 
@@ -315,11 +268,11 @@ If you get `Permission denied (publickey)`:
 
 1. Check that your key is registered: `GET /api/ssh-keys`
 2. Sync keys to the workspace: `POST /api/workspaces/{id}/ssh-keys/sync`
-3. Verify you are using the correct identity file: `ssh -v -p 2200 developer@rigbox.dev`
+3. Verify you are using the correct identity file: `ssh -v my-project-ctbxi8lb@eu-west-1.rigbox.dev`
 
 ### Slow connection
 
-The SSH gateway adds minimal latency. If connections feel slow:
+If connections feel slow:
 
 1. Check your network connection
 2. Try connecting with `-o ServerAliveInterval=60` to prevent timeouts
@@ -329,10 +282,8 @@ The SSH gateway adds minimal latency. If connections feel slow:
 
 ## API Reference
 
-For complete details on the SSH key endpoints, see the API reference:
-
-- [POST /ssh-keys](/api-reference/ssh-keys/register-ssh-key) — Register a new SSH key
-- [GET /ssh-keys](/api-reference/ssh-keys/list-ssh-keys) — List registered SSH keys
-- [DELETE /ssh-keys/{id}](/api-reference/ssh-keys/remove-ssh-key) — Remove an SSH key
-- [POST /workspaces/{id}/ssh-keys/sync](/api-reference/workspaces/sync-ssh-keys) — Sync keys to a workspace
-- [GET /workspaces/{id}/ssh-keys](/api-reference/workspaces/list-workspace-ssh-keys) — List keys on a workspace
+- [Add SSH Key](/api-reference/ssh-keys/add) — Register a new SSH key
+- [List SSH Keys](/api-reference/ssh-keys/list) — List registered SSH keys
+- [Delete SSH Key](/api-reference/ssh-keys/delete) — Remove an SSH key
+- [Sync Workspace SSH Keys](/api-reference/ssh-keys/sync-workspace) — Sync keys to a workspace
+- [List Workspace SSH Keys](/api-reference/ssh-keys/list-workspace) — List keys on a workspace
