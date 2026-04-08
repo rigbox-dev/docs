@@ -108,10 +108,10 @@ This copies all your registered public keys into the workspace VM's `~/.ssh/auth
 When you create a workspace, Rigbox gives you an SSH command in this format:
 
 ```bash
-ssh {workspace-name}-{workspace-id}@eu-west-1.rigbox.dev
+ssh {workspace-name}-{workspace-id}@{region}.rigbox.dev
 ```
 
-For example, if your workspace is named `my-project` with ID `ws-ctbxi8lb`:
+For example, if your workspace is named `my-project` with ID `ws-ctbxi8lb` in the `eu-west-1` region:
 
 ```bash
 ssh my-project-ctbxi8lb@eu-west-1.rigbox.dev
@@ -120,8 +120,23 @@ ssh my-project-ctbxi8lb@eu-west-1.rigbox.dev
 The SSH server identifies you by your registered key and routes the connection directly to your workspace VM.
 
 <Tip>
-  The SSH command is shown in the dashboard when you create a workspace. You can also construct it from the workspace name and ID (strip the `ws-` prefix from the ID).
+  The SSH command is shown in the dashboard when you create a workspace. You can also construct it from the workspace name, ID (strip the `ws-` prefix), and region.
 </Tip>
+
+### Region-direct vs gateway routing
+
+There are two ways to connect:
+
+| Method | Example | Latency |
+| --- | --- | --- |
+| **Region-direct** | `ssh user@eu-west-1.rigbox.dev` | Lowest — connects directly to the compute node in your workspace's region |
+| **Gateway** | `ssh user@rigbox.dev` | Higher — routes through the central gateway, which forwards to the correct region |
+
+Use the region-specific hostname (e.g., `eu-west-1.rigbox.dev`) for the best experience. The gateway hostname (`rigbox.dev`) works from anywhere but adds latency proportional to the distance between the gateway and your workspace's region.
+
+<Note>
+  The region is part of the SSH command shown in the dashboard. As Rigbox expands to more regions, your workspace will always include the correct region hostname.
+</Note>
 
 ### Specify an identity file
 
@@ -156,6 +171,12 @@ Rigbox includes an interactive terminal dashboard accessible over SSH. Connect a
 
 ```bash
 ssh rig@eu-west-1.rigbox.dev
+```
+
+You can also use the gateway hostname:
+
+```bash
+ssh rig@rigbox.dev
 ```
 
 The TUI dashboard shows:
@@ -260,7 +281,7 @@ If you get `Connection refused`, verify:
 
 1. Your workspace is running (check with `GET /api/workspaces/{id}` or `rig ls`)
 2. Your SSH key is registered and synced
-3. You're using the correct username format: `{workspace-name}-{id}@eu-west-1.rigbox.dev`
+3. You're using the correct username format: `{workspace-name}-{id}@{region}.rigbox.dev`
 
 ### Permission denied
 
@@ -268,7 +289,7 @@ If you get `Permission denied (publickey)`:
 
 1. Check that your key is registered: `GET /api/ssh-keys`
 2. Sync keys to the workspace: `POST /api/workspaces/{id}/ssh-keys/sync`
-3. Verify you are using the correct identity file: `ssh -v my-project-ctbxi8lb@eu-west-1.rigbox.dev`
+3. Verify you are using the correct identity file: `ssh -v my-project-ctbxi8lb@{region}.rigbox.dev`
 
 ### Slow connection
 
