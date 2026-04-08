@@ -13,8 +13,8 @@
     "dark": "#0f0f11"
   },
   "openapi": [
-    "https://api.rigbox.dev/api-docs/openapi.json",
-    "https://api.rigbox.dev/api-docs/auth/openapi.json"
+    "openapi/rigbox-api.json",
+    "openapi/auth-api.json"
   ],
   "navigation": {
     "tabs": [

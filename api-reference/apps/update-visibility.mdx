@@ -1,7 +1,11 @@
 ---
 title: Update App Visibility
-openapi: PUT /api/apps/{id}/visibility
-description: Set an app to public, private, or privileged access.
+api: PUT /apps/{id}/visibility
+description: "Set an app to public, private, or privileged access."
 ---
 
 Public apps are accessible to anyone with the URL. Private apps require authentication. Privileged apps require a workspace API key.
+
+<ParamField body="visibility" type="string" required>
+  One of `public`, `private`, or `privileged`
+</ParamField>
