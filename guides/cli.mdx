@@ -26,17 +26,17 @@ Download the latest release for your platform:
 <CodeGroup>
 
 ```bash macOS (Apple Silicon)
-curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rig-darwin-arm64 -o /usr/local/bin/rig
+curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rigbox-darwin-arm64 -o /usr/local/bin/rig
 chmod +x /usr/local/bin/rig
 ```
 
 ```bash macOS (Intel)
-curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rig-darwin-amd64 -o /usr/local/bin/rig
+curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rigbox-darwin-amd64 -o /usr/local/bin/rig
 chmod +x /usr/local/bin/rig
 ```
 
 ```bash Linux (x86_64)
-curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rig-linux-amd64 -o /usr/local/bin/rig
+curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rigbox-linux-amd64 -o /usr/local/bin/rig
 chmod +x /usr/local/bin/rig
 ```
 
@@ -299,8 +299,8 @@ Export these variables in your shell:
 
   export OPENAI_API_KEY=rig_proxy_...
   export ANTHROPIC_API_KEY=rig_proxy_...
-  export OPENAI_BASE_URL=http://172.16.0.1:9090/openai
-  export ANTHROPIC_BASE_URL=http://172.16.0.1:9090/anthropic
+  export OPENAI_BASE_URL=<proxy_url>/openai
+  export ANTHROPIC_BASE_URL=<proxy_url>/anthropic
 
 Or run: eval $(rig proxy on --eval)
 ```
@@ -322,7 +322,7 @@ rig proxy off
 ```
 
 <Note>
-  The AI proxy is only available from inside a workspace VM. It routes requests through the Rigbox proxy service at `172.16.0.1:9090`, which handles credit tracking and key injection.
+  The AI proxy is only available from inside a workspace VM. It routes requests through an internal proxy service that handles credit tracking and key injection.
 </Note>
 
 ### Check credit balance
@@ -355,8 +355,8 @@ All commands behave identically regardless of where you run them. Inside a works
 
 The CLI wraps the Rigbox REST API. For programmatic access, see:
 
-- [Workspaces API](/api-reference/workspaces/list-workspaces) — Create, manage, and monitor workspaces
-- [Apps API](/api-reference/apps/list-apps) — Manage app routes and services
-- [SSH Keys API](/api-reference/ssh-keys/list-ssh-keys) — Register and manage SSH keys
-- [Templates API](/api-reference/templates/list-templates) — Browse available templates
-- [Users API](/api-reference/users/get-current-user) — Account info, credits, and limits
+- [Workspaces API](/api-reference/workspaces/list) — Create, manage, and monitor workspaces
+- [Apps API](/api-reference/apps/list) — Manage app routes and services
+- [SSH Keys API](/api-reference/ssh-keys/list) — Register and manage SSH keys
+- [Templates API](/api-reference/templates/list) — Browse available templates
+- [AI & Credits API](/api-reference/ai/get-credits) — Credits, usage, and AI configuration
