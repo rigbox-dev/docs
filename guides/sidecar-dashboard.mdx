@@ -1,0 +1,200 @@
+---
+title: Sidecar Dashboard
+description: Monitor tasks, git status, files, agent sessions, and Rigbox workspace state from a terminal TUI.
+---
+
+# Sidecar Dashboard
+
+Sidecar is a multi-pane TUI (Terminal User Interface) that runs alongside AI coding agents. It gives you real-time visibility into tasks, git status, files, agent conversations, and Rigbox workspace metrics — all without leaving the terminal.
+
+<Note>
+Sidecar is pre-installed in the `dev` image. For other images, install it via a [setup script](/guides/setup-scripts). See [Images & Templates](/guides/images-and-templates) for details.
+</Note>
+
+## Launch
+
+```bash
+sidecar
+```
+
+Sidecar opens a full-terminal TUI with tabbed panels. Use **Tab** / **Shift+Tab** to switch between panels.
+
+<Tip>
+Run sidecar in a tmux pane alongside your AI agent. This lets you monitor what the agent is doing in real-time without interrupting it.
+
+```bash
+# Split terminal horizontally
+tmux split-window -h 'sidecar'
+```
+</Tip>
+
+## Panels
+
+Sidecar organizes information into tabbed panels. Each panel focuses on a different aspect of your development workflow.
+
+### TD Monitor
+
+Integrates with [td](/guides/td-task-manager) to show your task management state:
+
+- **Focused task** — the task you're currently working on (`td start`)
+- **Task list** — all tasks with status indicators and priority
+- **Activity log** — recent logs, handoffs, and status changes with session context
+- **Review queue** — tasks awaiting review
+
+This panel reads directly from td's local SQLite database (`.todos/db.sqlite`), so it updates in real-time as you or your agent runs td commands.
+
+### Git Status
+
+A split-pane git interface for monitoring changes:
+
+- **Staged files** — ready to commit
+- **Modified files** — changed but not staged
+- **Untracked files** — new files not yet tracked
+- **Inline diffs** — see what changed without leaving sidecar
+
+| Key | Action |
+|-----|--------|
+| `s` | Stage selected file |
+| `u` | Unstage selected file |
+| `d` | View diff for selected file |
+| `v` | Toggle side-by-side diff view |
+
+Also provides commit history browsing for reviewing recent changes.
+
+### File Browser
+
+Navigate your project structure with a collapsible directory tree:
+
+- Expandable folder navigation
+- Code preview with syntax highlighting for the selected file
+- Auto-refreshes when files change on disk
+
+Useful for quickly checking what files an agent has created or modified.
+
+### Conversations
+
+Unified view of AI agent session history across supported tools:
+
+- **Claude Code** sessions
+- **Codex CLI** sessions
+- **Gemini CLI** sessions
+- **GitHub Copilot** sessions
+- **Other agents** detected in the workspace
+
+Each session shows:
+- Start time and duration
+- Token usage (input/output)
+- Session status
+
+| Key | Action |
+|-----|--------|
+| `/` | Search sessions |
+| `Enter` | View session details |
+
+### Workspaces
+
+Manage parallel development branches:
+
+- Create and delete workspaces (git branches as sibling directories)
+- Link [td tasks](/guides/td-task-manager) to workspaces
+- Launch coding agents directly from the panel
+
+| Key | Action |
+|-----|--------|
+| `m` | Merge workflow: commit → push → create PR → cleanup |
+
+### Rigbox Panel
+
+<Note>
+This panel only appears when sidecar is running inside a Rigbox workspace. It detects the environment automatically.
+</Note>
+
+The Rigbox panel shows five sections of workspace-specific information:
+
+**Workspace**
+- Workspace name and ID
+- Running/stopped status with colored indicator
+- Last task sync time and status
+
+**Tasks**
+- Aggregated task counts by status: Open, In Progress, In Review, Closed
+- Sourced from td's local database
+
+**Resources**
+- CPU usage (%) with warning thresholds at 50% and 80%
+- RAM usage (MB used / total)
+- Disk usage (GB used / total)
+
+**Apps**
+- List of running apps with port numbers
+- Status indicators (running/stopped)
+- Public URLs when available
+
+**AI Credits**
+- Credit balance with progress bar
+- 7-day usage statistics (credits consumed, request count)
+- Active AI agents with PID and status
+- Credit mode (free/pro)
+
+The Rigbox panel polls the platform API every 10 seconds for fresh metrics. Press `r` to refresh manually.
+
+## Global Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `Tab` / `Shift+Tab` | Switch between panels |
+| `r` | Refresh current panel data |
+| `/` | Search within the current panel |
+| `q` | Quit sidecar |
+| `?` | Show help |
+
+## How Sidecar Reads Data
+
+Sidecar pulls from multiple sources to build its dashboard:
+
+| Data | Source | Update frequency |
+|------|--------|-----------------|
+| Tasks | `.todos/db.sqlite` (td's local database) | Real-time |
+| Task sync status | `.todos/.rigbox-sync` | Real-time |
+| Git status | Local git repository | On file change |
+| File tree | Local filesystem | On file change |
+| Agent sessions | Agent log files in workspace | On change |
+| Workspace metrics | Rigbox API (`GET /workspaces/{id}/metrics`) | Every 10s |
+| App status | Rigbox API (`GET /workspaces/{id}`) | Every 10s |
+| AI credits | Rigbox API (`GET /users/me/credits`) | Every 10s |
+
+## Typical Setup
+
+The most effective way to use sidecar is in a split terminal — one pane for your agent, one for sidecar:
+
+```bash
+# Option 1: tmux (recommended)
+tmux new-session -d -s dev 'sidecar'
+tmux split-window -h
+tmux attach -t dev
+
+# Option 2: run sidecar in background, switch with Ctrl+B then arrow keys
+```
+
+With this setup, you can:
+- Watch the agent create tasks and log progress in the TD Monitor panel
+- See files change in real-time in the Git Status panel
+- Monitor resource usage to know if the workspace needs more RAM/CPU
+- Check credit balance to know when to switch to [BYOK mode](/guides/byok)
+
+## Configuration
+
+Sidecar uses a plugin-based architecture. Plugins are loaded automatically based on what's available in the workspace:
+
+- **td** plugin loads if `.todos/` directory exists
+- **git** plugin loads if the directory is a git repository
+- **rigbox** plugin loads if `/etc/rigbox/workspace.json` exists (automatic in Rigbox VMs)
+- **conversations** plugin loads if agent session files are detected
+
+No manual configuration is needed — sidecar adapts to whatever tools are present.
+
+## Next Steps
+
+- [Task Management with td](/guides/td-task-manager) — the task CLI that powers sidecar's TD Monitor
+- [AI Coding Tools](/guides/ai-coding-tools) — use Claude Code, Codex, and others alongside sidecar
+- [Images & Templates](/guides/images-and-templates) — choose the `dev` image for sidecar pre-installed
