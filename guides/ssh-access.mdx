@@ -5,7 +5,7 @@ description: Connect to your workspaces via SSH for terminal access, file transf
 
 # SSH Access
 
-Every Rigbox workspace is a full Linux VM with SSH access. Connect from any terminal to get a shell, transfer files, or use the interactive TUI dashboard.
+Every Rigbox workspace is a full Linux VM with SSH access. Connect from any terminal to get a shell or transfer files.
 
 ## Prerequisites
 
@@ -162,35 +162,6 @@ Then connect with:
 ```bash
 ssh my-project
 ```
-
----
-
-## TUI Dashboard
-
-Rigbox includes an interactive terminal dashboard accessible over SSH. Connect as the `rig` user:
-
-```bash
-ssh rig@eu-west-1.rigbox.dev
-```
-
-You can also use the gateway hostname:
-
-```bash
-ssh rig@rigbox.dev
-```
-
-The TUI dashboard shows:
-
-- **Workspace list** — all your workspaces with status indicators
-- **Resource usage** — CPU, memory, and disk for each workspace
-- **App status** — running apps, their ports, and health
-- **Quick actions** — start, stop, and manage workspaces
-
-Navigate with arrow keys, press Enter to select, and `q` to quit.
-
-<Tip>
-  The TUI dashboard is a great way to check on your workspaces without leaving the terminal. It updates in real time and works over any SSH connection, including from mobile terminal apps.
-</Tip>
 
 ---
 
