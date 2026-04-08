@@ -1,87 +1,89 @@
 ---
 title: Introduction
-description: Rigbox is a platform for running code in isolated Firecracker micro-VMs with full API control over workspaces, apps, and AI configuration.
+description: Rigbox is an API-first platform for running code in isolated micro-VMs with built-in app routing, AI credits, and developer tooling.
 ---
 
 # Rigbox
 
-Rigbox is an open platform for running untrusted code in secure, isolated [Firecracker](https://firecracker-microvm.github.io/) micro-VMs. Each workspace is a full Linux VM with SSH access, app routing, snapshots, and live metrics — provisioned and managed entirely through the API.
+Rigbox gives you isolated Linux VMs — each with its own kernel, filesystem, and network — managed entirely through an API. Deploy workspaces, expose apps to the internet, run AI agents with managed credits, and automate everything with setup scripts and service specs.
+
+## Quick example
+
+Deploy a workspace in one API call:
+
+```bash
+curl -X POST https://api.rigbox.dev/api/quick-deploy \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"template_id": "dev", "name": "my-project"}'
+```
+
+This provisions an isolated Firecracker micro-VM with Python, Node.js, build tools, and SSH access — ready in seconds.
 
 <Tip>
-  New to Rigbox? Start with the [Quickstart](/quickstart) to deploy your first workspace in under a minute.
+New to Rigbox? Follow the [Quickstart](/quickstart) for a step-by-step walkthrough with polling, app exposure, and health checks.
 </Tip>
 
-## Key capabilities
+## When to use Rigbox
+
+| Use case | How Rigbox helps |
+| --- | --- |
+| **AI agent sandboxes** | Run untrusted AI-generated code in isolated VMs with no access to your infrastructure |
+| **App hosting** | Expose any port as a public URL with automatic HTTPS and subdomain routing |
+| **AI coding tools** | Run Claude Code, Codex, Aider with managed credits — no API keys needed |
+| **Development environments** | Reproducible dev environments with setup scripts, snapshots, and pre-installed tools |
+| **Bot deployment** | Deploy Telegram bots, chat interfaces, and AI agents with the OpenClaw template |
+| **Build a platform** | Use the API to build your own hosting service on top of Rigbox infrastructure |
+
+## Core capabilities
 
 <CardGroup cols={2}>
-  <Card title="Workspaces" icon="server" href="/api-reference/workspaces/create">
-    Provision isolated Firecracker VMs with configurable CPU, memory, and disk. Start, stop, snapshot, and delete through the API.
+  <Card title="Workspaces" icon="server" href="/guides/workspaces">
+    Isolated Firecracker micro-VMs with configurable CPU, memory, disk, and full SSH access
   </Card>
-  <Card title="Apps & Routing" icon="globe" href="/api-reference/apps/create">
-    Expose ports from inside your workspace as public subdomains on `rigbox.dev`. Control visibility and monitor health.
+  <Card title="Apps & Routing" icon="globe" href="/guides/expose-and-route">
+    Expose ports as public URLs on `rigbox.dev` with automatic HTTPS and health checks
   </Card>
-  <Card title="AI Configuration" icon="sparkles" href="/api-reference/ai/get-workspace-ai-config">
-    Run AI workloads with managed API keys or bring your own. Credit tracking, provider routing, and usage analytics built in.
+  <Card title="AI & Credits" icon="sparkles" href="/guides/managed-proxy">
+    Managed AI proxy with credits for Anthropic, OpenAI, and Google — or bring your own keys
   </Card>
-  <Card title="Quick Deploy" icon="rocket" href="/api-reference/templates/quick-deploy">
-    Go from zero to a running workspace in one API call using pre-configured templates.
+  <Card title="Tools" icon="wrench" href="/guides/architecture-explorer">
+    Architecture Explorer for code visualization, Virtual Browser for remote browsing
   </Card>
-  <Card title="Tools & Automation" icon="wrench" href="/api-reference/tools/list">
-    Install development tools into workspaces. Define setup scripts and service specs to automate initialization.
+  <Card title="Catalog Apps" icon="grid-2x2" href="/guides/catalog">
+    Install VS Code, Jupyter, Streamlit, and more in one call
   </Card>
-  <Card title="Snapshots" icon="camera" href="/api-reference/snapshots/create">
-    Capture and restore full workspace state. Useful for checkpointing long-running work or creating reproducible environments.
+  <Card title="Snapshots" icon="camera" href="/guides/snapshots">
+    Checkpoint full workspace state and restore instantly
+  </Card>
+  <Card title="Automation" icon="repeat" href="/guides/setup-scripts">
+    Setup scripts and service specs for reproducible environments
+  </Card>
+  <Card title="SSH & CLI" icon="terminal" href="/guides/ssh-access">
+    SSH access, file transfer, and full CLI management with `rig`
   </Card>
 </CardGroup>
 
-## Architecture
-
-Rigbox uses a two-zone security model:
-
-- **Control Plane** — holds agent runtimes, API keys, and user state. Runs the API gateway, auth service, and admin portal.
-- **Data Plane** — runs untrusted generated code in Firecracker VMs with no access to platform secrets.
-
-All communication between zones goes through authenticated internal APIs over an encrypted mesh network.
-
-## Integration guides
-
-Building on top of Rigbox? These guides map exactly which API endpoints power each frontend:
+## Get started
 
 <CardGroup cols={3}>
-  <Card title="Sandbox" icon="terminal" href="/sandbox-api-surface">
-    How `sandbox.rigbox.dev` uses the API for workspace lifecycle, terminal access, and log streaming
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Deploy your first workspace and app in 5 steps
   </Card>
-  <Card title="Clawd" icon="message-square" href="/clawd-api-surface">
-    How `clawd.rigbox.dev` uses the API for AI bot deployment, billing, and managed proxy
+  <Card title="Authentication" icon="key" href="/authentication">
+    API keys, JWTs, and session tokens
   </Card>
-  <Card title="Clawd Runtime" icon="cpu" href="/clawd-runtime-services">
-    Internal service contracts for the managed AI proxy, credit enforcement, and config injection
+  <Card title="Guides" icon="book-open" href="/guides/workspaces">
+    In-depth guides for every feature
   </Card>
 </CardGroup>
 
 ## Base URL
 
-```bash
+All API requests go to:
+
+```
 https://api.rigbox.dev/api
 ```
 
-All endpoints are relative to this base. Authentication is required for most endpoints — see [Authentication](/authentication) for details.
-
-## Response format
-
-All responses are JSON. Errors include a `message` field:
-
-```json
-{
-  "message": "Workspace not found"
-}
-```
-
-| Status | Meaning |
-| --- | --- |
-| `2xx` | Success |
-| `401` | Missing or invalid authentication |
-| `403` | Insufficient permissions |
-| `404` | Resource not found |
-| `429` | Rate limited — retry with exponential backoff |
-| `5xx` | Server error |
+See the [API Reference](/api-reference/workspaces/list) for the full endpoint catalog, or the [Authentication](/authentication) page for how to authenticate.

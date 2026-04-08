@@ -1,0 +1,160 @@
+---
+title: Resource Limits & Quotas
+description: Plan tiers, workspace limits, AI credits, and rate limits.
+---
+
+# Resource Limits & Quotas
+
+Every Rigbox account has limits on workspaces, resources, and AI credits based on your plan tier. This page covers what's available and how to check your usage.
+
+## Plan tiers
+
+| | Free | Pro |
+| --- | --- | --- |
+| **Workspaces** | 2 | 10 |
+| **Apps per workspace** | 5 | 20 |
+| **Max RAM per workspace** | 1 GB | 4 GB |
+| **Max vCPUs per workspace** | 1 | 4 |
+| **Max disk per workspace** | 4 GB | 10 GB |
+| **AI credits / month** | 250 | 2,000 |
+| **Snapshots per workspace** | 3 | 10 |
+| **SSH keys** | 5 | 20 |
+
+<Note>
+These are representative limits. Check your actual limits with the API — they may differ based on promotions or custom arrangements.
+</Note>
+
+## Check your limits
+
+Query your current plan limits and usage:
+
+```bash
+curl https://api.rigbox.dev/api/users/me/limits \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+The response includes both the maximum allowed and current usage for each resource type.
+
+See [Get User Limits](/api-reference/ai/get-limits) for the full response schema.
+
+## Workspace resources
+
+When creating a workspace, you specify RAM, vCPU, and disk allocation. These are validated against your plan limits:
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "my-project",
+    "image": "dev",
+    "ram_mb": 2048,
+    "vcpu_count": 2,
+    "disk_size_mb": 4096
+  }'
+```
+
+If the request exceeds your limits, the API returns `402 Payment Required` with a message indicating which limit was exceeded.
+
+### Resizing
+
+You can resize a workspace after creation. The workspace must be stopped first:
+
+```bash
+curl -X PUT https://api.rigbox.dev/api/workspaces/{id}/resources \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"ram_mb": 4096, "vcpu_count": 4}'
+```
+
+See [Update Workspace Resources](/api-reference/workspaces/update-resources) for details.
+
+## AI credits
+
+AI credits fund requests through the [managed AI proxy](/guides/managed-proxy). Each credit maps to approximately $0.01 of upstream provider cost, though the exact rate depends on the model and token count.
+
+### Check your balance
+
+```bash
+curl https://api.rigbox.dev/api/users/me/credits \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json
+{
+  "remaining": 1800,
+  "total": 2000,
+  "mode": "managed"
+}
+```
+
+### View usage breakdown
+
+```bash
+curl https://api.rigbox.dev/api/users/me/ai-usage \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Returns daily usage broken down by workspace, provider, and model.
+
+### When credits run out
+
+- API requests through the proxy return `402`
+- Non-AI services in your workspace continue running
+- Switch to [BYOK mode](/guides/byok) for unlimited usage with your own keys
+
+## Rate limits
+
+API requests are rate-limited per user. Limits vary by endpoint class:
+
+| Endpoint class | Requests / minute |
+| --- | --- |
+| Authentication | 120 |
+| Workspaces | 180 |
+| Apps | 240 |
+
+When rate-limited, the API returns `429 Too Many Requests`. Implement exponential backoff in your client:
+
+```python
+import time
+import requests
+
+def api_call(url, headers, max_retries=3):
+    for attempt in range(max_retries):
+        resp = requests.get(url, headers=headers)
+        if resp.status_code == 429:
+            wait = 2 ** attempt
+            time.sleep(wait)
+            continue
+        return resp
+    raise Exception("Rate limited after retries")
+```
+
+## Capacity
+
+Before creating a workspace, check if the platform has capacity:
+
+```bash
+curl https://api.rigbox.dev/api/capacity
+```
+
+```json
+{
+  "available": true,
+  "total": 50,
+  "used": 12
+}
+```
+
+This endpoint is public — no authentication required.
+
+## Learn more
+
+<CardGroup cols={2}>
+  <Card title="Architecture" icon="sitemap" href="/concepts/architecture">
+    How the platform is structured
+  </Card>
+  <Card title="Managed AI Proxy" icon="sparkles" href="/guides/managed-proxy">
+    How credits and the AI proxy work
+  </Card>
+</CardGroup>

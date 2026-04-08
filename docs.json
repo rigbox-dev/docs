@@ -30,16 +30,11 @@
             ]
           },
           {
-            "group": "Sandbox Integration",
+            "group": "Concepts",
             "pages": [
-              "sandbox-api-surface"
-            ]
-          },
-          {
-            "group": "Clawd Integration",
-            "pages": [
-              "clawd-api-surface",
-              "clawd-runtime-services"
+              "concepts/architecture",
+              "concepts/security",
+              "concepts/limits"
             ]
           }
         ]
@@ -107,7 +102,10 @@
           {
             "group": "Build With Rigbox",
             "pages": [
-              "guides/build-hosting-platform"
+              "guides/build-hosting-platform",
+              "sandbox-api-surface",
+              "clawd-api-surface",
+              "clawd-runtime-services"
             ]
           }
         ]
