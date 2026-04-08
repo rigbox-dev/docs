@@ -1,0 +1,321 @@
+---
+title: Setup Scripts
+description: Automate workspace initialization with reusable bash scripts.
+---
+
+# Setup Scripts
+
+Setup scripts are bash scripts that run automatically when a workspace starts. They let you define reproducible environments — install packages, clone repos, seed databases, configure tools — so every workspace boots into a ready-to-use state.
+
+## How Setup Scripts Work
+
+When a workspace starts, Rigbox executes all attached setup scripts inside the VM as the `developer` user. Scripts run sequentially in the order you specify, with full network access and sudo privileges.
+
+Each script has a **run mode** that controls when it executes:
+
+| Run Mode | Behavior |
+|----------|----------|
+| `first_boot` | Runs only once, on the very first start of the workspace |
+| `every_start` | Runs on every workspace start (including restarts and resumes) |
+
+<Tip>
+Use `first_boot` for one-time setup like installing packages or cloning repos. Use `every_start` for configuration that might change between restarts, like refreshing tokens or syncing files.
+</Tip>
+
+## Create a Setup Script
+
+Create a reusable setup script via the API. Once created, you can attach it to any number of workspaces.
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/setup-scripts \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "python-data-stack",
+    "content": "#!/bin/bash\nset -e\npip install pandas numpy scikit-learn matplotlib\necho \"Data stack installed successfully\"",
+    "run_on": "first_boot"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.rigbox.dev/api/setup-scripts",
+    headers={"Authorization": f"Bearer {token}"},
+    json={
+        "name": "python-data-stack",
+        "content": (
+            "#!/bin/bash\n"
+            "set -e\n"
+            "pip install pandas numpy scikit-learn matplotlib\n"
+            'echo "Data stack installed successfully"'
+        ),
+        "run_on": "first_boot"
+    }
+)
+
+script = response.json()
+print(script["id"])  # "ss_abc123"
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.rigbox.dev/api/setup-scripts", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    name: "python-data-stack",
+    content: [
+      "#!/bin/bash",
+      "set -e",
+      "pip install pandas numpy scikit-learn matplotlib",
+      'echo "Data stack installed successfully"',
+    ].join("\n"),
+    run_on: "first_boot",
+  }),
+});
+
+const script = await response.json();
+console.log(script.id); // "ss_abc123"
+```
+</CodeGroup>
+
+See the [Setup Scripts API reference](/api-reference/setup-scripts/create) for the full request and response schema.
+
+## Script Content Guidelines
+
+Setup scripts run as bash inside the workspace VM. Here are guidelines for writing reliable scripts:
+
+```bash
+#!/bin/bash
+set -e  # Exit on first error
+
+# Use absolute paths — the working directory is /home/developer
+PROJECT_DIR="/home/developer/my-project"
+
+# Install system packages (sudo is available)
+sudo apt-get update -qq
+sudo apt-get install -y -qq postgresql-client redis-tools
+
+# Install language-specific packages
+pip install -q flask sqlalchemy celery
+
+# Clone repositories
+git clone https://github.com/your-org/your-repo.git "$PROJECT_DIR"
+cd "$PROJECT_DIR" && pip install -r requirements.txt
+
+# Seed data or run migrations
+cd "$PROJECT_DIR" && python manage.py migrate
+
+echo "Setup complete!"
+```
+
+<Warning>
+Always use `set -e` at the top of your scripts. Without it, a failing command will not stop execution, and subsequent commands may run in a broken state.
+</Warning>
+
+## Attach Scripts to a Workspace
+
+Include `setup_script_ids` when creating a workspace. Scripts run in the order they appear in the array.
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/workspaces \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "ml-workspace",
+    "template_id": "tpl_python",
+    "setup_script_ids": ["ss_abc123", "ss_def456"]
+  }'
+```
+
+```python Python
+response = requests.post(
+    "https://api.rigbox.dev/api/workspaces",
+    headers={"Authorization": f"Bearer {token}"},
+    json={
+        "name": "ml-workspace",
+        "template_id": "tpl_python",
+        "setup_script_ids": ["ss_abc123", "ss_def456"]
+    }
+)
+```
+</CodeGroup>
+
+### Script Ordering
+
+Scripts execute sequentially in array order. This is important when scripts have dependencies:
+
+```json
+{
+  "setup_script_ids": [
+    "ss_system_deps",    // 1. Install system packages
+    "ss_clone_repo",     // 2. Clone the repo (needs git from step 1)
+    "ss_python_deps",    // 3. Install Python deps (needs repo from step 2)
+    "ss_seed_data"       // 4. Seed database (needs packages from step 3)
+  ]
+}
+```
+
+## List Your Scripts
+
+Retrieve all setup scripts in your account.
+
+<CodeGroup>
+```bash cURL
+curl -s https://api.rigbox.dev/api/setup-scripts \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+```
+
+```json Response
+[
+  {
+    "id": "ss_abc123",
+    "name": "python-data-stack",
+    "run_on": "first_boot",
+    "created_at": "2026-04-01T10:00:00Z",
+    "updated_at": "2026-04-01T10:00:00Z"
+  },
+  {
+    "id": "ss_def456",
+    "name": "git-config",
+    "run_on": "every_start",
+    "created_at": "2026-04-02T14:30:00Z",
+    "updated_at": "2026-04-02T14:30:00Z"
+  }
+]
+```
+</CodeGroup>
+
+See the [List Setup Scripts API reference](/api-reference/setup-scripts/list) for pagination and filtering options.
+
+## Update a Script
+
+Modify an existing script's content, name, or run mode.
+
+```bash
+curl -X PUT https://api.rigbox.dev/api/setup-scripts/ss_abc123 \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "python-data-stack-v2",
+    "content": "#!/bin/bash\nset -e\npip install pandas numpy scikit-learn matplotlib seaborn\necho \"Data stack v2 installed\"",
+    "run_on": "first_boot"
+  }'
+```
+
+<Note>
+Updating a script affects all future workspace starts that reference it. Already-running workspaces will pick up the change on their next restart (for `every_start` scripts) or not at all (for `first_boot` scripts that have already executed).
+</Note>
+
+## Delete a Script
+
+```bash
+curl -X DELETE https://api.rigbox.dev/api/setup-scripts/ss_abc123 \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+```
+
+<Warning>
+Deleting a script that is still attached to workspaces will cause those workspaces to skip that script on future starts. The workspace itself is not affected.
+</Warning>
+
+## Combining with Templates
+
+Templates can include their own setup scripts. When you create a workspace with both a template and additional `setup_script_ids`, the template's scripts run first, followed by yours.
+
+```json
+{
+  "name": "custom-workspace",
+  "template_id": "tpl_node_fullstack",
+  "setup_script_ids": ["ss_my_custom_config"]
+}
+```
+
+Execution order:
+1. Template `tpl_node_fullstack` scripts (e.g., install Node.js, npm packages)
+2. Your script `ss_my_custom_config` (e.g., clone your repo, set up environment)
+
+This layering lets you build on top of standard templates without duplicating their setup logic.
+
+## Use Case: Team Onboarding
+
+Create a single setup script that configures everything a new team member needs. Every workspace they create starts fully configured.
+
+```bash
+#!/bin/bash
+set -e
+
+# Configure git
+git config --global user.name "$GIT_USER_NAME"
+git config --global user.email "$GIT_USER_EMAIL"
+git config --global pull.rebase true
+
+# Clone the monorepo
+git clone https://github.com/acme-corp/platform.git /home/developer/platform
+
+# Install dependencies
+cd /home/developer/platform
+npm ci
+
+# Set up local database
+cd /home/developer/platform
+npm run db:migrate
+npm run db:seed
+
+# Install team CLI tools
+npm install -g @acme/cli turbo
+
+echo "Welcome to the Acme Platform team workspace!"
+```
+
+Then set this as the default for all new workspaces via a template, and every new hire gets an identical development environment in seconds.
+
+## Use Case: Ephemeral Demo Environments
+
+For product demos, create a setup script that loads sample data and starts services:
+
+```bash
+#!/bin/bash
+set -e
+
+# Clone the demo branch
+git clone -b demo https://github.com/acme-corp/product.git /home/developer/demo
+cd /home/developer/demo
+
+# Install and seed
+npm ci
+npm run db:setup -- --demo-data
+
+# Generate sample reports
+node scripts/generate-reports.js
+
+echo "Demo environment ready"
+```
+
+Combine this with a [service spec](/guides/service-specs) that auto-starts the app server, and you have a one-click demo environment.
+
+## Debugging Setup Scripts
+
+If a setup script fails, the workspace will still start, but the script's exit code and output are captured.
+
+To check script execution results, look at the workspace status after it starts:
+
+```bash
+curl -s https://api.rigbox.dev/api/workspaces/{workspace_id} \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq '.setup_status'
+```
+
+<Tip>
+Add `echo` statements throughout your scripts for visibility. The output is captured and available in the workspace details, making it easier to pinpoint where a script failed.
+</Tip>
+
+## Next Steps
+
+- [Service Specs](/guides/service-specs) — define background services that auto-start after setup completes
+- [Snapshots](/guides/snapshots) — snapshot a fully configured workspace and restore it later
+- [Managed AI Proxy](/guides/managed-proxy) — add AI capabilities to your scripted environments

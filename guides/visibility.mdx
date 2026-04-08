@@ -1,0 +1,267 @@
+---
+title: App Visibility
+description: Control who can access your apps with public, private, and privileged modes.
+---
+
+Every app exposed through Rigbox has a **visibility mode** that determines who can access it. By default, apps are private — only you can see them. You can open them up to the world or share them with specific people.
+
+## Visibility Modes
+
+There are three visibility modes:
+
+| Mode | Who can access | Use case |
+|------|---------------|----------|
+| **Private** | Only the workspace owner | Development, testing, internal tools |
+| **Public** | Anyone with the URL | Demos, public APIs, static sites, documentation |
+| **Privileged** | Owner + specific email addresses | Team collaboration, client previews, staging |
+
+<Note>
+Private is the default for all newly created apps. You must explicitly change the visibility to make an app accessible to others.
+</Note>
+
+## How Access is Enforced
+
+When a request arrives at an app subdomain (e.g., `my-api.rigbox.dev`), Rigbox checks the visibility mode before forwarding the request to your service:
+
+- **Public**: the request is forwarded immediately with no authentication check.
+- **Private**: the request must include valid authentication matching the workspace owner. Unauthenticated requests receive a 403 response.
+- **Privileged**: the request must include valid authentication for either the workspace owner or a user whose email is in the `allowed_emails` list.
+
+<Tip>
+CORS preflight requests (`OPTIONS` method) are always allowed through regardless of visibility mode. This ensures browser-based applications can function correctly even when the app is private or privileged.
+</Tip>
+
+## Setting Visibility
+
+Use the visibility endpoint to change an app's access mode.
+
+### Make an App Public
+
+<CodeGroup>
+```bash cURL
+curl -X PUT https://api.rigbox.dev/api/apps/$APP_ID/visibility \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "visibility": "public"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.put(
+    f"https://api.rigbox.dev/api/apps/{app_id}/visibility",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={"visibility": "public"},
+)
+print(f"Visibility set to: {response.json()['visibility']}")
+```
+</CodeGroup>
+
+See [Set Visibility](/api-reference/apps/set-visibility) for the full request/response schema.
+
+### Make an App Private
+
+<CodeGroup>
+```bash cURL
+curl -X PUT https://api.rigbox.dev/api/apps/$APP_ID/visibility \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "visibility": "private"
+  }'
+```
+
+```python Python
+response = requests.put(
+    f"https://api.rigbox.dev/api/apps/{app_id}/visibility",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={"visibility": "private"},
+)
+```
+</CodeGroup>
+
+### Share with Specific People (Privileged)
+
+Privileged mode lets you grant access to specific email addresses. This is useful for sharing a staging environment with teammates or showing a client preview.
+
+<CodeGroup>
+```bash cURL
+curl -X PUT https://api.rigbox.dev/api/apps/$APP_ID/visibility \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "visibility": "privileged",
+    "allowed_emails": [
+      "alice@example.com",
+      "bob@example.com"
+    ]
+  }'
+```
+
+```python Python
+response = requests.put(
+    f"https://api.rigbox.dev/api/apps/{app_id}/visibility",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={
+        "visibility": "privileged",
+        "allowed_emails": [
+            "alice@example.com",
+            "bob@example.com",
+        ],
+    },
+)
+app = response.json()
+print(f"Visibility: {app['visibility']}")
+print(f"Allowed: {app['allowed_emails']}")
+```
+</CodeGroup>
+
+<Warning>
+The `allowed_emails` field is only used when visibility is set to `privileged`. If you set visibility to `public` or `private`, the `allowed_emails` field is ignored.
+</Warning>
+
+## Updating the Allowed Emails List
+
+To add or remove people from the privileged access list, send a new PUT request with the complete list. The list is replaced entirely — it's not additive.
+
+```python
+# Add carol to the existing list
+response = requests.put(
+    f"https://api.rigbox.dev/api/apps/{app_id}/visibility",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={
+        "visibility": "privileged",
+        "allowed_emails": [
+            "alice@example.com",
+            "bob@example.com",
+            "carol@example.com",  # newly added
+        ],
+    },
+)
+```
+
+<Note>
+To remove someone, send the list without their email. There is no separate "remove" endpoint — you always send the full list.
+</Note>
+
+## Checking Current Visibility
+
+Retrieve the app details to see its current visibility mode and allowed emails.
+
+<CodeGroup>
+```bash cURL
+curl -s https://api.rigbox.dev/api/apps/$APP_ID \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq '{visibility, allowed_emails}'
+```
+
+```python Python
+response = requests.get(
+    f"https://api.rigbox.dev/api/apps/{app_id}",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+app = response.json()
+print(f"Visibility: {app['visibility']}")
+if app.get("allowed_emails"):
+    print(f"Allowed emails: {', '.join(app['allowed_emails'])}")
+```
+</CodeGroup>
+
+See [Get App](/api-reference/apps/get) for the full response schema.
+
+## Complete Example: Development to Production
+
+This walkthrough shows a typical flow — develop privately, test with teammates, then go public.
+
+<Steps>
+
+### Deploy your app privately
+
+Create and expose your app. It starts as private by default.
+
+```python
+import requests
+
+API_URL = "https://api.rigbox.dev/api"
+HEADERS = {"Authorization": f"Bearer {api_key}"}
+
+# Expose port 3000 (private by default)
+app = requests.post(
+    f"{API_URL}/workspaces/{workspace_id}/expose-port",
+    headers=HEADERS,
+    json={"port": 3000},
+).json()
+
+app_id = app["id"]
+app_url = f"https://{app['name']}.rigbox.dev"
+print(f"Private app at: {app_url}")
+```
+
+### Test and iterate
+
+While the app is private, only you can access it. Make changes, test, and refine.
+
+### Share with your team for review
+
+Once you're ready for feedback, switch to privileged mode.
+
+```python
+requests.put(
+    f"{API_URL}/apps/{app_id}/visibility",
+    headers=HEADERS,
+    json={
+        "visibility": "privileged",
+        "allowed_emails": [
+            "teammate@company.com",
+            "reviewer@company.com",
+        ],
+    },
+)
+print(f"Shared with team at: {app_url}")
+```
+
+### Go public
+
+After the team approves, make it available to everyone.
+
+```python
+requests.put(
+    f"{API_URL}/apps/{app_id}/visibility",
+    headers=HEADERS,
+    json={"visibility": "public"},
+)
+print(f"Public at: {app_url}")
+```
+
+### Lock it back down if needed
+
+You can revert to private at any time.
+
+```python
+requests.put(
+    f"{API_URL}/apps/{app_id}/visibility",
+    headers=HEADERS,
+    json={"visibility": "private"},
+)
+print("App is private again")
+```
+
+</Steps>
+
+## Security Considerations
+
+- **Private apps are not accessible without authentication.** Even if someone knows the subdomain URL, they cannot access a private app.
+- **Privileged mode uses email verification.** Users in the `allowed_emails` list must authenticate through Rigbox to access the app.
+- **Public apps are open to the entire internet.** Only set an app to public if you intend for anyone to access it. Don't expose admin panels, databases, or sensitive services as public.
+- **Visibility changes take effect immediately.** There is no propagation delay — the next request will use the new visibility mode.
+
+<Warning>
+Be careful with public visibility for apps that expose sensitive interfaces (e.g., database clients, admin panels, file browsers). Consider using privileged mode with specific emails instead.
+</Warning>
+
+## Next Steps
+
+- [Expose Ports & Route Apps](/guides/expose-and-route) — create and manage app routes
+- [Workspaces](/guides/workspaces) — workspace lifecycle management
+- [Catalog Apps](/guides/catalog) — install pre-packaged apps with routing handled automatically

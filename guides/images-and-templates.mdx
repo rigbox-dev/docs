@@ -1,0 +1,242 @@
+---
+title: Images & Templates
+description: Choose the right base image and template for your workspace.
+---
+
+Every workspace runs on a **base image** — a pre-built Debian 12 root filesystem with tools and runtimes already installed. **Templates** combine an image with default resource settings (RAM, vCPU, disk) so you can deploy in one call.
+
+## Images
+
+Images determine what software is available inside your workspace out of the box. All images include SSH access, systemd, and the Rigbox CLI.
+
+| Image | Size | Includes | Best for |
+|-------|------|----------|----------|
+| `base` | 3 GB | Python 3.12, Node.js 22, uv, git, vim, tmux, GitHub CLI | General development, scripts, web apps |
+| `dev` | 4 GB | Everything in base + Docker CLI, cmake, build tools, strace, gdb, PostgreSQL client | Systems programming, native builds |
+| `full` | 5 GB | Everything in base + Architecture Explorer, Virtual Browser pre-installed | Full tooling, code analysis |
+| `openclaw` | 2.5 GB | Node.js 22, OpenClaw gateway pre-installed | AI bot deployment (Telegram, web) |
+
+<Note>
+All images are built on Debian 12 (Bookworm) and include Python 3.12 and Node.js 22 except where noted. The `openclaw` image is specialized and does not include Python.
+</Note>
+
+### What's in each image
+
+**base** is the right choice for most workloads. It includes:
+- Python 3.12 with `uv` for fast package management
+- Node.js 22 with npm
+- git, vim, tmux, curl, wget, jq
+- GitHub CLI (`gh`)
+- Pre-warmed npm caches for popular tools (Jupyter, Marimo, Streamlit, Excalidraw)
+
+**dev** adds build tooling on top of base:
+- Docker CLI (for building images — Docker daemon runs on the host)
+- cmake, make, gcc, g++
+- strace, gdb, ltrace for debugging
+- PostgreSQL client (`psql`)
+
+**full** adds pre-installed Rigbox tools:
+- Architecture Explorer — ready to launch without installation
+- Virtual Browser (Chromium + Firefox via Playwright) — ready to launch
+- Xvfb and x11vnc for headless display
+
+**openclaw** is a minimal image for AI bot workloads:
+- Node.js 22 with the OpenClaw gateway pre-configured
+- Designed for Telegram bots, web chat bots, and similar agents
+
+### Listing Available Images
+
+<CodeGroup>
+```bash cURL
+curl -s https://api.rigbox.dev/api/images \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.rigbox.dev/api/images",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+for image in response.json():
+    print(f"{image['name']:12} {image['size_mb']} MB")
+```
+</CodeGroup>
+
+See [List Images](/api-reference/images/list) for the full response schema.
+
+## Templates
+
+Templates are pre-configured workspace definitions that pair an image with sensible resource defaults. Use them with [quick deploy](/api-reference/workspaces/quick-deploy) for one-call workspace creation.
+
+| Template | Image | RAM | vCPU | Disk | Use case |
+|----------|-------|-----|------|------|----------|
+| `base` | base | 512 MB | 1 | 3 GB | Minimal workspace for scripts and web apps |
+| `dev` | dev | 1 GB | 1 | 4 GB | Developer environment with build tools |
+| `full` | full | 1 GB | 1 | 5 GB | Full tooling pre-installed (Architecture Explorer, Virtual Browser) |
+| `openclaw` | openclaw | 1 GB | 1 | 2.5 GB | AI bot workspace with OpenClaw gateway |
+| `ai-agent-starter` | base | 1 GB | 2 | 3 GB | AI sandbox with Open Terminal for agent workloads |
+| `custom-repo` | base | 1 GB | 1 | 3 GB | Clone and run a git repository |
+
+### Listing Available Templates
+
+<CodeGroup>
+```bash cURL
+curl -s https://api.rigbox.dev/api/templates \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```
+
+```python Python
+response = requests.get(
+    "https://api.rigbox.dev/api/templates",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+for tmpl in response.json():
+    print(f"{tmpl['id']:20} image={tmpl['image']:10} ram={tmpl['ram_mb']}MB")
+```
+</CodeGroup>
+
+See [List Templates](/api-reference/templates/list) for the full response schema.
+
+## Choosing the Right Image
+
+Use this decision tree to pick the image that fits your workload:
+
+<Steps>
+
+### Do you need AI bot deployment?
+
+If you're building a Telegram bot, web chat agent, or similar AI-powered service, use the **openclaw** image. It has the OpenClaw gateway pre-installed.
+
+### Do you need Architecture Explorer or Virtual Browser?
+
+If you want to visualize code structure or run a remote browser without installing anything, use the **full** image. Both tools are pre-installed and ready to launch.
+
+### Do you need Docker, cmake, or native build tools?
+
+If you're compiling C/C++ code, building Docker images, or need debugging tools like strace and gdb, use the **dev** image.
+
+### For everything else, use base
+
+The **base** image covers Python, Node.js, and general development. It's the smallest and fastest to boot.
+
+</Steps>
+
+<Tip>
+You can always install additional packages inside any workspace with `apt-get`. The image choice just determines what's pre-installed for faster startup.
+</Tip>
+
+## Quick Deploy with a Template
+
+The fastest way to create a workspace is quick deploy with a template ID.
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/quick-deploy \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "template_id": "dev"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.rigbox.dev/api/quick-deploy",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={"template_id": "dev"},
+)
+workspace = response.json()
+print(f"Workspace ID: {workspace['id']}")
+print(f"Status: {workspace['status']}")
+```
+</CodeGroup>
+
+Quick deploy creates the workspace and starts it in a single call. Poll the workspace status until it's `running`.
+
+See [Quick Deploy](/api-reference/workspaces/quick-deploy) for the full request/response schema.
+
+## Custom Workspace with a Specific Image
+
+If the template defaults don't fit your needs, create a workspace manually and specify the image along with custom resource settings.
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/workspaces \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "heavy-compute",
+    "image": "dev",
+    "ram_mb": 2048,
+    "disk_size_mb": 8192,
+    "vcpu_count": 2
+  }'
+```
+
+```python Python
+response = requests.post(
+    "https://api.rigbox.dev/api/workspaces",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={
+        "name": "heavy-compute",
+        "image": "dev",
+        "ram_mb": 2048,
+        "disk_size_mb": 8192,
+        "vcpu_count": 2,
+    },
+)
+workspace = response.json()
+print(f"Created: {workspace['id']} with image={workspace['image']}")
+```
+</CodeGroup>
+
+See [Create Workspace](/api-reference/workspaces/create) for the full request/response schema.
+
+## Resizing After Creation
+
+You can change the RAM, vCPU, and disk size of an existing workspace without switching images. The workspace must be stopped first.
+
+```bash
+# Stop the workspace
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/stop \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+
+# Resize
+curl -X PUT https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/resources \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"ram_mb": 2048, "vcpu_count": 2}'
+
+# Restart
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/start \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+<Warning>
+You cannot change the image of an existing workspace. To switch images, create a new workspace with the desired image.
+</Warning>
+
+See [Resize Workspace](/api-reference/workspaces/resize) for details.
+
+## Pre-warmed Caches
+
+The **base** image includes pre-warmed npm caches for several popular tools. This means installing catalog apps like Jupyter, Marimo, Streamlit, and Excalidraw is significantly faster because dependencies are already downloaded.
+
+| Tool | Cache benefit |
+|------|---------------|
+| Jupyter Lab | npm packages cached, installs in ~30 seconds |
+| Marimo | npm packages cached, installs in ~20 seconds |
+| Streamlit | pip packages cached via uv |
+| Excalidraw | npm packages cached, installs in ~15 seconds |
+
+See [Catalog Apps](/guides/catalog) for how to install these tools.
+
+## Next Steps
+
+- [Workspaces](/guides/workspaces) — create, start, stop, and manage workspace lifecycle
+- [Expose Ports & Route Apps](/guides/expose-and-route) — make services accessible at `*.rigbox.dev`
+- [Catalog Apps](/guides/catalog) — install VS Code, Jupyter, and more with one call

@@ -1,0 +1,362 @@
+---
+title: The Rigbox CLI
+description: Manage workspaces, apps, tools, and AI credits from the command line.
+---
+
+# The Rigbox CLI
+
+The `rig` CLI (alias for `rigbox`) gives you full control over your Rigbox workspaces, apps, and AI credits from the terminal. It is pre-installed in every workspace VM, and you can also install it on your local machine.
+
+---
+
+## Installation
+
+### Inside a workspace
+
+The CLI is already installed in every Rigbox workspace. Open a terminal and run:
+
+```bash
+rig --version
+```
+
+### On your local machine
+
+Download the latest release for your platform:
+
+<CodeGroup>
+
+```bash macOS (Apple Silicon)
+curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rig-darwin-arm64 -o /usr/local/bin/rig
+chmod +x /usr/local/bin/rig
+```
+
+```bash macOS (Intel)
+curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rig-darwin-amd64 -o /usr/local/bin/rig
+chmod +x /usr/local/bin/rig
+```
+
+```bash Linux (x86_64)
+curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rig-linux-amd64 -o /usr/local/bin/rig
+chmod +x /usr/local/bin/rig
+```
+
+</CodeGroup>
+
+---
+
+## Authentication
+
+Before using the CLI outside a workspace, you need to log in:
+
+```bash
+rig login
+```
+
+This opens your browser for OAuth authentication and stores your token locally. Inside a workspace, the CLI uses the workspace's local credentials automatically.
+
+<Note>
+  Your CLI configuration is stored in `~/.rigbox/config.json`. This includes your auth token and default settings.
+</Note>
+
+---
+
+## Workspace Management
+
+Workspaces are isolated Firecracker micro-VMs where your code runs. The CLI provides full lifecycle management.
+
+### List workspaces
+
+```bash
+rig ls
+```
+
+Output:
+
+```
+NAME          STATUS    IMAGE    CREATED
+my-project    running   dev      2 hours ago
+api-service   stopped   base     3 days ago
+ml-notebook   running   dev      1 day ago
+```
+
+### Create a workspace
+
+```bash
+rig new my-project --image dev
+```
+
+This creates a workspace but does not start it. Available images include `base` (minimal) and `dev` (includes development tools, sidecar, and more).
+
+### Create and start in one command
+
+```bash
+rig spawn my-project
+```
+
+<Tip>
+  Use `rig spawn` for the fastest path from zero to a running workspace. It creates the workspace, starts the VM, and waits until it is ready — all in one command.
+</Tip>
+
+### Start and stop
+
+```bash
+rig start my-project     # Boot the VM
+rig stop my-project      # Shut down the VM (preserves disk)
+```
+
+### Check status
+
+```bash
+rig status
+```
+
+This shows a dashboard with your account quota, resource usage across all workspaces, and current plan limits.
+
+### Stream logs
+
+```bash
+rig logs my-project --follow
+```
+
+Streams workspace system logs in real time. Press `Ctrl+C` to stop.
+
+### Delete a workspace
+
+```bash
+rig rm my-project
+```
+
+<Warning>
+  Deleting a workspace permanently destroys the VM and its disk. This action cannot be undone. Make sure to back up any important files first.
+</Warning>
+
+---
+
+## App Management
+
+Apps are services running inside your workspace that are exposed to the internet via a unique subdomain (`{name}.rigbox.dev`).
+
+### List apps
+
+```bash
+rig app ls
+```
+
+Output:
+
+```
+NAME       PORT    STATUS    URL
+my-api     3000    running   my-api.rigbox.dev
+frontend   5173    running   frontend.rigbox.dev
+```
+
+### Create an app
+
+```bash
+rig app new my-api --port 3000
+```
+
+This creates an app route that maps a public subdomain to the specified port inside your workspace.
+
+### Start, stop, and restart
+
+```bash
+rig app start my-api      # Start the app service
+rig app stop my-api       # Stop the app service
+rig app restart my-api    # Restart the app service
+```
+
+### Stream app logs
+
+```bash
+rig app logs my-api --follow
+```
+
+### Delete an app
+
+```bash
+rig app rm my-api
+```
+
+---
+
+## Templates and Catalog
+
+### Browse templates
+
+Templates are pre-configured workspace setups for common use cases:
+
+```bash
+rig template
+```
+
+Output:
+
+```
+NAME                  DESCRIPTION
+ai-agent-starter      AI agent with tool use and memory
+openclaw              Telegram bot with AI backend
+web-fullstack         React + Node.js full-stack starter
+python-ml             Python ML workspace with Jupyter
+```
+
+### Browse installable apps
+
+The catalog lists applications you can install into a running workspace:
+
+```bash
+rig catalog
+```
+
+### Install from catalog
+
+```bash
+rig catalog install vscode
+```
+
+This installs VS Code Server into your current workspace, making it accessible via a browser.
+
+<Tip>
+  The catalog includes popular tools like VS Code, Jupyter, and database clients. Run `rig catalog` to see the full list.
+</Tip>
+
+---
+
+## Tools
+
+Tools are interactive applications that run alongside your workspace.
+
+### List available tools
+
+```bash
+rig tool ls my-project
+```
+
+### Launch a tool
+
+```bash
+rig tool launch architecture-explorer my-project
+```
+
+This starts the specified tool and provides you with the URL to access it.
+
+---
+
+## SSH Key Management
+
+Manage the SSH keys registered to your account directly from the CLI.
+
+### Add a key
+
+```bash
+rig ssh-key add laptop
+```
+
+This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it with your account.
+
+### List keys
+
+```bash
+rig ssh-key ls
+```
+
+Output:
+
+```
+NAME      FINGERPRINT                               CREATED
+laptop    SHA256:abc123def456...                     2 days ago
+desktop   SHA256:xyz789ghi012...                     1 week ago
+```
+
+### Remove a key
+
+```bash
+rig ssh-key rm laptop
+```
+
+For more details on SSH access, including connecting to workspaces and using the TUI dashboard, see the [SSH Access guide](/guides/ssh-access).
+
+---
+
+## AI Proxy
+
+The managed AI proxy lets you use AI APIs (OpenAI, Anthropic, Google, etc.) through Rigbox's credit system, without managing your own API keys.
+
+### Activate the proxy
+
+From inside a workspace VM:
+
+```bash
+rig proxy on
+```
+
+Output:
+
+```
+AI proxy activated.
+
+Export these variables in your shell:
+
+  export OPENAI_API_KEY=rig_proxy_...
+  export ANTHROPIC_API_KEY=rig_proxy_...
+  export OPENAI_BASE_URL=http://172.16.0.1:9090/openai
+  export ANTHROPIC_BASE_URL=http://172.16.0.1:9090/anthropic
+
+Or run: eval $(rig proxy on --eval)
+```
+
+After activating the proxy, any AI SDK requests (OpenAI, Anthropic, etc.) from your workspace route through the managed proxy automatically.
+
+### Quick setup with eval
+
+```bash
+eval $(rig proxy on --eval)
+```
+
+This sets all the environment variables in one step.
+
+### Deactivate the proxy
+
+```bash
+rig proxy off
+```
+
+<Note>
+  The AI proxy is only available from inside a workspace VM. It routes requests through the Rigbox proxy service at `172.16.0.1:9090`, which handles credit tracking and key injection.
+</Note>
+
+### Check credit balance
+
+You can check your AI credit balance via the API:
+
+```bash
+curl https://api.rigbox.dev/api/users/me/credits \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+See the [Build a Hosting Platform guide](/guides/build-hosting-platform) for more on integrating AI credits into your own application.
+
+---
+
+## Inside vs. Outside Workspaces
+
+The CLI works the same way in both contexts, with one difference in how authentication is handled:
+
+| Context | Auth method | Notes |
+|---------|-------------|-------|
+| Inside a workspace | Automatic (local credentials) | No `rig login` needed |
+| On your local machine | OAuth token via `rig login` | Token stored in `~/.rigbox/config.json` |
+
+All commands behave identically regardless of where you run them. Inside a workspace, the CLI detects the local environment and uses the workspace's credentials.
+
+---
+
+## API Reference
+
+The CLI wraps the Rigbox REST API. For programmatic access, see:
+
+- [Workspaces API](/api-reference/workspaces/list-workspaces) — Create, manage, and monitor workspaces
+- [Apps API](/api-reference/apps/list-apps) — Manage app routes and services
+- [SSH Keys API](/api-reference/ssh-keys/list-ssh-keys) — Register and manage SSH keys
+- [Templates API](/api-reference/templates/list-templates) — Browse available templates
+- [Users API](/api-reference/users/get-current-user) — Account info, credits, and limits

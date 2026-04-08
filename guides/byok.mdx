@@ -1,0 +1,279 @@
+---
+title: Bring Your Own Keys
+description: Use your own AI provider API keys instead of Rigbox-managed credits.
+---
+
+# Bring Your Own Keys
+
+Bring Your Own Keys (BYOK) mode lets you use your own AI provider API keys with Rigbox workspaces. Your keys are stored securely and injected into the workspace runtime — you get unlimited usage billed directly by your provider, with no Rigbox credit limits.
+
+## When to Use BYOK
+
+BYOK is the right choice when:
+
+- **You already have API keys** from Anthropic, OpenAI, Google, or another provider
+- **You need unlimited usage** beyond the managed credit tiers
+- **You need a specific model** not available in managed mode
+- **Your organization requires** that API keys stay under your own provider account for billing, audit, or compliance reasons
+
+<Tip>
+If you are just getting started or prototyping, [managed mode](/guides/managed-proxy) is faster to set up — no keys needed.
+</Tip>
+
+## Set BYOK Mode
+
+Configure a workspace to use your own API key by setting the AI config to `byok` mode.
+
+<CodeGroup>
+```bash cURL
+curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "byok",
+    "provider": "openai",
+    "api_key": "sk-proj-...",
+    "model": "gpt-4o"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.put(
+    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config",
+    headers={"Authorization": f"Bearer {token}"},
+    json={
+        "mode": "byok",
+        "provider": "openai",
+        "api_key": "sk-proj-...",
+        "model": "gpt-4o"
+    }
+)
+
+print(response.json())
+# {"mode": "byok", "provider": "openai", "model": "gpt-4o"}
+```
+
+```javascript JavaScript
+const response = await fetch(
+  `https://api.rigbox.dev/api/workspaces/${workspaceId}/ai-config`,
+  {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      mode: "byok",
+      provider: "openai",
+      api_key: "sk-proj-...",
+      model: "gpt-4o",
+    }),
+  }
+);
+
+const config = await response.json();
+// Note: api_key is never returned in responses
+console.log(config);
+```
+</CodeGroup>
+
+<Warning>
+The API never returns your API key in responses. Once set, you can update or clear the key, but you cannot read it back. Treat it as a write-only field.
+</Warning>
+
+## How Keys Are Stored and Injected
+
+When you set a BYOK key:
+
+1. **Encrypted at rest** — the key is encrypted before being written to the database
+2. **Injected at runtime** — when the workspace starts, the key is injected as an environment variable inside the VM
+3. **Never logged** — keys are redacted from all request logs and audit trails
+4. **Scoped to the workspace** — each workspace has its own AI config; changing one does not affect others
+
+The key is available inside the workspace as the standard environment variable for the provider SDK (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`).
+
+## Clear a Key
+
+To remove an API key from a workspace without changing the mode:
+
+```bash
+curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "byok",
+    "provider": "openai",
+    "api_key": null
+  }'
+```
+
+Setting `api_key` to `null` removes the stored key. The workspace will no longer have access to the provider until you set a new key.
+
+## Switch Back to Managed Mode
+
+You can switch from BYOK to managed mode at any time. This clears the stored key and starts using Rigbox-managed credits instead.
+
+```bash
+curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "managed",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-20250514"
+  }'
+```
+
+<Note>
+Switching modes takes effect on the next AI API call — no workspace restart required.
+</Note>
+
+## Set Defaults for New Workspaces
+
+If you use the same provider and key across most of your workspaces, set a default so new workspaces inherit your BYOK configuration automatically.
+
+<CodeGroup>
+```bash cURL
+curl -X PUT https://api.rigbox.dev/api/users/me/ai-defaults \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "byok",
+    "provider": "anthropic",
+    "api_key": "sk-ant-...",
+    "model": "claude-sonnet-4-20250514"
+  }'
+```
+
+```python Python
+response = requests.put(
+    "https://api.rigbox.dev/api/users/me/ai-defaults",
+    headers={"Authorization": f"Bearer {token}"},
+    json={
+        "mode": "byok",
+        "provider": "anthropic",
+        "api_key": "sk-ant-...",
+        "model": "claude-sonnet-4-20250514"
+    }
+)
+```
+</CodeGroup>
+
+New workspaces will use these defaults unless you explicitly override the AI config at creation time.
+
+See the [AI Defaults API reference](/api-reference/users/set-ai-defaults) for the full schema.
+
+## Managed vs. BYOK Comparison
+
+| Feature | Managed | BYOK |
+|---------|---------|------|
+| API keys required | No | Yes |
+| Credit tracking | Automatic | N/A (billed by your provider) |
+| Cost | Included credits (Free: 250, Pro: 2,000) | Your provider billing |
+| Supported providers | Anthropic, OpenAI, Google, Brave | Any supported provider |
+| Usage limits | Credit balance | Your provider's rate limits |
+| Setup time | Instant | Need existing API key |
+| Best for | Quick start, prototyping, demos | Production, high volume, specific models |
+
+## Provider-Specific Examples
+
+### Anthropic (Claude)
+
+```bash
+curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "byok",
+    "provider": "anthropic",
+    "api_key": "sk-ant-api03-...",
+    "model": "claude-sonnet-4-20250514"
+  }'
+```
+
+Inside the workspace:
+
+```python
+from anthropic import Anthropic
+
+# ANTHROPIC_API_KEY is injected automatically
+client = Anthropic()
+message = client.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "Hello, Claude!"}]
+)
+print(message.content[0].text)
+```
+
+### OpenAI (GPT)
+
+```bash
+curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "byok",
+    "provider": "openai",
+    "api_key": "sk-proj-...",
+    "model": "gpt-4o"
+  }'
+```
+
+Inside the workspace:
+
+```python
+from openai import OpenAI
+
+# OPENAI_API_KEY is injected automatically
+client = OpenAI()
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Hello, GPT!"}]
+)
+print(response.choices[0].message.content)
+```
+
+### Google (Gemini)
+
+```bash
+curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "byok",
+    "provider": "google",
+    "api_key": "AIza...",
+    "model": "google/gemini-2.5-pro"
+  }'
+```
+
+Inside the workspace:
+
+```python
+import google.generativeai as genai
+
+# GOOGLE_API_KEY is injected automatically
+model = genai.GenerativeModel("gemini-2.5-pro")
+response = model.generate_content("Hello, Gemini!")
+print(response.text)
+```
+
+## Security Best Practices
+
+<Warning>
+Never set API keys using raw environment variables or `.env` files inside the workspace. Always use the `ai-config` endpoint — it ensures keys are encrypted, scoped, and never exposed in logs.
+</Warning>
+
+- **Rotate keys regularly** — update the key via the ai-config endpoint; no workspace restart needed
+- **Use scoped keys** — if your provider supports project-scoped or restricted keys, prefer those over organization-wide keys
+- **Audit usage** — monitor your provider dashboard for unexpected usage patterns
+- **One key per workspace** — avoid sharing the same key across many workspaces; this makes it easier to revoke access to a single workspace
+
+## Next Steps
+
+- [Managed AI Proxy](/guides/managed-proxy) — use Rigbox-provided credits instead
+- [Setup Scripts](/guides/setup-scripts) — automate SDK installation in every workspace
+- [Service Specs](/guides/service-specs) — run AI-powered backend services automatically

@@ -1,0 +1,266 @@
+---
+title: Architecture Explorer
+description: Visualize code structure, module dependencies, and handler call graphs.
+---
+
+Architecture Explorer analyzes your codebase and generates an interactive visualization of its structure — modules, dependencies, handler call graphs, and more. It runs inside your workspace and serves a web-based UI you can access from your browser.
+
+## What It Does
+
+Architecture Explorer scans your project files, builds a dependency graph, and renders it as an interactive web application. You can explore:
+
+- **Module structure** — how files and directories relate to each other
+- **Dependency graphs** — which modules import or depend on others
+- **Handler call graphs** — trace the flow from HTTP handlers through business logic
+- **Code metrics** — file sizes, complexity indicators, and module boundaries
+
+## Supported Languages
+
+| Language | Detection | What's analyzed |
+|----------|-----------|-----------------|
+| Rust | `Cargo.toml` | Crate dependencies, module tree, handler functions |
+| TypeScript | `package.json` | Import graph, component hierarchy, route definitions |
+| JavaScript | `package.json` | Import graph, module structure |
+
+<Note>
+Architecture Explorer scans up to **5 projects** at a maximum directory depth of **25**. For monorepos, it discovers and analyzes each project (crate or package) independently.
+</Note>
+
+## Availability by Image
+
+Architecture Explorer comes **pre-installed** in the `full` image. For other images, you need to install it first.
+
+| Image | Status | Action needed |
+|-------|--------|---------------|
+| `full` | Pre-installed | Launch directly |
+| `base` | Not installed | Install, then launch |
+| `dev` | Not installed | Install, then launch |
+| `openclaw` | Not installed | Install, then launch |
+
+<Tip>
+Use the `full` template if you want Architecture Explorer available immediately without an installation step. See [Images & Templates](/guides/images-and-templates) for details.
+</Tip>
+
+## Installation
+
+If your workspace doesn't use the `full` image, install Architecture Explorer first.
+
+<Steps>
+
+### Start the installation
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/architecture-explorer/install \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/architecture-explorer/install",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+print(f"Installation started: {response.json()}")
+```
+</CodeGroup>
+
+See [Install Architecture Explorer](/api-reference/tools/architecture-explorer/install) for the full response schema.
+
+### Poll for installation status
+
+Installation takes 1-3 minutes depending on the workspace image. Poll until the status is `installed`.
+
+<CodeGroup>
+```bash cURL
+while true; do
+  STATUS=$(curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/architecture-explorer/install-status \
+    -H "Authorization: Bearer $RIGBOX_API_KEY" | jq -r '.status')
+  echo "Status: $STATUS"
+  [ "$STATUS" = "installed" ] && break
+  sleep 5
+done
+```
+
+```python Python
+import time
+
+while True:
+    resp = requests.get(
+        f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/architecture-explorer/install-status",
+        headers={"Authorization": f"Bearer {api_key}"},
+    )
+    status = resp.json()["status"]
+    print(f"Installation: {status}")
+    if status == "installed":
+        break
+    time.sleep(5)
+```
+</CodeGroup>
+
+See [Installation Status](/api-reference/tools/architecture-explorer/install-status) for the response schema.
+
+### Installation complete
+
+Once installed, Architecture Explorer is ready to launch.
+
+</Steps>
+
+## Launching Architecture Explorer
+
+After installation (or immediately on the `full` image), launch the tool.
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/architecture-explorer/launch \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+```python Python
+response = requests.post(
+    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/architecture-explorer/launch",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+launch = response.json()
+print(f"Architecture Explorer launched")
+```
+</CodeGroup>
+
+See [Launch Architecture Explorer](/api-reference/tools/architecture-explorer/launch) for the response schema.
+
+## Accessing the Visualization
+
+Once launched, Architecture Explorer serves a Vite development server on **port 5174** inside the workspace. It's accessible at:
+
+```
+https://arch-{workspace-id}.rigbox.dev
+```
+
+Open this URL in your browser to interact with the visualization.
+
+<Note>
+The `arch-` prefixed subdomain is created automatically when you launch Architecture Explorer. You don't need to create an app route manually.
+</Note>
+
+### What you'll see
+
+The visualization includes:
+
+- **Project overview** — list of all detected projects with their type (Rust crate, Node.js package)
+- **Dependency graph** — interactive node graph showing how modules connect
+- **File tree** — expandable tree view of the analyzed directory structure
+- **Call graph** — for Rust projects, trace handler functions through layers of business logic
+- **Search** — find specific modules, functions, or files across all analyzed projects
+
+## Stopping Architecture Explorer
+
+When you're done, stop the tool to free up resources.
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/architecture-explorer/stop \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+```python Python
+requests.post(
+    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/architecture-explorer/stop",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+print("Architecture Explorer stopped")
+```
+</CodeGroup>
+
+See [Stop Architecture Explorer](/api-reference/tools/architecture-explorer/stop) for details.
+
+## Complete Example: Analyze a Rust Project
+
+This walkthrough clones a Rust project into a workspace and visualizes its architecture.
+
+<Steps>
+
+### Create a workspace with the full image
+
+```python
+import requests
+import time
+
+API_URL = "https://api.rigbox.dev/api"
+HEADERS = {"Authorization": f"Bearer {api_key}"}
+
+# Quick deploy with the full template (Architecture Explorer pre-installed)
+workspace = requests.post(
+    f"{API_URL}/quick-deploy",
+    headers=HEADERS,
+    json={"template_id": "full"},
+).json()
+
+workspace_id = workspace["id"]
+
+# Wait for the workspace to be running
+while True:
+    status = requests.get(
+        f"{API_URL}/workspaces/{workspace_id}",
+        headers=HEADERS,
+    ).json()["status"]
+    if status == "running":
+        break
+    time.sleep(2)
+
+print(f"Workspace running: {workspace_id}")
+```
+
+### Clone your project
+
+SSH into the workspace and clone the repository you want to analyze:
+
+```bash
+# Inside the VM
+git clone https://github.com/your-org/your-rust-project.git
+```
+
+### Launch Architecture Explorer
+
+```python
+response = requests.post(
+    f"{API_URL}/workspaces/{workspace_id}/tools/architecture-explorer/launch",
+    headers=HEADERS,
+)
+print(f"Launched — open https://arch-{workspace_id}.rigbox.dev")
+```
+
+### Explore the visualization
+
+Open `https://arch-{workspace_id}.rigbox.dev` in your browser. Architecture Explorer will scan the cloned project, detect `Cargo.toml`, and build the dependency and call graphs.
+
+### Stop when done
+
+```python
+requests.post(
+    f"{API_URL}/workspaces/{workspace_id}/tools/architecture-explorer/stop",
+    headers=HEADERS,
+)
+```
+
+</Steps>
+
+## Tips
+
+<Tip>
+For the fastest experience, use the `full` template. Architecture Explorer is pre-installed and ready to launch immediately — no installation wait.
+</Tip>
+
+<Tip>
+Architecture Explorer works best with well-structured projects that have clear module boundaries. Flat file structures with hundreds of files in one directory produce less useful visualizations.
+</Tip>
+
+<Warning>
+Architecture Explorer consumes CPU and RAM while running. If your workspace has limited resources (e.g., 512 MB RAM), consider stopping other services before launching.
+</Warning>
+
+## Next Steps
+
+- [Virtual Browser](/guides/virtual-browser) — run a remote browser inside your workspace
+- [Images & Templates](/guides/images-and-templates) — choose the right image for your tools
+- [Catalog Apps](/guides/catalog) — install VS Code, Jupyter, and other pre-packaged apps

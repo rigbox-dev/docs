@@ -1,0 +1,379 @@
+---
+title: Snapshots
+description: Save and restore full workspace state for checkpointing, branching, and recovery.
+---
+
+# Snapshots
+
+Snapshots capture the full disk state of a workspace — every file, installed package, database, and configuration. You can use them to checkpoint your work, experiment safely, or recover from mistakes.
+
+## How Snapshots Work
+
+A snapshot is a point-in-time copy of a workspace's entire filesystem. When you create a snapshot:
+
+1. The workspace must be **stopped** (not running)
+2. Rigbox copies the workspace's root filesystem image
+3. The snapshot is stored with sparse file optimization (only non-zero blocks are saved)
+4. You can restore the snapshot at any time to roll back the workspace to that exact state
+
+<Note>
+Snapshots capture disk state only — they do not capture running processes or in-memory state. Stop your workspace cleanly (let services shut down gracefully) before snapshotting.
+</Note>
+
+## Create a Snapshot
+
+Stop the workspace first, then create a named snapshot.
+
+**Step 1 — Stop the workspace:**
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/stop \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+```
+
+**Step 2 — Create the snapshot:**
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "before-migration"
+  }'
+```
+
+```python Python
+import requests
+
+# Stop the workspace
+requests.post(
+    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/stop",
+    headers={"Authorization": f"Bearer {token}"}
+)
+
+# Create the snapshot
+response = requests.post(
+    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots",
+    headers={"Authorization": f"Bearer {token}"},
+    json={"name": "before-migration"}
+)
+
+snapshot = response.json()
+print(snapshot["id"])          # "snap_abc123"
+print(snapshot["size_bytes"])  # 2147483648
+```
+
+```javascript JavaScript
+// Stop the workspace
+await fetch(
+  `https://api.rigbox.dev/api/workspaces/${workspaceId}/stop`,
+  {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${token}` },
+  }
+);
+
+// Create the snapshot
+const response = await fetch(
+  `https://api.rigbox.dev/api/workspaces/${workspaceId}/snapshots`,
+  {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name: "before-migration" }),
+  }
+);
+
+const snapshot = await response.json();
+console.log(snapshot.id); // "snap_abc123"
+```
+</CodeGroup>
+
+See the [Create Snapshot API reference](/api-reference/snapshots/create) for the full response schema.
+
+<Warning>
+Creating a snapshot while a workspace is running will return an error. Always stop the workspace first.
+</Warning>
+
+## List Snapshots
+
+### For a Specific Workspace
+
+```bash
+curl -s https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+```
+
+```json
+[
+  {
+    "id": "snap_abc123",
+    "workspace_id": "ws_xyz789",
+    "name": "before-migration",
+    "size_bytes": 2147483648,
+    "created_at": "2026-04-07T10:30:00Z"
+  },
+  {
+    "id": "snap_def456",
+    "workspace_id": "ws_xyz789",
+    "name": "after-setup",
+    "size_bytes": 1073741824,
+    "created_at": "2026-04-06T15:00:00Z"
+  }
+]
+```
+
+### All Your Snapshots
+
+To see snapshots across all your workspaces:
+
+```bash
+curl -s https://api.rigbox.dev/api/snapshots \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+```
+
+See the [List Snapshots API reference](/api-reference/snapshots/list) for pagination and filtering options.
+
+## Restore a Snapshot
+
+Restoring a snapshot replaces the workspace's current disk state with the snapshot's saved state.
+
+<CodeGroup>
+```bash cURL
+# Workspace must be stopped
+curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots/{snapshot_id}/restore \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+```
+
+```python Python
+# Workspace must be stopped
+response = requests.post(
+    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots/{snapshot_id}/restore",
+    headers={"Authorization": f"Bearer {token}"}
+)
+
+print(response.status_code)  # 200
+```
+
+```javascript JavaScript
+// Workspace must be stopped
+const response = await fetch(
+  `https://api.rigbox.dev/api/workspaces/${workspaceId}/snapshots/${snapshotId}/restore`,
+  {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${token}` },
+  }
+);
+
+console.log(response.status); // 200
+```
+</CodeGroup>
+
+<Warning>
+Restoring a snapshot **overwrites** the current workspace disk state. Any changes made since the snapshot was taken will be lost. If you want to keep the current state, create a new snapshot before restoring.
+</Warning>
+
+After restoring, start the workspace to boot into the restored state:
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/start \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+```
+
+## Delete a Snapshot
+
+```bash
+curl -X DELETE https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots/{snapshot_id} \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+```
+
+<Note>
+Deleting a snapshot is permanent and frees the associated storage. This does not affect the workspace itself.
+</Note>
+
+## Storage and Sizing
+
+Snapshots use **sparse file optimization**. This means only disk blocks that actually contain data are stored — empty space is not copied.
+
+| Workspace Disk Size | Typical Snapshot Size | Why |
+|---------------------|----------------------|-----|
+| 5 GB | 2-3 GB | OS and packages use ~2 GB, rest is empty space |
+| 10 GB | 3-5 GB | More data, but still sparse |
+| 20 GB | 5-10 GB | Depends on how much data you have stored |
+
+The actual size depends on how much data is written to the filesystem. A workspace with a 10 GB disk but only 3 GB of actual files will produce a snapshot close to 3 GB.
+
+<Tip>
+Check the `size_bytes` field in the snapshot response to see the actual storage used.
+</Tip>
+
+## Use Cases
+
+### Pre-Demo Checkpoint
+
+Snapshot before a live demo so you can instantly roll back if something breaks.
+
+```bash
+# Before the demo
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/stop \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/snapshots \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "pre-demo-2026-04-07"}'
+
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/start \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+
+# ... run the demo ...
+
+# Something went wrong — restore and try again
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/stop \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/snapshots/snap_predemo/restore \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/start \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+```
+
+### Experiment Branching
+
+Try a risky change without fear. Snapshot first, experiment freely, restore if it fails.
+
+```bash
+# Checkpoint current state
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/stop \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/snapshots \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "stable-model-v2"}'
+
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/start \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+
+# ... experiment with new model architecture ...
+# ... results are worse, roll back ...
+
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/stop \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/snapshots/snap_stable_v2/restore \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+
+curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/start \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+# Back to the known-good state
+```
+
+### Disaster Recovery
+
+Create regular snapshots as backups for critical workspaces.
+
+```bash
+#!/bin/bash
+# Run this on a schedule (e.g., daily via cron)
+WORKSPACE_ID="ws_production"
+DATE=$(date +%Y-%m-%d)
+
+# Stop, snapshot, start
+curl -X POST "https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/stop" \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+
+curl -X POST "https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/snapshots" \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"name\": \"daily-backup-$DATE\"}"
+
+curl -X POST "https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/start" \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+```
+
+<Tip>
+If you automate snapshots, consider cleaning up old ones periodically to manage storage. Keep the last N snapshots and delete older ones.
+</Tip>
+
+### Reproducibility
+
+Share a known-good workspace state with your team. Create a snapshot at a stable point, and teammates can restore from it to start from the exact same environment.
+
+## Complete Workflow Example
+
+Here is a full checkpoint-and-restore flow using Python.
+
+```python
+import requests
+import time
+
+BASE = "https://api.rigbox.dev/api"
+HEADERS = {"Authorization": f"Bearer {token}"}
+WS_ID = "ws_abc123"
+
+
+def stop_workspace():
+    """Stop the workspace and wait for it to be fully stopped."""
+    requests.post(f"{BASE}/workspaces/{WS_ID}/stop", headers=HEADERS)
+    # Poll until stopped
+    while True:
+        r = requests.get(f"{BASE}/workspaces/{WS_ID}", headers=HEADERS)
+        if r.json()["status"] == "stopped":
+            break
+        time.sleep(2)
+
+
+def start_workspace():
+    """Start the workspace."""
+    requests.post(f"{BASE}/workspaces/{WS_ID}/start", headers=HEADERS)
+
+
+def create_snapshot(name: str) -> str:
+    """Create a snapshot and return its ID."""
+    r = requests.post(
+        f"{BASE}/workspaces/{WS_ID}/snapshots",
+        headers=HEADERS,
+        json={"name": name}
+    )
+    return r.json()["id"]
+
+
+def restore_snapshot(snapshot_id: str):
+    """Restore a snapshot."""
+    requests.post(
+        f"{BASE}/workspaces/{WS_ID}/snapshots/{snapshot_id}/restore",
+        headers=HEADERS
+    )
+
+
+# Workflow: checkpoint -> experiment -> restore
+stop_workspace()
+snap_id = create_snapshot("before-experiment")
+start_workspace()
+
+# ... make changes, run experiments ...
+
+# Something went wrong — roll back
+stop_workspace()
+restore_snapshot(snap_id)
+start_workspace()
+# Back to the checkpointed state
+```
+
+## Limitations
+
+- **Workspace must be stopped** — you cannot snapshot or restore a running workspace
+- **Disk state only** — running processes and in-memory data are not captured
+- **Same workspace only** — you cannot restore a snapshot from workspace A into workspace B
+- **Storage costs** — snapshots consume storage proportional to their size; clean up old snapshots you no longer need
+
+## Next Steps
+
+- [Setup Scripts](/guides/setup-scripts) — automate the setup that leads to a snapshot-worthy state
+- [Service Specs](/guides/service-specs) — define services that auto-start after a snapshot restore
+- [Bring Your Own Keys](/guides/byok) — configure AI providers for workspaces you snapshot

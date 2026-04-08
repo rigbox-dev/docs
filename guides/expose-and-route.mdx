@@ -1,0 +1,298 @@
+---
+title: Expose Ports & Route Apps
+description: Map ports from inside your workspace to public URLs on rigbox.dev.
+---
+
+When a service runs inside your workspace, it's only accessible within the VM by default. To make it reachable from the internet, you create an **app** — a route that maps an internal port to a public URL at `{name}.rigbox.dev`.
+
+## How Routing Works
+
+The flow from a running service to a public URL:
+
+```
+Your service (port 8080 inside VM)
+  → App created with name "my-api"
+    → Rigbox configures reverse proxy
+      → Accessible at https://my-api.rigbox.dev
+```
+
+Each app gets a unique subdomain on `rigbox.dev`. HTTPS is handled automatically — your service only needs to listen on HTTP inside the VM.
+
+<Note>
+App subdomains are globally unique across all Rigbox users. If a name is taken, you'll need to choose a different one.
+</Note>
+
+## Discover Listening Ports
+
+Before exposing a port, you can check which ports have active listeners inside the workspace.
+
+<CodeGroup>
+```bash cURL
+curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/listening-ports \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/listening-ports",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+for port_info in response.json():
+    print(f"Port {port_info['port']} — {port_info.get('process', 'unknown')}")
+```
+</CodeGroup>
+
+This scans the workspace for active TCP listeners and returns the port number along with the process name when available.
+
+See [List Listening Ports](/api-reference/workspaces/listening-ports) for the full response schema.
+
+## Create an App Manually
+
+If you know the port and want full control over the app name, create it directly.
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/apps \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "workspace_id": "'$WORKSPACE_ID'",
+    "name": "my-api",
+    "port": 8080
+  }'
+```
+
+```python Python
+response = requests.post(
+    "https://api.rigbox.dev/api/apps",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={
+        "workspace_id": workspace_id,
+        "name": "my-api",
+        "port": 8080,
+    },
+)
+app = response.json()
+print(f"App URL: https://{app['name']}.rigbox.dev")
+```
+</CodeGroup>
+
+See [Create App](/api-reference/apps/create) for the full request/response schema.
+
+## Expose Port Shortcut
+
+The expose-port endpoint detects the process listening on the specified port and creates an app in one call. This is the easiest way to make a service public.
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/expose-port \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "port": 3000
+  }'
+```
+
+```python Python
+response = requests.post(
+    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/expose-port",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={"port": 3000},
+)
+app = response.json()
+print(f"Exposed at: https://{app['name']}.rigbox.dev")
+```
+</CodeGroup>
+
+The endpoint automatically detects the process name and uses it to generate a sensible app name.
+
+See [Expose Port](/api-reference/workspaces/expose-port) for details.
+
+## Reconcile Template Apps
+
+If your workspace was created from a template that defines default apps (like a web server or API), you can ensure those apps exist with a reconcile call.
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/reconcile-apps \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+This checks the template definition and creates any missing apps. It's idempotent — running it multiple times has no side effects.
+
+See [Reconcile Apps](/api-reference/workspaces/reconcile-apps) for details.
+
+## Check App Health
+
+Before sharing a URL, verify the app is reachable.
+
+<CodeGroup>
+```bash cURL
+curl -s https://api.rigbox.dev/api/apps/$APP_ID/health \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```
+
+```python Python
+response = requests.get(
+    f"https://api.rigbox.dev/api/apps/{app_id}/health",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+health = response.json()
+print(f"Healthy: {health['healthy']}")
+```
+</CodeGroup>
+
+<Tip>
+If health returns unhealthy, check that your service is actually listening on the correct port inside the VM. Use the listening-ports endpoint to verify.
+</Tip>
+
+See [App Health](/api-reference/apps/health) for the response schema.
+
+## App Lifecycle: Start, Stop, Restart
+
+Control the routing for an app without affecting the underlying service.
+
+<CodeGroup>
+```bash cURL (stop)
+curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/stop \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+```bash cURL (start)
+curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/start \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+```bash cURL (restart)
+curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/restart \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+</CodeGroup>
+
+| Action | Effect |
+|--------|--------|
+| `stop` | Removes the public route. The service inside the VM keeps running. |
+| `start` | Re-enables the public route. |
+| `restart` | Removes and re-adds the route. Useful if the proxy is in a bad state. |
+
+See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop), and [Restart App](/api-reference/apps/restart) for details.
+
+## Update an App
+
+You can rename an app or change its port. Renaming an app changes its public subdomain URL.
+
+<CodeGroup>
+```bash cURL
+curl -X PATCH https://api.rigbox.dev/api/apps/$APP_ID \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "new-name"
+  }'
+```
+
+```python Python
+response = requests.patch(
+    f"https://api.rigbox.dev/api/apps/{app_id}",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={"name": "new-name"},
+)
+app = response.json()
+print(f"New URL: https://{app['name']}.rigbox.dev")
+```
+</CodeGroup>
+
+<Warning>
+Renaming an app changes its public URL. Any existing links to the old subdomain will stop working immediately.
+</Warning>
+
+See [Update App](/api-reference/apps/update) for the full schema.
+
+## Delete an App
+
+Deleting an app removes the public route. The service inside the VM is unaffected.
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE https://api.rigbox.dev/api/apps/$APP_ID \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+```python Python
+requests.delete(
+    f"https://api.rigbox.dev/api/apps/{app_id}",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+```
+</CodeGroup>
+
+See [Delete App](/api-reference/apps/delete) for details.
+
+## Complete Example: Deploy a Python Server
+
+This walkthrough starts a Python HTTP server inside a workspace and exposes it to the internet.
+
+<Steps>
+
+### Start a service inside the VM
+
+SSH into your workspace and start a simple Python server:
+
+```bash
+# Inside the VM
+python3 -m http.server 8080 &
+```
+
+### Expose the port
+
+From your local machine, expose port 8080:
+
+```python
+import requests
+
+API_URL = "https://api.rigbox.dev/api"
+HEADERS = {"Authorization": f"Bearer {api_key}"}
+
+# Expose port 8080
+app = requests.post(
+    f"{API_URL}/workspaces/{workspace_id}/expose-port",
+    headers=HEADERS,
+    json={"port": 8080},
+).json()
+
+app_id = app["id"]
+app_url = f"https://{app['name']}.rigbox.dev"
+print(f"App created: {app_url}")
+```
+
+### Verify health
+
+```python
+import time
+
+# Wait a moment for the route to propagate
+time.sleep(3)
+
+health = requests.get(
+    f"{API_URL}/apps/{app_id}/health",
+    headers=HEADERS,
+).json()
+
+if health["healthy"]:
+    print(f"App is live at {app_url}")
+else:
+    print("App is not healthy yet — check the service is running")
+```
+
+### Share the URL
+
+Once healthy, anyone with the URL can access your service (if visibility is set to public). See [App Visibility](/guides/visibility) to control access.
+
+</Steps>
+
+## Next Steps
+
+- [App Visibility](/guides/visibility) — control who can access your apps
+- [Catalog Apps](/guides/catalog) — install VS Code, Jupyter, and more (routing is handled automatically)
+- [Workspaces](/guides/workspaces) — workspace lifecycle management

@@ -45,6 +45,66 @@
         ]
       },
       {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "guides/workspaces",
+              "guides/images-and-templates"
+            ]
+          },
+          {
+            "group": "App Hosting",
+            "pages": [
+              "guides/expose-and-route",
+              "guides/visibility"
+            ]
+          },
+          {
+            "group": "Tools",
+            "pages": [
+              "guides/architecture-explorer",
+              "guides/virtual-browser"
+            ]
+          },
+          {
+            "group": "Catalog Apps",
+            "pages": [
+              "guides/catalog"
+            ]
+          },
+          {
+            "group": "AI & Credits",
+            "pages": [
+              "guides/managed-proxy",
+              "guides/byok"
+            ]
+          },
+          {
+            "group": "Automation",
+            "pages": [
+              "guides/setup-scripts",
+              "guides/service-specs",
+              "guides/snapshots"
+            ]
+          },
+          {
+            "group": "Access & SSH",
+            "pages": [
+              "guides/ssh-access",
+              "guides/cli"
+            ]
+          },
+          {
+            "group": "Build With Rigbox",
+            "pages": [
+              "guides/build-hosting-platform"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API Reference",
         "groups": [
           {

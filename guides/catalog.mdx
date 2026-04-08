@@ -1,0 +1,344 @@
+---
+title: Catalog Apps
+description: Install pre-packaged apps like VS Code, Jupyter, and Streamlit in one call.
+---
+
+The Rigbox app catalog provides curated, pre-packaged applications that you can install into any workspace with a single API call. Each catalog app is configured with the correct port, subdomain, and systemd service — no manual setup required.
+
+## How It Works
+
+When you install a catalog app:
+
+1. Rigbox downloads and configures the app inside your workspace
+2. A **systemd service** is created so the app starts automatically and restarts on failure
+3. An **app route** is created, mapping the app's port to a `*.rigbox.dev` subdomain
+4. The app is immediately accessible once installation completes
+
+You manage installed catalog apps with the same endpoints you use for any other app — start, stop, restart, delete, and change visibility.
+
+## Available Apps
+
+Browse the catalog to see what's available.
+
+<CodeGroup>
+```bash cURL
+curl -s https://api.rigbox.dev/api/app-catalog \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.rigbox.dev/api/app-catalog",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+for app in response.json():
+    print(f"{app['id']:16} port={app['port']:5} — {app['description']}")
+```
+</CodeGroup>
+
+See [Browse Catalog](/api-reference/catalog/list) for the full response schema.
+
+### Catalog Reference
+
+| App | Catalog ID | Port | Subdomain | Description |
+|-----|-----------|------|-----------|-------------|
+| VS Code Server | `vscode` | 8443 | `vscode` | Browser-based VS Code with full extension support |
+| Jupyter Lab | `jupyter` | 8888 | `jupyter` | Interactive notebooks for Python, Julia, R |
+| Marimo | `marimo` | 8000 | `marimo` | Reactive Python notebooks |
+| Streamlit | `streamlit` | 8501 | `streamlit` | Python data app framework for dashboards |
+| File Browser | `filebrowser` | 8080 | `files` | Web-based file manager with upload/download |
+| Excalidraw | `excalidraw` | 3000 | `excalidraw` | Collaborative whiteboard and diagramming |
+| PGWeb | `pgweb` | 8081 | `pgweb` | PostgreSQL web client with query builder |
+| Chat Starter | `chat` | 3000 | `chat` | Minimal chat UI template with OpenAI integration |
+
+<Note>
+Subdomains are prefixed with the workspace name. For example, if your workspace app is named `my-ws-vscode`, the full URL would be `https://my-ws-vscode.rigbox.dev`.
+</Note>
+
+## Installing a Catalog App
+
+Install an app by sending the catalog ID. The endpoint returns a job ID you can use to track installation progress.
+
+<Steps>
+
+### Start the installation
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "catalog_id": "vscode"
+  }'
+```
+
+```python Python
+response = requests.post(
+    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/install-app",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={"catalog_id": "vscode"},
+)
+result = response.json()
+job_id = result["job_id"]
+print(f"Installation started — job: {job_id}")
+```
+</CodeGroup>
+
+See [Install Catalog App](/api-reference/catalog/install) for the full request/response schema.
+
+### Track installation progress
+
+Poll the job endpoint to check progress.
+
+<CodeGroup>
+```bash cURL
+curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/jobs/$JOB_ID \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```
+
+```python Python
+import time
+
+while True:
+    resp = requests.get(
+        f"https://api.rigbox.dev/api/workspaces/{workspace_id}/jobs/{job_id}",
+        headers={"Authorization": f"Bearer {api_key}"},
+    )
+    job = resp.json()
+    print(f"Status: {job['status']} — {job.get('message', '')}")
+    if job["status"] in ("completed", "failed"):
+        break
+    time.sleep(3)
+```
+</CodeGroup>
+
+See [Get Job Status](/api-reference/workspaces/job-status) for the response schema.
+
+### Access the installed app
+
+Once completed, the app is running and accessible at its subdomain URL.
+
+</Steps>
+
+## Managing Installed Apps
+
+After installation, catalog apps behave like any other app. Use the standard app endpoints to manage them.
+
+### Start and Stop
+
+<CodeGroup>
+```bash cURL (stop)
+curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/stop \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+```bash cURL (start)
+curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/start \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+```bash cURL (restart)
+curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/restart \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+</CodeGroup>
+
+See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop), and [Restart App](/api-reference/apps/restart) for details.
+
+### Change Visibility
+
+Catalog apps are private by default. Make them public or share with specific people.
+
+```bash
+curl -X PUT https://api.rigbox.dev/api/apps/$APP_ID/visibility \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"visibility": "public"}'
+```
+
+See [App Visibility](/guides/visibility) for all visibility options.
+
+### Delete
+
+Deleting an installed app removes both the route and the systemd service inside the workspace.
+
+```bash
+curl -X DELETE https://api.rigbox.dev/api/apps/$APP_ID \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+See [Delete App](/api-reference/apps/delete) for details.
+
+## App Details
+
+### VS Code Server
+
+A full browser-based VS Code instance with extension support, integrated terminal, and file editing. Runs [code-server](https://github.com/coder/code-server).
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"catalog_id": "vscode"}'
+```
+
+<Tip>
+VS Code Server supports installing extensions from the Open VSX registry. Search and install extensions directly from the browser UI.
+</Tip>
+
+### Jupyter Lab
+
+Interactive notebooks for Python, Julia, R, and more. Supports inline visualizations, markdown cells, and kernel management.
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"catalog_id": "jupyter"}'
+```
+
+### Marimo
+
+Reactive Python notebooks where cells automatically re-execute when dependencies change. An alternative to Jupyter with a focus on reproducibility.
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"catalog_id": "marimo"}'
+```
+
+### Streamlit
+
+Build interactive data dashboards and web apps in Python. Write a Python script and Streamlit renders it as a web application.
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"catalog_id": "streamlit"}'
+```
+
+### File Browser
+
+A web-based file manager with drag-and-drop upload, download, and file editing. Useful for managing files inside the workspace without SSH.
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"catalog_id": "filebrowser"}'
+```
+
+### Excalidraw
+
+A collaborative whiteboard for sketching diagrams, wireframes, and architecture drawings. Runs locally inside the workspace — no external dependencies.
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"catalog_id": "excalidraw"}'
+```
+
+### PGWeb
+
+A web-based PostgreSQL client with a query editor, table browser, and export functionality. Useful for inspecting databases running inside the workspace.
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"catalog_id": "pgweb"}'
+```
+
+### Chat Starter
+
+A minimal chat UI template with OpenAI API integration. Use it as a starting point for building conversational AI applications.
+
+```bash
+curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"catalog_id": "chat"}'
+```
+
+<Warning>
+Chat Starter requires Node.js, which is available in the `base`, `dev`, and `full` images but not in `openclaw`. Check your workspace image before installing.
+</Warning>
+
+## Image Compatibility
+
+Most catalog apps work on all images, but some have dependencies that not every image provides.
+
+| App | base | dev | full | openclaw |
+|-----|------|-----|------|----------|
+| VS Code Server | Yes | Yes | Yes | Yes |
+| Jupyter Lab | Yes | Yes | Yes | No (needs Python) |
+| Marimo | Yes | Yes | Yes | No (needs Python) |
+| Streamlit | Yes | Yes | Yes | No (needs Python) |
+| File Browser | Yes | Yes | Yes | Yes |
+| Excalidraw | Yes | Yes | Yes | Yes |
+| PGWeb | Yes | Yes | Yes | Yes |
+| Chat Starter | Yes | Yes | Yes | No (needs Node.js) |
+
+<Tip>
+The `base` image has pre-warmed npm caches for Jupyter, Marimo, Streamlit, and Excalidraw. Installation on `base` is significantly faster than on other images because dependencies are already downloaded.
+</Tip>
+
+## Complete Example: Install VS Code and Jupyter
+
+This walkthrough installs both VS Code and Jupyter Lab into a single workspace.
+
+```python
+import requests
+import time
+
+API_URL = "https://api.rigbox.dev/api"
+HEADERS = {"Authorization": f"Bearer {api_key}"}
+
+workspace_id = "your-workspace-id"
+
+# Install VS Code
+vscode_result = requests.post(
+    f"{API_URL}/workspaces/{workspace_id}/install-app",
+    headers=HEADERS,
+    json={"catalog_id": "vscode"},
+).json()
+print(f"VS Code install started — job: {vscode_result['job_id']}")
+
+# Install Jupyter
+jupyter_result = requests.post(
+    f"{API_URL}/workspaces/{workspace_id}/install-app",
+    headers=HEADERS,
+    json={"catalog_id": "jupyter"},
+).json()
+print(f"Jupyter install started — job: {jupyter_result['job_id']}")
+
+# Wait for both to complete
+for name, job_id in [("VS Code", vscode_result["job_id"]), ("Jupyter", jupyter_result["job_id"])]:
+    while True:
+        job = requests.get(
+            f"{API_URL}/workspaces/{workspace_id}/jobs/{job_id}",
+            headers=HEADERS,
+        ).json()
+        if job["status"] == "completed":
+            print(f"{name} installed successfully")
+            break
+        elif job["status"] == "failed":
+            print(f"{name} installation failed: {job.get('message', '')}")
+            break
+        time.sleep(3)
+
+print("Both apps installed and accessible at their subdomain URLs.")
+```
+
+## Next Steps
+
+- [Expose Ports & Route Apps](/guides/expose-and-route) — understand how app routing works
+- [App Visibility](/guides/visibility) — control who can access installed apps
+- [Workspaces](/guides/workspaces) — manage the workspace where your apps run
+- [Images & Templates](/guides/images-and-templates) — choose the right base image for your catalog apps
