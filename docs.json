@@ -8,8 +8,8 @@
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0b74ff",
-    "light": "#38bdf8",
+    "primary": "#10b981",
+    "light": "#00a866",
     "dark": "#0f0f11"
   },
   "openapi": [
