@@ -5,7 +5,7 @@ description: Track issues, enforce handoffs, and sync task state across AI agent
 
 # Task Management with td
 
-**td** is a task management CLI designed for AI-agent development workflows. It tracks issues locally in SQLite, enforces structured handoffs between sessions, and auto-syncs task state to the Rigbox platform.
+**td** is a task management CLI designed for AI-agent development workflows. It tracks issues locally in SQLite, enforces structured handoffs between sessions, and auto-syncs task state to the Rigbox platform. Rigbox ships a [fork](https://github.com/rigbox-dev/td) with workspace integration built in.
 
 When an agent's context window ends, the next session picks up exactly where the last one left off — no lost context, no duplicated work.
 
@@ -252,6 +252,10 @@ td usage --new-session
 td reviewable
 td approve td-a1b2c3 --reason "UI matches design spec, API calls correct"
 ```
+
+## Credits
+
+td was originally created by [Marcus Vorwaller](https://github.com/marcus/td) and is distributed under the MIT License. Rigbox maintains a [fork](https://github.com/rigbox-dev/td) with added workspace detection and platform sync.
 
 ## Next Steps
 

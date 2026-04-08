@@ -5,7 +5,7 @@ description: Monitor tasks, git status, files, agent sessions, and Rigbox worksp
 
 # Sidecar Dashboard
 
-Sidecar is a multi-pane TUI (Terminal User Interface) that runs alongside AI coding agents. It gives you real-time visibility into tasks, git status, files, agent conversations, and Rigbox workspace metrics — all without leaving the terminal.
+Sidecar is a multi-pane TUI (Terminal User Interface) that runs alongside AI coding agents. It gives you real-time visibility into tasks, git status, files, agent conversations, and Rigbox workspace metrics — all without leaving the terminal. Rigbox ships a [fork](https://github.com/rigbox-dev/sidecar) with a dedicated Rigbox plugin for workspace monitoring.
 
 <Note>
 Sidecar is pre-installed in the `dev` image. For other images, install it via a [setup script](/guides/setup-scripts). See [Images & Templates](/guides/images-and-templates) for details.
@@ -192,6 +192,10 @@ Sidecar uses a plugin-based architecture. Plugins are loaded automatically based
 - **conversations** plugin loads if agent session files are detected
 
 No manual configuration is needed — sidecar adapts to whatever tools are present.
+
+## Credits
+
+Sidecar was originally created by [Marcus Vorwaller](https://github.com/marcus/sidecar) and is distributed under the MIT License. Rigbox maintains a [fork](https://github.com/rigbox-dev/sidecar) with an added Rigbox workspace plugin for metrics, apps, credits, and task sync display.
 
 ## Next Steps
 
