@@ -103,8 +103,6 @@ See [List Templates](/api-reference/templates/list) for the full response schema
 
 Use this decision tree to pick the image that fits your workload:
 
-<Steps>
-
 ### Do you need AI bot deployment?
 
 If you're building a Telegram bot, web chat agent, or similar AI-powered service, use the **openclaw** image. It has the OpenClaw gateway pre-installed.
@@ -121,7 +119,6 @@ If you're compiling C/C++ code, building Docker images, or need debugging tools 
 
 The **base** image covers Python, Node.js, and general development. It's the smallest and fastest to boot.
 
-</Steps>
 
 <Tip>
 You can always install additional packages inside any workspace with `apt-get`. The image choice just determines what's pre-installed for faster startup.
