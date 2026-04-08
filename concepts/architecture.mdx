@@ -5,117 +5,56 @@ description: How Rigbox isolates workspaces, routes traffic, and manages AI prov
 
 # Architecture
 
-Rigbox uses a two-zone security model where the control plane manages orchestration and secrets, while the data plane runs untrusted code with no access to platform credentials.
-
-## Two-zone model
-
-```mermaid
-flowchart TB
-    subgraph Control["Control Plane"]
-        GW[API Gateway]
-        AUTH[Auth Service]
-        DB[(PostgreSQL)]
-    end
-
-    subgraph Data["Data Plane"]
-        VM1[Workspace VM]
-        VM2[Workspace VM]
-        VM3[Workspace VM]
-        PROXY[AI Proxy]
-    end
-
-    USER[User / API Client] --> GW
-    GW --> AUTH
-    GW --> DB
-    GW --> VM1
-    GW --> VM2
-    GW --> VM3
-    VM1 --> PROXY
-    VM2 --> PROXY
-    PROXY --> AI[AI Providers]
-```
-
-**Control Plane** holds:
-- API gateway — edge routing, rate limiting, request placement
-- Auth service — user authentication, API key management, billing
-- Database — all platform state (workspaces, apps, users, configs)
-
-**Data Plane** holds:
-- Workspace VMs — isolated Firecracker micro-VMs running user code
-- AI Proxy — injects provider API keys, enforces credit limits
-
-The two zones communicate over authenticated internal APIs on an encrypted mesh network. Workspace VMs have no access to the database, auth service, or other users' VMs.
+Rigbox separates platform operations from user code. Your workspaces run in isolated micro-VMs that have no access to platform credentials, other users' data, or control plane services.
 
 ## Workspace isolation
 
-Each workspace is a [Firecracker](https://firecracker-microvm.github.io/) micro-VM with:
+Each workspace is a [Firecracker](https://firecracker-microvm.github.io/) micro-VM — not a container. This gives you:
 
-- **Dedicated kernel** — not a container; each VM boots its own Linux kernel
-- **Own filesystem** — isolated ext4 disk, not shared with other workspaces
-- **Private network** — internal IP on an isolated network segment
+- **Dedicated kernel** — each VM boots its own Linux kernel, fully independent from other workspaces
+- **Own filesystem** — isolated ext4 disk with no shared volumes
+- **Private network** — workspaces cannot communicate with each other directly
 - **systemd init** — full Linux userspace with service management
-- **No platform secrets** — API keys, database credentials, and auth tokens never enter the VM
+- **No platform secrets** — credentials and internal tokens never enter the VM
 
-```mermaid
-flowchart LR
-    subgraph VM["Workspace VM"]
-        K[Linux Kernel]
-        FS[ext4 Filesystem]
-        SS[systemd Services]
-        APP[Your Code]
-    end
-    
-    SSH[SSH Access] --> VM
-    API[Rigbox API] --> VM
-    VM --> PROXY[AI Proxy]
-    VM --> CDN[App Subdomain]
-```
-
-This means even if code running inside a workspace is compromised, it cannot access other workspaces, platform secrets, or the control plane.
+Even if code running inside a workspace achieves root access, it is confined to that VM. It cannot reach other workspaces or platform infrastructure.
 
 ## App routing
 
-When you expose a port from a workspace, Rigbox creates a public URL:
+When you expose a port from a workspace, Rigbox creates a public URL with automatic HTTPS:
 
 ```mermaid
 flowchart LR
-    BROWSER[Browser] -->|HTTPS| CDN["my-app.rigbox.dev"]
-    CDN --> RP[Reverse Proxy]
-    RP -->|HTTP| VM["Workspace VM\nport 3000"]
+    BROWSER[Browser] -->|HTTPS| SUB["my-app.rigbox.dev"]
+    SUB --> VM["Your service\nport 3000"]
 ```
 
 - Each app gets a unique subdomain: `{name}.rigbox.dev`
-- HTTPS termination is automatic — your service only needs to listen on HTTP
-- The reverse proxy dynamically syncs routes as apps are created or deleted
+- HTTPS termination is automatic — your service only needs to listen on HTTP inside the VM
+- Routes are created and removed dynamically as you add or delete apps
 - [Visibility controls](/guides/visibility) determine who can access each app (public, private, or privileged)
 
 ## AI proxy
 
-The managed AI proxy sits between workspace VMs and upstream AI providers:
+The managed AI proxy lets your workspace code call AI providers without holding API keys:
 
 ```mermaid
 flowchart LR
-    CODE[Your code in VM] -->|SDK request| PROXY[AI Proxy]
-    PROXY -->|Injects API key| PROVIDER[Anthropic / OpenAI / Google]
-    PROXY --> CREDITS[Credit tracking]
+    CODE[Your code] -->|SDK request| PROXY[Rigbox AI Proxy]
+    PROXY -->|Authenticated| PROVIDER[Anthropic / OpenAI / Google]
+    PROXY --> CREDITS[Credits deducted]
 ```
 
-- Provider API keys are held by the proxy and never enter the VM
-- The proxy injects the correct key at request time based on the workspace's AI configuration
-- Token usage is metered and deducted from the user's credit balance
-- The proxy is opt-in per workspace — activate it via the [API](/api-reference/ai/update-workspace-ai-config) or [CLI](/guides/cli) (`rig proxy on`)
+- Provider API keys never enter your VM — the proxy injects them at request time
+- Token usage is metered and deducted from your credit balance
+- The proxy is opt-in per workspace — activate via the [API](/api-reference/ai/update-workspace-ai-config) or [CLI](/guides/cli) (`rig proxy on`)
+- Supports Anthropic, OpenAI, Google Gemini, and Brave Search
 
-See [Managed AI Proxy](/guides/managed-proxy) for usage details.
+See [Managed AI Proxy](/guides/managed-proxy) for usage details and [BYOK](/guides/byok) for using your own keys.
 
-## Regional deployment
+## Regions
 
-Workspaces run on compute nodes in specific regions. Each region has its own:
-
-- Compute servers running Firecracker VMs
-- AI proxy instance
-- App routing infrastructure
-
-SSH connections to `{region}.rigbox.dev` (e.g., `eu-west-1.rigbox.dev`) connect directly to the compute node in that region for lowest latency. The gateway at `rigbox.dev` can route to any region but adds a hop.
+Workspaces run in specific regions. SSH connections to `{region}.rigbox.dev` (e.g., `eu-west-1.rigbox.dev`) connect directly to the region for lowest latency. The base hostname `rigbox.dev` routes to any region but may add latency depending on your location.
 
 See [SSH Access](/guides/ssh-access) for connection details.
 
@@ -123,7 +62,7 @@ See [SSH Access](/guides/ssh-access) for connection details.
 
 <CardGroup cols={2}>
   <Card title="Security & Isolation" icon="shield" href="/concepts/security">
-    How Rigbox protects your code and credentials
+    Credential protection, access control, and network model
   </Card>
   <Card title="Resource Limits" icon="gauge" href="/concepts/limits">
     Plan tiers, quotas, and rate limits
