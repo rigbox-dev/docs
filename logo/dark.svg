@@ -1,16 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Rigbox Favicon">
-  <defs>
-    <linearGradient id="rigbox-bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f172a" />
-      <stop offset="100%" stop-color="#2563eb" />
-    </linearGradient>
-    <linearGradient id="rigbox-accent" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#22d3ee" />
-      <stop offset="100%" stop-color="#38bdf8" />
-    </linearGradient>
-  </defs>
-  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#rigbox-bg)" />
-  <rect x="12" y="12" width="40" height="40" rx="10" fill="url(#rigbox-accent)" opacity="0.2" />
-  <path d="M21 23L32 32L21 41" fill="none" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
-  <line x1="35" y1="41" x2="45" y2="41" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Rigbox Logo">
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="#0b74ff" />
+  <path d="M21 23L32 32L21 41" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+  <line x1="35" y1="41" x2="45" y2="41" stroke="#ffffff" stroke-width="5" stroke-linecap="round" />
 </svg>
