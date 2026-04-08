@@ -11,6 +11,8 @@ Workspaces are the core primitive in Rigbox. You create one, run code inside it,
 
 Every workspace moves through a predictable set of states:
 
+<div style={{textAlign: 'center'}}>
+
 ```mermaid
 stateDiagram-v2
     provisioned --> running : start
@@ -19,6 +21,8 @@ stateDiagram-v2
     stopped --> deleted : delete
     provisioned --> deleted : delete
 ```
+
+</div>
 
 | Status | Description |
 |--------|-------------|
