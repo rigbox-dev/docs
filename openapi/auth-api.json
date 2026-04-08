@@ -1,1452 +1,1476 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-        "title": "Rigbox Auth Access Control API",
-        "description": "Public access-control APIs served by rig-auth-service. Canonical refs use forms like `rig:account:u-123`, `rig:workspace:ws-123`, and `rig:app:app-123`. Use `/api/access-control/principals` to look up assignable users, `/api/access-control/bindings` for role grants, `/api/access-control/tags` for tag maps, `/api/access-control/throttle-binding` for throttle profiles, `/api/access-control/throttle-presets` to inspect available throttle profiles, and `/api/access-control/simulate` to preview an action against a canonical resource ref.",
-        "contact": {
-            "name": "Rigbox",
-            "url": "https://rigbox.dev"
-        },
-        "license": {
-            "name": ""
-        },
-        "version": "1.0.0"
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Rigbox Auth Access Control API",
+    "description": "Public access-control APIs served by rig-auth-service. Canonical refs use forms like `rig:account:u-123`, `rig:workspace:ws-123`, and `rig:app:app-123`. Use `/api/access-control/principals` to look up assignable users, `/api/access-control/bindings` for role grants, `/api/access-control/tags` for tag maps, `/api/access-control/throttle-binding` for throttle profiles, `/api/access-control/throttle-presets` to inspect available throttle profiles, and `/api/access-control/simulate` to preview an action against a canonical resource ref.",
+    "contact": {
+      "name": "Rigbox",
+      "url": "https://rigbox.dev"
     },
-    "servers": [
-        {
-            "url": "https://api.rigbox.dev",
-            "description": "Production"
-        }
-    ],
-    "paths": {
-        "/api/access-control/bindings": {
-            "get": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "list_bindings",
-                "parameters": [
-                    {
-                        "name": "resource",
-                        "in": "query",
-                        "description": "Canonical resource ref, e.g. rig:workspace:ws-123",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Resource access bindings",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/BindingsResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid resource or unsupported direct bindings",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Caller is not allowed to read bindings for this resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Resource not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "create_binding",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateBindingRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Access binding created",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AccessBinding"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request or unknown role preset",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Caller is not allowed to modify bindings for this resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Resource not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "delete_binding",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/DeleteBindingRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Access binding deleted",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DeleteResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Caller is not allowed to modify bindings for this resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Binding or resource not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "patch": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "update_binding",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateBindingRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Access binding updated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AccessBinding"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request or unknown role preset",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Caller is not allowed to modify bindings for this resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Binding or resource not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/access-control/principals": {
-            "get": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "search_principals",
-                "parameters": [
-                    {
-                        "name": "resource",
-                        "in": "query",
-                        "description": "Canonical resource ref, e.g. rig:workspace:ws-123",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "query",
-                        "in": "query",
-                        "description": "Email or display-name search text",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Optional result limit (max 20)",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "minimum": 0
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Assignable principal search results",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PrincipalLookupResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid resource or query",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Caller is not allowed to manage bindings for this resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Resource not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/access-control/role-presets": {
-            "get": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "list_role_presets",
-                "parameters": [
-                    {
-                        "name": "scope_kind",
-                        "in": "query",
-                        "description": "Optional role preset scope: platform, account, or workspace",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Available role presets",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/RolePresetsResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/access-control/simulate": {
-            "post": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "simulate_access",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/SimulateAccessRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Authorization decision simulation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SimulateAccessResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid resource, action, or principal",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Caller is not allowed to simulate access for this resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Resource or principal not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/access-control/tags": {
-            "get": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "get_tags",
-                "parameters": [
-                    {
-                        "name": "resource",
-                        "in": "query",
-                        "description": "Canonical resource ref, e.g. rig:app:app-123",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Resource tags",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TagsResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid resource or unsupported direct tags",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Caller is not allowed to read tags for this resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Resource not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "put_tags",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateTagsRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Resource tags updated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TagsResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid resource or unsupported direct tags",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Caller is not allowed to update tags for this resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Resource not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/access-control/throttle-binding": {
-            "get": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "get_throttle_binding",
-                "parameters": [
-                    {
-                        "name": "resource",
-                        "in": "query",
-                        "description": "Canonical resource ref, e.g. rig:workspace:ws-123",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Throttle binding for a resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ThrottleBindingResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid resource or unsupported direct throttle binding",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Caller is not allowed to read throttle bindings for this resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Resource not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "put_throttle_binding",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateThrottleBindingRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Throttle binding updated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ThrottleBindingResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid resource or unknown throttle preset",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Caller is not allowed to update throttle bindings for this resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Resource not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/access-control/throttle-presets": {
-            "get": {
-                "tags": [
-                    "Access Control"
-                ],
-                "operationId": "list_throttle_presets",
-                "parameters": [
-                    {
-                        "name": "resource",
-                        "in": "query",
-                        "description": "Canonical resource ref, e.g. rig:workspace:ws-123",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Available throttle presets for a resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ThrottlePresetsResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid resource or unsupported direct throttle binding",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Missing or invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Caller is not allowed to manage throttle bindings for this resource",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Resource not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiErrorBody"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        }
+    "license": {
+      "name": ""
     },
-    "components": {
-        "schemas": {
-            "AccessBinding": {
-                "type": "object",
-                "required": [
-                    "principal_ref",
-                    "resource_ref",
-                    "role",
-                    "created_at",
-                    "updated_at"
-                ],
-                "properties": {
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "created_by_ref": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "principal_ref": {
-                        "type": "string"
-                    },
-                    "resource_ref": {
-                        "type": "string"
-                    },
-                    "role": {
-                        "type": "string"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            },
-            "ApiErrorBody": {
-                "type": "object",
-                "description": "JSON body returned for all errors.",
-                "required": [
-                    "error"
-                ],
-                "properties": {
-                    "error": {
-                        "$ref": "#/components/schemas/ApiErrorDetail"
-                    }
-                }
-            },
-            "ApiErrorDetail": {
-                "type": "object",
-                "required": [
-                    "code",
-                    "message"
-                ],
-                "properties": {
-                    "code": {
-                        "type": "string"
-                    },
-                    "message": {
-                        "type": "string"
-                    }
-                }
-            },
-            "BindingsResponse": {
-                "type": "object",
-                "required": [
-                    "bindings"
-                ],
-                "properties": {
-                    "bindings": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/AccessBinding"
-                        }
-                    }
-                }
-            },
-            "CreateBindingRequest": {
-                "type": "object",
-                "required": [
-                    "principal",
-                    "resource",
-                    "role"
-                ],
-                "properties": {
-                    "principal": {
-                        "type": "string"
-                    },
-                    "resource": {
-                        "type": "string"
-                    },
-                    "role": {
-                        "type": "string"
-                    }
-                }
-            },
-            "DeleteBindingRequest": {
-                "type": "object",
-                "required": [
-                    "principal",
-                    "resource",
-                    "role"
-                ],
-                "properties": {
-                    "principal": {
-                        "type": "string"
-                    },
-                    "resource": {
-                        "type": "string"
-                    },
-                    "role": {
-                        "type": "string"
-                    }
-                }
-            },
-            "DeleteResponse": {
-                "type": "object",
-                "required": [
-                    "deleted"
-                ],
-                "properties": {
-                    "deleted": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            "PrincipalLookupResponse": {
-                "type": "object",
-                "required": [
-                    "principals"
-                ],
-                "properties": {
-                    "principals": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/PrincipalLookupResult"
-                        }
-                    }
-                }
-            },
-            "PrincipalLookupResult": {
-                "type": "object",
-                "required": [
-                    "principal",
-                    "user_id",
-                    "email"
-                ],
-                "properties": {
-                    "display_name": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "email": {
-                        "type": "string"
-                    },
-                    "principal": {
-                        "type": "string"
-                    },
-                    "user_id": {
-                        "type": "string"
-                    }
-                }
-            },
-            "RolePreset": {
-                "type": "object",
-                "required": [
-                    "scope_kind",
-                    "role",
-                    "permissions",
-                    "required_resource_tags",
-                    "match_tag_keys",
-                    "system_managed",
-                    "updated_at"
-                ],
-                "properties": {
-                    "match_tag_keys": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "permissions": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "required_resource_tags": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string"
-                        },
-                        "propertyNames": {
-                            "type": "string"
-                        }
-                    },
-                    "role": {
-                        "type": "string"
-                    },
-                    "scope_kind": {
-                        "type": "string"
-                    },
-                    "system_managed": {
-                        "type": "boolean"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            },
-            "RolePresetsResponse": {
-                "type": "object",
-                "required": [
-                    "presets"
-                ],
-                "properties": {
-                    "presets": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RolePreset"
-                        }
-                    }
-                }
-            },
-            "SimulateAccessRequest": {
-                "type": "object",
-                "required": [
-                    "resource",
-                    "action"
-                ],
-                "properties": {
-                    "action": {
-                        "type": "string"
-                    },
-                    "principal": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "resource": {
-                        "type": "string"
-                    }
-                }
-            },
-            "SimulateAccessResponse": {
-                "type": "object",
-                "required": [
-                    "principal",
-                    "resource",
-                    "action",
-                    "allowed",
-                    "reason"
-                ],
-                "properties": {
-                    "action": {
-                        "type": "string"
-                    },
-                    "allowed": {
-                        "type": "boolean"
-                    },
-                    "principal": {
-                        "type": "string"
-                    },
-                    "reason": {
-                        "type": "string"
-                    },
-                    "resource": {
-                        "type": "string"
-                    }
-                }
-            },
-            "TagsResponse": {
-                "type": "object",
-                "required": [
-                    "resource",
-                    "tags"
-                ],
-                "properties": {
-                    "resource": {
-                        "type": "string"
-                    },
-                    "tags": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string"
-                        },
-                        "propertyNames": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "ThrottleBindingResponse": {
-                "type": "object",
-                "required": [
-                    "resource"
-                ],
-                "properties": {
-                    "profile": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "resource": {
-                        "type": "string"
-                    }
-                }
-            },
-            "ThrottlePreset": {
-                "type": "object",
-                "required": [
-                    "name",
-                    "rules",
-                    "system_managed",
-                    "updated_at"
-                ],
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "rules": {},
-                    "system_managed": {
-                        "type": "boolean"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            },
-            "ThrottlePresetsResponse": {
-                "type": "object",
-                "required": [
-                    "presets"
-                ],
-                "properties": {
-                    "presets": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ThrottlePreset"
-                        }
-                    }
-                }
-            },
-            "UpdateBindingRequest": {
-                "type": "object",
-                "required": [
-                    "principal",
-                    "resource",
-                    "current_role",
-                    "new_role"
-                ],
-                "properties": {
-                    "current_role": {
-                        "type": "string"
-                    },
-                    "new_role": {
-                        "type": "string"
-                    },
-                    "principal": {
-                        "type": "string"
-                    },
-                    "resource": {
-                        "type": "string"
-                    }
-                }
-            },
-            "UpdateTagsRequest": {
-                "type": "object",
-                "required": [
-                    "resource",
-                    "tags"
-                ],
-                "properties": {
-                    "resource": {
-                        "type": "string"
-                    },
-                    "tags": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string"
-                        },
-                        "propertyNames": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "UpdateThrottleBindingRequest": {
-                "type": "object",
-                "required": [
-                    "resource"
-                ],
-                "properties": {
-                    "profile": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "resource": {
-                        "type": "string"
-                    }
-                }
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.rigbox.dev",
+      "description": "Production"
+    }
+  ],
+  "paths": {
+    "/api/access-control/bindings": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "list_bindings",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Canonical resource ref, e.g. rig:workspace:ws-123",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource access bindings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BindingsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid resource or unsupported direct bindings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not allowed to read bindings for this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
         },
-        "securitySchemes": {
-            "bearer": {
-                "type": "http",
-                "scheme": "bearer"
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List bindings",
+        "description": "Returns all role bindings, showing who has what access to which resources. Filter by resource ref or principal to narrow results."
+      },
+      "post": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "create_binding",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBindingRequest"
+              }
             }
-        }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Access binding created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessBinding"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or unknown role preset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not allowed to modify bindings for this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create binding",
+        "description": "Grants a role to a principal on a specific resource. Resource refs use the format `rig:account:{id}`, `rig:workspace:{id}`, or `rig:app:{id}`."
+      },
+      "delete": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "delete_binding",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteBindingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Access binding deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not allowed to modify bindings for this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Binding or resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete binding",
+        "description": "Revokes a role binding, removing the principal's access to the specified resource."
+      },
+      "patch": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "update_binding",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBindingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Access binding updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessBinding"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or unknown role preset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not allowed to modify bindings for this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Binding or resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update binding",
+        "description": "Updates an existing role binding, such as changing the assigned role or modifying conditions."
+      }
     },
-    "tags": [
-        {
-            "name": "Access Control"
+    "/api/access-control/principals": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "search_principals",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Canonical resource ref, e.g. rig:workspace:ws-123",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "description": "Email or display-name search text",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Optional result limit (max 20)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Assignable principal search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrincipalLookupResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid resource or query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not allowed to manage bindings for this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Search principals",
+        "description": "Search for users and service accounts that can be assigned roles. Use this to look up principals by email or name before creating role bindings."
+      }
+    },
+    "/api/access-control/role-presets": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "list_role_presets",
+        "parameters": [
+          {
+            "name": "scope_kind",
+            "in": "query",
+            "description": "Optional role preset scope: platform, account, or workspace",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available role presets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolePresetsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List role presets",
+        "description": "Returns available role presets and their permissions. Use these when creating role bindings."
+      }
+    },
+    "/api/access-control/simulate": {
+      "post": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "simulate_access",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulateAccessRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Authorization decision simulation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulateAccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid resource, action, or principal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not allowed to simulate access for this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or principal not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Simulate access",
+        "description": "Tests whether a specific action would be allowed for a given principal and resource, without making any changes. Useful for debugging access control policies."
+      }
+    },
+    "/api/access-control/tags": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "get_tags",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Canonical resource ref, e.g. rig:app:app-123",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid resource or unsupported direct tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not allowed to read tags for this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get tags",
+        "description": "Returns tags assigned to a resource. Tags are used in policy evaluation to match access control rules."
+      },
+      "put": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "put_tags",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Resource tags updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid resource or unsupported direct tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not allowed to update tags for this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update tags",
+        "description": "Updates the tags on a resource. Tags can trigger or restrict access control rules during policy evaluation."
+      }
+    },
+    "/api/access-control/throttle-binding": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "get_throttle_binding",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Canonical resource ref, e.g. rig:workspace:ws-123",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Throttle binding for a resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThrottleBindingResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid resource or unsupported direct throttle binding",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not allowed to read throttle bindings for this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get throttle binding",
+        "description": "Returns the throttle profile currently bound to a resource. Throttle profiles control rate limits for API requests."
+      },
+      "put": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "put_throttle_binding",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateThrottleBindingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Throttle binding updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThrottleBindingResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid resource or unknown throttle preset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not allowed to update throttle bindings for this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update throttle binding",
+        "description": "Assigns a throttle profile to a resource, controlling the rate limits applied to API requests targeting that resource."
+      }
+    },
+    "/api/access-control/throttle-presets": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "list_throttle_presets",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Canonical resource ref, e.g. rig:workspace:ws-123",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available throttle presets for a resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThrottlePresetsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid resource or unsupported direct throttle binding",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not allowed to manage throttle bindings for this resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List throttle presets",
+        "description": "Returns available throttle presets (rate limit profiles). Each preset defines requests-per-minute and burst limits."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccessBinding": {
+        "type": "object",
+        "required": [
+          "principal_ref",
+          "resource_ref",
+          "role",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "principal_ref": {
+            "type": "string"
+          },
+          "resource_ref": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
-    ]
+      },
+      "ApiErrorBody": {
+        "type": "object",
+        "description": "JSON body returned for all errors.",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ApiErrorDetail"
+          }
+        }
+      },
+      "ApiErrorDetail": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "BindingsResponse": {
+        "type": "object",
+        "required": [
+          "bindings"
+        ],
+        "properties": {
+          "bindings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccessBinding"
+            }
+          }
+        }
+      },
+      "CreateBindingRequest": {
+        "type": "object",
+        "required": [
+          "principal",
+          "resource",
+          "role"
+        ],
+        "properties": {
+          "principal": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "DeleteBindingRequest": {
+        "type": "object",
+        "required": [
+          "principal",
+          "resource",
+          "role"
+        ],
+        "properties": {
+          "principal": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "DeleteResponse": {
+        "type": "object",
+        "required": [
+          "deleted"
+        ],
+        "properties": {
+          "deleted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PrincipalLookupResponse": {
+        "type": "object",
+        "required": [
+          "principals"
+        ],
+        "properties": {
+          "principals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrincipalLookupResult"
+            }
+          }
+        }
+      },
+      "PrincipalLookupResult": {
+        "type": "object",
+        "required": [
+          "principal",
+          "user_id",
+          "email"
+        ],
+        "properties": {
+          "display_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": "string"
+          },
+          "principal": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
+      "RolePreset": {
+        "type": "object",
+        "required": [
+          "scope_kind",
+          "role",
+          "permissions",
+          "required_resource_tags",
+          "match_tag_keys",
+          "system_managed",
+          "updated_at"
+        ],
+        "properties": {
+          "match_tag_keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_resource_tags": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "role": {
+            "type": "string"
+          },
+          "scope_kind": {
+            "type": "string"
+          },
+          "system_managed": {
+            "type": "boolean"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RolePresetsResponse": {
+        "type": "object",
+        "required": [
+          "presets"
+        ],
+        "properties": {
+          "presets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RolePreset"
+            }
+          }
+        }
+      },
+      "SimulateAccessRequest": {
+        "type": "object",
+        "required": [
+          "resource",
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "principal": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resource": {
+            "type": "string"
+          }
+        }
+      },
+      "SimulateAccessResponse": {
+        "type": "object",
+        "required": [
+          "principal",
+          "resource",
+          "action",
+          "allowed",
+          "reason"
+        ],
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "allowed": {
+            "type": "boolean"
+          },
+          "principal": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          }
+        }
+      },
+      "TagsResponse": {
+        "type": "object",
+        "required": [
+          "resource",
+          "tags"
+        ],
+        "properties": {
+          "resource": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ThrottleBindingResponse": {
+        "type": "object",
+        "required": [
+          "resource"
+        ],
+        "properties": {
+          "profile": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resource": {
+            "type": "string"
+          }
+        }
+      },
+      "ThrottlePreset": {
+        "type": "object",
+        "required": [
+          "name",
+          "rules",
+          "system_managed",
+          "updated_at"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "rules": {},
+          "system_managed": {
+            "type": "boolean"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ThrottlePresetsResponse": {
+        "type": "object",
+        "required": [
+          "presets"
+        ],
+        "properties": {
+          "presets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ThrottlePreset"
+            }
+          }
+        }
+      },
+      "UpdateBindingRequest": {
+        "type": "object",
+        "required": [
+          "principal",
+          "resource",
+          "current_role",
+          "new_role"
+        ],
+        "properties": {
+          "current_role": {
+            "type": "string"
+          },
+          "new_role": {
+            "type": "string"
+          },
+          "principal": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateTagsRequest": {
+        "type": "object",
+        "required": [
+          "resource",
+          "tags"
+        ],
+        "properties": {
+          "resource": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "UpdateThrottleBindingRequest": {
+        "type": "object",
+        "required": [
+          "resource"
+        ],
+        "properties": {
+          "profile": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resource": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Access Control"
+    }
+  ]
 }
