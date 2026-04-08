@@ -10,14 +10,7 @@
   "colors": {
     "primary": "#0b74ff",
     "light": "#38bdf8",
-    "dark": "#0f0f11",
-    "background": {
-      "dark": "#0f0f11",
-      "light": "#f7fafc"
-    }
-  },
-  "appearance": {
-    "default": "dark"
+    "dark": "#0f0f11"
   },
   "openapi": [
     "https://api.rigbox.dev/api-docs/openapi.json",
