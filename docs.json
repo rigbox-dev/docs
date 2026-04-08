@@ -30,6 +30,12 @@
             ]
           },
           {
+            "group": "Sandbox Integration",
+            "pages": [
+              "sandbox-api-surface"
+            ]
+          },
+          {
             "group": "Clawd Integration",
             "pages": [
               "clawd-api-surface",

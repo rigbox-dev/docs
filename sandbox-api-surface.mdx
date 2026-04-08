@@ -1,0 +1,89 @@
+---
+title: Sandbox API Surface
+description: Which APIs power sandbox.rigbox.dev and how to reuse them in your own app
+---
+
+# Sandbox API Surface
+
+`sandbox.rigbox.dev` is built on top of the same Rigbox API base (`https://api.rigbox.dev/api`). It provides a streamlined UI for running AI-generated code in isolated Firecracker micro-VMs with terminal access, app management, and log streaming.
+
+Use this guide as an API map when building your own sandbox-like experience.
+
+## API Groups
+
+| Group | What it does | Should you use it in your own app? |
+| --- | --- | --- |
+| Core Workspace APIs | Create, start, stop, delete sandboxes | Yes, these are the foundation |
+| App Management APIs | Deploy, monitor, and expose apps running inside sandboxes | Yes, for any app hosting |
+| Log Streaming APIs | View historical and real-time app logs | Yes, for observability |
+| API Key Management | Manage programmatic access keys | Yes, for automation |
+
+## Core Rigbox APIs Used by Sandbox
+
+| Endpoint | Used for |
+| --- | --- |
+| `GET /workspaces` | List all sandboxes on the dashboard |
+| `GET /workspaces/{id}` | Fetch sandbox detail view (metadata + status) |
+| `POST /workspaces/{id}/start` | Start a stopped sandbox |
+| `POST /workspaces/{id}/stop` | Stop a running sandbox |
+| `DELETE /workspaces/{id}` | Delete a sandbox permanently |
+| `POST /quick-deploy` | One-shot sandbox creation from template |
+| `GET /capacity` | Check available slots before creating a sandbox |
+
+## App Management APIs Used by Sandbox
+
+| Endpoint | Used for |
+| --- | --- |
+| `GET /apps` | List apps in a workspace (filtered by `workspace_id`) |
+| `PATCH /apps/{id}` | Toggle app visibility (public/private) |
+| `GET /apps/{id}/health` | Check if an app is reachable |
+| `POST /workspaces/{id}/reconcile-apps` | Ensure template apps exist after deploy |
+
+## Log Streaming APIs
+
+| Endpoint | Used for |
+| --- | --- |
+| `GET /apps/{id}/logs` | Fetch historical logs with pagination (`?lines=200&direction=oldest`) |
+| `GET /apps/{id}/logs/stream` | Stream live logs via SSE (`?lines=200&interval_ms=3000`) |
+
+<Note>
+  Log streaming uses Server-Sent Events (SSE). Set `Accept: text/event-stream` header and read the response as an event stream.
+</Note>
+
+## API Key Management
+
+| Endpoint | Used for |
+| --- | --- |
+| `GET /api-keys` | List user's API keys |
+| `POST /api-keys` | Create a new API key |
+| `DELETE /api-keys/{id}` | Revoke an API key |
+
+## Terminal Access
+
+The Sandbox UI provides terminal access to workspaces via WebSocket connections. This uses the shared terminal infrastructure (xterm.js) and connects through the SSH gateway, not through the REST API.
+
+## Authentication
+
+The Sandbox UI authenticates via Clerk session tokens. For programmatic access, use API keys with the `Authorization: Bearer rb_...` header.
+
+## Minimal Sandbox-Like Integration Flow
+
+1. Check capacity with `GET /capacity` — verify `available` is `true`.
+2. Call `POST /quick-deploy` with your desired template.
+3. Poll `GET /workspaces/{id}` until `status` is `running`.
+4. Call `POST /workspaces/{id}/reconcile-apps` to ensure apps are created.
+5. List apps with `GET /apps?workspace_id={id}`.
+6. Stream logs with `GET /apps/{id}/logs/stream` for real-time output.
+7. Toggle visibility with `PATCH /apps/{id}` to expose apps publicly.
+
+## Key Differences from Clawd
+
+| Feature | Sandbox | Clawd |
+| --- | --- | --- |
+| Primary use case | Run any code in isolated VMs | Deploy OpenClaw AI bots |
+| AI config management | Available but optional | Core feature (managed/BYOK) |
+| Terminal access | Built-in xterm.js terminal | Not included |
+| App log streaming | SSE-based live logs | SSE-based live logs |
+| Template focus | General-purpose | OpenClaw-specific |
+
+For the Clawd-specific API surface, see [/clawd-api-surface](/clawd-api-surface).
