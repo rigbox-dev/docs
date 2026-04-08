@@ -41,7 +41,7 @@ Rigbox uses a two-zone security model:
 - **Control Plane** — holds agent runtimes, API keys, and user state. Runs the API gateway, auth service, and admin portal.
 - **Data Plane** — runs untrusted generated code in Firecracker VMs with no access to platform secrets.
 
-All communication between zones goes through authenticated internal APIs over a Tailscale mesh.
+All communication between zones goes through authenticated internal APIs over an encrypted mesh network.
 
 ## Integration guides
 

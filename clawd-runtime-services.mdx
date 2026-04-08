@@ -18,7 +18,7 @@ This page documents Clawd-specific runtime behavior as a separate service layer 
 
 ## Managed AI Proxy (Clawd Runtime)
 
-In managed mode, the workspace does not hold provider API keys in the VM. Instead it sends requests to the internal proxy URL (`AI_PROXY_URL`, default `http://172.16.0.1:9090`).
+In managed mode, the workspace does not hold provider API keys in the VM. Instead it sends requests to an internal proxy service (`AI_PROXY_URL`).
 
 The proxy service handles:
 
