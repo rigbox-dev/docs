@@ -178,9 +178,7 @@ See [Stop Architecture Explorer](/api-reference/tools/architecture-explorer/stop
 
 This walkthrough clones a Rust project into a workspace and visualizes its architecture.
 
-<Steps>
-
-### Create a workspace with the full image
+**1. Create a workspace with the full image**
 
 ```python
 import requests
@@ -196,45 +194,44 @@ workspace = requests.post(
     json={"template_id": "full"},
 ).json()
 
-workspace_id = workspace["id"]
+workspace_id = workspace["workspace"]["id"]
 
 # Wait for the workspace to be running
 while True:
-    status = requests.get(
+    ws = requests.get(
         f"{API_URL}/workspaces/{workspace_id}",
         headers=HEADERS,
-    ).json()["status"]
-    if status == "running":
+    ).json()
+    if ws["vm"]["status"] == "running":
         break
     time.sleep(2)
 
 print(f"Workspace running: {workspace_id}")
 ```
 
-### Clone your project
+**2. Clone your project**
 
 SSH into the workspace and clone the repository you want to analyze:
 
 ```bash
-# Inside the VM
 git clone https://github.com/your-org/your-rust-project.git
 ```
 
-### Launch Architecture Explorer
+**3. Launch Architecture Explorer**
 
 ```python
-response = requests.post(
+requests.post(
     f"{API_URL}/workspaces/{workspace_id}/tools/architecture-explorer/launch",
     headers=HEADERS,
 )
 print(f"Launched — open https://arch-{workspace_id}.rigbox.dev")
 ```
 
-### Explore the visualization
+**4. Explore the visualization**
 
 Open `https://arch-{workspace_id}.rigbox.dev` in your browser. Architecture Explorer will scan the cloned project, detect `Cargo.toml`, and build the dependency and call graphs.
 
-### Stop when done
+**5. Stop when done**
 
 ```python
 requests.post(
@@ -242,8 +239,6 @@ requests.post(
     headers=HEADERS,
 )
 ```
-
-</Steps>
 
 ## Tips
 
