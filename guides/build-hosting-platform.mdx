@@ -341,7 +341,7 @@ curl -X DELETE https://api.rigbox.dev/api/workspaces/{workspace_id} \
 [Clawd](https://clawd.rigbox.dev) is an AI bot hosting platform built on Rigbox. Here is what makes it unique:
 
 - **Template**: Uses `openclaw` for Telegram bot deployment
-- **Billing**: Integrates Stripe via `POST /api/auth/create-checkout-session` to sell credit packs
+- **Billing**: Integrates Stripe for credit pack sales (billing is handled outside the Rigbox API)
 - **Dashboard**: Shows real-time metrics and AI credit balance
 - **AI config**: Lets users pick their provider and model through a settings UI
 

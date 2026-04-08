@@ -58,16 +58,9 @@ These are the APIs that manage AI provider configuration:
   Prefer `PUT /workspaces/{id}/ai-config` for AI provider changes. It is normalized and safer than raw env mutation.
 </Note>
 
-## Billing and Subscription APIs Used by Clawd UI
+## Billing and Subscriptions
 
-| Endpoint | Purpose |
-| --- | --- |
-| `POST /auth/create-checkout-session` | Start Stripe checkout |
-| `GET /auth/subscription-status` | Resolve active plan status |
-| `POST /auth/create-portal-session` | Open Stripe customer portal |
-| `POST /auth/switch-plan` | Plan switch workflow |
-
-If you build your own dashboard, you can replace these with your own billing backend while still using the same core Rigbox APIs.
+Clawd handles billing through its own integration layer. If you build your own dashboard, use your preferred billing provider (Stripe, Paddle, etc.) — Rigbox's core workspace and AI APIs work independently of billing.
 
 ## Minimal Clawd-Like Integration Flow
 
