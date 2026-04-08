@@ -1,0 +1,145 @@
+name: Sync OpenAPI Specs
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Every Monday at 06:00 UTC
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch latest OpenAPI specs
+        run: |
+          curl -sf https://api.rigbox.dev/api-docs/openapi.json -o /tmp/rigbox-api-new.json
+          curl -sf https://api.rigbox.dev/api-docs/auth/openapi.json -o /tmp/auth-api-new.json
+
+      - name: Merge specs (preserve hand-written descriptions)
+        run: |
+          python3 << 'PYEOF'
+          import json
+
+          def merge_spec(existing_path, new_path):
+              """Merge new spec data while preserving hand-written descriptions."""
+              existing = json.load(open(existing_path))
+              new = json.load(open(new_path))
+
+              # Build lookup of existing descriptions
+              existing_descs = {}
+              for path, methods in existing.get('paths', {}).items():
+                  for method, details in methods.items():
+                      desc = details.get('description')
+                      summary = details.get('summary')
+                      if desc:
+                          existing_descs[(method, path, 'description')] = desc
+                      if summary:
+                          existing_descs[(method, path, 'summary')] = summary
+
+              # Take the new spec as base, overlay existing descriptions
+              for path, methods in new.get('paths', {}).items():
+                  for method, details in methods.items():
+                      # Preserve existing description if new one is missing
+                      desc_key = (method, path, 'description')
+                      if not details.get('description') and desc_key in existing_descs:
+                          details['description'] = existing_descs[desc_key]
+
+                      # Preserve existing summary if new one is missing
+                      sum_key = (method, path, 'summary')
+                      if not details.get('summary') and sum_key in existing_descs:
+                          details['summary'] = existing_descs[sum_key]
+
+              # Detect new endpoints
+              new_endpoints = []
+              for path, methods in new.get('paths', {}).items():
+                  for method in methods:
+                      if method in ('get','post','put','patch','delete'):
+                          if path not in existing.get('paths', {}) or method not in existing['paths'].get(path, {}):
+                              new_endpoints.append(f"{method.upper()} {path}")
+
+              # Detect removed endpoints
+              removed_endpoints = []
+              for path, methods in existing.get('paths', {}).items():
+                  for method in methods:
+                      if method in ('get','post','put','patch','delete'):
+                          if path not in new.get('paths', {}) or method not in new['paths'].get(path, {}):
+                              removed_endpoints.append(f"{method.upper()} {path}")
+
+              with open(existing_path, 'w') as f:
+                  json.dump(new, f, indent=2)
+
+              return new_endpoints, removed_endpoints
+
+          print("Merging main API spec...")
+          new_main, removed_main = merge_spec('openapi/rigbox-api.json', '/tmp/rigbox-api-new.json')
+
+          print("Merging auth API spec...")
+          new_auth, removed_auth = merge_spec('openapi/auth-api.json', '/tmp/auth-api-new.json')
+
+          # Write summary for PR body
+          summary_lines = []
+          if new_main or new_auth:
+              summary_lines.append("### New endpoints")
+              for ep in new_main + new_auth:
+                  summary_lines.append(f"- `{ep}`")
+          if removed_main or removed_auth:
+              summary_lines.append("### Removed endpoints")
+              for ep in removed_main + removed_auth:
+                  summary_lines.append(f"- `{ep}`")
+          if not summary_lines:
+              summary_lines.append("No endpoint additions or removals — schema/description updates only.")
+
+          with open('/tmp/sync-summary.md', 'w') as f:
+              f.write('\n'.join(summary_lines))
+
+          print(f"Main: {len(new_main)} new, {len(removed_main)} removed")
+          print(f"Auth: {len(new_auth)} new, {len(removed_auth)} removed")
+          PYEOF
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet openapi/; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No spec changes detected."
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Spec changes detected:"
+            git diff --stat openapi/
+          fi
+
+      - name: Create pull request
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          BRANCH="sync-openapi-$(date +%Y%m%d)"
+          git checkout -b "$BRANCH"
+          git add openapi/
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: sync OpenAPI specs from production"
+
+          git push -u origin "$BRANCH"
+
+          SUMMARY=$(cat /tmp/sync-summary.md)
+          gh pr create \
+            --title "chore: sync OpenAPI specs $(date +%Y-%m-%d)" \
+            --body "$(cat <<EOF
+          ## OpenAPI Spec Sync
+
+          Auto-synced from production API specs.
+
+          $SUMMARY
+
+          **Review checklist:**
+          - [ ] New endpoints have descriptions (add manually if missing)
+          - [ ] No unintended schema changes
+          - [ ] MDX pages exist for any new endpoints
+          EOF
+          )"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
