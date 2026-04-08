@@ -11,10 +11,13 @@ Rigbox workspaces come with a full Linux environment, SSH access, and a managed 
 
 AI coding tools use the same provider SDKs (Anthropic, OpenAI, Google) that the managed proxy already supports. When you run `rig proxy on` inside a workspace, the proxy sets environment variables that redirect SDK traffic through Rigbox's infrastructure. Your credits cover the usage — no API keys needed.
 
-```
-You in workspace → AI coding tool → SDK → Rigbox proxy → Provider API
-                                              ↓
-                                     Credits deducted
+```mermaid
+flowchart LR
+    A[Your code] --> B[AI coding tool]
+    B --> C[SDK]
+    C --> D[Rigbox proxy]
+    D --> E[Provider API]
+    D --> F[Credits deducted]
 ```
 
 ## Supported Tools

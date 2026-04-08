@@ -17,12 +17,12 @@ Virtual Browser lets you run a full Chromium or Firefox browser inside your work
 
 Virtual Browser runs three components inside your workspace:
 
-```
-Xvfb (virtual display)
-  → Chromium or Firefox (renders pages)
-    → x11vnc (streams display via VNC)
-      → noVNC (browser-accessible VNC client)
-        → Accessible at browser-{workspace-id}.rigbox.dev
+```mermaid
+flowchart LR
+    A[Xvfb\nvirtual display] --> B[Chromium / Firefox]
+    B --> C[x11vnc\nVNC server]
+    C --> D[noVNC\nweb client]
+    D --> E[browser-*.rigbox.dev]
 ```
 
 You open the noVNC URL in your own browser and get a live, interactive view of the remote browser.

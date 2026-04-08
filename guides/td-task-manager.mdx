@@ -153,12 +153,14 @@ td critical-path
 
 ## Status Flow
 
-```
-open ──→ in_progress ──→ in_review ──→ closed
-  ↑       (td start)    (td review)   (td approve)
-  │                                        │
-  └────────────────────────────────────────┘
-               (td reject → back to open)
+```mermaid
+stateDiagram-v2
+    open --> in_progress : td start
+    in_progress --> in_review : td review
+    in_review --> closed : td approve
+    in_review --> open : td reject
+    open --> blocked : td block
+    blocked --> open : td unblock
 ```
 
 Additional transitions:

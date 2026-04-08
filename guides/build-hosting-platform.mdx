@@ -15,10 +15,12 @@ This guide walks through building a service like [Clawd](https://clawd.rigbox.de
 
 Your platform sits between your users and the Rigbox API:
 
-```
-Your Frontend → Your Backend → Rigbox API → Isolated VMs
-                                    ↓
-                            Managed AI Proxy
+```mermaid
+flowchart LR
+    A[Your Frontend] --> B[Your Backend]
+    B --> C[Rigbox API]
+    C --> D[Isolated VMs]
+    C --> E[Managed AI Proxy]
 ```
 
 Each user gets their own isolated Firecracker micro-VM. Your backend orchestrates lifecycle, configuration, and monitoring through the Rigbox API. You handle user auth and billing; Rigbox handles VM isolation, networking, and AI proxy.

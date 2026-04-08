@@ -11,11 +11,13 @@ Workspaces are the core primitive in Rigbox. You create one, run code inside it,
 
 Every workspace moves through a predictable set of states:
 
-```
-provisioned → running → stopped → deleted
-                ↑          |
-                └──────────┘
-                 (restart)
+```mermaid
+stateDiagram-v2
+    provisioned --> running : start
+    running --> stopped : stop
+    stopped --> running : start
+    stopped --> deleted : delete
+    provisioned --> deleted : delete
 ```
 
 | Status | Description |

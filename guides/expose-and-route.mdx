@@ -9,11 +9,11 @@ When a service runs inside your workspace, it's only accessible within the VM by
 
 The flow from a running service to a public URL:
 
-```
-Your service (port 8080 inside VM)
-  → App created with name "my-api"
-    → Rigbox configures reverse proxy
-      → Accessible at https://my-api.rigbox.dev
+```mermaid
+flowchart LR
+    A[Your service\nport 8080 inside VM] --> B[App created\nname: my-api]
+    B --> C[Reverse proxy\nconfigured]
+    C --> D[my-api.rigbox.dev]
 ```
 
 Each app gets a unique subdomain on `rigbox.dev`. HTTPS is handled automatically — your service only needs to listen on HTTP inside the VM.
