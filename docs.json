@@ -78,7 +78,8 @@
             "group": "AI & Credits",
             "pages": [
               "guides/managed-proxy",
-              "guides/byok"
+              "guides/byok",
+              "guides/ai-coding-tools"
             ]
           },
           {
