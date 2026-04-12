@@ -309,7 +309,7 @@
           "Apps"
         ],
         "summary": "Check if an app's URL is live by verifying actual content is served,\nand probe the underlying service and port status.",
-        "description": "Checks whether an app is live and its port is responding. Use this to verify an app is ready before showing its URL to users.",
+        "description": "Returns `live` (HTTP reachable), `service_status` (service state),\nand `port_open` (whether the port is bound).",
         "operationId": "check_app_health",
         "parameters": [
           {
@@ -800,7 +800,7 @@
           "Workspaces"
         ],
         "summary": "Get composite dashboard data.",
-        "description": "Returns a combined dashboard view with workspace summaries, recent activity, and resource usage.",
+        "description": "Fetches workspaces, apps, limits, and AI credits in parallel and returns\nthem in a single JSON response.",
         "operationId": "get_dashboard",
         "responses": {
           "200": {
@@ -827,7 +827,7 @@
           "System"
         ],
         "summary": "Get feature flags resolved for the calling user.",
-        "description": "Returns feature flags enabled for the authenticated user. Flags control access to preview features like access control and disk resize.",
+        "description": "The response is a flat `{ \"flag_name\": true/false }` map where access is\npre-resolved using the caller's email and plan. The frontend caches this\nat startup and checks keys with `isFeatureOn('flag_name')`.",
         "operationId": "get_feature_flags",
         "responses": {
           "200": {
@@ -891,7 +891,7 @@
           "Roadmap"
         ],
         "summary": "Get all roadmap vote counts.",
-        "description": "Returns the list of roadmap features and whether the authenticated user has voted for each one.",
+        "description": "If an Authorization header is present, also returns the user's own votes.\nNo auth required \u2014 anyone can see vote counts.",
         "operationId": "get_roadmap_votes",
         "responses": {
           "200": {
@@ -2280,7 +2280,7 @@
           "Apps"
         ],
         "summary": "List ports with active listeners in a workspace.",
-        "description": "Lists ports currently listening inside a workspace. Useful for discovering services that can be exposed as apps.",
+        "description": "Detect which ports are listening in the workspace.\nCross-checks against existing apps to flag already-exposed ports.",
         "operationId": "get_listening_ports",
         "parameters": [
           {
@@ -2447,16 +2447,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResizeWorkspaceRequest"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
             "description": "Workspace resources updated",
@@ -2475,6 +2465,89 @@
           }
         ],
         "description": "Resizes a workspace's RAM, disk, or vCPU allocation. The workspace must be stopped before resizing. Changes take effect on next start."
+      }
+    },
+    "/api/workspaces/{id}/services": {
+      "get": {
+        "tags": [
+          "Workspace Services"
+        ],
+        "summary": "List all workspace services with health status.",
+        "operationId": "list_services",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of workspace services",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceServicesResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/workspaces/{id}/services/{name}": {
+      "get": {
+        "tags": [
+          "Workspace Services"
+        ],
+        "summary": "Get a single workspace service by name.",
+        "operationId": "get_service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Service name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceService"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/workspaces/{id}/snapshots": {
@@ -2985,7 +3058,7 @@
           "Tools"
         ],
         "summary": "Install a tool asynchronously.",
-        "description": "Installs a tool into a workspace. Installation runs asynchronously \u2014 use the install-status endpoint to poll for completion.",
+        "description": "Returns a `job_id` for polling install progress.",
         "operationId": "install_tool",
         "parameters": [
           {
@@ -3420,6 +3493,12 @@
           "created_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "description": {
             "type": [
@@ -5871,6 +5950,13 @@
             },
             "description": "User-configurable parameters for this expected app.\nValues are submitted at deploy time via `app_params` in QuickDeployRequest."
           },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Workspace services this app depends on (by name, e.g. \"postgresql\", \"redis-server\")."
+          },
           "managed": {
             "type": "boolean"
           },
@@ -6722,6 +6808,83 @@
           },
           "workspace_id": {
             "type": "string"
+          }
+        }
+      },
+      "WorkspaceService": {
+        "type": "object",
+        "description": "Runtime backing service instance tracked for health monitoring.\nDistinct from ServiceSpec (which generates systemd units for custom processes).\nWorkspaceService tracks apt-managed daemons like PostgreSQL, Redis, RabbitMQ.",
+        "required": [
+          "id",
+          "workspace_id",
+          "name",
+          "kind",
+          "health_cmd",
+          "status",
+          "exposed",
+          "source",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "exposed": {
+            "type": "boolean"
+          },
+          "health_cmd": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "port": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "unit_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkspaceServicesResponse": {
+        "type": "object",
+        "required": [
+          "services"
+        ],
+        "properties": {
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceService"
+            }
           }
         }
       },
