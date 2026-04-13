@@ -103,8 +103,8 @@
             "bearer": []
           }
         ],
-        "summary": "List bindings",
-        "description": "Returns all role bindings, showing who has what access to which resources. Filter by resource ref or principal to narrow results."
+        "description": "Returns all role bindings, showing who has what access to which resources. Filter by resource ref or principal to narrow results.",
+        "summary": "List bindings"
       },
       "post": {
         "tags": [
@@ -188,8 +188,8 @@
             "bearer": []
           }
         ],
-        "summary": "Create binding",
-        "description": "Grants a role to a principal on a specific resource. Resource refs use the format `rig:account:{id}`, `rig:workspace:{id}`, or `rig:app:{id}`."
+        "description": "Grants a role to a principal on a specific resource. Resource refs use the format `rig:account:{id}`, `rig:workspace:{id}`, or `rig:app:{id}`.",
+        "summary": "Create binding"
       },
       "delete": {
         "tags": [
@@ -273,8 +273,8 @@
             "bearer": []
           }
         ],
-        "summary": "Delete binding",
-        "description": "Revokes a role binding, removing the principal's access to the specified resource."
+        "description": "Revokes a role binding, removing the principal's access to the specified resource.",
+        "summary": "Delete binding"
       },
       "patch": {
         "tags": [
@@ -358,8 +358,8 @@
             "bearer": []
           }
         ],
-        "summary": "Update binding",
-        "description": "Updates an existing role binding, such as changing the assigned role or modifying conditions."
+        "description": "Updates an existing role binding, such as changing the assigned role or modifying conditions.",
+        "summary": "Update binding"
       }
     },
     "/api/access-control/principals": {
@@ -465,8 +465,8 @@
             "bearer": []
           }
         ],
-        "summary": "Search principals",
-        "description": "Search for users and service accounts that can be assigned roles. Use this to look up principals by email or name before creating role bindings."
+        "description": "Search for users and service accounts that can be assigned roles. Use this to look up principals by email or name before creating role bindings.",
+        "summary": "Search principals"
       }
     },
     "/api/access-control/role-presets": {
@@ -523,8 +523,8 @@
             "bearer": []
           }
         ],
-        "summary": "List role presets",
-        "description": "Returns available role presets and their permissions. Use these when creating role bindings."
+        "description": "Returns available role presets and their permissions. Use these when creating role bindings.",
+        "summary": "List role presets"
       }
     },
     "/api/access-control/simulate": {
@@ -610,8 +610,8 @@
             "bearer": []
           }
         ],
-        "summary": "Simulate access",
-        "description": "Tests whether a specific action would be allowed for a given principal and resource, without making any changes. Useful for debugging access control policies."
+        "description": "Tests whether a specific action would be allowed for a given principal and resource, without making any changes. Useful for debugging access control policies.",
+        "summary": "Simulate access"
       }
     },
     "/api/access-control/tags": {
@@ -698,8 +698,8 @@
             "bearer": []
           }
         ],
-        "summary": "Get tags",
-        "description": "Returns tags assigned to a resource. Tags are used in policy evaluation to match access control rules."
+        "description": "Returns tags assigned to a resource. Tags are used in policy evaluation to match access control rules.",
+        "summary": "Get tags"
       },
       "put": {
         "tags": [
@@ -783,8 +783,8 @@
             "bearer": []
           }
         ],
-        "summary": "Update tags",
-        "description": "Updates the tags on a resource. Tags can trigger or restrict access control rules during policy evaluation."
+        "description": "Updates the tags on a resource. Tags can trigger or restrict access control rules during policy evaluation.",
+        "summary": "Update tags"
       }
     },
     "/api/access-control/throttle-binding": {
@@ -871,8 +871,8 @@
             "bearer": []
           }
         ],
-        "summary": "Get throttle binding",
-        "description": "Returns the throttle profile currently bound to a resource. Throttle profiles control rate limits for API requests."
+        "description": "Returns the throttle profile currently bound to a resource. Throttle profiles control rate limits for API requests.",
+        "summary": "Get throttle binding"
       },
       "put": {
         "tags": [
@@ -956,8 +956,8 @@
             "bearer": []
           }
         ],
-        "summary": "Update throttle binding",
-        "description": "Assigns a throttle profile to a resource, controlling the rate limits applied to API requests targeting that resource."
+        "description": "Assigns a throttle profile to a resource, controlling the rate limits applied to API requests targeting that resource.",
+        "summary": "Update throttle binding"
       }
     },
     "/api/access-control/throttle-presets": {
@@ -1044,8 +1044,8 @@
             "bearer": []
           }
         ],
-        "summary": "List throttle presets",
-        "description": "Returns available throttle presets (rate limit profiles). Each preset defines requests-per-minute and burst limits."
+        "description": "Returns available throttle presets (rate limit profiles). Each preset defines requests-per-minute and burst limits.",
+        "summary": "List throttle presets"
       }
     }
   },
