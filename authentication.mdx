@@ -59,6 +59,23 @@ These endpoints do not require authentication:
 - `GET /capacity` — check platform availability
 - `GET /templates` — list available workspace templates
 
+## Private app authentication (X-Rigbox-Key)
+
+When an app's visibility is set to **private** or **privileged**, requests from outside the workspace must include an `X-Rigbox-Key` header. This is separate from the `Authorization` header used for the main API.
+
+Any valid API key (`rb_*`) will work as the value:
+
+```bash
+curl https://my-app.rigbox.dev/endpoint \
+  -H "X-Rigbox-Key: $RIGBOX_API_KEY"
+```
+
+<Note>
+Requests made from inside the workspace (e.g. between services on `localhost`) do not need this header. It is only required for requests arriving from the public internet.
+</Note>
+
+The app detail page in the dashboard includes this header automatically in the Usage tab examples when the app is private. See [App Visibility](/guides/visibility) for more details.
+
 ## Access control
 
 Rigbox supports fine-grained RBAC for multi-user accounts via the [Access Control API](/api-reference/access-control/list-bindings). This feature is currently in preview and available to select accounts.

@@ -1,0 +1,155 @@
+---
+title: Firecrawl
+description: Deploy a self-hosted Firecrawl web scraping API with one click.
+---
+
+The **Firecrawl template** gives you a fully self-hosted [Firecrawl](https://firecrawl.dev) v2 API running inside a Rigbox workspace. It comes pre-configured with everything you need to scrape and crawl websites at scale.
+
+## What's Included
+
+The template provisions a complete Firecrawl stack:
+
+| Component | Purpose |
+|-----------|---------|
+| **Firecrawl v2 API** | The main scraping and crawling engine |
+| **PostgreSQL** | Stores crawl jobs, results, and metadata |
+| **Redis** | Caching and rate limiting |
+| **RabbitMQ** | Job queue for distributed crawl tasks |
+| **Playwright + Chromium** | Renders JavaScript-heavy pages for accurate scraping |
+
+The workspace runs on **2 vCPU, 4 GB RAM, and 8 GB disk**.
+
+## Deploying Firecrawl
+
+You can deploy Firecrawl with a single click from the template gallery, or use the API.
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/quick-deploy \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "template_id": "firecrawl"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.rigbox.dev/api/quick-deploy",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={"template_id": "firecrawl"},
+)
+workspace = response.json()
+subdomain = workspace["apps"][0]["name"]
+print(f"Firecrawl API: https://{subdomain}.rigbox.dev")
+```
+</CodeGroup>
+
+Once the workspace is running, your Firecrawl API is live and ready to accept requests.
+
+<Note>
+The Firecrawl API key is generated automatically during deployment. You can find it in the **Usage** tab of your app in the dashboard.
+</Note>
+
+## Scraping a Page
+
+Use the v2 `/scrape` endpoint to extract content from a single URL. The `waitFor` and `timeout` parameters help with pages that load content dynamically using JavaScript.
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://$SUBDOMAIN.rigbox.dev/v1/scrape \
+  -H "Authorization: Bearer $FIRECRAWL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com",
+    "waitFor": 3000,
+    "timeout": 30000
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    f"https://{subdomain}.rigbox.dev/v1/scrape",
+    headers={"Authorization": f"Bearer {firecrawl_api_key}"},
+    json={
+        "url": "https://example.com",
+        "waitFor": 3000,
+        "timeout": 30000,
+    },
+)
+result = response.json()
+print(result["data"]["markdown"])
+```
+</CodeGroup>
+
+<Tip>
+Set `waitFor` to a higher value (in milliseconds) for pages that rely heavily on JavaScript to render content. This tells Playwright to wait before capturing the page.
+</Tip>
+
+## Crawling a Website
+
+To scrape multiple pages from the same site, use the `/crawl` endpoint. You provide a starting URL and Firecrawl follows links automatically.
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://$SUBDOMAIN.rigbox.dev/v1/crawl \
+  -H "Authorization: Bearer $FIRECRAWL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com",
+    "limit": 50,
+    "scrapeOptions": {
+      "waitFor": 2000,
+      "timeout": 30000
+    }
+  }'
+```
+
+```python Python
+response = requests.post(
+    f"https://{subdomain}.rigbox.dev/v1/crawl",
+    headers={"Authorization": f"Bearer {firecrawl_api_key}"},
+    json={
+        "url": "https://example.com",
+        "limit": 50,
+        "scrapeOptions": {
+            "waitFor": 2000,
+            "timeout": 30000,
+        },
+    },
+)
+crawl = response.json()
+print(f"Crawl job started: {crawl['id']}")
+```
+</CodeGroup>
+
+Crawling is asynchronous. The response includes a job ID that you can poll to check progress and retrieve results.
+
+## Configuring a Proxy
+
+Some websites use aggressive anti-bot protection that blocks requests from cloud IP addresses. If you run into this, you can route Firecrawl's requests through a proxy server.
+
+Set the **Proxy Server** parameter in your app settings. This tells Playwright and the scraping engine to send all outgoing requests through the proxy.
+
+<Warning>
+Using a proxy adds latency to every request. Only enable it for sites that actively block direct connections.
+</Warning>
+
+## AI Features
+
+Firecrawl supports LLM-powered extraction, which lets you pull structured data from pages using natural language prompts. To use these features, you need to configure an LLM provider:
+
+- **Managed Credits**: Enable this option to use Rigbox-managed LLM credits. No additional API keys required.
+- **Bring Your Own Key (BYOK)**: Provide your own OpenAI, Anthropic, or other LLM API key in the app settings.
+
+Once configured, you can use Firecrawl's `/scrape` endpoint with the `extract` parameter to pull structured data from pages using a natural language prompt.
+
+## Next Steps
+
+- [Workspace Services](/guides/workspace-services) - monitor the PostgreSQL, Redis, and RabbitMQ services backing your Firecrawl instance
+- [App Visibility](/guides/visibility) - control who can access your Firecrawl API
+- [Custom Domains](/guides/custom-domains) - put your Firecrawl instance behind your own domain

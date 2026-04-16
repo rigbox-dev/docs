@@ -1,0 +1,88 @@
+---
+title: Workspace Services
+description: Monitor and manage backing infrastructure like databases, caches, and message brokers.
+---
+
+When you deploy a workspace from a template, Rigbox often provisions **backing services** alongside your app. These are infrastructure components like PostgreSQL, Redis, and RabbitMQ that your apps depend on to function.
+
+You do not need to install, start, or stop these services manually. Rigbox manages them for you. This guide covers how to monitor their health and understand how they connect to your apps.
+
+## What Are Workspace Services?
+
+Workspace services are infrastructure processes that run inside your workspace and support one or more apps. Common examples include:
+
+| Service | Role |
+|---------|------|
+| **PostgreSQL** | Relational database for persistent storage |
+| **Redis** | In-memory cache and pub/sub messaging |
+| **RabbitMQ** | Message broker for background job queues |
+
+These services are defined by the template that created your workspace. For example, the [Firecrawl](/guides/firecrawl) template provisions all three.
+
+<Note>
+Not every workspace has backing services. If you created a workspace from the base image or a template that does not define services, the infrastructure bar will not appear.
+</Note>
+
+## Health Monitoring
+
+Each service has a **health command** that Rigbox runs periodically to check whether the service is responsive. The results appear in real time on the workspace dashboard.
+
+### Service Statuses
+
+| Status | Meaning |
+|--------|---------|
+| **Installing** | The service is being set up for the first time. This happens during initial workspace provisioning. |
+| **Healthy** | The health check passed. The service is running and responsive. |
+| **Unhealthy** | The health check failed. The service may have crashed, run out of memory, or encountered a configuration error. |
+
+<Tip>
+If a service shows as unhealthy, check the workspace logs for error messages. Most issues are caused by the service running out of memory or disk space.
+</Tip>
+
+## Viewing Services in the Dashboard
+
+Open your workspace detail page. The **infrastructure bar** appears at the top of the Overview tab, showing each service with its current health status. You can see at a glance whether everything is running smoothly or if something needs attention.
+
+## App Dependencies
+
+Apps can declare which services they depend on using the `depends_on` field. This creates a dependency tree that the dashboard visualizes, so you can see exactly which services power which apps.
+
+For example, a Firecrawl app might depend on PostgreSQL, Redis, and RabbitMQ. If one of those services goes unhealthy, you know immediately which apps are affected.
+
+## Listing Services via the API
+
+Use the services endpoint to retrieve all backing services for a workspace along with their current health status.
+
+<CodeGroup>
+```bash cURL
+curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/services \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/services",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+for service in response.json():
+    print(f"{service['name']:15} status={service['status']}")
+```
+</CodeGroup>
+
+The response includes each service's name, type, and current health status.
+
+## Managed Automatically
+
+Workspace services are fully managed by Rigbox. When you start a workspace, the services start with it. When you stop the workspace, they shut down gracefully. You do not need to run any commands to keep them running.
+
+<Warning>
+Do not manually stop or modify the systemd units for workspace services. Rigbox manages their lifecycle, and manual changes may cause health checks to report incorrect status.
+</Warning>
+
+## Next Steps
+
+- [Workspaces](/guides/workspaces) - workspace lifecycle, resizing, and environment variables
+- [Firecrawl](/guides/firecrawl) - a template that uses PostgreSQL, Redis, and RabbitMQ as workspace services
+- [Expose Ports & Route Apps](/guides/expose-and-route) - make services accessible at `*.rigbox.dev`

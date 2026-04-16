@@ -59,7 +59,7 @@ print(f"Visibility set to: {response.json()['visibility']}")
 ```
 </CodeGroup>
 
-See [Set Visibility](/api-reference/apps/set-visibility) for the full request/response schema.
+See [Update Visibility](/api-reference/apps/update-visibility) for the full request/response schema.
 
 ### Make an App Private
 
@@ -245,6 +245,36 @@ requests.put(
 print("App is private again")
 ```
 
+
+## Authenticating Requests to Private Apps
+
+When your app is private or privileged, requests from outside the workspace need an `X-Rigbox-Key` header to get through. Use any of your API keys (`rb_*`) as the value. You can create and manage keys on the **Settings > API Tokens** page in the dashboard.
+
+<CodeGroup>
+```bash cURL
+curl https://my-api.rigbox.dev/data \
+  -H "X-Rigbox-Key: $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://my-api.rigbox.dev/data",
+    headers={"X-Rigbox-Key": api_key},
+)
+print(response.json())
+```
+</CodeGroup>
+
+<Tip>
+The **Usage** tab on the app detail page includes this header automatically in its copy-paste examples when the app is private. No need to remember the header name yourself.
+</Tip>
+
+<Note>
+This header is only needed for requests arriving from the public internet. Services running inside the same workspace can call each other on `localhost` without any auth header.
+</Note>
 
 ## Security Considerations
 

@@ -1,0 +1,143 @@
+---
+title: Custom Domains
+description: Point your own domain at a Rigbox app with automatic TLS.
+---
+
+Every app you expose through Rigbox gets a subdomain at `*.rigbox.dev`. That works great for development, but when you want to share something under your own brand, you can attach a **custom domain** instead.
+
+Each app supports one custom domain. The custom domain works alongside the default `.rigbox.dev` subdomain, so both URLs stay active at the same time.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- **A domain you own** (e.g., `app.yourcompany.com`)
+- **Access to your DNS settings** (through your registrar or DNS provider)
+- **An existing Rigbox app** that you want to map the domain to
+
+## Setting a Custom Domain
+
+You can set a custom domain from the Rigbox dashboard or via the API.
+
+### Using the Dashboard
+
+Open your app, go to the **Access** tab, and enter your domain in the Custom Domain field.
+
+### Using the API
+
+<CodeGroup>
+```bash cURL
+curl -X PATCH https://api.rigbox.dev/api/apps/$APP_ID \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "custom_domain": "app.yourcompany.com"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.patch(
+    f"https://api.rigbox.dev/api/apps/{app_id}",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={"custom_domain": "app.yourcompany.com"},
+)
+app = response.json()
+print(f"Custom domain set to: {app['custom_domain']}")
+```
+</CodeGroup>
+
+## Configuring DNS
+
+After setting the custom domain, you need to point it at the Rigbox infrastructure. Add an **A record** in your DNS provider:
+
+| Record Type | Name | Value |
+|-------------|------|-------|
+| A | `app.yourcompany.com` | `51.255.194.99` |
+
+<Warning>
+If you use Cloudflare, you must turn off the proxy (set it to **DNS only** / grey cloud). Cloudflare's proxy intercepts TLS and prevents Rigbox from issuing a certificate for your domain.
+</Warning>
+
+DNS changes can take a few minutes to propagate. In most cases, the record is live within 1 to 5 minutes.
+
+## Verifying Your Domain
+
+Once the DNS record is in place, you need to verify that it resolves correctly. Verification checks that your domain points to `51.255.194.99`.
+
+### Using the Dashboard
+
+Click the **Verify** button next to the custom domain field in the Access tab.
+
+### Using the API
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/verify-domain \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+```python Python
+response = requests.post(
+    f"https://api.rigbox.dev/api/apps/{app_id}/verify-domain",
+    headers={"Authorization": f"Bearer {api_key}"},
+)
+result = response.json()
+print(f"Verified: {result['verified']}")
+```
+</CodeGroup>
+
+## TLS Certificates
+
+You do not need to set up TLS manually. When the first request arrives on your custom domain, Rigbox automatically provisions a certificate through **Let's Encrypt**. This happens transparently and only takes a moment.
+
+<Tip>
+The initial request to your custom domain may be slightly slower while the certificate is being issued. All subsequent requests use the cached certificate and are fast as usual.
+</Tip>
+
+## Removing a Custom Domain
+
+If you no longer want a custom domain attached to your app, you can remove it from the Access tab in the dashboard or set `custom_domain` to an empty string via the API.
+
+<CodeGroup>
+```bash cURL
+curl -X PATCH https://api.rigbox.dev/api/apps/$APP_ID \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "custom_domain": ""
+  }'
+```
+
+```python Python
+response = requests.patch(
+    f"https://api.rigbox.dev/api/apps/{app_id}",
+    headers={"Authorization": f"Bearer {api_key}"},
+    json={"custom_domain": ""},
+)
+print("Custom domain removed")
+```
+</CodeGroup>
+
+After removing the custom domain, your app is still accessible at its default `*.rigbox.dev` subdomain.
+
+## Troubleshooting
+
+If verification fails or your custom domain isn't working, check these common issues:
+
+| Problem | Solution |
+|---------|----------|
+| DNS not propagated yet | Wait a few minutes and try verifying again. You can use `dig app.yourcompany.com` to check if the record is live. |
+| Cloudflare proxy enabled | Make sure the proxy toggle is set to **DNS only** (grey cloud). The orange cloud means the proxy is active, which blocks certificate issuance. |
+| Verification failing | Confirm your A record points to `51.255.194.99`. If you see a different IP, update the record and verify again. |
+| Certificate not issuing | Verification must pass first. Make sure the domain resolves to the correct IP and that no proxy is intercepting traffic. |
+
+<Note>
+If you recently changed DNS settings, it can take up to a few minutes for the change to propagate globally. Be patient and retry verification after waiting.
+</Note>
+
+## Next Steps
+
+- [App Visibility](/guides/visibility) - control who can access your app through authentication and access modes
+- [Expose Ports & Route Apps](/guides/expose-and-route) - learn how routing and subdomains work under the hood
