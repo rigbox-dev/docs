@@ -9,13 +9,13 @@ Rigbox separates platform operations from user code. Your workspaces run in isol
 
 ## Workspace isolation
 
-Each workspace is a [Firecracker](https://firecracker-microvm.github.io/) micro-VM — not a container. This gives you:
+Each workspace is a [Firecracker](https://firecracker-microvm.github.io/) micro-VM - not a container. This gives you:
 
-- **Dedicated kernel** — each VM boots its own Linux kernel, fully independent from other workspaces
-- **Own filesystem** — isolated ext4 disk with no shared volumes
-- **Private network** — workspaces cannot communicate with each other directly
-- **systemd init** — full Linux userspace with service management
-- **No platform secrets** — credentials and internal tokens never enter the VM
+- **Dedicated kernel** - each VM boots its own Linux kernel, fully independent from other workspaces
+- **Own filesystem** - isolated ext4 disk with no shared volumes
+- **Private network** - workspaces cannot communicate with each other directly
+- **systemd init** - full Linux userspace with service management
+- **No platform secrets** - credentials and internal tokens never enter the VM
 
 Even if code running inside a workspace achieves root access, it is confined to that VM. It cannot reach other workspaces or platform infrastructure.
 
@@ -30,7 +30,7 @@ flowchart LR
 ```
 
 - Each app gets a unique subdomain: `{name}.rigbox.dev`
-- HTTPS termination is automatic — your service only needs to listen on HTTP inside the VM
+- HTTPS termination is automatic - your service only needs to listen on HTTP inside the VM
 - Routes are created and removed dynamically as you add or delete apps
 - [Visibility controls](/guides/visibility) determine who can access each app (public, private, or privileged)
 
@@ -45,9 +45,9 @@ flowchart LR
     PROXY --> CREDITS[Credits deducted]
 ```
 
-- Provider API keys never enter your VM — the proxy injects them at request time
+- Provider API keys never enter your VM - the proxy injects them at request time
 - Token usage is metered and deducted from your credit balance
-- The proxy is opt-in per workspace — activate via the [API](/api-reference/ai/update-workspace-ai-config) or [CLI](/guides/cli) (`rig proxy on`)
+- The proxy is opt-in per workspace - activate via the [API](/api-reference/ai/update-workspace-ai-config) or [CLI](/guides/cli) (`rig proxy on`)
 - Supports Anthropic, OpenAI, Google Gemini, and Brave Search
 
 See [Managed AI Proxy](/guides/managed-proxy) for usage details and [BYOK](/guides/byok) for using your own keys.

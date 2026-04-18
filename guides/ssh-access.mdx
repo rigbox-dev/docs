@@ -70,7 +70,7 @@ rig ssh-key add laptop
 This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it automatically.
 
 <Tip>
-  You can register multiple SSH keys for different machines — for example, one for your laptop and one for your desktop. Give each a descriptive name so you can identify them later.
+  You can register multiple SSH keys for different machines - for example, one for your laptop and one for your desktop. Give each a descriptive name so you can identify them later.
 </Tip>
 
 ---
@@ -129,8 +129,8 @@ There are two ways to connect:
 
 | Method | Example | Latency |
 | --- | --- | --- |
-| **Region-direct** | `ssh user@eu-west-1.rigbox.dev` | Lowest — connects directly to the compute node in your workspace's region |
-| **Gateway** | `ssh user@rigbox.dev` | Higher — routes through the central gateway, which forwards to the correct region |
+| **Region-direct** | `ssh user@eu-west-1.rigbox.dev` | Lowest - connects directly to the compute node in your workspace's region |
+| **Gateway** | `ssh user@rigbox.dev` | Higher - routes through the central gateway, which forwards to the correct region |
 
 Use the region-specific hostname (e.g., `eu-west-1.rigbox.dev`) for the best experience. The gateway hostname (`rigbox.dev`) works from anywhere but adds latency proportional to the distance between the gateway and your workspace's region.
 
@@ -274,8 +274,8 @@ If connections feel slow:
 
 ## API Reference
 
-- [Add SSH Key](/api-reference/ssh-keys/add) — Register a new SSH key
-- [List SSH Keys](/api-reference/ssh-keys/list) — List registered SSH keys
-- [Delete SSH Key](/api-reference/ssh-keys/delete) — Remove an SSH key
-- [Sync Workspace SSH Keys](/api-reference/ssh-keys/sync-workspace) — Sync keys to a workspace
-- [List Workspace SSH Keys](/api-reference/ssh-keys/list-workspace) — List keys on a workspace
+- [Add SSH Key](/api-reference/ssh-keys/add) - Register a new SSH key
+- [List SSH Keys](/api-reference/ssh-keys/list) - List registered SSH keys
+- [Delete SSH Key](/api-reference/ssh-keys/delete) - Remove an SSH key
+- [Sync Workspace SSH Keys](/api-reference/ssh-keys/sync-workspace) - Sync keys to a workspace
+- [List Workspace SSH Keys](/api-reference/ssh-keys/list-workspace) - List keys on a workspace

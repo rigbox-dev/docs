@@ -3,7 +3,7 @@ title: Catalog Apps
 description: Install pre-packaged apps like VS Code, Jupyter, and Streamlit in one call.
 ---
 
-The Rigbox app catalog provides curated, pre-packaged applications that you can install into any workspace with a single API call. Each catalog app is configured with the correct port, subdomain, and systemd service — no manual setup required.
+The Rigbox app catalog provides curated, pre-packaged applications that you can install into any workspace with a single API call. Each catalog app is configured with the correct port, subdomain, and systemd service - no manual setup required.
 
 ## How It Works
 
@@ -14,7 +14,7 @@ When you install a catalog app:
 3. An **app route** is created, mapping the app's port to a `*.rigbox.dev` subdomain
 4. The app is immediately accessible once installation completes
 
-You manage installed catalog apps with the same endpoints you use for any other app — start, stop, restart, delete, and change visibility.
+You manage installed catalog apps with the same endpoints you use for any other app - start, stop, restart, delete, and change visibility.
 
 ## Available Apps
 
@@ -34,7 +34,7 @@ response = requests.get(
     headers={"Authorization": f"Bearer {api_key}"},
 )
 for app in response.json():
-    print(f"{app['id']:16} port={app['port']:5} — {app['description']}")
+    print(f"{app['id']:16} port={app['port']:5} - {app['description']}")
 ```
 </CodeGroup>
 
@@ -81,7 +81,7 @@ response = requests.post(
 )
 result = response.json()
 job_id = result["job_id"]
-print(f"Installation started — job: {job_id}")
+print(f"Installation started - job: {job_id}")
 ```
 </CodeGroup>
 
@@ -106,7 +106,7 @@ while True:
         headers={"Authorization": f"Bearer {api_key}"},
     )
     job = resp.json()
-    print(f"Status: {job['status']} — {job.get('message', '')}")
+    print(f"Status: {job['status']} - {job.get('message', '')}")
     if job["status"] in ("completed", "failed"):
         break
     time.sleep(3)
@@ -232,7 +232,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
 
 ### Excalidraw
 
-A collaborative whiteboard for sketching diagrams, wireframes, and architecture drawings. Runs locally inside the workspace — no external dependencies.
+A collaborative whiteboard for sketching diagrams, wireframes, and architecture drawings. Runs locally inside the workspace - no external dependencies.
 
 ```bash
 curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
@@ -305,7 +305,7 @@ vscode_result = requests.post(
     headers=HEADERS,
     json={"catalog_id": "vscode"},
 ).json()
-print(f"VS Code install started — job: {vscode_result['job_id']}")
+print(f"VS Code install started - job: {vscode_result['job_id']}")
 
 # Install Jupyter
 jupyter_result = requests.post(
@@ -313,7 +313,7 @@ jupyter_result = requests.post(
     headers=HEADERS,
     json={"catalog_id": "jupyter"},
 ).json()
-print(f"Jupyter install started — job: {jupyter_result['job_id']}")
+print(f"Jupyter install started - job: {jupyter_result['job_id']}")
 
 # Wait for both to complete
 for name, job_id in [("VS Code", vscode_result["job_id"]), ("Jupyter", jupyter_result["job_id"])]:
@@ -335,7 +335,7 @@ print("Both apps installed and accessible at their subdomain URLs.")
 
 ## Next Steps
 
-- [Expose Ports & Route Apps](/guides/expose-and-route) — understand how app routing works
-- [App Visibility](/guides/visibility) — control who can access installed apps
-- [Workspaces](/guides/workspaces) — manage the workspace where your apps run
-- [Images & Templates](/guides/images-and-templates) — choose the right base image for your catalog apps
+- [Expose Ports & Route Apps](/guides/expose-and-route) - understand how app routing works
+- [App Visibility](/guides/visibility) - control who can access installed apps
+- [Workspaces](/guides/workspaces) - manage the workspace where your apps run
+- [Images & Templates](/guides/images-and-templates) - choose the right base image for your catalog apps

@@ -16,7 +16,7 @@ When you attach a service spec to a workspace, Rigbox generates a systemd servic
 - **Working directory**: `/home/developer`
 - **Environment**: variables you define in `env_vars`, plus any workspace-level environment
 
-If `auto_enable` is set to `true`, the service starts automatically when the workspace boots — after setup scripts have finished.
+If `auto_enable` is set to `true`, the service starts automatically when the workspace boots - after setup scripts have finished.
 
 ## Create a Service Spec
 
@@ -103,7 +103,7 @@ See the [Service Specs API reference](/api-reference/service-specs/create) for t
 |--------|----------|
 | `always` | Restart the service whenever it exits, regardless of exit code |
 | `on-failure` | Restart only if the service exits with a non-zero exit code |
-| `no` | Never restart — if the process exits, it stays stopped |
+| `no` | Never restart - if the process exits, it stays stopped |
 
 <Tip>
 Use `always` for servers and daemons that should run continuously. Use `on-failure` for tasks that should recover from crashes but not restart after a clean exit. Use `no` for one-shot tasks.
@@ -199,7 +199,7 @@ curl -X PUT https://api.rigbox.dev/api/service-specs/svc_abc123 \
 ```
 
 <Warning>
-Changes to a service spec take effect on the next workspace start. Running workspaces will not pick up changes automatically — you need to restart the workspace.
+Changes to a service spec take effect on the next workspace start. Running workspaces will not pick up changes automatically - you need to restart the workspace.
 </Warning>
 
 ## Delete a Service Spec
@@ -213,7 +213,7 @@ curl -X DELETE https://api.rigbox.dev/api/service-specs/svc_abc123 \
 
 A common pattern is to use a setup script to install dependencies and a service spec to run the application. The setup script runs first, so your service spec can assume everything is installed.
 
-**Step 1 — Create a setup script that installs dependencies:**
+**Step 1 - Create a setup script that installs dependencies:**
 
 ```bash
 curl -X POST https://api.rigbox.dev/api/setup-scripts \
@@ -226,7 +226,7 @@ curl -X POST https://api.rigbox.dev/api/setup-scripts \
   }'
 ```
 
-**Step 2 — Create a service spec that runs the app:**
+**Step 2 - Create a service spec that runs the app:**
 
 ```bash
 curl -X POST https://api.rigbox.dev/api/service-specs \
@@ -241,7 +241,7 @@ curl -X POST https://api.rigbox.dev/api/service-specs \
   }'
 ```
 
-**Step 3 — Create a workspace with both:**
+**Step 3 - Create a workspace with both:**
 
 ```bash
 curl -X POST https://api.rigbox.dev/api/workspaces \
@@ -282,7 +282,7 @@ The app gets a unique URL (e.g., `my-web-app-ws123.rigbox.dev`) that routes to p
 
 Here is a complete example that sets up a React frontend and Node.js backend as two separate services.
 
-**Setup script** — install everything:
+**Setup script** - install everything:
 
 ```bash
 #!/bin/bash
@@ -332,6 +332,6 @@ Both services start on workspace boot, and you can expose either or both via app
 
 ## Next Steps
 
-- [Setup Scripts](/guides/setup-scripts) — automate dependency installation before services start
-- [Snapshots](/guides/snapshots) — snapshot a workspace with running services for quick restore
-- [Managed AI Proxy](/guides/managed-proxy) — add AI capabilities to your background services
+- [Setup Scripts](/guides/setup-scripts) - automate dependency installation before services start
+- [Snapshots](/guides/snapshots) - snapshot a workspace with running services for quick restore
+- [Managed AI Proxy](/guides/managed-proxy) - add AI capabilities to your background services

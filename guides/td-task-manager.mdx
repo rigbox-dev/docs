@@ -7,7 +7,7 @@ description: Track issues, enforce handoffs, and sync task state across AI agent
 
 **td** is a task management CLI designed for AI-agent development workflows. It tracks issues locally in SQLite, enforces structured handoffs between sessions, and auto-syncs task state to the Rigbox platform. Rigbox ships a [fork](https://github.com/rigbox-dev/td) with workspace integration built in.
 
-When an agent's context window ends, the next session picks up exactly where the last one left off — no lost context, no duplicated work.
+When an agent's context window ends, the next session picks up exactly where the last one left off - no lost context, no duplicated work.
 
 <Note>
 td is pre-installed in the `dev` image. For other images, install it via a [setup script](/guides/setup-scripts). See [Images & Templates](/guides/images-and-templates) for details.
@@ -58,7 +58,7 @@ td reject td-a1b2c3 --reason "Missing error handling in token refresh"
 ```
 
 <Warning>
-The session that implements a task cannot review it. This enforces code review by a different agent or human session. Minor tasks (`td add "fix typo" --minor`) are the exception — they allow self-review.
+The session that implements a task cannot review it. This enforces code review by a different agent or human session. Minor tasks (`td add "fix typo" --minor`) are the exception - they allow self-review.
 </Warning>
 
 ## Core Commands
@@ -116,7 +116,7 @@ td handoff td-a1b2c3 \
 The next session runs `td usage --new-session` and sees exactly what was done, what's left, what was decided, and what's still uncertain.
 
 <Tip>
-Always handoff before your agent session ends. Run `td handoff <id>` even if you're mid-task — partial handoffs are better than no handoff.
+Always handoff before your agent session ends. Run `td handoff <id>` even if you're mid-task - partial handoffs are better than no handoff.
 </Tip>
 
 ## Multi-Issue Work Sessions
@@ -164,13 +164,13 @@ stateDiagram-v2
 ```
 
 Additional transitions:
-- `td block <id>` / `td unblock <id>` — mark a task as blocked by a dependency
-- `td close <id>` — admin closure (bypasses review, use sparingly)
-- `td defer <id> 2026-04-15` — defer until a future date
+- `td block <id>` / `td unblock <id>` - mark a task as blocked by a dependency
+- `td close <id>` - admin closure (bypasses review, use sparingly)
+- `td defer <id> 2026-04-15` - defer until a future date
 
 ## Platform Sync
 
-When td runs inside a Rigbox workspace, it automatically syncs task state to the platform. No configuration needed — it detects the Rigbox environment and pushes after every mutating command.
+When td runs inside a Rigbox workspace, it automatically syncs task state to the platform. No configuration needed - it detects the Rigbox environment and pushes after every mutating command.
 
 **What gets synced**: task ID, title, status, priority, type, implementer session, timestamps.
 
@@ -178,7 +178,7 @@ When td runs inside a Rigbox workspace, it automatically syncs task state to the
 - The [Sidecar](/guides/sidecar-dashboard) Rigbox plugin shows task counts and sync status
 - The workspace tasks API: [GET /workspaces/{id}/tasks](/api-reference/workspaces/tasks)
 
-**Sync status** is written to `.todos/.rigbox-sync` — you can check it with:
+**Sync status** is written to `.todos/.rigbox-sync` - you can check it with:
 
 ```bash
 cat .todos/.rigbox-sync
@@ -198,11 +198,11 @@ td monitor
 ```
 
 Keyboard shortcuts:
-- `b` — toggle board view (swimlanes)
-- `/` — search tasks
-- `s` — show statistics
-- `c` — toggle showing closed tasks
-- `q` — quit
+- `b` - toggle board view (swimlanes)
+- `/` - search tasks
+- `s` - show statistics
+- `c` - toggle showing closed tasks
+- `q` - quit
 
 ## Query Language
 
@@ -259,6 +259,6 @@ td was originally created by [Marcus Vorwaller](https://github.com/marcus/td) an
 
 ## Next Steps
 
-- [Sidecar Dashboard](/guides/sidecar-dashboard) — TUI that integrates td with git, files, and Rigbox metrics
-- [Setup Scripts](/guides/setup-scripts) — install td in non-dev images automatically
-- [Workspace Tasks API](/api-reference/workspaces/tasks) — read synced tasks programmatically
+- [Sidecar Dashboard](/guides/sidecar-dashboard) - TUI that integrates td with git, files, and Rigbox metrics
+- [Setup Scripts](/guides/setup-scripts) - install td in non-dev images automatically
+- [Workspace Tasks API](/api-reference/workspaces/tasks) - read synced tasks programmatically

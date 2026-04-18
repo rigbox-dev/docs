@@ -3,16 +3,16 @@ title: Architecture Explorer
 description: Visualize code structure, module dependencies, and handler call graphs.
 ---
 
-Architecture Explorer analyzes your codebase and generates an interactive visualization of its structure — modules, dependencies, handler call graphs, and more. It runs inside your workspace and serves a web-based UI you can access from your browser.
+Architecture Explorer analyzes your codebase and generates an interactive visualization of its structure - modules, dependencies, handler call graphs, and more. It runs inside your workspace and serves a web-based UI you can access from your browser.
 
 ## What It Does
 
 Architecture Explorer scans your project files, builds a dependency graph, and renders it as an interactive web application. You can explore:
 
-- **Module structure** — how files and directories relate to each other
-- **Dependency graphs** — which modules import or depend on others
-- **Handler call graphs** — trace the flow from HTTP handlers through business logic
-- **Code metrics** — file sizes, complexity indicators, and module boundaries
+- **Module structure** - how files and directories relate to each other
+- **Dependency graphs** - which modules import or depend on others
+- **Handler call graphs** - trace the flow from HTTP handlers through business logic
+- **Code metrics** - file sizes, complexity indicators, and module boundaries
 
 ## Supported Languages
 
@@ -144,11 +144,11 @@ The `arch-` prefixed subdomain is created automatically when you launch Architec
 
 The visualization includes:
 
-- **Project overview** — list of all detected projects with their type (Rust crate, Node.js package)
-- **Dependency graph** — interactive node graph showing how modules connect
-- **File tree** — expandable tree view of the analyzed directory structure
-- **Call graph** — for Rust projects, trace handler functions through layers of business logic
-- **Search** — find specific modules, functions, or files across all analyzed projects
+- **Project overview** - list of all detected projects with their type (Rust crate, Node.js package)
+- **Dependency graph** - interactive node graph showing how modules connect
+- **File tree** - expandable tree view of the analyzed directory structure
+- **Call graph** - for Rust projects, trace handler functions through layers of business logic
+- **Search** - find specific modules, functions, or files across all analyzed projects
 
 ## Stopping Architecture Explorer
 
@@ -221,7 +221,7 @@ requests.post(
     f"{API_URL}/workspaces/{workspace_id}/tools/architecture-explorer/launch",
     headers=HEADERS,
 )
-print(f"Launched — open https://arch-{workspace_id}.rigbox.dev")
+print(f"Launched - open https://arch-{workspace_id}.rigbox.dev")
 ```
 
 **4. Explore the visualization**
@@ -240,7 +240,7 @@ requests.post(
 ## Tips
 
 <Tip>
-For the fastest experience, use the `full` template. Architecture Explorer is pre-installed and ready to launch immediately — no installation wait.
+For the fastest experience, use the `full` template. Architecture Explorer is pre-installed and ready to launch immediately - no installation wait.
 </Tip>
 
 <Tip>
@@ -253,6 +253,6 @@ Architecture Explorer consumes CPU and RAM while running. If your workspace has 
 
 ## Next Steps
 
-- [Virtual Browser](/guides/virtual-browser) — run a remote browser inside your workspace
-- [Images & Templates](/guides/images-and-templates) — choose the right image for your tools
-- [Catalog Apps](/guides/catalog) — install VS Code, Jupyter, and other pre-packaged apps
+- [Virtual Browser](/guides/virtual-browser) - run a remote browser inside your workspace
+- [Images & Templates](/guides/images-and-templates) - choose the right image for your tools
+- [Catalog Apps](/guides/catalog) - install VS Code, Jupyter, and other pre-packaged apps

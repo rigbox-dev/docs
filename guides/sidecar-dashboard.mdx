@@ -5,7 +5,7 @@ description: Monitor tasks, git status, files, agent sessions, and Rigbox worksp
 
 # Sidecar Dashboard
 
-Sidecar is a multi-pane TUI (Terminal User Interface) that runs alongside AI coding agents. It gives you real-time visibility into tasks, git status, files, agent conversations, and Rigbox workspace metrics — all without leaving the terminal. Rigbox ships a [fork](https://github.com/rigbox-dev/sidecar) with a dedicated Rigbox plugin for workspace monitoring.
+Sidecar is a multi-pane TUI (Terminal User Interface) that runs alongside AI coding agents. It gives you real-time visibility into tasks, git status, files, agent conversations, and Rigbox workspace metrics - all without leaving the terminal. Rigbox ships a [fork](https://github.com/rigbox-dev/sidecar) with a dedicated Rigbox plugin for workspace monitoring.
 
 <Note>
 Sidecar is pre-installed in the `dev` image. For other images, install it via a [setup script](/guides/setup-scripts). See [Images & Templates](/guides/images-and-templates) for details.
@@ -36,10 +36,10 @@ Sidecar organizes information into tabbed panels. Each panel focuses on a differ
 
 Integrates with [td](/guides/td-task-manager) to show your task management state:
 
-- **Focused task** — the task you're currently working on (`td start`)
-- **Task list** — all tasks with status indicators and priority
-- **Activity log** — recent logs, handoffs, and status changes with session context
-- **Review queue** — tasks awaiting review
+- **Focused task** - the task you're currently working on (`td start`)
+- **Task list** - all tasks with status indicators and priority
+- **Activity log** - recent logs, handoffs, and status changes with session context
+- **Review queue** - tasks awaiting review
 
 This panel reads directly from td's local SQLite database (`.todos/db.sqlite`), so it updates in real-time as you or your agent runs td commands.
 
@@ -47,10 +47,10 @@ This panel reads directly from td's local SQLite database (`.todos/db.sqlite`), 
 
 A split-pane git interface for monitoring changes:
 
-- **Staged files** — ready to commit
-- **Modified files** — changed but not staged
-- **Untracked files** — new files not yet tracked
-- **Inline diffs** — see what changed without leaving sidecar
+- **Staged files** - ready to commit
+- **Modified files** - changed but not staged
+- **Untracked files** - new files not yet tracked
+- **Inline diffs** - see what changed without leaving sidecar
 
 | Key | Action |
 |-----|--------|
@@ -165,7 +165,7 @@ Sidecar pulls from multiple sources to build its dashboard:
 
 ## Typical Setup
 
-The most effective way to use sidecar is in a split terminal — one pane for your agent, one for sidecar:
+The most effective way to use sidecar is in a split terminal - one pane for your agent, one for sidecar:
 
 ```bash
 # Option 1: tmux (recommended)
@@ -191,7 +191,7 @@ Sidecar uses a plugin-based architecture. Plugins are loaded automatically based
 - **rigbox** plugin loads if `/etc/rigbox/workspace.json` exists (automatic in Rigbox VMs)
 - **conversations** plugin loads if agent session files are detected
 
-No manual configuration is needed — sidecar adapts to whatever tools are present.
+No manual configuration is needed - sidecar adapts to whatever tools are present.
 
 ## Credits
 
@@ -199,6 +199,6 @@ Sidecar was originally created by [Marcus Vorwaller](https://github.com/marcus/s
 
 ## Next Steps
 
-- [Task Management with td](/guides/td-task-manager) — the task CLI that powers sidecar's TD Monitor
-- [AI Coding Tools](/guides/ai-coding-tools) — use Claude Code, Codex, and others alongside sidecar
-- [Images & Templates](/guides/images-and-templates) — choose the `dev` image for sidecar pre-installed
+- [Task Management with td](/guides/td-task-manager) - the task CLI that powers sidecar's TD Monitor
+- [AI Coding Tools](/guides/ai-coding-tools) - use Claude Code, Codex, and others alongside sidecar
+- [Images & Templates](/guides/images-and-templates) - choose the `dev` image for sidecar pre-installed

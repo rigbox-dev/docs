@@ -9,7 +9,7 @@ Rigbox is designed to run untrusted code safely. Every workspace is an isolated 
 
 ## VM-level isolation
 
-Each workspace runs in a [Firecracker](https://firecracker-microvm.github.io/) micro-VM — not a container. This means:
+Each workspace runs in a [Firecracker](https://firecracker-microvm.github.io/) micro-VM - not a container. This means:
 
 | Property | What it means |
 | --- | --- |
@@ -28,9 +28,9 @@ Database credentials, internal auth tokens, and service keys are held in the con
 
 ### AI provider keys
 
-In [managed mode](/guides/managed-proxy), AI provider API keys (Anthropic, OpenAI, Google) are held by the AI proxy service. The proxy injects keys at request time — they never enter the VM. Your code calls the standard SDK endpoint, and the proxy transparently adds authentication.
+In [managed mode](/guides/managed-proxy), AI provider API keys (Anthropic, OpenAI, Google) are held by the AI proxy service. The proxy injects keys at request time - they never enter the VM. Your code calls the standard SDK endpoint, and the proxy transparently adds authentication.
 
-In [BYOK mode](/guides/byok), you provide your own keys via the AI config API. Keys are stored encrypted and injected into the VM's environment at boot — they are not persisted to disk inside the VM.
+In [BYOK mode](/guides/byok), you provide your own keys via the AI config API. Keys are stored encrypted and injected into the VM's environment at boot - they are not persisted to disk inside the VM.
 
 ### API keys
 
@@ -51,7 +51,7 @@ Every app exposed from a workspace has a [visibility setting](/guides/visibility
 | **Public** | Anyone with the URL | Demos, public APIs, static sites |
 | **Privileged** | Owner + specific email addresses | Team collaboration, internal tools |
 
-Access is enforced at the reverse proxy layer — unauthorized requests are blocked before reaching your workspace.
+Access is enforced at the reverse proxy layer - unauthorized requests are blocked before reaching your workspace.
 
 ## SSH authentication
 
@@ -81,7 +81,7 @@ flowchart TB
     PROXY --> AI[AI Providers]
 ```
 
-- Workspace VMs are on an internal network — not directly accessible from the internet
+- Workspace VMs are on an internal network - not directly accessible from the internet
 - All inbound traffic flows through the API gateway, reverse proxy, or SSH gateway
 - Outbound AI requests flow through the managed proxy (when enabled)
 - VMs can make outbound HTTP requests to the public internet for package installation, git clones, etc.

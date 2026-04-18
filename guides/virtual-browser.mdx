@@ -3,15 +3,15 @@ title: Virtual Browser
 description: Run a remote Chromium or Firefox browser accessible from your own browser.
 ---
 
-Virtual Browser lets you run a full Chromium or Firefox browser inside your workspace and control it remotely from your own browser. It uses a headless display server with VNC streaming — you see and interact with the remote browser as if it were running locally.
+Virtual Browser lets you run a full Chromium or Firefox browser inside your workspace and control it remotely from your own browser. It uses a headless display server with VNC streaming - you see and interact with the remote browser as if it were running locally.
 
 ## Use Cases
 
-- **Web scraping** — browse sites from a VM IP address, avoiding bot detection on your local machine
-- **UI testing** — visually verify web applications running inside the workspace
-- **Web tool access** — use browser-based tools (admin panels, dashboards) from within the VM network
-- **Screenshot automation** — capture pages rendered by a real browser engine
-- **Multi-browser testing** — both Chromium and Firefox are available for cross-browser verification
+- **Web scraping** - browse sites from a VM IP address, avoiding bot detection on your local machine
+- **UI testing** - visually verify web applications running inside the workspace
+- **Web tool access** - use browser-based tools (admin panels, dashboards) from within the VM network
+- **Screenshot automation** - capture pages rendered by a real browser engine
+- **Multi-browser testing** - both Chromium and Firefox are available for cross-browser verification
 
 ## How It Works
 
@@ -247,7 +247,7 @@ requests.post(
 Since Virtual Browser installs Playwright, you can also control the browser programmatically from within the VM for automation tasks.
 
 ```python
-# Inside the VM — run this as a Python script
+# Inside the VM - run this as a Python script
 from playwright.sync_api import sync_playwright
 
 with sync_playwright() as p:
@@ -271,6 +271,6 @@ Virtual Browser (the VNC-based UI) and Playwright scripts use separate browser i
 
 ## Next Steps
 
-- [Architecture Explorer](/guides/architecture-explorer) — visualize code structure and dependencies
-- [Images & Templates](/guides/images-and-templates) — choose the `full` image for pre-installed tools
-- [Catalog Apps](/guides/catalog) — install VS Code, Jupyter, and other pre-packaged apps
+- [Architecture Explorer](/guides/architecture-explorer) - visualize code structure and dependencies
+- [Images & Templates](/guides/images-and-templates) - choose the `full` image for pre-installed tools
+- [Catalog Apps](/guides/catalog) - install VS Code, Jupyter, and other pre-packaged apps

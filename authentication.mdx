@@ -17,7 +17,7 @@ curl https://api.rigbox.dev/api/workspaces \
 ```
 
 <Warning>
-  API keys grant full access to your account. Store them in environment variables or a secrets manager — never commit them to source control.
+  API keys grant full access to your account. Store them in environment variables or a secrets manager - never commit them to source control.
 </Warning>
 
 All API keys use the `rb_` prefix:
@@ -42,7 +42,7 @@ JWTs expire after a set period. The dashboard handles refresh automatically.
 
 ## Dashboard session tokens
 
-The Rigbox frontends (`rigbox.dev`, `clawd.rigbox.dev`, `sandbox.rigbox.dev`) handle authentication automatically. Session tokens are managed by the dashboard — no extra setup needed for first-party UIs.
+The Rigbox frontends (`rigbox.dev`, `clawd.rigbox.dev`, `sandbox.rigbox.dev`) handle authentication automatically. Session tokens are managed by the dashboard - no extra setup needed for first-party UIs.
 
 ## Choosing an auth method
 
@@ -56,8 +56,8 @@ The Rigbox frontends (`rigbox.dev`, `clawd.rigbox.dev`, `sandbox.rigbox.dev`) ha
 
 These endpoints do not require authentication:
 
-- `GET /capacity` — check platform availability
-- `GET /templates` — list available workspace templates
+- `GET /capacity` - check platform availability
+- `GET /templates` - list available workspace templates
 
 ## Private app authentication (X-Rigbox-Key)
 

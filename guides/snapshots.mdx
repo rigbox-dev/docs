@@ -5,7 +5,7 @@ description: Save and restore full workspace state for checkpointing, branching,
 
 # Snapshots
 
-Snapshots capture the full disk state of a workspace — every file, installed package, database, and configuration. You can use them to checkpoint your work, experiment safely, or recover from mistakes.
+Snapshots capture the full disk state of a workspace - every file, installed package, database, and configuration. You can use them to checkpoint your work, experiment safely, or recover from mistakes.
 
 ## How Snapshots Work
 
@@ -17,21 +17,21 @@ A snapshot is a point-in-time copy of a workspace's entire filesystem. When you 
 4. You can restore the snapshot at any time to roll back the workspace to that exact state
 
 <Note>
-Snapshots capture disk state only — they do not capture running processes or in-memory state. Stop your workspace cleanly (let services shut down gracefully) before snapshotting.
+Snapshots capture disk state only - they do not capture running processes or in-memory state. Stop your workspace cleanly (let services shut down gracefully) before snapshotting.
 </Note>
 
 ## Create a Snapshot
 
 Stop the workspace first, then create a named snapshot.
 
-**Step 1 — Stop the workspace:**
+**Step 1 - Stop the workspace:**
 
 ```bash
 curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/stop \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 ```
 
-**Step 2 — Create the snapshot:**
+**Step 2 - Create the snapshot:**
 
 <CodeGroup>
 ```bash cURL
@@ -196,7 +196,7 @@ Deleting a snapshot is permanent and frees the associated storage. This does not
 
 ## Storage and Sizing
 
-Snapshots use **sparse file optimization**. This means only disk blocks that actually contain data are stored — empty space is not copied.
+Snapshots use **sparse file optimization**. This means only disk blocks that actually contain data are stored - empty space is not copied.
 
 | Workspace Disk Size | Typical Snapshot Size | Why |
 |---------------------|----------------------|-----|
@@ -231,7 +231,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/start \
 
 # ... run the demo ...
 
-# Something went wrong — restore and try again
+# Something went wrong - restore and try again
 curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/stop \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 
@@ -358,7 +358,7 @@ start_workspace()
 
 # ... make changes, run experiments ...
 
-# Something went wrong — roll back
+# Something went wrong - roll back
 stop_workspace()
 restore_snapshot(snap_id)
 start_workspace()
@@ -367,13 +367,13 @@ start_workspace()
 
 ## Limitations
 
-- **Workspace must be stopped** — you cannot snapshot or restore a running workspace
-- **Disk state only** — running processes and in-memory data are not captured
-- **Same workspace only** — you cannot restore a snapshot from workspace A into workspace B
-- **Storage costs** — snapshots consume storage proportional to their size; clean up old snapshots you no longer need
+- **Workspace must be stopped** - you cannot snapshot or restore a running workspace
+- **Disk state only** - running processes and in-memory data are not captured
+- **Same workspace only** - you cannot restore a snapshot from workspace A into workspace B
+- **Storage costs** - snapshots consume storage proportional to their size; clean up old snapshots you no longer need
 
 ## Next Steps
 
-- [Setup Scripts](/guides/setup-scripts) — automate the setup that leads to a snapshot-worthy state
-- [Service Specs](/guides/service-specs) — define services that auto-start after a snapshot restore
-- [Bring Your Own Keys](/guides/byok) — configure AI providers for workspaces you snapshot
+- [Setup Scripts](/guides/setup-scripts) - automate the setup that leads to a snapshot-worthy state
+- [Service Specs](/guides/service-specs) - define services that auto-start after a snapshot restore
+- [Bring Your Own Keys](/guides/byok) - configure AI providers for workspaces you snapshot

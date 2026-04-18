@@ -5,11 +5,11 @@ description: Use Rigbox credits to power Claude Code, Codex CLI, OpenCode, Gemin
 
 # AI Coding Tools
 
-Rigbox workspaces come with a full Linux environment, SSH access, and a managed AI proxy — making them a natural home for AI coding agents. Tools like Claude Code, Codex CLI, OpenCode, and Gemini CLI work out of the box when you activate managed credits.
+Rigbox workspaces come with a full Linux environment, SSH access, and a managed AI proxy - making them a natural home for AI coding agents. Tools like Claude Code, Codex CLI, OpenCode, and Gemini CLI work out of the box when you activate managed credits.
 
 ## How It Works
 
-AI coding tools use the same provider SDKs (Anthropic, OpenAI, Google) that the managed proxy already supports. When you run `rig proxy on` inside a workspace, the proxy sets environment variables that redirect SDK traffic through Rigbox's infrastructure. Your credits cover the usage — no API keys needed.
+AI coding tools use the same provider SDKs (Anthropic, OpenAI, Google) that the managed proxy already supports. When you run `rig proxy on` inside a workspace, the proxy sets environment variables that redirect SDK traffic through Rigbox's infrastructure. Your credits cover the usage - no API keys needed.
 
 ```mermaid
 flowchart LR
@@ -70,7 +70,7 @@ go install github.com/opencode-ai/opencode@latest
 
 ### 3. Start coding
 
-The tools pick up the proxy environment variables automatically — no API key configuration needed.
+The tools pick up the proxy environment variables automatically - no API key configuration needed.
 
 <CodeGroup>
 
@@ -100,7 +100,7 @@ Use the `dev` or `full` image for AI coding tools. They include build toolchains
 
 ### Claude Code
 
-Claude Code works immediately after `rig proxy on` — it reads `ANTHROPIC_BASE_URL` from the environment.
+Claude Code works immediately after `rig proxy on` - it reads `ANTHROPIC_BASE_URL` from the environment.
 
 ```bash
 eval $(rig proxy on)
@@ -172,7 +172,7 @@ Attach this script to your workspace or template so every new workspace comes pr
 
 ## Monitor Credit Usage
 
-AI coding tools can consume credits quickly — especially agentic tools that make many API calls in a loop. Monitor your balance:
+AI coding tools can consume credits quickly - especially agentic tools that make many API calls in a loop. Monitor your balance:
 
 ```bash
 curl -s https://api.rigbox.dev/api/users/me/credits \
@@ -208,13 +208,13 @@ Then run `rig proxy on` again to update the environment.
 |---------|--------|
 | **Isolated environment** | Agents can run commands, install packages, and modify files without affecting your local machine |
 | **No key management** | Managed credits mean zero API key configuration |
-| **Full Linux VM** | Build tools, compilers, databases — everything agents need is available |
+| **Full Linux VM** | Build tools, compilers, databases - everything agents need is available |
 | **SSH access** | Work alongside the agent: SSH in to review changes, run tests, or pair-program |
 | **Snapshots** | [Snapshot](/guides/snapshots) before a big refactor, restore if the agent goes sideways |
 
 ## Next Steps
 
-- [Managed AI Proxy](/guides/managed-proxy) — how the proxy and credit system works in detail
-- [Bring Your Own Keys](/guides/byok) — use your own API keys for unlimited usage
-- [Setup Scripts](/guides/setup-scripts) — automate tool installation across workspaces
-- [Images & Templates](/guides/images-and-templates) — choose the right base image for coding
+- [Managed AI Proxy](/guides/managed-proxy) - how the proxy and credit system works in detail
+- [Bring Your Own Keys](/guides/byok) - use your own API keys for unlimited usage
+- [Setup Scripts](/guides/setup-scripts) - automate tool installation across workspaces
+- [Images & Templates](/guides/images-and-templates) - choose the right base image for coding

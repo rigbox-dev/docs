@@ -5,7 +5,7 @@ description: How Clawd uses Rigbox's AI proxy, credits, and configuration APIs.
 
 # Clawd Runtime Services
 
-This page documents how [Clawd](https://clawd.rigbox.dev) uses Rigbox's general-purpose AI and configuration APIs to power its bot hosting experience. These are not Clawd-specific APIs — they're available to any Rigbox integration.
+This page documents how [Clawd](https://clawd.rigbox.dev) uses Rigbox's general-purpose AI and configuration APIs to power its bot hosting experience. These are not Clawd-specific APIs - they're available to any Rigbox integration.
 
 ## APIs used by Clawd's runtime
 
@@ -23,7 +23,7 @@ When a Clawd bot workspace is in managed mode:
 
 1. The bot's code calls the AI SDK (e.g., Anthropic, OpenAI) using standard endpoints
 2. The `rig proxy on` environment routes these calls through Rigbox's AI proxy
-3. The proxy injects the real provider API key — the bot workspace never sees it
+3. The proxy injects the real provider API key - the bot workspace never sees it
 4. Token usage is metered and deducted from the user's credit balance
 5. If credits run out, requests return `402` and the Clawd UI prompts an upgrade
 
@@ -50,6 +50,6 @@ The `PUT /workspaces/{id}/ai-config` endpoint accepts:
 
 If you're building your own AI-powered hosting platform on Rigbox, the same APIs that power Clawd are available to you. See:
 
-- [Build a Hosting Platform](/guides/build-hosting-platform) — end-to-end tutorial
-- [Clawd API Surface](/clawd-api-surface) — full endpoint map of what Clawd calls
-- [Managed AI Proxy](/guides/managed-proxy) — detailed proxy and credit guide
+- [Build a Hosting Platform](/guides/build-hosting-platform) - end-to-end tutorial
+- [Clawd API Surface](/clawd-api-surface) - full endpoint map of what Clawd calls
+- [Managed AI Proxy](/guides/managed-proxy) - detailed proxy and credit guide

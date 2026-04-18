@@ -17,7 +17,7 @@ When managed mode is active for a workspace, outbound AI SDK requests are routed
 4. Logs token usage and deducts from your credit balance
 5. Returns the response to your code
 
-Your workspace code uses the standard SDK for each provider — you only change the base URL to point at the proxy endpoint.
+Your workspace code uses the standard SDK for each provider - you only change the base URL to point at the proxy endpoint.
 
 <Tip>
 Because the proxy speaks the same protocol as each provider's native API, you can switch between managed mode and your own keys with a single configuration change.
@@ -41,7 +41,7 @@ Every Rigbox account comes with AI credits that reset monthly.
 | **Free** | 250 | Trying out the platform, small experiments |
 | **Pro** | 2,000 | Active development, prototyping, demos |
 
-Credits map roughly to API cost — one credit equals approximately $0.01 of upstream provider spend. The exact mapping depends on the model and token count.
+Credits map roughly to API cost - one credit equals approximately $0.01 of upstream provider spend. The exact mapping depends on the model and token count.
 
 ## Activate Managed Mode
 
@@ -186,9 +186,9 @@ See the [AI Usage API reference](/api-reference/users/get-ai-usage) for full res
 
 When your credit balance reaches zero:
 
-1. **API requests return HTTP 402** — the proxy responds with a `credits_exhausted` error code
-2. **The UI shows an upgrade prompt** — you can upgrade to Pro or switch to [BYOK mode](/guides/byok)
-3. **Existing services keep running** — only new AI API calls are blocked; your workspace and non-AI services are unaffected
+1. **API requests return HTTP 402** - the proxy responds with a `credits_exhausted` error code
+2. **The UI shows an upgrade prompt** - you can upgrade to Pro or switch to [BYOK mode](/guides/byok)
+3. **Existing services keep running** - only new AI API calls are blocked; your workspace and non-AI services are unaffected
 
 <Warning>
 If you have a long-running agent or automated pipeline, it will start receiving 402 errors once credits are exhausted. Consider monitoring your balance programmatically using the credits endpoint.
@@ -198,7 +198,7 @@ If you have a long-running agent or automated pipeline, it will start receiving 
 
 Here is a complete flow: activate managed mode, make an AI call from inside the workspace, then check remaining credits.
 
-**Step 1 — Activate managed mode for a workspace:**
+**Step 1 - Activate managed mode for a workspace:**
 
 ```bash
 curl -X PUT https://api.rigbox.dev/api/workspaces/ws_abc123/ai-config \
@@ -207,7 +207,7 @@ curl -X PUT https://api.rigbox.dev/api/workspaces/ws_abc123/ai-config \
   -d '{"mode": "managed", "provider": "anthropic", "model": "claude-sonnet-4-20250514"}'
 ```
 
-**Step 2 — Inside the workspace VM, configure the SDK and make a call:**
+**Step 2 - Inside the workspace VM, configure the SDK and make a call:**
 
 ```bash
 # Apply proxy environment variables
@@ -215,7 +215,7 @@ eval $(rig proxy on)
 ```
 
 ```python
-# The proxy intercepts this call — no API key needed in your code
+# The proxy intercepts this call - no API key needed in your code
 from anthropic import Anthropic
 
 client = Anthropic()  # Uses proxy base URL from environment
@@ -227,7 +227,7 @@ message = client.messages.create(
 print(message.content[0].text)
 ```
 
-**Step 3 — Check remaining credits:**
+**Step 3 - Check remaining credits:**
 
 ```bash
 curl -s https://api.rigbox.dev/api/users/me/credits \
@@ -236,7 +236,7 @@ curl -s https://api.rigbox.dev/api/users/me/credits \
 ```
 
 <Note>
-Credit deduction happens synchronously — the balance is updated before the proxy returns the response to your code, so the credits endpoint always reflects the latest usage.
+Credit deduction happens synchronously - the balance is updated before the proxy returns the response to your code, so the credits endpoint always reflects the latest usage.
 </Note>
 
 ## Switching Providers
@@ -255,6 +255,6 @@ If you are using the CLI inside the VM, run `rig proxy on` again to refresh the 
 
 ## Next Steps
 
-- [Bring Your Own Keys](/guides/byok) — use your own API keys for unlimited usage
-- [Setup Scripts](/guides/setup-scripts) — automate SDK installation in new workspaces
-- [Service Specs](/guides/service-specs) — run AI-powered services as background daemons
+- [Bring Your Own Keys](/guides/byok) - use your own API keys for unlimited usage
+- [Setup Scripts](/guides/setup-scripts) - automate SDK installation in new workspaces
+- [Service Specs](/guides/service-specs) - run AI-powered services as background daemons

@@ -3,7 +3,7 @@ title: Images & Templates
 description: Choose the right base image and template for your workspace.
 ---
 
-Every workspace runs on a **base image** — a pre-built Debian 12 root filesystem with tools and runtimes already installed. **Templates** combine an image with default resource settings (RAM, vCPU, disk) so you can deploy in one call.
+Every workspace runs on a **base image** - a pre-built Debian 12 root filesystem with tools and runtimes already installed. **Templates** combine an image with default resource settings (RAM, vCPU, disk) so you can deploy in one call.
 
 ## Images
 
@@ -30,14 +30,14 @@ All images are built on Debian 12 (Bookworm) and include Python 3.12 and Node.js
 - Pre-warmed npm caches for popular tools (Jupyter, Marimo, Streamlit, Excalidraw)
 
 **dev** adds build tooling on top of base:
-- Docker CLI (for building images — Docker daemon runs on the host)
+- Docker CLI (for building images - Docker daemon runs on the host)
 - cmake, make, gcc, g++
 - strace, gdb, ltrace for debugging
 - PostgreSQL client (`psql`)
 
 **full** adds pre-installed Rigbox tools:
-- Architecture Explorer — ready to launch without installation
-- Virtual Browser (Chromium + Firefox via Playwright) — ready to launch
+- Architecture Explorer - ready to launch without installation
+- Virtual Browser (Chromium + Firefox via Playwright) - ready to launch
 - Xvfb and x11vnc for headless display
 
 **openclaw** is a minimal image for AI bot workloads:
@@ -234,6 +234,6 @@ See [Catalog Apps](/guides/catalog) for how to install these tools.
 
 ## Next Steps
 
-- [Workspaces](/guides/workspaces) — create, start, stop, and manage workspace lifecycle
-- [Expose Ports & Route Apps](/guides/expose-and-route) — make services accessible at `*.rigbox.dev`
-- [Catalog Apps](/guides/catalog) — install VS Code, Jupyter, and more with one call
+- [Workspaces](/guides/workspaces) - create, start, stop, and manage workspace lifecycle
+- [Expose Ports & Route Apps](/guides/expose-and-route) - make services accessible at `*.rigbox.dev`
+- [Catalog Apps](/guides/catalog) - install VS Code, Jupyter, and more with one call

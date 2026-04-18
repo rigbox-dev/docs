@@ -68,7 +68,7 @@ The Sandbox UI authenticates via session tokens automatically. For programmatic 
 
 ## Minimal Sandbox-Like Integration Flow
 
-1. Check capacity with `GET /capacity` — verify `available` is `true`.
+1. Check capacity with `GET /capacity` - verify `available` is `true`.
 2. Call `POST /quick-deploy` with your desired template.
 3. Poll `GET /workspaces/{id}` until `status` is `running`.
 4. Call `POST /workspaces/{id}/reconcile-apps` to ensure apps are created.

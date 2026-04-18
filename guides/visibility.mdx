@@ -3,7 +3,7 @@ title: App Visibility
 description: Control who can access your apps with public, private, and privileged modes.
 ---
 
-Every app exposed through Rigbox has a **visibility mode** that determines who can access it. By default, apps are private — only you can see them. You can open them up to the world or share them with specific people.
+Every app exposed through Rigbox has a **visibility mode** that determines who can access it. By default, apps are private - only you can see them. You can open them up to the world or share them with specific people.
 
 ## Visibility Modes
 
@@ -124,7 +124,7 @@ The `allowed_emails` field is only used when visibility is set to `privileged`. 
 
 ## Updating the Allowed Emails List
 
-To add or remove people from the privileged access list, send a new PUT request with the complete list. The list is replaced entirely — it's not additive.
+To add or remove people from the privileged access list, send a new PUT request with the complete list. The list is replaced entirely - it's not additive.
 
 ```python
 # Add carol to the existing list
@@ -143,7 +143,7 @@ response = requests.put(
 ```
 
 <Note>
-To remove someone, send the list without their email. There is no separate "remove" endpoint — you always send the full list.
+To remove someone, send the list without their email. There is no separate "remove" endpoint - you always send the full list.
 </Note>
 
 ## Checking Current Visibility
@@ -172,7 +172,7 @@ See [Get App](/api-reference/apps/get) for the full response schema.
 
 ## Complete Example: Development to Production
 
-This walkthrough shows a typical flow — develop privately, test with teammates, then go public.
+This walkthrough shows a typical flow - develop privately, test with teammates, then go public.
 
 ### Deploy your app privately
 
@@ -281,7 +281,7 @@ This header is only needed for requests arriving from the public internet. Servi
 - **Private apps are not accessible without authentication.** Even if someone knows the subdomain URL, they cannot access a private app.
 - **Privileged mode uses email verification.** Users in the `allowed_emails` list must authenticate through Rigbox to access the app.
 - **Public apps are open to the entire internet.** Only set an app to public if you intend for anyone to access it. Don't expose admin panels, databases, or sensitive services as public.
-- **Visibility changes take effect immediately.** There is no propagation delay — the next request will use the new visibility mode.
+- **Visibility changes take effect immediately.** There is no propagation delay - the next request will use the new visibility mode.
 
 <Warning>
 Be careful with public visibility for apps that expose sensitive interfaces (e.g., database clients, admin panels, file browsers). Consider using privileged mode with specific emails instead.
@@ -289,6 +289,6 @@ Be careful with public visibility for apps that expose sensitive interfaces (e.g
 
 ## Next Steps
 
-- [Expose Ports & Route Apps](/guides/expose-and-route) — create and manage app routes
-- [Workspaces](/guides/workspaces) — workspace lifecycle management
-- [Catalog Apps](/guides/catalog) — install pre-packaged apps with routing handled automatically
+- [Expose Ports & Route Apps](/guides/expose-and-route) - create and manage app routes
+- [Workspaces](/guides/workspaces) - workspace lifecycle management
+- [Catalog Apps](/guides/catalog) - install pre-packaged apps with routing handled automatically

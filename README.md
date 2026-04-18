@@ -43,12 +43,12 @@ A few endpoints without utoipa annotations use manual `api:` frontmatter with ha
 
 ### Prose pages
 
-- `introduction.mdx` — Platform overview and architecture
-- `authentication.mdx` — Auth methods (API keys, JWTs, session tokens)
-- `quickstart.mdx` — Deploy your first workspace in 5 steps
-- `sandbox-api-surface.mdx` — Which APIs power sandbox.rigbox.dev
-- `clawd-api-surface.mdx` — Which APIs power clawd.rigbox.dev
-- `clawd-runtime-services.mdx` — Managed AI proxy service contracts
+- `introduction.mdx` - Platform overview and architecture
+- `authentication.mdx` - Auth methods (API keys, JWTs, session tokens)
+- `quickstart.mdx` - Deploy your first workspace in 5 steps
+- `sandbox-api-surface.mdx` - Which APIs power sandbox.rigbox.dev
+- `clawd-api-surface.mdx` - Which APIs power clawd.rigbox.dev
+- `clawd-runtime-services.mdx` - Managed AI proxy service contracts
 
 ## Updating the docs
 
@@ -67,7 +67,7 @@ The static spec files are kept in sync with production via the `sync-openapi.yml
 
 ### How description preservation works
 
-The utoipa-generated specs don't include `description` fields on endpoints — those are added manually in this repo. The sync workflow merges new spec data while keeping existing descriptions intact, so hand-written docs aren't overwritten.
+The utoipa-generated specs don't include `description` fields on endpoints - those are added manually in this repo. The sync workflow merges new spec data while keeping existing descriptions intact, so hand-written docs aren't overwritten.
 
 ## Local development
 
@@ -79,4 +79,4 @@ This starts a local preview server at `http://localhost:3000`.
 
 ## DNS
 
-`docs.rigbox.dev` is a CNAME in Cloudflare pointing to `cname.mintlify.app`. No Caddy or VPS configuration needed — Mintlify handles hosting and TLS.
+`docs.rigbox.dev` is a CNAME in Cloudflare pointing to `cname.mintlify.app`. No Caddy or VPS configuration needed - Mintlify handles hosting and TLS.

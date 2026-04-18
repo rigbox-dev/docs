@@ -92,7 +92,7 @@ jobs:
               for ep in removed_main + removed_auth:
                   summary_lines.append(f"- `{ep}`")
           if not summary_lines:
-              summary_lines.append("No endpoint additions or removals — schema/description updates only.")
+              summary_lines.append("No endpoint additions or removals - schema/description updates only.")
 
           with open('/tmp/sync-summary.md', 'w') as f:
               f.write('\n'.join(summary_lines))

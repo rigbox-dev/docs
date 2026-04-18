@@ -5,7 +5,7 @@ description: Use your own AI provider API keys instead of Rigbox-managed credits
 
 # Bring Your Own Keys
 
-Bring Your Own Keys (BYOK) mode lets you use your own AI provider API keys with Rigbox workspaces. Your keys are stored securely and injected into the workspace runtime — you get unlimited usage billed directly by your provider, with no Rigbox credit limits.
+Bring Your Own Keys (BYOK) mode lets you use your own AI provider API keys with Rigbox workspaces. Your keys are stored securely and injected into the workspace runtime - you get unlimited usage billed directly by your provider, with no Rigbox credit limits.
 
 ## When to Use BYOK
 
@@ -17,7 +17,7 @@ BYOK is the right choice when:
 - **Your organization requires** that API keys stay under your own provider account for billing, audit, or compliance reasons
 
 <Tip>
-If you are just getting started or prototyping, [managed mode](/guides/managed-proxy) is faster to set up — no keys needed.
+If you are just getting started or prototyping, [managed mode](/guides/managed-proxy) is faster to set up - no keys needed.
 </Tip>
 
 ## Set BYOK Mode
@@ -87,10 +87,10 @@ The API never returns your API key in responses. Once set, you can update or cle
 
 When you set a BYOK key:
 
-1. **Encrypted at rest** — the key is encrypted before being written to the database
-2. **Injected at runtime** — when the workspace starts, the key is injected as an environment variable inside the VM
-3. **Never logged** — keys are redacted from all request logs and audit trails
-4. **Scoped to the workspace** — each workspace has its own AI config; changing one does not affect others
+1. **Encrypted at rest** - the key is encrypted before being written to the database
+2. **Injected at runtime** - when the workspace starts, the key is injected as an environment variable inside the VM
+3. **Never logged** - keys are redacted from all request logs and audit trails
+4. **Scoped to the workspace** - each workspace has its own AI config; changing one does not affect others
 
 The key is available inside the workspace as the standard environment variable for the provider SDK (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`).
 
@@ -127,7 +127,7 @@ curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
 ```
 
 <Note>
-Switching modes takes effect on the next AI API call — no workspace restart required.
+Switching modes takes effect on the next AI API call - no workspace restart required.
 </Note>
 
 ## Set Defaults for New Workspaces
@@ -264,16 +264,16 @@ print(response.text)
 ## Security Best Practices
 
 <Warning>
-Never set API keys using raw environment variables or `.env` files inside the workspace. Always use the `ai-config` endpoint — it ensures keys are encrypted, scoped, and never exposed in logs.
+Never set API keys using raw environment variables or `.env` files inside the workspace. Always use the `ai-config` endpoint - it ensures keys are encrypted, scoped, and never exposed in logs.
 </Warning>
 
-- **Rotate keys regularly** — update the key via the ai-config endpoint; no workspace restart needed
-- **Use scoped keys** — if your provider supports project-scoped or restricted keys, prefer those over organization-wide keys
-- **Audit usage** — monitor your provider dashboard for unexpected usage patterns
-- **One key per workspace** — avoid sharing the same key across many workspaces; this makes it easier to revoke access to a single workspace
+- **Rotate keys regularly** - update the key via the ai-config endpoint; no workspace restart needed
+- **Use scoped keys** - if your provider supports project-scoped or restricted keys, prefer those over organization-wide keys
+- **Audit usage** - monitor your provider dashboard for unexpected usage patterns
+- **One key per workspace** - avoid sharing the same key across many workspaces; this makes it easier to revoke access to a single workspace
 
 ## Next Steps
 
-- [Managed AI Proxy](/guides/managed-proxy) — use Rigbox-provided credits instead
-- [Setup Scripts](/guides/setup-scripts) — automate SDK installation in every workspace
-- [Service Specs](/guides/service-specs) — run AI-powered backend services automatically
+- [Managed AI Proxy](/guides/managed-proxy) - use Rigbox-provided credits instead
+- [Setup Scripts](/guides/setup-scripts) - automate SDK installation in every workspace
+- [Service Specs](/guides/service-specs) - run AI-powered backend services automatically

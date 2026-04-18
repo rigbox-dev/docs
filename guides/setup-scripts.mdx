@@ -5,7 +5,7 @@ description: Automate workspace initialization with reusable bash scripts.
 
 # Setup Scripts
 
-Setup scripts are bash scripts that run automatically when a workspace starts. They let you define reproducible environments — install packages, clone repos, seed databases, configure tools — so every workspace boots into a ready-to-use state.
+Setup scripts are bash scripts that run automatically when a workspace starts. They let you define reproducible environments - install packages, clone repos, seed databases, configure tools - so every workspace boots into a ready-to-use state.
 
 ## How Setup Scripts Work
 
@@ -94,7 +94,7 @@ Setup scripts run as bash inside the workspace VM. Here are guidelines for writi
 #!/bin/bash
 set -e  # Exit on first error
 
-# Use absolute paths — the working directory is /home/developer
+# Use absolute paths - the working directory is /home/developer
 PROJECT_DIR="/home/developer/my-project"
 
 # Install system packages (sudo is available)
@@ -316,6 +316,6 @@ Add `echo` statements throughout your scripts for visibility. The output is capt
 
 ## Next Steps
 
-- [Service Specs](/guides/service-specs) — define background services that auto-start after setup completes
-- [Snapshots](/guides/snapshots) — snapshot a fully configured workspace and restore it later
-- [Managed AI Proxy](/guides/managed-proxy) — add AI capabilities to your scripted environments
+- [Service Specs](/guides/service-specs) - define background services that auto-start after setup completes
+- [Snapshots](/guides/snapshots) - snapshot a fully configured workspace and restore it later
+- [Managed AI Proxy](/guides/managed-proxy) - add AI capabilities to your scripted environments
