@@ -217,7 +217,7 @@ requests.put(
 The workspace must be in a `stopped` state before resizing. Start it again after the resize completes.
 </Warning>
 
-See [Resize Workspace](/api-reference/workspaces/resize) for the full schema.
+See [Update Workspace Resources](/api-reference/workspaces/update-resources) for the full schema.
 
 ## Environment Variables
 
@@ -254,7 +254,7 @@ requests.post(
 Environment variables persist across restarts. You don't need to set them again after stopping and starting a workspace.
 </Tip>
 
-See [Set Environment Variables](/api-reference/workspaces/set-env) for details.
+See [Update Workspace Environment](/api-reference/workspaces/update-env) for details.
 
 ## Live Metrics
 
@@ -278,7 +278,7 @@ print(f"Disk: {metrics['disk_used_mb']} / {metrics['disk_total_mb']} MB")
 ```
 </CodeGroup>
 
-See [Get Metrics](/api-reference/workspaces/metrics) for the full response schema.
+See [Get Metrics](/api-reference/workspaces/get-metrics) for the full response schema.
 
 ## Logs
 
@@ -307,7 +307,7 @@ for line in response.json()["logs"]:
 
 The `/logs/stream` endpoint returns Server-Sent Events (SSE). Use an SSE client library for production integrations.
 
-See [Get Logs](/api-reference/workspaces/logs) and [Stream Logs](/api-reference/workspaces/logs-stream) for details.
+See [Get Logs](/api-reference/workspaces/get-logs) and [Stream Logs](/api-reference/workspaces/stream-logs) for details.
 
 ## Deleting a Workspace
 

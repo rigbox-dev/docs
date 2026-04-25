@@ -46,7 +46,7 @@ for port_info in response.json():
 
 This scans the workspace for active TCP listeners and returns the port number along with the process name when available.
 
-See [List Listening Ports](/api-reference/workspaces/listening-ports) for the full response schema.
+See [List Listening Ports](/api-reference/apps/listening-ports) for the full response schema.
 
 ## Create an App Manually
 
@@ -108,7 +108,7 @@ print(f"Exposed at: https://{app['name']}.rigbox.dev")
 
 The endpoint automatically detects the process name and uses it to generate a sensible app name.
 
-See [Expose Port](/api-reference/workspaces/expose-port) for details.
+See [Expose Port](/api-reference/apps/expose-port) for details.
 
 ## Reconcile Template Apps
 
@@ -121,7 +121,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/reconcile-apps 
 
 This checks the template definition and creates any missing apps. It's idempotent - running it multiple times has no side effects.
 
-See [Reconcile Apps](/api-reference/workspaces/reconcile-apps) for details.
+See [Reconcile Apps](/api-reference/apps/reconcile) for details.
 
 ## Check App Health
 
@@ -147,7 +147,7 @@ print(f"Healthy: {health['healthy']}")
 If health returns unhealthy, check that your service is actually listening on the correct port inside the VM. Use the listening-ports endpoint to verify.
 </Tip>
 
-See [App Health](/api-reference/apps/health) for the response schema.
+See [App Health](/api-reference/apps/health-check) for the response schema.
 
 ## App Lifecycle: Start, Stop, Restart
 

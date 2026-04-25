@@ -19,6 +19,8 @@ The CLI is already installed in every Rigbox workspace. Open a terminal and run:
 rig --version
 ```
 
+Inside a workspace, `rig` automatically switches into workspace-scoped mode. You do not need to log in, and account-wide commands are intentionally hidden.
+
 ### On your local machine
 
 Download the latest release for your platform:
@@ -44,25 +46,52 @@ chmod +x /usr/local/bin/rig
 
 ---
 
-## Authentication
+## Authentication and Runtime Modes
 
-Before using the CLI outside a workspace, you need to log in:
+The CLI has two modes depending on where it runs.
+
+| Context | Auth method | Command surface |
+|---------|-------------|-----------------|
+| Inside a workspace VM | Ambient workspace identity from the VM bridge | Workspace-local commands only |
+| On your local machine | OAuth token via `rig login` | Full account and workspace control |
+
+### Outside a workspace
+
+Before using the CLI on your laptop or another external machine, log in:
 
 ```bash
 rig login
 ```
 
-This opens your browser for OAuth authentication and stores your token locally. Inside a workspace, the CLI uses the workspace's local credentials automatically.
+This opens your browser for OAuth authentication and stores your token locally.
 
 <Note>
-  Your CLI configuration is stored in `~/.rigbox/config.json`. This includes your auth token and default settings.
+  External CLI configuration is stored in `~/.rigbox/config.json`. This includes your auth token and default settings.
 </Note>
+
+### Inside a workspace
+
+Inside a workspace, `rig` detects `/etc/rigbox/workspace.json` and talks to the VM-local bridge API at `http://172.16.0.1:9090/rig/v1`.
+
+No bearer token is sent for normal workspace-scoped operations. The bridge resolves your workspace from the VM's source IP on the compute node, so editing local config files cannot switch the workspace identity.
+
+Run:
+
+```bash
+rig whoami
+```
+
+The output should show `workspace_ip` or equivalent bridge identity as the auth method.
 
 ---
 
 ## Workspace Management
 
-Workspaces are isolated Firecracker micro-VMs where your code runs. The CLI provides full lifecycle management.
+Workspaces are isolated Firecracker micro-VMs where your code runs. On your local machine, the CLI provides full lifecycle management across your account.
+
+<Note>
+  Workspace lifecycle commands such as `rig ls`, `rig new`, `rig spawn`, `rig start`, `rig stop`, `rig restart`, and `rig rm` are external-mode commands. Inside a workspace VM, `rig` is scoped to the current workspace and these account-wide commands are not shown in `rig -h`.
+</Note>
 
 ### List workspaces
 
@@ -136,6 +165,8 @@ rig rm my-project
 
 Apps are services running inside your workspace that are exposed to the internet via a unique subdomain (`{name}.rigbox.dev`).
 
+Inside a workspace VM, app commands are always scoped to the current workspace. Passing another workspace ID does not change the target workspace.
+
 ### List apps
 
 ```bash
@@ -181,6 +212,8 @@ rig app rm my-api
 ---
 
 ## Templates and Catalog
+
+Templates, catalog browsing, and account-level tool management are available from the external CLI. They are hidden inside workspace VM mode.
 
 ### Browse templates
 
@@ -244,7 +277,7 @@ This starts the specified tool and provides you with the URL to access it.
 
 ## SSH Key Management
 
-Manage the SSH keys registered to your account directly from the CLI.
+Manage the SSH keys registered to your account directly from the external CLI. SSH key commands are account-wide and are not shown inside workspace VM mode.
 
 ### Add a key
 
@@ -280,74 +313,79 @@ For more details on SSH access, including connecting to workspaces and using the
 
 ## AI Proxy
 
-The managed AI proxy lets you use AI APIs (OpenAI, Anthropic, Google, etc.) through Rigbox's credit system, without managing your own API keys.
+The managed AI proxy lets you use supported AI providers through Rigbox's credit system without putting provider keys in your workspace.
 
-### Activate the proxy
+### Configure the current shell
 
 From inside a workspace VM:
 
 ```bash
-rig proxy on
+eval "$(rig proxy on)"
 ```
 
-Output:
-
-```
-AI proxy activated.
-
-Export these variables in your shell:
-
-  export OPENAI_API_KEY=rig_proxy_...
-  export ANTHROPIC_API_KEY=rig_proxy_...
-  export OPENAI_BASE_URL=<proxy_url>/openai
-  export ANTHROPIC_BASE_URL=<proxy_url>/anthropic
-
-Or run: eval $(rig proxy on --eval)
-```
-
-After activating the proxy, any AI SDK requests (OpenAI, Anthropic, etc.) from your workspace route through the managed proxy automatically.
-
-### Quick setup with eval
+This prints and applies SDK environment variables for the current shell:
 
 ```bash
-eval $(rig proxy on --eval)
+export RIGBOX_AI_PROXY_URL='http://172.16.0.1:9090'
+export OPENAI_BASE_URL='http://172.16.0.1:9090/v1'
+export OPENAI_API_KEY='managed-by-rigbox'
+export GEMINI_BASE_URL='http://172.16.0.1:9090/google'
+export GOOGLE_API_KEY='managed-by-rigbox'
 ```
 
-This sets all the environment variables in one step.
+You can also source the generated env file directly:
+
+```bash
+source ~/.rigbox/proxy.env
+```
+
+Provider SDK variables are opt-in. Rigbox does not globally export `OPENAI_BASE_URL`, `ANTHROPIC_BASE_URL`, or `GEMINI_BASE_URL` for every shell session, because that can hijack other tools that you authenticate separately.
 
 ### Deactivate the proxy
 
 ```bash
-rig proxy off
+eval "$(rig proxy off)"
 ```
 
-<Note>
-  The AI proxy is only available from inside a workspace VM. It routes requests through an internal proxy service that handles credit tracking and key injection.
-</Note>
+### Check proxy status
 
-### Check credit balance
+```bash
+rig proxy status
+```
 
-You can check your AI credit balance via the API:
+This shows the bridge URL, available provider base URLs, whether your current shell environment matches them, and your credit balance when available.
+
+You can also check credits through the public API from outside the VM:
 
 ```bash
 curl https://api.rigbox.dev/api/users/me/credits \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-See the [Build a Hosting Platform guide](/guides/build-hosting-platform) for more on integrating AI credits into your own application.
+<Note>
+  The proxy bridge is only reachable from inside a workspace VM. It listens at `http://172.16.0.1:9090`, resolves the workspace by bridge source IP, injects managed provider keys upstream, and meters usage against your credits.
+</Note>
 
 ---
 
-## Inside vs. Outside Workspaces
+## Workspace VM Command Surface
 
-The CLI works the same way in both contexts, with one difference in how authentication is handled:
+Inside a workspace VM, `rig` is intentionally smaller. Run `rig -h` in the VM to see only workspace-safe commands.
 
-| Context | Auth method | Notes |
-|---------|-------------|-------|
-| Inside a workspace | Automatic (local credentials) | No `rig login` needed |
-| On your local machine | OAuth token via `rig login` | Token stored in `~/.rigbox/config.json` |
+Shown in VM mode:
 
-All commands behave identically regardless of where you run them. Inside a workspace, the CLI detects the local environment and uses the workspace's credentials.
+- `rig whoami`
+- `rig status`
+- `rig app ...`
+- `rig proxy ...`
+
+Hidden in VM mode:
+
+- `rig login` and `rig logout`
+- `rig ls`, `rig new`, `rig spawn`, `rig start`, `rig stop`, `rig restart`, and `rig rm`
+- `rig template`, `rig catalog`, `rig tool`, and `rig ssh-key`
+
+Those commands remain available from your local machine after `rig login`.
 
 ---
 

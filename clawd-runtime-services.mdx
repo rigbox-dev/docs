@@ -22,13 +22,13 @@ This page documents how [Clawd](https://clawd.rigbox.dev) uses Rigbox's general-
 When a Clawd bot workspace is in managed mode:
 
 1. The bot's code calls the AI SDK (e.g., Anthropic, OpenAI) using standard endpoints
-2. The `rig proxy on` environment routes these calls through Rigbox's AI proxy
+2. The workspace's proxy configuration routes these calls through Rigbox's bridge-local AI proxy
 3. The proxy injects the real provider API key - the bot workspace never sees it
 4. Token usage is metered and deducted from the user's credit balance
 5. If credits run out, requests return `402` and the Clawd UI prompts an upgrade
 
 <Note>
-The managed AI proxy is a general Rigbox feature, not Clawd-specific. Any workspace can use it by setting `mode: "managed"` via the [AI Config API](/api-reference/ai/update-workspace-ai-config) or running `rig proxy on` inside the VM.
+The managed AI proxy is a general Rigbox feature, not Clawd-specific. Any workspace can use it by setting `mode: "managed"` via the [AI Config API](/api-reference/ai/update-workspace-ai-config), then running `eval "$(rig proxy on)"` or sourcing `~/.rigbox/proxy.env` inside the VM.
 </Note>
 
 ## AI config fields

@@ -5,11 +5,11 @@ description: Use Rigbox credits to power Claude Code, Codex CLI, OpenCode, Gemin
 
 # AI Coding Tools
 
-Rigbox workspaces come with a full Linux environment, SSH access, and a managed AI proxy - making them a natural home for AI coding agents. Tools like Claude Code, Codex CLI, OpenCode, and Gemini CLI work out of the box when you activate managed credits.
+Rigbox workspaces come with a full Linux environment, SSH access, and a managed AI proxy - making them a natural home for AI coding agents. Tools like Claude Code, Codex CLI, OpenCode, and Gemini CLI can use Rigbox credits when the matching managed provider is available.
 
 ## How It Works
 
-AI coding tools use the same provider SDKs (Anthropic, OpenAI, Google) that the managed proxy already supports. When you run `rig proxy on` inside a workspace, the proxy sets environment variables that redirect SDK traffic through Rigbox's infrastructure. Your credits cover the usage - no API keys needed.
+AI coding tools use the same provider SDKs (Anthropic, OpenAI, Google) that the managed proxy exposes. When you run `eval "$(rig proxy on)"` inside a workspace, `rig` sets environment variables for the current shell that redirect SDK traffic through Rigbox's bridge proxy. Your credits cover the usage; provider API keys stay outside the VM.
 
 ```mermaid
 flowchart LR
@@ -37,7 +37,7 @@ flowchart LR
 From inside your workspace:
 
 ```bash
-eval $(rig proxy on)
+eval "$(rig proxy on)"
 ```
 
 This sets the environment variables each SDK needs (`ANTHROPIC_BASE_URL`, `OPENAI_BASE_URL`, etc.) to route through the Rigbox proxy.
@@ -70,7 +70,7 @@ go install github.com/opencode-ai/opencode@latest
 
 ### 3. Start coding
 
-The tools pick up the proxy environment variables automatically - no API key configuration needed.
+The tools pick up the proxy environment variables automatically. The placeholder API keys are set to `managed-by-rigbox`; the proxy ignores that placeholder and injects server-side managed keys upstream.
 
 <CodeGroup>
 
@@ -100,10 +100,10 @@ Use the `dev` or `full` image for AI coding tools. They include build toolchains
 
 ### Claude Code
 
-Claude Code works immediately after `rig proxy on` - it reads `ANTHROPIC_BASE_URL` from the environment.
+Claude Code can use the proxy after `rig proxy on` when Anthropic is configured for managed routing. It reads `ANTHROPIC_BASE_URL` from the environment.
 
 ```bash
-eval $(rig proxy on)
+eval "$(rig proxy on)"
 claude
 ```
 
@@ -115,10 +115,10 @@ Claude Code uses Claude Sonnet by default. To use Opus, pass `--model claude-opu
 
 ### Codex CLI
 
-Codex reads `OPENAI_BASE_URL` from the environment.
+Codex reads `OPENAI_BASE_URL` from the environment. In Rigbox, that points at the OpenAI-compatible `/v1` gateway. If the current environment does not have a managed OpenAI key configured, `/v1` returns `503 provider_unavailable`; use a configured provider path or BYOK instead.
 
 ```bash
-eval $(rig proxy on)
+eval "$(rig proxy on)"
 codex "add error handling to the API routes in src/routes/"
 ```
 
@@ -127,7 +127,7 @@ codex "add error handling to the API routes in src/routes/"
 Gemini CLI reads `GOOGLE_API_KEY` or the configured base URL from the environment.
 
 ```bash
-eval $(rig proxy on)
+eval "$(rig proxy on)"
 gemini
 ```
 
@@ -136,7 +136,7 @@ gemini
 Aider supports multiple providers. The proxy environment variables are picked up automatically.
 
 ```bash
-eval $(rig proxy on)
+eval "$(rig proxy on)"
 
 # Use with Anthropic (default after proxy on)
 aider --model claude-sonnet-4-20250514
@@ -153,7 +153,7 @@ aider --model gemini/gemini-2.5-pro
 OpenCode uses the same SDK environment variables. Configure it to use your preferred provider.
 
 ```bash
-eval $(rig proxy on)
+eval "$(rig proxy on)"
 opencode
 ```
 
@@ -200,7 +200,7 @@ curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
   -d '{"mode": "byok", "provider": "anthropic", "api_key": "sk-ant-..."}'
 ```
 
-Then run `rig proxy on` again to update the environment.
+Then run `eval "$(rig proxy on)"` again to update the environment.
 
 ## Why Rigbox for AI Coding
 

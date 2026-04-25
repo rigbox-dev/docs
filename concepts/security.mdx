@@ -24,7 +24,13 @@ Even if code running inside a workspace achieves root access, it is confined to 
 
 ### Platform secrets
 
-Database credentials, internal auth tokens, and service keys are held in the control plane. They never enter workspace VMs. The only credential a VM receives is its own workspace API key, which has scoped access to that workspace's resources.
+Database credentials, internal auth tokens, provider keys, and service keys are held outside workspace VMs. They never enter the VM.
+
+Each VM receives immutable workspace metadata at `/etc/rigbox/workspace.json`, but that file is not an authentication secret. VM-local Rigbox services authenticate the workspace by the source IP of the VM on the compute node's bridge network, scoped by the compute node ID. In other words, identity is resolved as `(node, VM source IP)`, not by a token that code inside the VM can swap out.
+
+<Note>
+  The baked-in `rig` CLI inside a workspace uses this ambient VM identity. It does not require `rig login`, and it does not read your personal `~/.rigbox/config.json` for normal workspace-scoped commands.
+</Note>
 
 ### AI provider keys
 
@@ -83,7 +89,8 @@ flowchart TB
 
 - Workspace VMs are on an internal network - not directly accessible from the internet
 - All inbound traffic flows through the API gateway, reverse proxy, or SSH gateway
-- Outbound AI requests flow through the managed proxy (when enabled)
+- VM-local Rigbox services are exposed only on the compute bridge (`172.16.0.1:9090`) and resolve callers from node-scoped VM IP leases
+- Outbound AI requests can flow through the managed proxy (when enabled)
 - VMs can make outbound HTTP requests to the public internet for package installation, git clones, etc.
 
 ## Rate limiting

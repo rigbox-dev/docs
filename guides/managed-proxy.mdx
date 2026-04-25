@@ -5,32 +5,36 @@ description: Use Rigbox-provided AI credits without managing your own API keys.
 
 # Managed AI Proxy
 
-The managed AI proxy lets your workspace code call AI providers (Anthropic, OpenAI, Google, Brave Search) without ever touching an API key. Rigbox holds the provider keys on your behalf, injects them at request time, and tracks usage against your credit balance.
+The managed AI proxy lets your workspace code call supported AI providers without putting provider API keys in the VM. Rigbox holds managed provider keys on your behalf, injects them at request time, and tracks usage against your credit balance.
 
 ## How It Works
 
-When managed mode is active for a workspace, outbound AI SDK requests are routed through a proxy running on the Rigbox data plane. The proxy:
+Every workspace can reach the proxy at `http://172.16.0.1:9090` from inside the VM. When managed mode is active, AI SDK requests can be routed through that bridge-local proxy. The proxy:
 
 1. Intercepts the request from your workspace VM
-2. Injects the correct provider API key (which never enters your VM)
-3. Forwards the request to the upstream provider
-4. Logs token usage and deducts from your credit balance
-5. Returns the response to your code
+2. Resolves the workspace from the VM's source IP on the compute bridge
+3. Injects the correct provider API key (which never enters your VM)
+4. Forwards the request to the upstream provider
+5. Logs token usage and deducts from your credit balance
+6. Returns the response to your code
 
-Your workspace code uses the standard SDK for each provider - you only change the base URL to point at the proxy endpoint.
+Your workspace code uses normal SDKs and HTTP clients. For OpenAI-compatible tools, point the base URL at `/v1`. For provider-native SDKs, use the provider path such as `/google`.
 
 <Tip>
-Because the proxy speaks the same protocol as each provider's native API, you can switch between managed mode and your own keys with a single configuration change.
+Provider SDK environment variables are opt-in. Rigbox exposes `RIGBOX_AI_PROXY_URL` globally for discovery, and writes `~/.rigbox/proxy.env` for shells or projects that want to route through the proxy.
 </Tip>
 
 ## Supported Providers
 
-| Provider | Models | SDK Compatibility |
-|----------|--------|-------------------|
-| **Anthropic** | Claude 4 Opus, Claude 4 Sonnet, Claude 3.5 Haiku | Anthropic Python/JS SDK |
-| **OpenAI** | GPT-4o, GPT-4o-mini, o3, o4-mini | OpenAI Python/JS SDK |
-| **Google** | Gemini 2.5 Pro, Gemini 2.5 Flash | Google AI Python/JS SDK |
-| **Brave Search** | Web Search API | REST / HTTP client |
+Managed provider availability depends on the keys configured for the current Rigbox environment. Use `rig proxy status` inside a workspace to see the proxy URLs available to your shell.
+
+| Surface | Endpoint | Notes |
+|----------|----------|-------|
+| **OpenAI-compatible gateway** | `http://172.16.0.1:9090/v1` | Supports `/models`, `/chat/completions`, `/responses`, and `/embeddings` when a managed OpenAI key is configured |
+| **Google Gemini provider path** | `http://172.16.0.1:9090/google` | Provider-native Gemini REST shape |
+| **Anthropic provider path** | `http://172.16.0.1:9090/anthropic` | Provider-native Anthropic shape when configured |
+| **OpenAI provider path** | `http://172.16.0.1:9090/openai` | Legacy/provider-native OpenAI path |
+| **Brave Search** | `http://172.16.0.1:9090/brave` | Web Search API when configured |
 
 ## Credit Tiers
 
@@ -102,25 +106,25 @@ console.log(config);
 
 ### Via the CLI (Inside a Workspace VM)
 
-If you are already inside a running workspace, the `rig` CLI can activate managed mode and configure your shell in one step.
+If you are already inside a running workspace, the `rig` CLI can configure your current shell to use the proxy.
 
 ```bash
-rig proxy on
+eval "$(rig proxy on)"
 ```
 
 This command:
-- Enables managed proxy mode for the current workspace
 - Prints shell `export` statements that set the correct base URLs for each AI SDK
-- Routes all subsequent AI SDK calls through the Rigbox proxy
+- Uses `managed-by-rigbox` placeholder API keys where SDKs require a non-empty key
+- Routes subsequent AI SDK calls in that shell through the Rigbox proxy
 
 <Tip>
-Run `eval $(rig proxy on)` to apply the exports to your current shell session automatically.
+Use `rig proxy status` to see available provider URLs, current shell state, and credit balance.
 </Tip>
 
 To deactivate:
 
 ```bash
-rig proxy off
+eval "$(rig proxy off)"
 ```
 
 ## Check Your Credit Balance
@@ -142,7 +146,7 @@ curl -s https://api.rigbox.dev/api/users/me/credits \
 ```
 </CodeGroup>
 
-See the [Credits API reference](/api-reference/users/get-credits) for full response schema.
+See the [Credits API reference](/api-reference/ai/get-credits) for full response schema.
 
 ## View Usage Breakdown
 
@@ -180,13 +184,13 @@ curl -s https://api.rigbox.dev/api/users/me/ai-usage \
 ```
 </CodeGroup>
 
-See the [AI Usage API reference](/api-reference/users/get-ai-usage) for full response schema and query parameters.
+See the [AI Usage API reference](/api-reference/ai/get-usage) for full response schema and query parameters.
 
 ## What Happens When Credits Run Out
 
 When your credit balance reaches zero:
 
-1. **API requests return HTTP 402** - the proxy responds with a `credits_exhausted` error code
+1. **API requests return HTTP 402** - the proxy rejects new managed AI calls until credits are available
 2. **The UI shows an upgrade prompt** - you can upgrade to Pro or switch to [BYOK mode](/guides/byok)
 3. **Existing services keep running** - only new AI API calls are blocked; your workspace and non-AI services are unaffected
 
@@ -204,27 +208,27 @@ Here is a complete flow: activate managed mode, make an AI call from inside the 
 curl -X PUT https://api.rigbox.dev/api/workspaces/ws_abc123/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"mode": "managed", "provider": "anthropic", "model": "claude-sonnet-4-20250514"}'
+  -d '{"mode": "managed", "provider": "google", "model": "gemini-2.5-flash-lite"}'
 ```
 
-**Step 2 - Inside the workspace VM, configure the SDK and make a call:**
+**Step 2 - Inside the workspace VM, configure the shell and make a call:**
 
 ```bash
 # Apply proxy environment variables
-eval $(rig proxy on)
-```
+eval "$(rig proxy on)"
 
-```python
-# The proxy intercepts this call - no API key needed in your code
-from anthropic import Anthropic
-
-client = Anthropic()  # Uses proxy base URL from environment
-message = client.messages.create(
-    model="claude-sonnet-4-20250514",
-    max_tokens=1024,
-    messages=[{"role": "user", "content": "Explain microVMs in one paragraph."}]
-)
-print(message.content[0].text)
+curl -sS \
+  -H "Content-Type: application/json" \
+  -X POST "$RIGBOX_AI_PROXY_URL/google/v1beta/models/gemini-2.5-flash-lite:generateContent" \
+  -d '{
+    "contents": [
+      {
+        "parts": [
+          {"text": "Explain microVMs in one paragraph."}
+        ]
+      }
+    ]
+  }' | jq .
 ```
 
 **Step 3 - Check remaining credits:**
@@ -241,17 +245,17 @@ Credit deduction happens synchronously - the balance is updated before the proxy
 
 ## Switching Providers
 
-You can change the provider and model at any time without restarting the workspace. The next AI API call will use the new configuration.
+You can change the provider and model at any time without restarting the workspace, as long as the selected managed provider is configured for your environment. The next AI API call will use the new configuration.
 
 ```bash
-# Switch from Anthropic to OpenAI
+# Switch to OpenAI when the managed OpenAI gateway is configured
 curl -X PUT https://api.rigbox.dev/api/workspaces/ws_abc123/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"mode": "managed", "provider": "openai", "model": "gpt-4o"}'
 ```
 
-If you are using the CLI inside the VM, run `rig proxy on` again to refresh the environment variables for the new provider.
+If you are using the CLI inside the VM, run `eval "$(rig proxy on)"` again to refresh the environment variables for the new provider.
 
 ## Next Steps
 

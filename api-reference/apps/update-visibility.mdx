@@ -4,7 +4,7 @@ api: PUT /apps/{id}/visibility
 description: "Set an app to public, private, or privileged access."
 ---
 
-Public apps are accessible to anyone with the URL. Private apps require authentication. Privileged apps require a workspace API key.
+Public apps are accessible to anyone with the URL. Private apps require authentication. Privileged apps require authentication for the owner or an allowed email address. For direct HTTP access, send an `X-Rigbox-Key` header with one of your `rb_*` API keys.
 
 <ParamField body="visibility" type="string" required>
   One of `public`, `private`, or `privileged`

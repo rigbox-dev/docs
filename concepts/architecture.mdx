@@ -40,17 +40,31 @@ The managed AI proxy lets your workspace code call AI providers without holding 
 
 ```mermaid
 flowchart LR
-    CODE[Your code] -->|SDK request| PROXY[Rigbox AI Proxy]
+    CODE[Your code] -->|SDK request| PROXY["Bridge proxy\n172.16.0.1:9090"]
     PROXY -->|Authenticated| PROVIDER[Anthropic / OpenAI / Google]
     PROXY --> CREDITS[Credits deducted]
 ```
 
 - Provider API keys never enter your VM - the proxy injects them at request time
 - Token usage is metered and deducted from your credit balance
-- The proxy is opt-in per workspace - activate via the [API](/api-reference/ai/update-workspace-ai-config) or [CLI](/guides/cli) (`rig proxy on`)
-- Supports Anthropic, OpenAI, Google Gemini, and Brave Search
+- Workspaces discover the proxy through `RIGBOX_AI_PROXY_URL=http://172.16.0.1:9090`
+- Provider SDK environment variables are opt-in; source `~/.rigbox/proxy.env` or run `eval "$(rig proxy on)"` inside the VM
+- The OpenAI-compatible gateway is available at `/v1`; provider-native routes remain available under `/google`, `/anthropic`, `/openai`, and `/brave` when that managed provider is configured
 
 See [Managed AI Proxy](/guides/managed-proxy) for usage details and [BYOK](/guides/byok) for using your own keys.
+
+## VM-local bridge services
+
+Each running workspace can reach a compute-local bridge service at `http://172.16.0.1:9090`. That service hosts the managed AI proxy and the VM-scoped CLI API used by the baked-in `rig` command.
+
+```mermaid
+flowchart LR
+    VM["Workspace VM"] -->|source IP on bridge| BRIDGE["172.16.0.1:9090"]
+    BRIDGE --> CLI["/rig/v1\nworkspace-scoped CLI"]
+    BRIDGE --> AI["/v1 and provider paths\nAI proxy"]
+```
+
+The bridge does not trust user-supplied workspace IDs as identity. Rigbox resolves the caller from the VM source IP and the compute node that received the request. This keeps VM identity fixed even if code inside the VM edits local files.
 
 ## Regions
 

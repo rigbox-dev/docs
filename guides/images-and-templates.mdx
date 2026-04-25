@@ -64,11 +64,11 @@ for image in response.json():
 ```
 </CodeGroup>
 
-See [List Images](/api-reference/images/list) for the full response schema.
+See [List Images](/api-reference/other/images) for the full response schema.
 
 ## Templates
 
-Templates are pre-configured workspace definitions that pair an image with sensible resource defaults. Use them with [quick deploy](/api-reference/workspaces/quick-deploy) for one-call workspace creation.
+Templates are pre-configured workspace definitions that pair an image with sensible resource defaults. Use them with [quick deploy](/api-reference/templates/quick-deploy) for one-call workspace creation.
 
 | Template | Image | RAM | vCPU | Disk | Use case |
 |----------|-------|-----|------|------|----------|
@@ -154,7 +154,7 @@ print(f"Status: {workspace['status']}")
 
 Quick deploy creates the workspace and starts it in a single call. Poll the workspace status until it's `running`.
 
-See [Quick Deploy](/api-reference/workspaces/quick-deploy) for the full request/response schema.
+See [Quick Deploy](/api-reference/templates/quick-deploy) for the full request/response schema.
 
 ## Custom Workspace with a Specific Image
 
@@ -217,7 +217,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/start \
 You cannot change the image of an existing workspace. To switch images, create a new workspace with the desired image.
 </Warning>
 
-See [Resize Workspace](/api-reference/workspaces/resize) for details.
+See [Update Workspace Resources](/api-reference/workspaces/update-resources) for details.
 
 ## Pre-warmed Caches
 

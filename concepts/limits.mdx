@@ -148,6 +148,8 @@ curl https://api.rigbox.dev/api/capacity
 
 This endpoint is public - no authentication required.
 
+Rigbox also tracks per-node runtime capacity internally, including bridge IP leases for running VMs. Each compute node has 253 active VM bridge IPs available (`172.16.0.2` through `172.16.0.254`), and stopped or deleted workspaces release their active IP lease.
+
 ## Learn more
 
 <CardGroup cols={2}>
