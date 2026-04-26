@@ -14,10 +14,10 @@ api.rigbox.dev/api-docs/openapi.json
         │  fetched weekly by CI, saved as static files
         ▼
 This repo
-├── openapi/rigbox-api.json      ← 80 endpoints (main API)
-├── openapi/auth-api.json        ← 12 endpoints (access control)
+├── openapi/rigbox-api.json      ← 84 operations (main API)
+├── openapi/auth-api.json        ← 12 operations (access control)
 ├── docs.json                    ← Mintlify config + navigation
-├── api-reference/**/*.mdx       ← 98 pages, each points to a spec operation
+├── api-reference/**/*.mdx       ← 101 pages, most point to a spec operation
 └── *.mdx                        ← Hand-written prose pages
         │
         │  push to main → Mintlify auto-builds
@@ -61,7 +61,7 @@ A few endpoints without utoipa annotations use manual `api:` frontmatter with ha
 
 ## OpenAPI spec sync
 
-The static spec files are kept in sync with production via the `sync-openapi.yml` GitHub Action. It runs weekly and on-demand, fetching fresh specs from `api.rigbox.dev`, preserving any hand-written descriptions, and opening a PR if there are changes.
+The static spec files are kept in sync with production via the `sync-openapi.yml` GitHub Action. It runs weekly and on-demand, fetching fresh specs from `api.rigbox.dev`, preserving any hand-written descriptions, and committing updates directly to `main` if there are changes.
 
 **Manual trigger:** Go to Actions → Sync OpenAPI Specs → Run workflow.
 
