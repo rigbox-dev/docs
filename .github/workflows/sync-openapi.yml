@@ -10,15 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Fetch latest OpenAPI specs
         run: |
-          curl -sf https://api.rigbox.dev/api-docs/openapi.json -o /tmp/rigbox-api-new.json
-          curl -sf https://api.rigbox.dev/api-docs/auth/openapi.json -o /tmp/auth-api-new.json
+          curl --fail --silent --show-error --location --retry 3 https://api.rigbox.dev/api-docs/openapi.json -o /tmp/rigbox-api-new.json
+          curl --fail --silent --show-error --location --retry 3 https://api.rigbox.dev/api-docs/auth/openapi.json -o /tmp/auth-api-new.json
 
       - name: Merge specs (preserve hand-written descriptions)
         run: |
@@ -81,7 +80,7 @@ jobs:
           print("Merging auth API spec...")
           new_auth, removed_auth = merge_spec('openapi/auth-api.json', '/tmp/auth-api-new.json')
 
-          # Write summary for PR body
+          # Write summary for the workflow run
           summary_lines = []
           if new_main or new_auth:
               summary_lines.append("### New endpoints")
@@ -113,33 +112,24 @@ jobs:
             git diff --stat openapi/
           fi
 
-      - name: Create pull request
+      - name: Commit updated specs
         if: steps.diff.outputs.changed == 'true'
         run: |
-          BRANCH="sync-openapi-$(date +%Y%m%d)"
-          git checkout -b "$BRANCH"
           git add openapi/
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "chore: sync OpenAPI specs from production"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
 
-          git push -u origin "$BRANCH"
-
-          SUMMARY=$(cat /tmp/sync-summary.md)
-          gh pr create \
-            --title "chore: sync OpenAPI specs $(date +%Y-%m-%d)" \
-            --body "$(cat <<EOF
-          ## OpenAPI Spec Sync
-
-          Auto-synced from production API specs.
-
-          $SUMMARY
-
-          **Review checklist:**
-          - [ ] New endpoints have descriptions (add manually if missing)
-          - [ ] No unintended schema changes
-          - [ ] MDX pages exist for any new endpoints
-          EOF
-          )"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Write sync summary
+        if: always()
+        run: |
+          {
+            echo "## OpenAPI Spec Sync"
+            echo
+            if [ -f /tmp/sync-summary.md ]; then
+              cat /tmp/sync-summary.md
+            else
+              echo "Sync summary was not generated."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
