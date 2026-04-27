@@ -584,6 +584,138 @@
         ]
       }
     },
+    "/api/apps/{id}/metrics": {
+      "get": {
+        "tags": [
+          "Apps"
+        ],
+        "summary": "Get app time-series metrics.",
+        "operationId": "get_app_metrics",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "App ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Metrics range: 1h, 6h, 24h, or 7d",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/AppMetricsRange"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "App metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppMetricsResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Prometheus returned an invalid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Prometheus unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/apps/{id}/metrics/summary": {
+      "get": {
+        "tags": [
+          "Apps"
+        ],
+        "summary": "Get app summary metrics.",
+        "operationId": "get_app_metrics_summary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "App ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Metrics range: 1h, 6h, 24h, or 7d",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/AppMetricsRange"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "App metrics summary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppMetricsSummaryResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Prometheus returned an invalid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Prometheus unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/apps/{id}/params": {
       "get": {
         "tags": [
@@ -3709,6 +3841,156 @@
           "file_path"
         ]
       },
+      "AppMetricsRange": {
+        "type": "string",
+        "enum": [
+          "1h",
+          "6h",
+          "24h",
+          "7d"
+        ]
+      },
+      "AppMetricsResponse": {
+        "type": "object",
+        "required": [
+          "range",
+          "step_seconds",
+          "hosts",
+          "series",
+          "status_codes"
+        ],
+        "properties": {
+          "hosts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "range": {
+            "$ref": "#/components/schemas/AppMetricsRange"
+          },
+          "series": {
+            "$ref": "#/components/schemas/AppMetricsSeries"
+          },
+          "status_codes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppStatusCodeMetric"
+            }
+          },
+          "step_seconds": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AppMetricsSeries": {
+        "type": "object",
+        "required": [
+          "request_rate",
+          "error_rate_5xx",
+          "latency_p50_ms",
+          "latency_p95_ms",
+          "latency_p99_ms",
+          "bandwidth_out_bps"
+        ],
+        "properties": {
+          "bandwidth_out_bps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "error_rate_5xx": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "latency_p50_ms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "latency_p95_ms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "latency_p99_ms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "request_rate": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          }
+        }
+      },
+      "AppMetricsSummaryResponse": {
+        "type": "object",
+        "required": [
+          "range",
+          "hosts",
+          "total_requests",
+          "total_errors_5xx",
+          "error_rate_5xx",
+          "request_rate_avg",
+          "latency_p50_ms",
+          "latency_p95_ms",
+          "latency_p99_ms",
+          "bandwidth_out_bytes"
+        ],
+        "properties": {
+          "bandwidth_out_bytes": {
+            "type": "number",
+            "format": "double"
+          },
+          "error_rate_5xx": {
+            "type": "number",
+            "format": "double"
+          },
+          "hosts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "latency_p50_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "latency_p95_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "latency_p99_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "range": {
+            "$ref": "#/components/schemas/AppMetricsRange"
+          },
+          "request_rate_avg": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_errors_5xx": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_requests": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
       "AppParamsResponse": {
         "type": "object",
         "required": [
@@ -3743,6 +4025,27 @@
           "installing",
           "error"
         ]
+      },
+      "AppStatusCodeMetric": {
+        "type": "object",
+        "required": [
+          "class",
+          "count",
+          "ratio"
+        ],
+        "properties": {
+          "class": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number",
+            "format": "double"
+          },
+          "ratio": {
+            "type": "number",
+            "format": "double"
+          }
+        }
       },
       "CatalogResponse": {
         "type": "object",
@@ -5066,6 +5369,23 @@
         "properties": {
           "message": {
             "type": "string"
+          }
+        }
+      },
+      "MetricPoint": {
+        "type": "object",
+        "required": [
+          "t",
+          "v"
+        ],
+        "properties": {
+          "t": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "v": {
+            "type": "number",
+            "format": "double"
           }
         }
       },
