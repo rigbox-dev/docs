@@ -41,7 +41,7 @@ To create a workspace, send a POST request with the VM configuration.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -57,7 +57,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces \
 import requests
 
 response = requests.post(
-    "https://api.rigbox.dev/api/workspaces",
+    "https://api.rigbox.dev/api/v1/workspaces",
     headers={"Authorization": f"Bearer {api_key}"},
     json={
         "name": "my-project",
@@ -82,7 +82,7 @@ If you don't need custom sizing, use quick deploy to create a workspace from a p
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/quick-deploy \
+curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -92,7 +92,7 @@ curl -X POST https://api.rigbox.dev/api/quick-deploy \
 
 ```python Python
 response = requests.post(
-    "https://api.rigbox.dev/api/quick-deploy",
+    "https://api.rigbox.dev/api/v1/quick-deploy",
     headers={"Authorization": f"Bearer {api_key}"},
     json={"template_id": "dev"},
 )
@@ -110,13 +110,13 @@ After creation, boot the workspace with a start request, then poll until the sta
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/start \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/start \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```python Python
 requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/start",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/start",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 ```
@@ -129,7 +129,7 @@ The VM takes a few seconds to boot. Poll the workspace endpoint until `status` i
 <CodeGroup>
 ```bash cURL
 while true; do
-  STATUS=$(curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID \
+  STATUS=$(curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID \
     -H "Authorization: Bearer $RIGBOX_API_KEY" | jq -r '.status')
   echo "Status: $STATUS"
   [ "$STATUS" = "running" ] && break
@@ -142,7 +142,7 @@ import time
 
 while True:
     resp = requests.get(
-        f"https://api.rigbox.dev/api/workspaces/{workspace_id}",
+        f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}",
         headers={"Authorization": f"Bearer {api_key}"},
     )
     status = resp.json()["status"]
@@ -166,13 +166,13 @@ Stopping a workspace shuts down the VM but preserves the disk. You can restart i
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/stop \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/stop \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```python Python
 requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/stop",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/stop",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 ```
@@ -190,7 +190,7 @@ You can change the RAM, vCPU count, and disk size of a workspace. The workspace 
 
 <CodeGroup>
 ```bash cURL
-curl -X PUT https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/resources \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/resources \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -202,7 +202,7 @@ curl -X PUT https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/resources \
 
 ```python Python
 requests.put(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/resources",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/resources",
     headers={"Authorization": f"Bearer {api_key}"},
     json={
         "ram_mb": 1024,
@@ -225,7 +225,7 @@ Set environment variables that are injected into the workspace on boot.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/env \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/env \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -238,7 +238,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/env \
 
 ```python Python
 requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/env",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/env",
     headers={"Authorization": f"Bearer {api_key}"},
     json={
         "env_vars": {
@@ -262,13 +262,13 @@ Monitor CPU, RAM, and disk usage in real time.
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/metrics \
+curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/metrics \
   -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
 ```
 
 ```python Python
 response = requests.get(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/metrics",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/metrics",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 metrics = response.json()
@@ -286,18 +286,18 @@ Retrieve workspace logs or stream them in real time via Server-Sent Events.
 
 <CodeGroup>
 ```bash cURL (recent logs)
-curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/logs \
+curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/logs \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```bash cURL (live stream)
-curl -N https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/logs/stream \
+curl -N https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/logs/stream \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```python Python (recent logs)
 response = requests.get(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/logs",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/logs",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 for line in response.json()["logs"]:
@@ -317,13 +317,13 @@ Deleting a workspace is **irreversible**. All files, installed packages, and con
 
 <CodeGroup>
 ```bash cURL
-curl -X DELETE https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID \
+curl -X DELETE https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```python Python
 requests.delete(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 ```
@@ -339,7 +339,7 @@ This end-to-end example creates a workspace, starts it, and waits for it to be r
 import requests
 import time
 
-API_URL = "https://api.rigbox.dev/api"
+API_URL = "https://api.rigbox.dev/api/v1"
 HEADERS = {"Authorization": f"Bearer {api_key}"}
 
 # 1. Create the workspace

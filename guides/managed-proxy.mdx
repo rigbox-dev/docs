@@ -55,7 +55,7 @@ Set the AI configuration for a workspace to managed mode with your chosen provid
 
 <CodeGroup>
 ```bash cURL
-curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -69,7 +69,7 @@ curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
 import requests
 
 response = requests.put(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config",
     headers={"Authorization": f"Bearer {token}"},
     json={
         "mode": "managed",
@@ -84,7 +84,7 @@ print(response.json())
 
 ```javascript JavaScript
 const response = await fetch(
-  `https://api.rigbox.dev/api/workspaces/${workspaceId}/ai-config`,
+  `https://api.rigbox.dev/api/v1/workspaces/${workspaceId}/ai-config`,
   {
     method: "PUT",
     headers: {
@@ -133,7 +133,7 @@ Query your remaining credits at any time.
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/users/me/credits \
+curl -s https://api.rigbox.dev/api/v1/users/me/credits \
   -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
 ```
 
@@ -154,7 +154,7 @@ Get a daily breakdown of credit consumption across your workspaces.
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/users/me/ai-usage \
+curl -s https://api.rigbox.dev/api/v1/users/me/ai-usage \
   -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
 ```
 
@@ -205,7 +205,7 @@ Here is a complete flow: activate managed mode, make an AI call from inside the 
 **Step 1 - Activate managed mode for a workspace:**
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/workspaces/ws_abc123/ai-config \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/ws_abc123/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"mode": "managed", "provider": "google", "model": "gemini-2.5-flash-lite"}'
@@ -234,7 +234,7 @@ curl -sS \
 **Step 3 - Check remaining credits:**
 
 ```bash
-curl -s https://api.rigbox.dev/api/users/me/credits \
+curl -s https://api.rigbox.dev/api/v1/users/me/credits \
   -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
 # {"remaining": 1795, "total": 2000, "mode": "managed"}
 ```
@@ -249,7 +249,7 @@ You can change the provider and model at any time without restarting the workspa
 
 ```bash
 # Switch to OpenAI when the managed OpenAI gateway is configured
-curl -X PUT https://api.rigbox.dev/api/workspaces/ws_abc123/ai-config \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/ws_abc123/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"mode": "managed", "provider": "openai", "model": "gpt-4o"}'

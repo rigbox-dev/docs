@@ -49,7 +49,7 @@ If your workspace doesn't use the `full` image, install Architecture Explorer fi
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/architecture-explorer/install \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/architecture-explorer/install \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
@@ -57,7 +57,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/architect
 import requests
 
 response = requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/architecture-explorer/install",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/architecture-explorer/install",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 print(f"Installation started: {response.json()}")
@@ -73,7 +73,7 @@ Installation takes 1-3 minutes depending on the workspace image. Poll until the 
 <CodeGroup>
 ```bash cURL
 while true; do
-  STATUS=$(curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/architecture-explorer/install-status \
+  STATUS=$(curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/architecture-explorer/install-status \
     -H "Authorization: Bearer $RIGBOX_API_KEY" | jq -r '.status')
   echo "Status: $STATUS"
   [ "$STATUS" = "installed" ] && break
@@ -86,7 +86,7 @@ import time
 
 while True:
     resp = requests.get(
-        f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/architecture-explorer/install-status",
+        f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/architecture-explorer/install-status",
         headers={"Authorization": f"Bearer {api_key}"},
     )
     status = resp.json()["status"]
@@ -110,13 +110,13 @@ After installation (or immediately on the `full` image), launch the tool.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/architecture-explorer/launch \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/architecture-explorer/launch \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```python Python
 response = requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/architecture-explorer/launch",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/architecture-explorer/launch",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 launch = response.json()
@@ -156,13 +156,13 @@ When you're done, stop the tool to free up resources.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/architecture-explorer/stop \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/architecture-explorer/stop \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```python Python
 requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/architecture-explorer/stop",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/architecture-explorer/stop",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 print("Architecture Explorer stopped")
@@ -181,7 +181,7 @@ This walkthrough clones a Rust project into a workspace and visualizes its archi
 import requests
 import time
 
-API_URL = "https://api.rigbox.dev/api"
+API_URL = "https://api.rigbox.dev/api/v1"
 HEADERS = {"Authorization": f"Bearer {api_key}"}
 
 # Quick deploy with the full template (Architecture Explorer pre-installed)

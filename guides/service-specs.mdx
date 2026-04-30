@@ -24,7 +24,7 @@ Define a service spec with the command to run, environment variables, and restar
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/service-specs \
+curl -X POST https://api.rigbox.dev/api/v1/service-specs \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -43,7 +43,7 @@ curl -X POST https://api.rigbox.dev/api/service-specs \
 import requests
 
 response = requests.post(
-    "https://api.rigbox.dev/api/service-specs",
+    "https://api.rigbox.dev/api/v1/service-specs",
     headers={"Authorization": f"Bearer {token}"},
     json={
         "name": "api-server",
@@ -62,7 +62,7 @@ print(spec["id"])  # "svc_abc123"
 ```
 
 ```javascript JavaScript
-const response = await fetch("https://api.rigbox.dev/api/service-specs", {
+const response = await fetch("https://api.rigbox.dev/api/v1/service-specs", {
   method: "POST",
   headers: {
     "Authorization": `Bearer ${token}`,
@@ -114,7 +114,7 @@ Use `always` for servers and daemons that should run continuously. Use `on-failu
 Include `service_spec_ids` when creating a workspace.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -150,7 +150,7 @@ Services run under the `developer` user's systemd instance, so use `systemctl --
 ## List Your Service Specs
 
 ```bash
-curl -s https://api.rigbox.dev/api/service-specs \
+curl -s https://api.rigbox.dev/api/v1/service-specs \
   -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
 ```
 
@@ -182,7 +182,7 @@ See the [List Service Specs API reference](/api-reference/service-specs/list) fo
 ## Update a Service Spec
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/service-specs/svc_abc123 \
+curl -X PUT https://api.rigbox.dev/api/v1/service-specs/svc_abc123 \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -205,7 +205,7 @@ Changes to a service spec take effect on the next workspace start. Running works
 ## Delete a Service Spec
 
 ```bash
-curl -X DELETE https://api.rigbox.dev/api/service-specs/svc_abc123 \
+curl -X DELETE https://api.rigbox.dev/api/v1/service-specs/svc_abc123 \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 ```
 
@@ -216,7 +216,7 @@ A common pattern is to use a setup script to install dependencies and a service 
 **Step 1 - Create a setup script that installs dependencies:**
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/setup-scripts \
+curl -X POST https://api.rigbox.dev/api/v1/setup-scripts \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -229,7 +229,7 @@ curl -X POST https://api.rigbox.dev/api/setup-scripts \
 **Step 2 - Create a service spec that runs the app:**
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/service-specs \
+curl -X POST https://api.rigbox.dev/api/v1/service-specs \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -244,7 +244,7 @@ curl -X POST https://api.rigbox.dev/api/service-specs \
 **Step 3 - Create a workspace with both:**
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -267,7 +267,7 @@ To expose a service spec's port to the internet, create an [app](/api-reference/
 # Service spec runs a web server on port 3000
 # Create an app to expose it
 
-curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/apps \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/apps \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{

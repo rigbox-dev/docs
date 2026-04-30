@@ -317,6 +317,6 @@
     ]
   },
   "api": {
-    "baseUrl": "https://api.rigbox.dev/api"
+    "baseUrl": "https://api.rigbox.dev/api/v1"
   }
 }

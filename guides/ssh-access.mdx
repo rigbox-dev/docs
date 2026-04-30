@@ -32,7 +32,7 @@ To connect via SSH, you first need to register your public key with Rigbox.
 <CodeGroup>
 
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/ssh-keys \
+curl -X POST https://api.rigbox.dev/api/v1/ssh-keys \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -45,7 +45,7 @@ curl -X POST https://api.rigbox.dev/api/ssh-keys \
 import requests
 
 response = requests.post(
-    "https://api.rigbox.dev/api/ssh-keys",
+    "https://api.rigbox.dev/api/v1/ssh-keys",
     headers={"Authorization": "Bearer YOUR_API_KEY"},
     json={
         "name": "laptop",
@@ -82,13 +82,13 @@ When you create a workspace, your registered SSH keys are typically synced autom
 <CodeGroup>
 
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/ssh-keys/sync \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ssh-keys/sync \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
 ```python Python
 requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/ssh-keys/sync",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ssh-keys/sync",
     headers={"Authorization": "Bearer YOUR_API_KEY"},
 )
 ```
@@ -204,7 +204,7 @@ rsync -avz ./my-project/ my-project-ctbxi8lb@eu-west-1.rigbox.dev:/home/develope
 <CodeGroup>
 
 ```bash cURL
-curl https://api.rigbox.dev/api/ssh-keys \
+curl https://api.rigbox.dev/api/v1/ssh-keys \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -217,7 +217,7 @@ rig ssh-key ls
 ### List keys synced to a workspace
 
 ```bash
-curl https://api.rigbox.dev/api/workspaces/{workspace_id}/ssh-keys \
+curl https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ssh-keys \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -228,7 +228,7 @@ This returns the keys currently in the workspace's `authorized_keys` file.
 <CodeGroup>
 
 ```bash cURL
-curl -X DELETE https://api.rigbox.dev/api/ssh-keys/{key_id} \
+curl -X DELETE https://api.rigbox.dev/api/v1/ssh-keys/{key_id} \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -250,7 +250,7 @@ rig ssh-key rm laptop
 
 If you get `Connection refused`, verify:
 
-1. Your workspace is running (check with `GET /api/workspaces/{id}` or `rig ls`)
+1. Your workspace is running (check with `GET /api/v1/workspaces/{id}` or `rig ls`)
 2. Your SSH key is registered and synced
 3. You're using the correct username format: `{workspace-name}-{id}@{region}.rigbox.dev`
 
@@ -258,8 +258,8 @@ If you get `Connection refused`, verify:
 
 If you get `Permission denied (publickey)`:
 
-1. Check that your key is registered: `GET /api/ssh-keys`
-2. Sync keys to the workspace: `POST /api/workspaces/{id}/ssh-keys/sync`
+1. Check that your key is registered: `GET /api/v1/ssh-keys`
+2. Sync keys to the workspace: `POST /api/v1/workspaces/{id}/ssh-keys/sync`
 3. Verify you are using the correct identity file: `ssh -v my-project-ctbxi8lb@{region}.rigbox.dev`
 
 ### Slow connection

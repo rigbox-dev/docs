@@ -175,7 +175,7 @@ Attach this script to your workspace or template so every new workspace comes pr
 AI coding tools can consume credits quickly - especially agentic tools that make many API calls in a loop. Monitor your balance:
 
 ```bash
-curl -s https://api.rigbox.dev/api/users/me/credits \
+curl -s https://api.rigbox.dev/api/v1/users/me/credits \
   -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
 ```
 
@@ -194,7 +194,7 @@ Agentic tools like Claude Code and Codex can make dozens of API calls per task. 
 If you burn through managed credits quickly, switch to [BYOK mode](/guides/byok) and use your own API keys for unlimited usage:
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"mode": "byok", "provider": "anthropic", "api_key": "sk-ant-..."}'

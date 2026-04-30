@@ -12,7 +12,7 @@ Every request to the Rigbox API (except [public endpoints](#public-endpoints)) m
 The simplest way to authenticate. Create one from the [dashboard](https://rigbox.dev) under **Settings → API Keys**, or via the [Create API Key](/api-reference/api-keys/create) endpoint.
 
 ```bash
-curl https://api.rigbox.dev/api/workspaces \
+curl https://api.rigbox.dev/api/v1/workspaces \
   -H "Authorization: Bearer rb_your_api_key_here"
 ```
 
@@ -25,7 +25,7 @@ All API keys use the `rb_` prefix:
 ```bash
 export RIGBOX_API_KEY="rb_..."
 
-curl https://api.rigbox.dev/api/workspaces \
+curl https://api.rigbox.dev/api/v1/workspaces \
   -H "Authorization: Bearer ${RIGBOX_API_KEY}"
 ```
 
@@ -34,7 +34,7 @@ curl https://api.rigbox.dev/api/workspaces \
 If you authenticate through the dashboard login flow, you receive a JWT that can be used directly:
 
 ```bash
-curl https://api.rigbox.dev/api/workspaces \
+curl https://api.rigbox.dev/api/v1/workspaces \
   -H "Authorization: Bearer eyJhbG..."
 ```
 

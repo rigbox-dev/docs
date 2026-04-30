@@ -20,7 +20,7 @@ Quick Deploy creates a workspace with template defaults. For OpenClaw, this prov
 <CodeGroup>
 
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/quick-deploy \
+curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -33,7 +33,7 @@ curl -X POST https://api.rigbox.dev/api/quick-deploy \
 import requests
 
 resp = requests.post(
-    "https://api.rigbox.dev/api/quick-deploy",
+    "https://api.rigbox.dev/api/v1/quick-deploy",
     headers={"Authorization": "Bearer YOUR_API_KEY"},
     json={"template_id": "openclaw", "name": "my-bot"}
 )
@@ -41,7 +41,7 @@ print(resp.json())
 ```
 
 ```javascript JavaScript
-const resp = await fetch("https://api.rigbox.dev/api/quick-deploy", {
+const resp = await fetch("https://api.rigbox.dev/api/v1/quick-deploy", {
   method: "POST",
   headers: {
     "Authorization": "Bearer YOUR_API_KEY",
@@ -84,7 +84,7 @@ Example response:
 ```bash
 WORKSPACE_ID="ws-a1b2c3d4"
 
-curl -X POST "https://api.rigbox.dev/api/workspaces/${WORKSPACE_ID}/start" \
+curl -X POST "https://api.rigbox.dev/api/v1/workspaces/${WORKSPACE_ID}/start" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -92,7 +92,7 @@ curl -X POST "https://api.rigbox.dev/api/workspaces/${WORKSPACE_ID}/start" \
 
 ```bash
 for i in {1..60}; do
-  STATUS=$(curl -s "https://api.rigbox.dev/api/workspaces/${WORKSPACE_ID}" \
+  STATUS=$(curl -s "https://api.rigbox.dev/api/v1/workspaces/${WORKSPACE_ID}" \
     -H "Authorization: Bearer YOUR_API_KEY" | jq -r '.vm.status')
 
   echo "status=${STATUS}"
@@ -109,7 +109,7 @@ done
 Ensure expected template apps (for example OpenClaw gateway) exist:
 
 ```bash
-curl -X POST "https://api.rigbox.dev/api/workspaces/${WORKSPACE_ID}/reconcile-apps" \
+curl -X POST "https://api.rigbox.dev/api/v1/workspaces/${WORKSPACE_ID}/reconcile-apps" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -118,7 +118,7 @@ curl -X POST "https://api.rigbox.dev/api/workspaces/${WORKSPACE_ID}/reconcile-ap
 List apps:
 
 ```bash
-curl https://api.rigbox.dev/api/apps \
+curl https://api.rigbox.dev/api/v1/apps \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -127,7 +127,7 @@ Check a specific app is reachable before surfacing its URL in your own UI:
 ```bash
 APP_ID="app-x1y2z3"
 
-curl "https://api.rigbox.dev/api/apps/${APP_ID}/health" \
+curl "https://api.rigbox.dev/api/v1/apps/${APP_ID}/health" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -146,7 +146,7 @@ Expected response:
 For workspaces with AI integration, use the typed config endpoint:
 
 ```bash
-curl -X PUT "https://api.rigbox.dev/api/workspaces/${WORKSPACE_ID}/ai-config" \
+curl -X PUT "https://api.rigbox.dev/api/v1/workspaces/${WORKSPACE_ID}/ai-config" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

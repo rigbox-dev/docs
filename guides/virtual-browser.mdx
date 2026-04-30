@@ -48,7 +48,7 @@ If your workspace doesn't use the `full` image, install Virtual Browser first. T
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/virtual-browser/install \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/virtual-browser/install \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
@@ -56,7 +56,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/virtual-b
 import requests
 
 response = requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/virtual-browser/install",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/virtual-browser/install",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 print(f"Installation started: {response.json()}")
@@ -76,7 +76,7 @@ Poll the installation status to know when the browser is ready.
 <CodeGroup>
 ```bash cURL
 while true; do
-  STATUS=$(curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/virtual-browser/install-status \
+  STATUS=$(curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/virtual-browser/install-status \
     -H "Authorization: Bearer $RIGBOX_API_KEY" | jq -r '.status')
   echo "Status: $STATUS"
   [ "$STATUS" = "installed" ] && break
@@ -89,7 +89,7 @@ import time
 
 while True:
     resp = requests.get(
-        f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/virtual-browser/install-status",
+        f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/virtual-browser/install-status",
         headers={"Authorization": f"Bearer {api_key}"},
     )
     status = resp.json()["status"]
@@ -108,13 +108,13 @@ Once installed (or immediately on the `full` image), launch the browser.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/virtual-browser/launch \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/virtual-browser/launch \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```python Python
 response = requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/virtual-browser/launch",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/virtual-browser/launch",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 print(f"Virtual Browser launched")
@@ -157,13 +157,13 @@ Stop the browser when you're done to free up resources.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/tools/virtual-browser/stop \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/virtual-browser/stop \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```python Python
 requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/tools/virtual-browser/stop",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/virtual-browser/stop",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 print("Virtual Browser stopped")
@@ -182,7 +182,7 @@ This walkthrough starts a web app inside the workspace and uses Virtual Browser 
 import requests
 import time
 
-API_URL = "https://api.rigbox.dev/api"
+API_URL = "https://api.rigbox.dev/api/v1"
 HEADERS = {"Authorization": f"Bearer {api_key}"}
 
 # Quick deploy with the full template

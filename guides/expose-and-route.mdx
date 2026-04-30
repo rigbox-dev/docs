@@ -28,7 +28,7 @@ Before exposing a port, you can check which ports have active listeners inside t
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/listening-ports \
+curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/listening-ports \
   -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
 ```
 
@@ -36,7 +36,7 @@ curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/listening-ports \
 import requests
 
 response = requests.get(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/listening-ports",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/listening-ports",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 for port_info in response.json():
@@ -54,7 +54,7 @@ If you know the port and want full control over the app name, create it directly
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/apps \
+curl -X POST https://api.rigbox.dev/api/v1/apps \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -66,7 +66,7 @@ curl -X POST https://api.rigbox.dev/api/apps \
 
 ```python Python
 response = requests.post(
-    "https://api.rigbox.dev/api/apps",
+    "https://api.rigbox.dev/api/v1/apps",
     headers={"Authorization": f"Bearer {api_key}"},
     json={
         "workspace_id": workspace_id,
@@ -87,7 +87,7 @@ The expose-port endpoint detects the process listening on the specified port and
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/expose-port \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/expose-port \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -97,7 +97,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/expose-port \
 
 ```python Python
 response = requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/expose-port",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/expose-port",
     headers={"Authorization": f"Bearer {api_key}"},
     json={"port": 3000},
 )
@@ -115,7 +115,7 @@ See [Expose Port](/api-reference/apps/expose-port) for details.
 If your workspace was created from a template that defines default apps (like a web server or API), you can ensure those apps exist with a reconcile call.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/reconcile-apps \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/reconcile-apps \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
@@ -129,13 +129,13 @@ Before sharing a URL, verify the app is reachable.
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/apps/$APP_ID/health \
+curl -s https://api.rigbox.dev/api/v1/apps/$APP_ID/health \
   -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
 ```
 
 ```python Python
 response = requests.get(
-    f"https://api.rigbox.dev/api/apps/{app_id}/health",
+    f"https://api.rigbox.dev/api/v1/apps/{app_id}/health",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 health = response.json()
@@ -155,17 +155,17 @@ Control the routing for an app without affecting the underlying service.
 
 <CodeGroup>
 ```bash cURL (stop)
-curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/stop \
+curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/stop \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```bash cURL (start)
-curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/start \
+curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/start \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```bash cURL (restart)
-curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/restart \
+curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/restart \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 </CodeGroup>
@@ -184,7 +184,7 @@ You can rename an app or change its port. Renaming an app changes its public sub
 
 <CodeGroup>
 ```bash cURL
-curl -X PATCH https://api.rigbox.dev/api/apps/$APP_ID \
+curl -X PATCH https://api.rigbox.dev/api/v1/apps/$APP_ID \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -194,7 +194,7 @@ curl -X PATCH https://api.rigbox.dev/api/apps/$APP_ID \
 
 ```python Python
 response = requests.patch(
-    f"https://api.rigbox.dev/api/apps/{app_id}",
+    f"https://api.rigbox.dev/api/v1/apps/{app_id}",
     headers={"Authorization": f"Bearer {api_key}"},
     json={"name": "new-name"},
 )
@@ -215,13 +215,13 @@ Deleting an app removes the public route. The service inside the VM is unaffecte
 
 <CodeGroup>
 ```bash cURL
-curl -X DELETE https://api.rigbox.dev/api/apps/$APP_ID \
+curl -X DELETE https://api.rigbox.dev/api/v1/apps/$APP_ID \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```python Python
 requests.delete(
-    f"https://api.rigbox.dev/api/apps/{app_id}",
+    f"https://api.rigbox.dev/api/v1/apps/{app_id}",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 ```
@@ -249,7 +249,7 @@ From your local machine, expose port 8080:
 ```python
 import requests
 
-API_URL = "https://api.rigbox.dev/api"
+API_URL = "https://api.rigbox.dev/api/v1"
 HEADERS = {"Authorization": f"Bearer {api_key}"}
 
 # Expose port 8080

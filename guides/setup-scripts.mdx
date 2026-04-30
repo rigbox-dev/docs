@@ -28,7 +28,7 @@ Create a reusable setup script via the API. Once created, you can attach it to a
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/setup-scripts \
+curl -X POST https://api.rigbox.dev/api/v1/setup-scripts \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -42,7 +42,7 @@ curl -X POST https://api.rigbox.dev/api/setup-scripts \
 import requests
 
 response = requests.post(
-    "https://api.rigbox.dev/api/setup-scripts",
+    "https://api.rigbox.dev/api/v1/setup-scripts",
     headers={"Authorization": f"Bearer {token}"},
     json={
         "name": "python-data-stack",
@@ -61,7 +61,7 @@ print(script["id"])  # "ss_abc123"
 ```
 
 ```javascript JavaScript
-const response = await fetch("https://api.rigbox.dev/api/setup-scripts", {
+const response = await fetch("https://api.rigbox.dev/api/v1/setup-scripts", {
   method: "POST",
   headers: {
     "Authorization": `Bearer ${token}`,
@@ -124,7 +124,7 @@ Include `setup_script_ids` when creating a workspace. Scripts run in the order t
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -136,7 +136,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces \
 
 ```python Python
 response = requests.post(
-    "https://api.rigbox.dev/api/workspaces",
+    "https://api.rigbox.dev/api/v1/workspaces",
     headers={"Authorization": f"Bearer {token}"},
     json={
         "name": "ml-workspace",
@@ -168,7 +168,7 @@ Retrieve all setup scripts in your account.
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/setup-scripts \
+curl -s https://api.rigbox.dev/api/v1/setup-scripts \
   -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
 ```
 
@@ -199,7 +199,7 @@ See the [List Setup Scripts API reference](/api-reference/setup-scripts/list) fo
 Modify an existing script's content, name, or run mode.
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/setup-scripts/ss_abc123 \
+curl -X PUT https://api.rigbox.dev/api/v1/setup-scripts/ss_abc123 \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -216,7 +216,7 @@ Updating a script affects all future workspace starts that reference it. Already
 ## Delete a Script
 
 ```bash
-curl -X DELETE https://api.rigbox.dev/api/setup-scripts/ss_abc123 \
+curl -X DELETE https://api.rigbox.dev/api/v1/setup-scripts/ss_abc123 \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 ```
 
@@ -306,7 +306,7 @@ If a setup script fails, the workspace will still start, but the script's exit c
 To check script execution results, look at the workspace status after it starts:
 
 ```bash
-curl -s https://api.rigbox.dev/api/workspaces/{workspace_id} \
+curl -s https://api.rigbox.dev/api/v1/workspaces/{workspace_id} \
   -H "Authorization: Bearer $RIGBOX_TOKEN" | jq '.setup_status'
 ```
 

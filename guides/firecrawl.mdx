@@ -25,7 +25,7 @@ You can deploy Firecrawl with a single click from the template gallery, or use t
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/quick-deploy \
+curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -37,7 +37,7 @@ curl -X POST https://api.rigbox.dev/api/quick-deploy \
 import requests
 
 response = requests.post(
-    "https://api.rigbox.dev/api/quick-deploy",
+    "https://api.rigbox.dev/api/v1/quick-deploy",
     headers={"Authorization": f"Bearer {api_key}"},
     json={"template_id": "firecrawl"},
 )

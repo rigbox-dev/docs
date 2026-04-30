@@ -12,7 +12,7 @@ Rigbox gives you isolated Linux VMs - each with its own kernel, filesystem, and 
 Deploy a workspace in one API call:
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/quick-deploy \
+curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"template_id": "dev", "name": "my-project"}'
@@ -83,7 +83,7 @@ New to Rigbox? Follow the [Quickstart](/quickstart) for a step-by-step walkthrou
 All API requests go to:
 
 ```
-https://api.rigbox.dev/api
+https://api.rigbox.dev/api/v1
 ```
 
 See the [API Reference](/api-reference/workspaces/list) for the full endpoint catalog, or the [Authentication](/authentication) page for how to authenticate.

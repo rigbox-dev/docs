@@ -27,7 +27,7 @@ Open your app, go to the **Access** tab, and enter your domain in the Custom Dom
 
 <CodeGroup>
 ```bash cURL
-curl -X PATCH https://api.rigbox.dev/api/apps/$APP_ID \
+curl -X PATCH https://api.rigbox.dev/api/v1/apps/$APP_ID \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -39,7 +39,7 @@ curl -X PATCH https://api.rigbox.dev/api/apps/$APP_ID \
 import requests
 
 response = requests.patch(
-    f"https://api.rigbox.dev/api/apps/{app_id}",
+    f"https://api.rigbox.dev/api/v1/apps/{app_id}",
     headers={"Authorization": f"Bearer {api_key}"},
     json={"custom_domain": "app.yourcompany.com"},
 )
@@ -74,13 +74,13 @@ Click the **Verify** button next to the custom domain field in the Access tab.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/verify-domain \
+curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/verify-domain \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```python Python
 response = requests.post(
-    f"https://api.rigbox.dev/api/apps/{app_id}/verify-domain",
+    f"https://api.rigbox.dev/api/v1/apps/{app_id}/verify-domain",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 result = response.json()
@@ -102,7 +102,7 @@ If you no longer want a custom domain attached to your app, you can remove it fr
 
 <CodeGroup>
 ```bash cURL
-curl -X PATCH https://api.rigbox.dev/api/apps/$APP_ID \
+curl -X PATCH https://api.rigbox.dev/api/v1/apps/$APP_ID \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -112,7 +112,7 @@ curl -X PATCH https://api.rigbox.dev/api/apps/$APP_ID \
 
 ```python Python
 response = requests.patch(
-    f"https://api.rigbox.dev/api/apps/{app_id}",
+    f"https://api.rigbox.dev/api/v1/apps/{app_id}",
     headers={"Authorization": f"Bearer {api_key}"},
     json={"custom_domain": ""},
 )

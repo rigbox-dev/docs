@@ -55,7 +55,7 @@ Use the services endpoint to retrieve all backing services for a workspace along
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/services \
+curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/services \
   -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
 ```
 
@@ -63,7 +63,7 @@ curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/services \
 import requests
 
 response = requests.get(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/services",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/services",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 for service in response.json():

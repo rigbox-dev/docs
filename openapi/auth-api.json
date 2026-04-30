@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Rigbox Auth Access Control API",
-    "description": "Public access-control APIs served by rig-auth-service. Canonical refs use forms like `rig:account:u-123`, `rig:workspace:ws-123`, and `rig:app:app-123`. Use `/api/access-control/principals` to look up assignable users, `/api/access-control/bindings` for role grants, `/api/access-control/tags` for tag maps, `/api/access-control/throttle-binding` for throttle profiles, `/api/access-control/throttle-presets` to inspect available throttle profiles, and `/api/access-control/simulate` to preview an action against a canonical resource ref.",
+    "description": "Public access-control APIs served by rig-auth-service. Canonical refs use forms like `rig:account:u-123`, `rig:workspace:ws-123`, and `rig:app:app-123`. Use `/api/v1/access-control/principals` to look up assignable users, `/api/v1/access-control/bindings` for role grants, `/api/v1/access-control/tags` for tag maps, `/api/v1/access-control/throttle-binding` for throttle profiles, `/api/v1/access-control/throttle-presets` to inspect available throttle profiles, and `/api/v1/access-control/simulate` to preview an action against a canonical resource ref.",
     "contact": {
       "name": "Rigbox",
       "url": "https://rigbox.dev"
@@ -19,7 +19,7 @@
     }
   ],
   "paths": {
-    "/api/access-control/bindings": {
+    "/api/v1/access-control/bindings": {
       "get": {
         "tags": [
           "Access Control"
@@ -362,7 +362,7 @@
         "summary": "Update binding"
       }
     },
-    "/api/access-control/principals": {
+    "/api/v1/access-control/principals": {
       "get": {
         "tags": [
           "Access Control"
@@ -469,7 +469,7 @@
         "summary": "Search principals"
       }
     },
-    "/api/access-control/role-presets": {
+    "/api/v1/access-control/role-presets": {
       "get": {
         "tags": [
           "Access Control"
@@ -527,7 +527,7 @@
         "summary": "List role presets"
       }
     },
-    "/api/access-control/simulate": {
+    "/api/v1/access-control/simulate": {
       "post": {
         "tags": [
           "Access Control"
@@ -614,7 +614,7 @@
         "summary": "Simulate access"
       }
     },
-    "/api/access-control/tags": {
+    "/api/v1/access-control/tags": {
       "get": {
         "tags": [
           "Access Control"
@@ -787,7 +787,7 @@
         "summary": "Update tags"
       }
     },
-    "/api/access-control/throttle-binding": {
+    "/api/v1/access-control/throttle-binding": {
       "get": {
         "tags": [
           "Access Control"
@@ -960,7 +960,7 @@
         "summary": "Update throttle binding"
       }
     },
-    "/api/access-control/throttle-presets": {
+    "/api/v1/access-control/throttle-presets": {
       "get": {
         "tags": [
           "Access Control"

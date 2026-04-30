@@ -22,7 +22,7 @@ Browse the catalog to see what's available.
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/app-catalog \
+curl -s https://api.rigbox.dev/api/v1/app-catalog \
   -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
 ```
 
@@ -30,7 +30,7 @@ curl -s https://api.rigbox.dev/api/app-catalog \
 import requests
 
 response = requests.get(
-    "https://api.rigbox.dev/api/app-catalog",
+    "https://api.rigbox.dev/api/v1/app-catalog",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 for app in response.json():
@@ -65,7 +65,7 @@ Install an app by sending the catalog ID. The endpoint returns a job ID you can 
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -75,7 +75,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
 
 ```python Python
 response = requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/install-app",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/install-app",
     headers={"Authorization": f"Bearer {api_key}"},
     json={"catalog_id": "vscode"},
 )
@@ -93,7 +93,7 @@ Poll the job endpoint to check progress.
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/jobs/$JOB_ID \
+curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/jobs/$JOB_ID \
   -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
 ```
 
@@ -102,7 +102,7 @@ import time
 
 while True:
     resp = requests.get(
-        f"https://api.rigbox.dev/api/workspaces/{workspace_id}/jobs/{job_id}",
+        f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/jobs/{job_id}",
         headers={"Authorization": f"Bearer {api_key}"},
     )
     job = resp.json()
@@ -128,17 +128,17 @@ After installation, catalog apps behave like any other app. Use the standard app
 
 <CodeGroup>
 ```bash cURL (stop)
-curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/stop \
+curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/stop \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```bash cURL (start)
-curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/start \
+curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/start \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
 ```bash cURL (restart)
-curl -X POST https://api.rigbox.dev/api/apps/$APP_ID/restart \
+curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/restart \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 </CodeGroup>
@@ -150,7 +150,7 @@ See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop)
 Catalog apps are private by default. Make them public or share with specific people.
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/apps/$APP_ID/visibility \
+curl -X PUT https://api.rigbox.dev/api/v1/apps/$APP_ID/visibility \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"visibility": "public"}'
@@ -163,7 +163,7 @@ See [App Visibility](/guides/visibility) for all visibility options.
 Deleting an installed app removes both the route and the systemd service inside the workspace.
 
 ```bash
-curl -X DELETE https://api.rigbox.dev/api/apps/$APP_ID \
+curl -X DELETE https://api.rigbox.dev/api/v1/apps/$APP_ID \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 
@@ -176,7 +176,7 @@ See [Delete App](/api-reference/apps/delete) for details.
 A full browser-based VS Code instance with extension support, integrated terminal, and file editing. Runs [code-server](https://github.com/coder/code-server).
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"catalog_id": "vscode"}'
@@ -191,7 +191,7 @@ VS Code Server supports installing extensions from the Open VSX registry. Search
 Interactive notebooks for Python, Julia, R, and more. Supports inline visualizations, markdown cells, and kernel management.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"catalog_id": "jupyter"}'
@@ -202,7 +202,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
 Reactive Python notebooks where cells automatically re-execute when dependencies change. An alternative to Jupyter with a focus on reproducibility.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"catalog_id": "marimo"}'
@@ -213,7 +213,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
 Build interactive data dashboards and web apps in Python. Write a Python script and Streamlit renders it as a web application.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"catalog_id": "streamlit"}'
@@ -224,7 +224,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
 A web-based file manager with drag-and-drop upload, download, and file editing. Useful for managing files inside the workspace without SSH.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"catalog_id": "filebrowser"}'
@@ -235,7 +235,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
 A collaborative whiteboard for sketching diagrams, wireframes, and architecture drawings. Runs locally inside the workspace - no external dependencies.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"catalog_id": "excalidraw"}'
@@ -246,7 +246,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
 A web-based PostgreSQL client with a query editor, table browser, and export functionality. Useful for inspecting databases running inside the workspace.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"catalog_id": "pgweb"}'
@@ -257,7 +257,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
 A minimal chat UI template with OpenAI API integration. Use it as a starting point for building conversational AI applications.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/install-app \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"catalog_id": "chat"}'
@@ -294,7 +294,7 @@ This walkthrough installs both VS Code and Jupyter Lab into a single workspace.
 import requests
 import time
 
-API_URL = "https://api.rigbox.dev/api"
+API_URL = "https://api.rigbox.dev/api/v1"
 HEADERS = {"Authorization": f"Bearer {api_key}"}
 
 workspace_id = "your-workspace-id"

@@ -26,7 +26,7 @@ Configure a workspace to use your own API key by setting the AI config to `byok`
 
 <CodeGroup>
 ```bash cURL
-curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -41,7 +41,7 @@ curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
 import requests
 
 response = requests.put(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config",
     headers={"Authorization": f"Bearer {token}"},
     json={
         "mode": "byok",
@@ -57,7 +57,7 @@ print(response.json())
 
 ```javascript JavaScript
 const response = await fetch(
-  `https://api.rigbox.dev/api/workspaces/${workspaceId}/ai-config`,
+  `https://api.rigbox.dev/api/v1/workspaces/${workspaceId}/ai-config`,
   {
     method: "PUT",
     headers: {
@@ -99,7 +99,7 @@ The key is available inside the workspace as the standard environment variable f
 To remove an API key from a workspace without changing the mode:
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -116,7 +116,7 @@ Setting `api_key` to `null` removes the stored key. The workspace will no longer
 You can switch from BYOK to managed mode at any time. This clears the stored key and starts using Rigbox-managed credits instead.
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -136,7 +136,7 @@ If you use the same provider and key across most of your workspaces, set a defau
 
 <CodeGroup>
 ```bash cURL
-curl -X PUT https://api.rigbox.dev/api/users/me/ai-defaults \
+curl -X PUT https://api.rigbox.dev/api/v1/users/me/ai-defaults \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -149,7 +149,7 @@ curl -X PUT https://api.rigbox.dev/api/users/me/ai-defaults \
 
 ```python Python
 response = requests.put(
-    "https://api.rigbox.dev/api/users/me/ai-defaults",
+    "https://api.rigbox.dev/api/v1/users/me/ai-defaults",
     headers={"Authorization": f"Bearer {token}"},
     json={
         "mode": "byok",
@@ -182,7 +182,7 @@ See the [AI Defaults API reference](/api-reference/ai/update-defaults) for the f
 ### Anthropic (Claude)
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -211,7 +211,7 @@ print(message.content[0].text)
 ### OpenAI (GPT)
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -239,7 +239,7 @@ print(response.choices[0].message.content)
 ### Google (Gemini)
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/workspaces/{workspace_id}/ai-config \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{

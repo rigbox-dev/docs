@@ -27,7 +27,7 @@ Stop the workspace first, then create a named snapshot.
 **Step 1 - Stop the workspace:**
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/stop \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/stop \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 ```
 
@@ -35,7 +35,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/stop \
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -48,13 +48,13 @@ import requests
 
 # Stop the workspace
 requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/stop",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/stop",
     headers={"Authorization": f"Bearer {token}"}
 )
 
 # Create the snapshot
 response = requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots",
     headers={"Authorization": f"Bearer {token}"},
     json={"name": "before-migration"}
 )
@@ -67,7 +67,7 @@ print(snapshot["size_bytes"])  # 2147483648
 ```javascript JavaScript
 // Stop the workspace
 await fetch(
-  `https://api.rigbox.dev/api/workspaces/${workspaceId}/stop`,
+  `https://api.rigbox.dev/api/v1/workspaces/${workspaceId}/stop`,
   {
     method: "POST",
     headers: { "Authorization": `Bearer ${token}` },
@@ -76,7 +76,7 @@ await fetch(
 
 // Create the snapshot
 const response = await fetch(
-  `https://api.rigbox.dev/api/workspaces/${workspaceId}/snapshots`,
+  `https://api.rigbox.dev/api/v1/workspaces/${workspaceId}/snapshots`,
   {
     method: "POST",
     headers: {
@@ -103,7 +103,7 @@ Creating a snapshot while a workspace is running will return an error. Always st
 ### For a Specific Workspace
 
 ```bash
-curl -s https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots \
+curl -s https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots \
   -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
 ```
 
@@ -131,7 +131,7 @@ curl -s https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots \
 To see snapshots across all your workspaces:
 
 ```bash
-curl -s https://api.rigbox.dev/api/snapshots \
+curl -s https://api.rigbox.dev/api/v1/snapshots \
   -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
 ```
 
@@ -144,14 +144,14 @@ Restoring a snapshot replaces the workspace's current disk state with the snapsh
 <CodeGroup>
 ```bash cURL
 # Workspace must be stopped
-curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots/{snapshot_id}/restore \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots/{snapshot_id}/restore \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 ```
 
 ```python Python
 # Workspace must be stopped
 response = requests.post(
-    f"https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots/{snapshot_id}/restore",
+    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots/{snapshot_id}/restore",
     headers={"Authorization": f"Bearer {token}"}
 )
 
@@ -161,7 +161,7 @@ print(response.status_code)  # 200
 ```javascript JavaScript
 // Workspace must be stopped
 const response = await fetch(
-  `https://api.rigbox.dev/api/workspaces/${workspaceId}/snapshots/${snapshotId}/restore`,
+  `https://api.rigbox.dev/api/v1/workspaces/${workspaceId}/snapshots/${snapshotId}/restore`,
   {
     method: "POST",
     headers: { "Authorization": `Bearer ${token}` },
@@ -179,14 +179,14 @@ Restoring a snapshot **overwrites** the current workspace disk state. Any change
 After restoring, start the workspace to boot into the restored state:
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/workspaces/{workspace_id}/start \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/start \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 ```
 
 ## Delete a Snapshot
 
 ```bash
-curl -X DELETE https://api.rigbox.dev/api/workspaces/{workspace_id}/snapshots/{snapshot_id} \
+curl -X DELETE https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots/{snapshot_id} \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 ```
 
@@ -218,27 +218,27 @@ Snapshot before a live demo so you can instantly roll back if something breaks.
 
 ```bash
 # Before the demo
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/stop \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/stop \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/snapshots \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/snapshots \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name": "pre-demo-2026-04-07"}'
 
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/start \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/start \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 
 # ... run the demo ...
 
 # Something went wrong - restore and try again
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/stop \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/stop \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/snapshots/snap_predemo/restore \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/snapshots/snap_predemo/restore \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_demo/start \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/start \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 ```
 
@@ -248,27 +248,27 @@ Try a risky change without fear. Snapshot first, experiment freely, restore if i
 
 ```bash
 # Checkpoint current state
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/stop \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/stop \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/snapshots \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/snapshots \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name": "stable-model-v2"}'
 
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/start \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/start \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 
 # ... experiment with new model architecture ...
 # ... results are worse, roll back ...
 
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/stop \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/stop \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/snapshots/snap_stable_v2/restore \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/snapshots/snap_stable_v2/restore \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 
-curl -X POST https://api.rigbox.dev/api/workspaces/ws_ml/start \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/start \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 # Back to the known-good state
 ```
@@ -284,15 +284,15 @@ WORKSPACE_ID="ws_production"
 DATE=$(date +%Y-%m-%d)
 
 # Stop, snapshot, start
-curl -X POST "https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/stop" \
+curl -X POST "https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/stop" \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 
-curl -X POST "https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/snapshots" \
+curl -X POST "https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/snapshots" \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d "{\"name\": \"daily-backup-$DATE\"}"
 
-curl -X POST "https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/start" \
+curl -X POST "https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/start" \
   -H "Authorization: Bearer $RIGBOX_TOKEN"
 ```
 
@@ -312,7 +312,7 @@ Here is a full checkpoint-and-restore flow using Python.
 import requests
 import time
 
-BASE = "https://api.rigbox.dev/api"
+BASE = "https://api.rigbox.dev/api/v1"
 HEADERS = {"Authorization": f"Bearer {token}"}
 WS_ID = "ws_abc123"
 

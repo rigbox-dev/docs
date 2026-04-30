@@ -19,7 +19,7 @@
     }
   ],
   "paths": {
-    "/api/app-catalog": {
+    "/api/v1/app-catalog": {
       "get": {
         "tags": [
           "App Catalog"
@@ -40,7 +40,7 @@
         }
       }
     },
-    "/api/apps": {
+    "/api/v1/apps": {
       "get": {
         "tags": [
           "Apps"
@@ -130,7 +130,7 @@
         ]
       }
     },
-    "/api/apps/{id}": {
+    "/api/v1/apps/{id}": {
       "get": {
         "tags": [
           "Apps"
@@ -297,7 +297,7 @@
         ]
       }
     },
-    "/api/apps/{id}/health": {
+    "/api/v1/apps/{id}/health": {
       "get": {
         "tags": [
           "Apps"
@@ -335,7 +335,7 @@
         ]
       }
     },
-    "/api/apps/{id}/log-sources": {
+    "/api/v1/apps/{id}/log-sources": {
       "get": {
         "tags": [
           "Logs"
@@ -417,7 +417,7 @@
         ]
       }
     },
-    "/api/apps/{id}/log-sources/{source_id}": {
+    "/api/v1/apps/{id}/log-sources/{source_id}": {
       "delete": {
         "tags": [
           "Logs"
@@ -517,7 +517,7 @@
         ]
       }
     },
-    "/api/apps/{id}/logs": {
+    "/api/v1/apps/{id}/logs": {
       "get": {
         "tags": [
           "Logs"
@@ -554,7 +554,7 @@
         ]
       }
     },
-    "/api/apps/{id}/logs/stream": {
+    "/api/v1/apps/{id}/logs/stream": {
       "get": {
         "tags": [
           "Logs"
@@ -584,7 +584,7 @@
         ]
       }
     },
-    "/api/apps/{id}/metrics": {
+    "/api/v1/apps/{id}/metrics": {
       "get": {
         "tags": [
           "Apps"
@@ -650,7 +650,7 @@
         ]
       }
     },
-    "/api/apps/{id}/metrics/summary": {
+    "/api/v1/apps/{id}/metrics/summary": {
       "get": {
         "tags": [
           "Apps"
@@ -716,7 +716,7 @@
         ]
       }
     },
-    "/api/apps/{id}/params": {
+    "/api/v1/apps/{id}/params": {
       "get": {
         "tags": [
           "Apps"
@@ -798,7 +798,7 @@
         ]
       }
     },
-    "/api/apps/{id}/restart": {
+    "/api/v1/apps/{id}/restart": {
       "post": {
         "tags": [
           "Apps"
@@ -835,7 +835,7 @@
         ]
       }
     },
-    "/api/apps/{id}/start": {
+    "/api/v1/apps/{id}/start": {
       "post": {
         "tags": [
           "Apps"
@@ -872,7 +872,7 @@
         ]
       }
     },
-    "/api/apps/{id}/stop": {
+    "/api/v1/apps/{id}/stop": {
       "post": {
         "tags": [
           "Apps"
@@ -909,9 +909,9 @@
         ]
       }
     },
-    "/api/apps/{id}/verify-domain": {
+    "/api/v1/apps/{id}/verify-domain": {
       "post": {
-        "summary": "POST /api/apps/:id/verify-domain - re-check DNS for the app's custom domain.",
+        "summary": "POST /api/v1/apps/:id/verify-domain - re-check DNS for the app's custom domain.",
         "operationId": "verify_domain",
         "responses": {
           "200": {
@@ -925,7 +925,7 @@
         ]
       }
     },
-    "/api/dashboard": {
+    "/api/v1/dashboard": {
       "get": {
         "tags": [
           "Workspaces"
@@ -952,7 +952,7 @@
         ]
       }
     },
-    "/api/feature-flags": {
+    "/api/v1/feature-flags": {
       "get": {
         "tags": [
           "System"
@@ -979,7 +979,7 @@
         ]
       }
     },
-    "/api/quick-deploy": {
+    "/api/v1/quick-deploy": {
       "post": {
         "tags": [
           "Templates"
@@ -1015,7 +1015,7 @@
         ]
       }
     },
-    "/api/roadmap/votes": {
+    "/api/v1/roadmap/votes": {
       "get": {
         "tags": [
           "Roadmap"
@@ -1037,7 +1037,7 @@
         }
       }
     },
-    "/api/roadmap/votes/{feature_key}": {
+    "/api/v1/roadmap/votes/{feature_key}": {
       "post": {
         "tags": [
           "Roadmap"
@@ -1074,7 +1074,7 @@
         ]
       }
     },
-    "/api/service-specs": {
+    "/api/v1/service-specs": {
       "get": {
         "tags": [
           "Service Specs"
@@ -1134,7 +1134,7 @@
         ]
       }
     },
-    "/api/service-specs/{id}": {
+    "/api/v1/service-specs/{id}": {
       "get": {
         "tags": [
           "Service Specs"
@@ -1251,7 +1251,7 @@
         ]
       }
     },
-    "/api/setup-scripts": {
+    "/api/v1/setup-scripts": {
       "get": {
         "tags": [
           "Setup Scripts"
@@ -1311,7 +1311,7 @@
         ]
       }
     },
-    "/api/setup-scripts/{id}": {
+    "/api/v1/setup-scripts/{id}": {
       "get": {
         "tags": [
           "Setup Scripts"
@@ -1428,7 +1428,7 @@
         ]
       }
     },
-    "/api/snapshots": {
+    "/api/v1/snapshots": {
       "get": {
         "tags": [
           "Snapshots"
@@ -1454,7 +1454,7 @@
         ]
       }
     },
-    "/api/snapshots/{snapshot_id}": {
+    "/api/v1/snapshots/{snapshot_id}": {
       "delete": {
         "tags": [
           "Snapshots"
@@ -1491,7 +1491,7 @@
         ]
       }
     },
-    "/api/snapshots/{snapshot_id}/restore": {
+    "/api/v1/snapshots/{snapshot_id}/restore": {
       "post": {
         "tags": [
           "Snapshots"
@@ -1528,7 +1528,7 @@
         ]
       }
     },
-    "/api/ssh-keys": {
+    "/api/v1/ssh-keys": {
       "get": {
         "tags": [
           "SSH Keys"
@@ -1588,7 +1588,7 @@
         ]
       }
     },
-    "/api/ssh-keys/{id}": {
+    "/api/v1/ssh-keys/{id}": {
       "delete": {
         "tags": [
           "SSH Keys"
@@ -1625,7 +1625,7 @@
         ]
       }
     },
-    "/api/templates": {
+    "/api/v1/templates": {
       "get": {
         "tags": [
           "Templates"
@@ -1646,7 +1646,7 @@
         }
       }
     },
-    "/api/users/me/ai-defaults": {
+    "/api/v1/users/me/ai-defaults": {
       "get": {
         "tags": [
           "AI"
@@ -1706,7 +1706,7 @@
         ]
       }
     },
-    "/api/users/me/ai-mode": {
+    "/api/v1/users/me/ai-mode": {
       "put": {
         "tags": [
           "AI"
@@ -1742,7 +1742,7 @@
         ]
       }
     },
-    "/api/users/me/ai-usage": {
+    "/api/v1/users/me/ai-usage": {
       "get": {
         "tags": [
           "AI"
@@ -1768,7 +1768,7 @@
         ]
       }
     },
-    "/api/users/me/credits": {
+    "/api/v1/users/me/credits": {
       "get": {
         "tags": [
           "AI"
@@ -1794,7 +1794,7 @@
         ]
       }
     },
-    "/api/users/me/limits": {
+    "/api/v1/users/me/limits": {
       "get": {
         "tags": [
           "AI"
@@ -1820,7 +1820,7 @@
         ]
       }
     },
-    "/api/users/me/regions": {
+    "/api/v1/users/me/regions": {
       "get": {
         "tags": [
           "User Settings"
@@ -1846,7 +1846,7 @@
         ]
       }
     },
-    "/api/users/me/settings": {
+    "/api/v1/users/me/settings": {
       "get": {
         "tags": [
           "User Settings"
@@ -1906,7 +1906,7 @@
         ]
       }
     },
-    "/api/workspaces": {
+    "/api/v1/workspaces": {
       "get": {
         "tags": [
           "Workspaces"
@@ -2006,7 +2006,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}": {
+    "/api/v1/workspaces/{id}": {
       "get": {
         "tags": [
           "Workspaces"
@@ -2098,7 +2098,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/ai-config": {
+    "/api/v1/workspaces/{id}/ai-config": {
       "get": {
         "tags": [
           "AI"
@@ -2180,7 +2180,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/env": {
+    "/api/v1/workspaces/{id}/env": {
       "post": {
         "tags": [
           "Workspaces"
@@ -2227,7 +2227,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/expose-port": {
+    "/api/v1/workspaces/{id}/expose-port": {
       "post": {
         "tags": [
           "Apps"
@@ -2274,7 +2274,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/install-app": {
+    "/api/v1/workspaces/{id}/install-app": {
       "post": {
         "tags": [
           "App Catalog"
@@ -2321,7 +2321,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/jobs/{job_id}": {
+    "/api/v1/workspaces/{id}/jobs/{job_id}": {
       "get": {
         "tags": [
           "App Catalog"
@@ -2367,7 +2367,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/listening-ports": {
+    "/api/v1/workspaces/{id}/listening-ports": {
       "get": {
         "tags": [
           "Apps"
@@ -2405,7 +2405,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/logs": {
+    "/api/v1/workspaces/{id}/logs": {
       "get": {
         "tags": [
           "Logs"
@@ -2442,7 +2442,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/logs/stream": {
+    "/api/v1/workspaces/{id}/logs/stream": {
       "get": {
         "tags": [
           "Logs"
@@ -2472,7 +2472,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/metrics": {
+    "/api/v1/workspaces/{id}/metrics": {
       "get": {
         "tags": [
           "Workspaces"
@@ -2519,7 +2519,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/resources": {
+    "/api/v1/workspaces/{id}/resources": {
       "put": {
         "tags": [
           "Workspaces"
@@ -2556,7 +2556,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/services": {
+    "/api/v1/workspaces/{id}/services": {
       "get": {
         "tags": [
           "Workspace Services"
@@ -2593,7 +2593,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/services/{name}": {
+    "/api/v1/workspaces/{id}/services/{name}": {
       "get": {
         "tags": [
           "Workspace Services"
@@ -2639,7 +2639,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/services/{name}/logs": {
+    "/api/v1/workspaces/{id}/services/{name}/logs": {
       "get": {
         "tags": [
           "Workspace Services"
@@ -2691,7 +2691,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/snapshots": {
+    "/api/v1/workspaces/{id}/snapshots": {
       "get": {
         "tags": [
           "Snapshots"
@@ -2773,7 +2773,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/snapshots/{snapshot_id}": {
+    "/api/v1/workspaces/{id}/snapshots/{snapshot_id}": {
       "delete": {
         "tags": [
           "Snapshots"
@@ -2819,7 +2819,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/snapshots/{snapshot_id}/restore": {
+    "/api/v1/workspaces/{id}/snapshots/{snapshot_id}/restore": {
       "post": {
         "tags": [
           "Snapshots"
@@ -2865,7 +2865,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/ssh-keys": {
+    "/api/v1/workspaces/{id}/ssh-keys": {
       "get": {
         "tags": [
           "SSH Keys"
@@ -2902,7 +2902,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/ssh-keys/sync": {
+    "/api/v1/workspaces/{id}/ssh-keys/sync": {
       "post": {
         "tags": [
           "SSH Keys"
@@ -2939,7 +2939,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/start": {
+    "/api/v1/workspaces/{id}/start": {
       "post": {
         "tags": [
           "Workspaces"
@@ -3006,7 +3006,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/stop": {
+    "/api/v1/workspaces/{id}/stop": {
       "post": {
         "tags": [
           "Workspaces"
@@ -3063,7 +3063,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/tasks": {
+    "/api/v1/workspaces/{id}/tasks": {
       "get": {
         "tags": [
           "Workspaces"
@@ -3145,7 +3145,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/tools": {
+    "/api/v1/workspaces/{id}/tools": {
       "get": {
         "tags": [
           "Tools"
@@ -3182,7 +3182,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/tools/{tool}/install": {
+    "/api/v1/workspaces/{id}/tools/{tool}/install": {
       "post": {
         "tags": [
           "Tools"
@@ -3229,7 +3229,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/tools/{tool}/install-status": {
+    "/api/v1/workspaces/{id}/tools/{tool}/install-status": {
       "get": {
         "tags": [
           "Tools"
@@ -3275,7 +3275,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/tools/{tool}/launch": {
+    "/api/v1/workspaces/{id}/tools/{tool}/launch": {
       "post": {
         "tags": [
           "Tools"
@@ -3330,7 +3330,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/tools/{tool}/status": {
+    "/api/v1/workspaces/{id}/tools/{tool}/status": {
       "get": {
         "tags": [
           "Tools"
@@ -3376,7 +3376,7 @@
         ]
       }
     },
-    "/api/workspaces/{id}/tools/{tool}/stop": {
+    "/api/v1/workspaces/{id}/tools/{tool}/stop": {
       "post": {
         "tags": [
           "Tools"

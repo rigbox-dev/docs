@@ -39,7 +39,7 @@ Use the visibility endpoint to change an app's access mode.
 
 <CodeGroup>
 ```bash cURL
-curl -X PUT https://api.rigbox.dev/api/apps/$APP_ID/visibility \
+curl -X PUT https://api.rigbox.dev/api/v1/apps/$APP_ID/visibility \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -51,7 +51,7 @@ curl -X PUT https://api.rigbox.dev/api/apps/$APP_ID/visibility \
 import requests
 
 response = requests.put(
-    f"https://api.rigbox.dev/api/apps/{app_id}/visibility",
+    f"https://api.rigbox.dev/api/v1/apps/{app_id}/visibility",
     headers={"Authorization": f"Bearer {api_key}"},
     json={"visibility": "public"},
 )
@@ -65,7 +65,7 @@ See [Update Visibility](/api-reference/apps/update-visibility) for the full requ
 
 <CodeGroup>
 ```bash cURL
-curl -X PUT https://api.rigbox.dev/api/apps/$APP_ID/visibility \
+curl -X PUT https://api.rigbox.dev/api/v1/apps/$APP_ID/visibility \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -75,7 +75,7 @@ curl -X PUT https://api.rigbox.dev/api/apps/$APP_ID/visibility \
 
 ```python Python
 response = requests.put(
-    f"https://api.rigbox.dev/api/apps/{app_id}/visibility",
+    f"https://api.rigbox.dev/api/v1/apps/{app_id}/visibility",
     headers={"Authorization": f"Bearer {api_key}"},
     json={"visibility": "private"},
 )
@@ -88,7 +88,7 @@ Privileged mode lets you grant access to specific email addresses. This is usefu
 
 <CodeGroup>
 ```bash cURL
-curl -X PUT https://api.rigbox.dev/api/apps/$APP_ID/visibility \
+curl -X PUT https://api.rigbox.dev/api/v1/apps/$APP_ID/visibility \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -102,7 +102,7 @@ curl -X PUT https://api.rigbox.dev/api/apps/$APP_ID/visibility \
 
 ```python Python
 response = requests.put(
-    f"https://api.rigbox.dev/api/apps/{app_id}/visibility",
+    f"https://api.rigbox.dev/api/v1/apps/{app_id}/visibility",
     headers={"Authorization": f"Bearer {api_key}"},
     json={
         "visibility": "privileged",
@@ -129,7 +129,7 @@ To add or remove people from the privileged access list, send a new PUT request 
 ```python
 # Add carol to the existing list
 response = requests.put(
-    f"https://api.rigbox.dev/api/apps/{app_id}/visibility",
+    f"https://api.rigbox.dev/api/v1/apps/{app_id}/visibility",
     headers={"Authorization": f"Bearer {api_key}"},
     json={
         "visibility": "privileged",
@@ -152,13 +152,13 @@ Retrieve the app details to see its current visibility mode and allowed emails.
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/apps/$APP_ID \
+curl -s https://api.rigbox.dev/api/v1/apps/$APP_ID \
   -H "Authorization: Bearer $RIGBOX_API_KEY" | jq '{visibility, allowed_emails}'
 ```
 
 ```python Python
 response = requests.get(
-    f"https://api.rigbox.dev/api/apps/{app_id}",
+    f"https://api.rigbox.dev/api/v1/apps/{app_id}",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 app = response.json()
@@ -181,7 +181,7 @@ Create and expose your app. It starts as private by default.
 ```python
 import requests
 
-API_URL = "https://api.rigbox.dev/api"
+API_URL = "https://api.rigbox.dev/api/v1"
 HEADERS = {"Authorization": f"Bearer {api_key}"}
 
 # Expose port 3000 (private by default)

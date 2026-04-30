@@ -48,7 +48,7 @@ All images are built on Debian 12 (Bookworm) and include Python 3.12 and Node.js
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/images \
+curl -s https://api.rigbox.dev/api/v1/images \
   -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
 ```
 
@@ -56,7 +56,7 @@ curl -s https://api.rigbox.dev/api/images \
 import requests
 
 response = requests.get(
-    "https://api.rigbox.dev/api/images",
+    "https://api.rigbox.dev/api/v1/images",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 for image in response.json():
@@ -83,13 +83,13 @@ Templates are pre-configured workspace definitions that pair an image with sensi
 
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/templates \
+curl -s https://api.rigbox.dev/api/v1/templates \
   -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
 ```
 
 ```python Python
 response = requests.get(
-    "https://api.rigbox.dev/api/templates",
+    "https://api.rigbox.dev/api/v1/templates",
     headers={"Authorization": f"Bearer {api_key}"},
 )
 for tmpl in response.json():
@@ -130,7 +130,7 @@ The fastest way to create a workspace is quick deploy with a template ID.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/quick-deploy \
+curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -142,7 +142,7 @@ curl -X POST https://api.rigbox.dev/api/quick-deploy \
 import requests
 
 response = requests.post(
-    "https://api.rigbox.dev/api/quick-deploy",
+    "https://api.rigbox.dev/api/v1/quick-deploy",
     headers={"Authorization": f"Bearer {api_key}"},
     json={"template_id": "dev"},
 )
@@ -162,7 +162,7 @@ If the template defaults don't fit your needs, create a workspace manually and s
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rigbox.dev/api/workspaces \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -176,7 +176,7 @@ curl -X POST https://api.rigbox.dev/api/workspaces \
 
 ```python Python
 response = requests.post(
-    "https://api.rigbox.dev/api/workspaces",
+    "https://api.rigbox.dev/api/v1/workspaces",
     headers={"Authorization": f"Bearer {api_key}"},
     json={
         "name": "heavy-compute",
@@ -199,17 +199,17 @@ You can change the RAM, vCPU, and disk size of an existing workspace without swi
 
 ```bash
 # Stop the workspace
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/stop \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/stop \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 
 # Resize
-curl -X PUT https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/resources \
+curl -X PUT https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/resources \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"ram_mb": 2048, "vcpu_count": 2}'
 
 # Restart
-curl -X POST https://api.rigbox.dev/api/workspaces/$WORKSPACE_ID/start \
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/start \
   -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
 

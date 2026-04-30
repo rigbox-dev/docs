@@ -32,7 +32,7 @@ Most pages use `openapi:` frontmatter to auto-generate content from the spec:
 ```mdx
 ---
 title: Create Workspace
-openapi: POST /api/workspaces
+openapi: POST /api/v1/workspaces
 description: Provision a new workspace with custom resources.
 ---
 ```
