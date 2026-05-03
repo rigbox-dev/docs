@@ -23,7 +23,7 @@ flowchart LR
     C --> E[Managed AI Proxy]
 ```
 
-Each user gets their own isolated Firecracker micro-VM. Your backend orchestrates lifecycle, configuration, and monitoring through the Rigbox API. You handle user auth and billing; Rigbox handles VM isolation, networking, and AI proxy.
+Each user gets their own isolated micro-VM. Your backend orchestrates lifecycle, configuration, and monitoring through the Rigbox API. You handle user auth and billing; Rigbox handles VM isolation, networking, and AI proxy.
 
 <Note>
   You handle user authentication and billing. Rigbox handles VM isolation, networking, and the AI proxy. This separation lets you focus on your product while Rigbox manages the infrastructure.

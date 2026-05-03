@@ -9,7 +9,7 @@ Rigbox separates platform operations from user code. Your workspaces run in isol
 
 ## Workspace isolation
 
-Each workspace is a [Firecracker](https://firecracker-microvm.github.io/) micro-VM - not a container. This gives you:
+Each workspace is a micro-VM - not a container. This gives you:
 
 - **Dedicated kernel** - each VM boots its own Linux kernel, fully independent from other workspaces
 - **Own filesystem** - isolated ext4 disk with no shared volumes
