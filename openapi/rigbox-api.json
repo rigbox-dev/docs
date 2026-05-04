@@ -925,6 +925,736 @@
         ]
       }
     },
+    "/api/v1/catalog": {
+      "get": {
+        "tags": [
+          "App Catalog"
+        ],
+        "summary": "List exact deployable catalog refs for the current user.",
+        "operationId": "list_versioned_catalog",
+        "responses": {
+          "200": {
+            "description": "Versioned official and community catalog items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCatalogResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/catalog/detail": {
+      "get": {
+        "tags": [
+          "App Catalog"
+        ],
+        "summary": "Get one exact deployable catalog ref for the current user.",
+        "operationId": "get_versioned_catalog_detail",
+        "parameters": [
+          {
+            "name": "ref",
+            "in": "query",
+            "description": "Exact deploy ref, e.g. @rigbox/filebrowser@builtin or @alice/pgweb@1.2.3",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Versioned catalog item detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCatalogDetailResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/compositions": {
+      "get": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "List published community workspace compositions the current user can see.",
+        "description": "Returns the caller's own items first (any visibility), then community-visible\nitems filtered by the caller's `community_items_preference`.",
+        "operationId": "list_compositions",
+        "responses": {
+          "200": {
+            "description": "Published community compositions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCompositionListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Publish a private or Community workspace composition version.",
+        "operationId": "publish_composition",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishCommunityCompositionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Composition published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishCommunityCompositionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/compositions/{vendor}/{slug}/{version}": {
+      "delete": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Unpublish a community composition version. Only the owning vendor can delete.\nBuilt-in compositions (`vendor=rigbox`) cannot be deleted.",
+        "operationId": "delete_composition",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Composition slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "Exact version (semver)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Composition version deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the vendor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/compositions/{vendor}/{slug}/{version}/deprecate": {
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Deprecate a community composition version. Only the owning vendor can mutate it.",
+        "operationId": "deprecate_composition",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Composition slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "Exact version (semver)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Composition version deprecated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCompositionLifecycleResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/compositions/{vendor}/{slug}/{version}/yank": {
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Yank a community composition version. Only the owning vendor can mutate it.",
+        "operationId": "yank_composition",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Composition slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "Exact version (semver)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Composition version yanked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCompositionLifecycleResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/installs/by-app/{app_id}": {
+      "get": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Get the current user's community install record for an installed app.",
+        "operationId": "get_community_install_by_app",
+        "parameters": [
+          {
+            "name": "app_id",
+            "in": "path",
+            "description": "Installed app ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Community install record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityInstallResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/profile": {
+      "get": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Get the current user's community profile and catalog preference.",
+        "operationId": "get_community_profile",
+        "responses": {
+          "200": {
+            "description": "Community profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityProfileResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Update the current user's community username or catalog preference.",
+        "operationId": "update_community_profile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCommunityProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Updated community profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityProfileResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/recipes": {
+      "get": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "List published community app recipes the current user can see.",
+        "description": "Returns the user's own items first (any visibility) then community-visible\nitems filtered by the caller's `community_items_preference`.",
+        "operationId": "list_recipes",
+        "responses": {
+          "200": {
+            "description": "Published community recipes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCatalogResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Publish a private or Community app recipe version.",
+        "operationId": "publish_recipe",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishCommunityRecipeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Recipe published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishCommunityRecipeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/recipes/{vendor}/{slug}/{version}": {
+      "delete": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Unpublish a community recipe version. Only the owning vendor can delete.\nBuilt-in recipes (`vendor=rigbox`) cannot be deleted.",
+        "operationId": "delete_recipe",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Recipe slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "Exact version (semver)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recipe version deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the vendor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/recipes/{vendor}/{slug}/{version}/deprecate": {
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Deprecate a community recipe version. Only the owning vendor can mutate it.",
+        "operationId": "deprecate_recipe",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Recipe slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "Exact version (semver)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recipe version deprecated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityRecipeLifecycleResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/recipes/{vendor}/{slug}/{version}/yank": {
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Yank a community recipe version. Only the owning vendor can mutate it.",
+        "operationId": "yank_recipe",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Recipe slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "Exact version (semver)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recipe version yanked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityRecipeLifecycleResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/registry/health": {
+      "get": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Get aggregate community registry health and adoption metrics.",
+        "operationId": "get_registry_health",
+        "responses": {
+          "200": {
+            "description": "Community registry health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityRegistryHealthResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/registry/verified-webhook": {
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Promote exact community recipe versions to Verified.",
+        "description": "This endpoint is intended for the future public `rigbox-dev/registry`\nrepository CI/webhook flow. The request body is a normalized allowlist\ndelta, signed with GitHub-style `X-Hub-Signature-256`.",
+        "operationId": "promote_verified_versions",
+        "parameters": [
+          {
+            "name": "x-github-delivery",
+            "in": "header",
+            "description": "Unique webhook delivery/event ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-hub-signature-256",
+            "in": "header",
+            "description": "sha256=<hex HMAC of the raw body>",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifiedPromotionWebhookRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Verified promotion webhook processed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifiedPromotionWebhookResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/dashboard": {
       "get": {
         "tags": [
@@ -940,6 +1670,80 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetDashboardResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/deploy/compositions/preview": {
+      "get": {
+        "tags": [
+          "Deploy"
+        ],
+        "summary": "Preview an exact Community workspace composition ref.",
+        "operationId": "preview_composition",
+        "parameters": [
+          {
+            "name": "ref",
+            "in": "query",
+            "description": "Exact composition ref, e.g. @alice/data-lab@1.0.0",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Composition deploy preview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompositionPreviewResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/deploy/preview": {
+      "get": {
+        "tags": [
+          "Deploy"
+        ],
+        "summary": "Preview an exact Official, private owner, or allowed community deploy ref.",
+        "operationId": "preview_deploy",
+        "parameters": [
+          {
+            "name": "ref",
+            "in": "query",
+            "description": "Exact deploy ref, e.g. @rigbox/filebrowser@builtin or @alice/pgweb@1.2.3",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deploy preview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeployPreviewResponse"
                 }
               }
             }
@@ -1768,6 +2572,80 @@
         ]
       }
     },
+    "/api/v1/users/me/ai-usage/metrics": {
+      "get": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "Get account AI usage metric series.",
+        "operationId": "get_account_ai_usage_metrics",
+        "parameters": [
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Metrics range: 1h, 6h, 24h, or 7d",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/AiUsageMetricsRange"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account AI usage metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiUsageMetricsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/users/me/ai-usage/metrics/summary": {
+      "get": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "Get account AI usage metric summary.",
+        "operationId": "get_account_ai_usage_metrics_summary",
+        "parameters": [
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Metrics range: 1h, 6h, 24h, or 7d",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/AiUsageMetricsRange"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account AI usage metrics summary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiUsageMetricsSummaryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/users/me/credits": {
       "get": {
         "tags": [
@@ -2006,6 +2884,42 @@
         ]
       }
     },
+    "/api/v1/workspaces/from-composition": {
+      "post": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Deploy a workspace composition (built-in or community) end-to-end.",
+        "operationId": "deploy_from_composition",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeployFromCompositionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Workspace created from composition",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeployFromCompositionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/workspaces/{id}": {
       "get": {
         "tags": [
@@ -2168,6 +3082,145 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WorkspaceAiConfigResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/ai-usage/metrics": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get workspace AI usage metric series.",
+        "operationId": "get_workspace_ai_usage_metrics",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Metrics range: 1h, 6h, 24h, or 7d",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/AiUsageMetricsRange"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace AI usage metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiUsageMetricsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/ai-usage/metrics/summary": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get workspace AI usage metric summary.",
+        "operationId": "get_workspace_ai_usage_metrics_summary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Metrics range: 1h, 6h, 24h, or 7d",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/AiUsageMetricsRange"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace AI usage metrics summary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiUsageMetricsSummaryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/deploy/launch": {
+      "post": {
+        "tags": [
+          "Deploy"
+        ],
+        "summary": "Launch an exact Official, private owner, or allowed community deploy ref into a workspace.",
+        "operationId": "launch_deploy",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LaunchDeployRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Deploy launched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeployLaunchResponse"
                 }
               }
             }
@@ -2503,6 +3556,138 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/metrics/series": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get workspace resource metric series.",
+        "operationId": "get_workspace_metrics_series",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Metrics range: 1h, 6h, 24h, or 7d",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/WorkspaceMetricsRange"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace metrics series",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceMetricsSeriesResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Prometheus returned an invalid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Prometheus unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/metrics/summary": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get workspace resource metric summary.",
+        "operationId": "get_workspace_metrics_summary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Metrics range: 1h, 6h, 24h, or 7d",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/WorkspaceMetricsRange"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace metrics summary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceMetricsSummaryResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Prometheus returned an invalid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Prometheus unavailable",
             "content": {
               "application/json": {
                 "schema": {
@@ -3531,6 +4716,113 @@
           }
         }
       },
+      "AiUsageMetricsRange": {
+        "type": "string",
+        "enum": [
+          "1h",
+          "6h",
+          "24h",
+          "7d"
+        ]
+      },
+      "AiUsageMetricsResponse": {
+        "type": "object",
+        "required": [
+          "range",
+          "step_seconds",
+          "series"
+        ],
+        "properties": {
+          "range": {
+            "$ref": "#/components/schemas/AiUsageMetricsRange"
+          },
+          "series": {
+            "$ref": "#/components/schemas/AiUsageMetricsSeries"
+          },
+          "step_seconds": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "workspace_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "AiUsageMetricsSeries": {
+        "type": "object",
+        "required": [
+          "credits",
+          "requests",
+          "input_tokens",
+          "output_tokens"
+        ],
+        "properties": {
+          "credits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "input_tokens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "output_tokens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          }
+        }
+      },
+      "AiUsageMetricsSummaryResponse": {
+        "type": "object",
+        "required": [
+          "range",
+          "total_credits",
+          "total_requests",
+          "input_tokens",
+          "output_tokens"
+        ],
+        "properties": {
+          "input_tokens": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "output_tokens": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "range": {
+            "$ref": "#/components/schemas/AiUsageMetricsRange"
+          },
+          "total_credits": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_requests": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "workspace_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "AiUsageWorkspaceTotal": {
         "type": "object",
         "required": [
@@ -3761,6 +5053,13 @@
           "subdomain_suffix": {
             "type": "string",
             "description": "Subdomain suffix - e.g. \"vscode\" \u2192 vscode-{ws_id}.rigbox.dev"
+          },
+          "system_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Author-declared discovery tags. Merged into the auto-generated\n`[\"catalog:{id}-{ws}\", \"catalog\"]` tags on the installed app."
           }
         }
       },
@@ -4119,6 +5418,584 @@
           }
         }
       },
+      "CommunityCatalogDetailResponse": {
+        "type": "object",
+        "required": [
+          "item"
+        ],
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/DeployPreviewResponse"
+          }
+        }
+      },
+      "CommunityCatalogItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "vendor_user_id",
+          "slug",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "latest_version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "slug": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "vendor_user_id": {
+            "type": "string"
+          }
+        }
+      },
+      "CommunityCatalogResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeployPreviewResponse"
+            }
+          }
+        }
+      },
+      "CommunityCatalogVersion": {
+        "type": "object",
+        "required": [
+          "id",
+          "item_id",
+          "version",
+          "manifest_yaml",
+          "manifest_json",
+          "manifest_digest",
+          "visibility",
+          "trust_tier",
+          "status",
+          "lint_results",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deprecated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "lint_results": {},
+          "manifest_digest": {
+            "type": "string"
+          },
+          "manifest_json": {},
+          "manifest_yaml": {
+            "type": "string"
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trust_tier": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "yanked_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "CommunityCatalogVersionInstallStats": {
+        "type": "object",
+        "required": [
+          "version_id",
+          "total_installs",
+          "active_installs",
+          "unique_installers"
+        ],
+        "properties": {
+          "active_installs": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "last_installed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "total_installs": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "unique_installers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "version_id": {
+            "type": "string"
+          }
+        }
+      },
+      "CommunityCompositionItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "vendor_user_id",
+          "slug",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "latest_version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "slug": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "vendor_user_id": {
+            "type": "string"
+          }
+        }
+      },
+      "CommunityCompositionLifecycleResponse": {
+        "type": "object",
+        "required": [
+          "deploy_ref",
+          "item",
+          "version",
+          "message"
+        ],
+        "properties": {
+          "deploy_ref": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/CommunityCompositionItem"
+          },
+          "message": {
+            "type": "string"
+          },
+          "version": {
+            "$ref": "#/components/schemas/CommunityCompositionVersion"
+          }
+        }
+      },
+      "CommunityCompositionListItem": {
+        "type": "object",
+        "required": [
+          "item",
+          "version"
+        ],
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/CommunityCompositionItem"
+          },
+          "vendor_username": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "$ref": "#/components/schemas/CommunityCompositionListVersion"
+          }
+        }
+      },
+      "CommunityCompositionListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommunityCompositionListItem"
+            }
+          }
+        }
+      },
+      "CommunityCompositionListVersion": {
+        "type": "object",
+        "required": [
+          "id",
+          "item_id",
+          "version",
+          "manifest_json",
+          "manifest_digest",
+          "visibility",
+          "trust_tier",
+          "effective_trust_tier",
+          "status",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deprecated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "effective_trust_tier": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "manifest_digest": {
+            "type": "string"
+          },
+          "manifest_json": {},
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trust_tier": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "yanked_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "CommunityCompositionVersion": {
+        "type": "object",
+        "required": [
+          "id",
+          "item_id",
+          "version",
+          "manifest_yaml",
+          "manifest_json",
+          "manifest_digest",
+          "visibility",
+          "trust_tier",
+          "effective_trust_tier",
+          "status",
+          "lint_results",
+          "compiled_preview",
+          "created_at"
+        ],
+        "properties": {
+          "compiled_preview": {},
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deprecated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "effective_trust_tier": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "lint_results": {},
+          "manifest_digest": {
+            "type": "string"
+          },
+          "manifest_json": {},
+          "manifest_yaml": {
+            "type": "string"
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trust_tier": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "yanked_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "CommunityInstall": {
+        "type": "object",
+        "required": [
+          "workspace_id",
+          "installer_user_id",
+          "version_id",
+          "installed_at"
+        ],
+        "properties": {
+          "installed_app_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "installed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "installer_user_id": {
+            "type": "string"
+          },
+          "version_id": {
+            "type": "string"
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "CommunityInstallResponse": {
+        "type": "object",
+        "required": [
+          "install"
+        ],
+        "properties": {
+          "install": {
+            "$ref": "#/components/schemas/CommunityInstall"
+          }
+        }
+      },
+      "CommunityProfile": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "community_items_preference"
+        ],
+        "properties": {
+          "community_items_preference": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "username": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CommunityProfileResponse": {
+        "type": "object",
+        "required": [
+          "profile"
+        ],
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/CommunityProfile"
+          }
+        }
+      },
+      "CommunityRecipeLifecycleResponse": {
+        "type": "object",
+        "required": [
+          "deploy_ref",
+          "item",
+          "version",
+          "message"
+        ],
+        "properties": {
+          "deploy_ref": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/CommunityCatalogItem"
+          },
+          "message": {
+            "type": "string"
+          },
+          "version": {
+            "$ref": "#/components/schemas/CommunityCatalogVersion"
+          }
+        }
+      },
+      "CommunityRegistryHealth": {
+        "type": "object",
+        "required": [
+          "catalog_items",
+          "catalog_versions",
+          "published_versions",
+          "verified_versions",
+          "community_versions",
+          "private_versions",
+          "deprecated_versions",
+          "yanked_versions",
+          "total_installs",
+          "active_installs",
+          "unique_installers"
+        ],
+        "properties": {
+          "active_installs": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "catalog_items": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "catalog_versions": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "community_versions": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "deprecated_versions": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "private_versions": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "published_versions": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_installs": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "unique_installers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "verified_versions": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "yanked_versions": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "CommunityRegistryHealthResponse": {
+        "type": "object",
+        "required": [
+          "health"
+        ],
+        "properties": {
+          "health": {
+            "$ref": "#/components/schemas/CommunityRegistryHealth"
+          }
+        }
+      },
       "CompleteWithKeyRequest": {
         "type": "object",
         "required": [
@@ -4142,6 +6019,427 @@
           },
           "success": {
             "type": "boolean"
+          }
+        }
+      },
+      "CompositionChildInstall": {
+        "type": "object",
+        "description": "One child install handle returned to the client so the UI can poll status.",
+        "required": [
+          "deploy_ref",
+          "source",
+          "trust_tier",
+          "status"
+        ],
+        "properties": {
+          "app_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "deploy_ref": {
+            "type": "string"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trust_tier": {
+            "type": "string"
+          }
+        }
+      },
+      "CompositionChildPreview": {
+        "type": "object",
+        "required": [
+          "deploy_ref",
+          "source",
+          "trust_tier",
+          "status",
+          "catalog_id",
+          "slug",
+          "version",
+          "name",
+          "resources",
+          "depends_on"
+        ],
+        "properties": {
+          "catalog_id": {
+            "type": "string"
+          },
+          "configurable_params": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParamSpec"
+            },
+            "description": "Configurable parameters this child app exposes. The deploy form uses\nthese to render per-app `ParamFields` editors when launching the\ncomposition into a workspace."
+          },
+          "credentials_declared": {
+            "type": "boolean",
+            "description": "True if this child declares default credentials (server-generated or\npre-filled). Surfaces a \"credentials required\" hint in the deploy form."
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deploy_ref": {
+            "type": "string"
+          },
+          "managed": {
+            "type": "boolean",
+            "description": "True if the recipe opts into Rigbox's managed AI proxy when installed."
+          },
+          "name": {
+            "type": "string"
+          },
+          "resources": {
+            "$ref": "#/components/schemas/DeployResourceRequirements"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trust_tier": {
+            "type": "string"
+          },
+          "vendor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "CompositionExpectedAppPreview": {
+        "type": "object",
+        "required": [
+          "name",
+          "port",
+          "protocol",
+          "managed",
+          "depends_on"
+        ],
+        "properties": {
+          "configurable_params": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParamSpec"
+            }
+          },
+          "credentials_declared": {
+            "type": "boolean"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "managed": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "system_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "usage_examples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsageExample"
+            }
+          }
+        }
+      },
+      "CompositionLogSourcePreview": {
+        "type": "object",
+        "required": [
+          "source_type",
+          "source_ref",
+          "is_primary"
+        ],
+        "properties": {
+          "display_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_primary": {
+            "type": "boolean"
+          },
+          "source_ref": {
+            "type": "string"
+          },
+          "source_type": {
+            "type": "string"
+          }
+        }
+      },
+      "CompositionPreviewResponse": {
+        "type": "object",
+        "required": [
+          "deploy_ref",
+          "source",
+          "trust_tier",
+          "effective_trust_tier",
+          "status",
+          "base_template_id",
+          "name",
+          "description",
+          "category",
+          "resources",
+          "apps",
+          "warnings"
+        ],
+        "properties": {
+          "apps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompositionChildPreview"
+            }
+          },
+          "base_template_id": {
+            "type": "string"
+          },
+          "base_template_minimums": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CompositionResourcePlanResponse",
+                "description": "Floor minimums sourced from the base template (used by client UI as floors)."
+              }
+            ]
+          },
+          "category": {
+            "type": "string"
+          },
+          "deploy_ref": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "effective_trust_tier": {
+            "type": "string"
+          },
+          "expected_apps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompositionExpectedAppPreview"
+            },
+            "description": "Apps pre-installed in the base template image (only for built-in compositions)."
+          },
+          "image": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Final image the workspace boots from (e.g. \"base\", \"firecrawl\").\nLifted from `manifest.workspace.image` so the catalog UI can show\nthe actual VM image without reading the raw manifest."
+          },
+          "image_bound": {
+            "type": "boolean",
+            "description": "True when this composition's apps/services live inside `image`\nrather than being installed via app recipes at provision time.\nImage-bound compositions (e.g. firecrawl) start faster but the\nmanifest can't fully describe what's inside the image."
+          },
+          "log_sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompositionLogSourcePreview"
+            },
+            "description": "Log source presets shipped with the base template (file paths,\nsystemd units) for the workspace-level Logs panel."
+          },
+          "manifest_digest": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "manifest_json": {
+            "description": "Raw manifest JSON for the \"View manifest\" affordance."
+          },
+          "name": {
+            "type": "string"
+          },
+          "portability_notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Author-declared notes describing what the image carries that the\nmanifest can't fully describe. Only populated when image_bound."
+          },
+          "resources": {
+            "$ref": "#/components/schemas/CompositionResourcePlanResponse"
+          },
+          "service_specs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompositionServiceSpecPreview"
+            },
+            "description": "Available systemd service specs shipped with the base template."
+          },
+          "setup_scripts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompositionSetupScriptPreview"
+            },
+            "description": "Available setup scripts shipped with the base template."
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trust_tier": {
+            "type": "string"
+          },
+          "verify_binaries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Binaries the workspace expects pre-installed in `image` (checked\nat first boot via `which`). Lifted from\n`manifest.template.verify_binaries` so the catalog UI can show\nusers what binaries the image carries."
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "workspace_services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompositionWorkspaceServicePreview"
+            },
+            "description": "Backing services (databases, brokers) provisioned by the base template."
+          }
+        }
+      },
+      "CompositionResourcePlanResponse": {
+        "type": "object",
+        "required": [
+          "ram_mb",
+          "vcpu_count",
+          "disk_mb"
+        ],
+        "properties": {
+          "disk_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "ram_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "vcpu_count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "CompositionServiceSpecPreview": {
+        "type": "object",
+        "required": [
+          "name",
+          "working_directory",
+          "restart_policy",
+          "auto_enable"
+        ],
+        "properties": {
+          "auto_enable": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "restart_policy": {
+            "type": "string"
+          },
+          "working_directory": {
+            "type": "string"
+          }
+        }
+      },
+      "CompositionSetupScriptPreview": {
+        "type": "object",
+        "required": [
+          "name",
+          "run_on",
+          "order"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "run_on": {
+            "type": "string"
+          }
+        }
+      },
+      "CompositionWorkspaceServicePreview": {
+        "type": "object",
+        "required": [
+          "name",
+          "kind",
+          "exposed"
+        ],
+        "properties": {
+          "exposed": {
+            "type": "boolean"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "port": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
           }
         }
       },
@@ -4388,6 +6686,333 @@
           },
           "file_path": {
             "type": "string"
+          }
+        }
+      },
+      "DeployExposure": {
+        "type": "object",
+        "required": [
+          "port",
+          "protocol",
+          "subdomain_suffix"
+        ],
+        "properties": {
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "subdomain_suffix": {
+            "type": "string"
+          }
+        }
+      },
+      "DeployFromCompositionRequest": {
+        "type": "object",
+        "description": "Request body for `POST /v1/workspaces/from-composition`.",
+        "required": [
+          "ref"
+        ],
+        "properties": {
+          "app_params": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Per-child param values keyed by the child's deploy_ref.",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              }
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "disk_size_mb": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "env_vars": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Workspace environment variables to overlay on top of composition defaults.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional workspace name. Defaults to a generated id from the slug."
+          },
+          "ram_mb": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "ref": {
+            "type": "string",
+            "description": "Composition deploy_ref, e.g. `@alice/data-lab@1.0.0` or\n`@rigbox/openclaw@builtin`."
+          },
+          "service_spec_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "User-selected service specs from their library."
+          },
+          "setup_script_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "User-selected setup scripts from their library."
+          },
+          "vcpu_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "DeployFromCompositionResponse": {
+        "type": "object",
+        "required": [
+          "workspace",
+          "message",
+          "installs"
+        ],
+        "properties": {
+          "installs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompositionChildInstall"
+            }
+          },
+          "message": {
+            "type": "string"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/Vm"
+          }
+        }
+      },
+      "DeployLaunchResponse": {
+        "type": "object",
+        "required": [
+          "deploy_ref",
+          "source",
+          "trust_tier",
+          "catalog_id",
+          "install"
+        ],
+        "properties": {
+          "catalog_id": {
+            "type": "string"
+          },
+          "deploy_ref": {
+            "type": "string"
+          },
+          "install": {
+            "$ref": "#/components/schemas/InstallAppResponse"
+          },
+          "source": {
+            "type": "string"
+          },
+          "trust_tier": {
+            "type": "string"
+          }
+        }
+      },
+      "DeployPreviewResponse": {
+        "type": "object",
+        "required": [
+          "deploy_ref",
+          "source",
+          "trust_tier",
+          "status",
+          "catalog_id",
+          "slug",
+          "version",
+          "name",
+          "description",
+          "icon",
+          "category",
+          "resources",
+          "exposure",
+          "configurable_params",
+          "credentials_declared",
+          "warnings"
+        ],
+        "properties": {
+          "catalog_id": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "community_version_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "configurable_params": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParamSpec"
+            }
+          },
+          "credentials_declared": {
+            "type": "boolean"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Backing services this app expects on the workspace (community only)."
+          },
+          "deploy_ref": {
+            "type": "string",
+            "description": "Canonical exact ref that will be installed."
+          },
+          "description": {
+            "type": "string"
+          },
+          "exposure": {
+            "$ref": "#/components/schemas/DeployExposure"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "install_script_preview": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "install_stats": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CommunityCatalogVersionInstallStats"
+              }
+            ]
+          },
+          "managed": {
+            "type": "boolean",
+            "description": "True if this recipe opts into Rigbox's managed AI proxy when installed."
+          },
+          "manifest_digest": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "manifest_json": {
+            "description": "Raw manifest JSON for the \"View manifest\" affordance. Community only."
+          },
+          "name": {
+            "type": "string"
+          },
+          "resources": {
+            "$ref": "#/components/schemas/DeployResourceRequirements"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "description": "`official` or `community`."
+          },
+          "status": {
+            "type": "string"
+          },
+          "system_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Discovery tags from the recipe manifest (community only)."
+          },
+          "trust_tier": {
+            "type": "string",
+            "description": "`official`, `verified`, `community`, or `private`."
+          },
+          "usage_examples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsageExample"
+            },
+            "description": "Copy-pasteable usage examples shown in the catalog detail \"Usage\" tab."
+          },
+          "vendor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": "string"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DeployResourceRequirements": {
+        "type": "object",
+        "required": [
+          "min_ram_mb",
+          "min_disk_mb"
+        ],
+        "properties": {
+          "min_disk_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "min_ram_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         }
       },
@@ -4913,32 +7538,6 @@
           }
         }
       },
-      "ImageInfo": {
-        "type": "object",
-        "description": "Image descriptor - used by system/images endpoint.",
-        "required": [
-          "name",
-          "display_name",
-          "description",
-          "default_ram_mb"
-        ],
-        "properties": {
-          "default_ram_mb": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "description": {
-            "type": "string"
-          },
-          "display_name": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
       "InstallAppRequest": {
         "type": "object",
         "required": [
@@ -5044,6 +7643,31 @@
           }
         }
       },
+      "LaunchDeployRequest": {
+        "type": "object",
+        "required": [
+          "ref"
+        ],
+        "properties": {
+          "params": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "User-supplied values for the resolved app's configurable params.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "ref": {
+            "type": "string",
+            "description": "Exact deploy ref, e.g. `@rigbox/filebrowser@builtin` or `@alice/pgweb@1.2.3`."
+          }
+        }
+      },
       "LaunchRequest": {
         "type": "object",
         "properties": {
@@ -5126,20 +7750,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/App"
-            }
-          }
-        }
-      },
-      "ListImagesResponse": {
-        "type": "object",
-        "required": [
-          "images"
-        ],
-        "properties": {
-          "images": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ImageInfo"
             }
           }
         }
@@ -5506,6 +8116,80 @@
           "textarea"
         ]
       },
+      "PublishCommunityCompositionRequest": {
+        "type": "object",
+        "required": [
+          "manifest"
+        ],
+        "properties": {
+          "manifest": {
+            "description": "Parsed workspace composition manifest."
+          },
+          "manifest_yaml": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional original YAML text used for digesting and review display."
+          }
+        }
+      },
+      "PublishCommunityCompositionResponse": {
+        "type": "object",
+        "required": [
+          "deploy_ref",
+          "item",
+          "version"
+        ],
+        "properties": {
+          "deploy_ref": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/CommunityCompositionItem"
+          },
+          "version": {
+            "$ref": "#/components/schemas/CommunityCompositionVersion"
+          }
+        }
+      },
+      "PublishCommunityRecipeRequest": {
+        "type": "object",
+        "required": [
+          "manifest"
+        ],
+        "properties": {
+          "manifest": {
+            "description": "Parsed app recipe manifest."
+          },
+          "manifest_yaml": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional original YAML text used for digesting and review display."
+          }
+        }
+      },
+      "PublishCommunityRecipeResponse": {
+        "type": "object",
+        "required": [
+          "deploy_ref",
+          "item",
+          "version"
+        ],
+        "properties": {
+          "deploy_ref": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/CommunityCatalogItem"
+          },
+          "version": {
+            "$ref": "#/components/schemas/CommunityCatalogVersion"
+          }
+        }
+      },
       "QuickDeployRequest": {
         "type": "object",
         "required": [
@@ -5571,6 +8255,26 @@
             ],
             "format": "int32",
             "minimum": 0
+          },
+          "service_spec_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "User-selected service specs from their library. None keeps legacy default behavior."
+          },
+          "setup_script_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "User-selected setup scripts from their library. None keeps legacy default behavior."
           },
           "template_id": {
             "type": "string"
@@ -6704,6 +9408,25 @@
           }
         }
       },
+      "UpdateCommunityProfileRequest": {
+        "type": "object",
+        "properties": {
+          "community_items_preference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Community catalog visibility preference: disabled, verified_only, or enabled."
+          },
+          "username": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Claimable community username. Once claimed, username changes are blocked."
+          }
+        }
+      },
       "UpdateServiceSpecRequest": {
         "type": "object",
         "properties": {
@@ -6980,6 +9703,91 @@
           }
         }
       },
+      "VerifiedPromotionResult": {
+        "type": "object",
+        "required": [
+          "vendor",
+          "slug",
+          "version",
+          "promoted"
+        ],
+        "properties": {
+          "promoted": {
+            "type": "boolean"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "vendor": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "VerifiedPromotionWebhookRequest": {
+        "type": "object",
+        "required": [
+          "verified"
+        ],
+        "properties": {
+          "event_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional event ID. `X-GitHub-Delivery` is preferred when present."
+          },
+          "verified": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerifiedRecipeRef"
+            }
+          }
+        }
+      },
+      "VerifiedPromotionWebhookResponse": {
+        "type": "object",
+        "required": [
+          "processed",
+          "event_id",
+          "results"
+        ],
+        "properties": {
+          "event_id": {
+            "type": "string"
+          },
+          "processed": {
+            "type": "boolean"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerifiedPromotionResult"
+            }
+          }
+        }
+      },
+      "VerifiedRecipeRef": {
+        "type": "object",
+        "required": [
+          "vendor",
+          "slug",
+          "version"
+        ],
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "vendor": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
       "Visibility": {
         "type": "string",
         "enum": [
@@ -7179,6 +9987,193 @@
           }
         }
       },
+      "WorkspaceMetricsRange": {
+        "type": "string",
+        "enum": [
+          "1h",
+          "6h",
+          "24h",
+          "7d"
+        ]
+      },
+      "WorkspaceMetricsSeries": {
+        "type": "object",
+        "required": [
+          "cpu_percent",
+          "memory_used_mb",
+          "memory_limit_mb",
+          "disk_used_mb",
+          "disk_total_mb",
+          "network_rx_bps",
+          "network_tx_bps"
+        ],
+        "properties": {
+          "cpu_percent": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "disk_total_mb": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "disk_used_mb": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "memory_limit_mb": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "memory_used_mb": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "network_rx_bps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          },
+          "network_tx_bps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricPoint"
+            }
+          }
+        }
+      },
+      "WorkspaceMetricsSeriesResponse": {
+        "type": "object",
+        "required": [
+          "range",
+          "step_seconds",
+          "workspace_id",
+          "source",
+          "series"
+        ],
+        "properties": {
+          "node_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "range": {
+            "$ref": "#/components/schemas/WorkspaceMetricsRange"
+          },
+          "series": {
+            "$ref": "#/components/schemas/WorkspaceMetricsSeries"
+          },
+          "source": {
+            "$ref": "#/components/schemas/WorkspaceMetricsSource"
+          },
+          "step_seconds": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkspaceMetricsSource": {
+        "type": "object",
+        "required": [
+          "cpu",
+          "network",
+          "memory",
+          "disk"
+        ],
+        "properties": {
+          "cpu": {
+            "type": "string"
+          },
+          "disk": {
+            "type": "string"
+          },
+          "memory": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkspaceMetricsSummaryResponse": {
+        "type": "object",
+        "required": [
+          "range",
+          "workspace_id",
+          "cpu_avg_percent",
+          "cpu_p95_percent",
+          "memory_used_mb",
+          "memory_limit_mb",
+          "disk_used_mb",
+          "disk_total_mb",
+          "network_rx_bytes",
+          "network_tx_bytes",
+          "guest_metrics_fresh"
+        ],
+        "properties": {
+          "cpu_avg_percent": {
+            "type": "number",
+            "format": "double"
+          },
+          "cpu_p95_percent": {
+            "type": "number",
+            "format": "double"
+          },
+          "disk_total_mb": {
+            "type": "number",
+            "format": "double"
+          },
+          "disk_used_mb": {
+            "type": "number",
+            "format": "double"
+          },
+          "guest_metrics_fresh": {
+            "type": "boolean"
+          },
+          "memory_limit_mb": {
+            "type": "number",
+            "format": "double"
+          },
+          "memory_used_mb": {
+            "type": "number",
+            "format": "double"
+          },
+          "network_rx_bytes": {
+            "type": "number",
+            "format": "double"
+          },
+          "network_tx_bytes": {
+            "type": "number",
+            "format": "double"
+          },
+          "range": {
+            "$ref": "#/components/schemas/WorkspaceMetricsRange"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
       "WorkspaceService": {
         "type": "object",
         "description": "Runtime backing service instance tracked for health monitoring.\nDistinct from ServiceSpec (which generates systemd units for custom processes).\nWorkspaceService tracks apt-managed daemons like PostgreSQL, Redis, RabbitMQ.",
@@ -7369,6 +10364,10 @@
           "image": {
             "type": "string"
           },
+          "image_bound": {
+            "type": "boolean",
+            "description": "True when this template's apps/services live inside the image\n(e.g. firecrawl, openclaw) rather than being installed onto a\nminimal base image at provision time. Mirrors the rule in\n`domain::community::export::image_bound` so the catalog and\n/templates UI can show the same `composable` / `image-bound`\ndistinction."
+          },
           "managed_ai_config": {
             "type": "boolean",
             "description": "If true, this template supports managed AI mode (proxy + credits)."
@@ -7478,6 +10477,12 @@
     },
     {
       "name": "Apps"
+    },
+    {
+      "name": "Community"
+    },
+    {
+      "name": "Deploy"
     },
     {
       "name": "Logs"
