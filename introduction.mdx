@@ -15,8 +15,10 @@ Deploy a workspace in one API call:
 curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"template_id": "dev", "name": "my-project"}'
+  -d '{"template_id": "dev", "name": "<WORKSPACE_NAME>"}'
 ```
+
+Replace `<WORKSPACE_NAME>` with a name of your choice and `YOUR_API_KEY` with the key from **Settings → API Keys** in the dashboard.
 
 This provisions an isolated micro-VM with Python, Node.js, build tools, and SSH access - ready in seconds.
 

@@ -93,6 +93,10 @@ Workspaces are isolated micro-VMs where your code runs. On your local machine, t
   Workspace lifecycle commands such as `rig ls`, `rig new`, `rig spawn`, `rig start`, `rig stop`, `rig restart`, and `rig rm` are external-mode commands. Inside a workspace VM, `rig` is scoped to the current workspace and these account-wide commands are not shown in `rig -h`.
 </Note>
 
+<Note>
+  Placeholders below use the form `<WORKSPACE_NAME>` and `<APP_NAME>` to make it obvious where you should substitute your own values. Replace the whole placeholder, including the angle brackets, with the actual name (e.g. `my-project`). The walkthrough examples that follow use `my-project` and `my-api` as illustrative names.
+</Note>
+
 ### List workspaces
 
 ```bash
@@ -111,7 +115,7 @@ ml-notebook   running   dev      1 day ago
 ### Create a workspace
 
 ```bash
-rig new my-project --image dev
+rig new <WORKSPACE_NAME> --image dev
 ```
 
 This creates a workspace but does not start it. Available images include `base` (minimal) and `dev` (includes development tools, sidecar, and more).
@@ -119,7 +123,7 @@ This creates a workspace but does not start it. Available images include `base` 
 ### Create and start in one command
 
 ```bash
-rig spawn my-project
+rig spawn <WORKSPACE_NAME>
 ```
 
 <Tip>
@@ -128,9 +132,11 @@ rig spawn my-project
 
 ### Start and stop
 
+`rig start`, `rig stop`, `rig restart`, `rig logs`, and `rig rm` accept either a workspace name or a workspace ID (`ws-...`). The placeholder `<WORKSPACE_NAME_OR_ID>` reflects that you can paste either.
+
 ```bash
-rig start my-project     # Boot the VM
-rig stop my-project      # Shut down the VM (preserves disk)
+rig start <WORKSPACE_NAME_OR_ID>     # Boot the VM
+rig stop <WORKSPACE_NAME_OR_ID>      # Shut down the VM (preserves disk)
 ```
 
 ### Check status
@@ -144,7 +150,7 @@ This shows a dashboard with your account quota, resource usage across all worksp
 ### Stream logs
 
 ```bash
-rig logs my-project --follow
+rig logs <WORKSPACE_NAME_OR_ID> --follow
 ```
 
 Streams workspace system logs in real time. Press `Ctrl+C` to stop.
@@ -152,7 +158,7 @@ Streams workspace system logs in real time. Press `Ctrl+C` to stop.
 ### Delete a workspace
 
 ```bash
-rig rm my-project
+rig rm <WORKSPACE_NAME_OR_ID>
 ```
 
 <Warning>
@@ -184,29 +190,31 @@ frontend   5173    running   frontend.rigbox.dev
 ### Create an app
 
 ```bash
-rig app new my-api --port 3000
+rig app new <APP_NAME> --port 3000
 ```
 
-This creates an app route that maps a public subdomain to the specified port inside your workspace.
+This creates an app route that maps a public subdomain to the specified port inside your workspace. The app will be reachable at `<APP_NAME>.rigbox.dev`.
 
 ### Start, stop, and restart
 
+`rig app start`, `rig app stop`, `rig app restart`, `rig app logs`, and `rig app rm` accept either an app name or an app ID (`app-...`).
+
 ```bash
-rig app start my-api      # Start the app service
-rig app stop my-api       # Stop the app service
-rig app restart my-api    # Restart the app service
+rig app start <APP_NAME_OR_ID>      # Start the app service
+rig app stop <APP_NAME_OR_ID>       # Stop the app service
+rig app restart <APP_NAME_OR_ID>    # Restart the app service
 ```
 
 ### Stream app logs
 
 ```bash
-rig app logs my-api --follow
+rig app logs <APP_NAME_OR_ID> --follow
 ```
 
 ### Delete an app
 
 ```bash
-rig app rm my-api
+rig app rm <APP_NAME_OR_ID>
 ```
 
 ---
@@ -262,13 +270,13 @@ Tools are interactive applications that run alongside your workspace.
 ### List available tools
 
 ```bash
-rig tool ls my-project
+rig tool ls <WORKSPACE_NAME_OR_ID>
 ```
 
 ### Launch a tool
 
 ```bash
-rig tool launch architecture-explorer my-project
+rig tool launch architecture-explorer <WORKSPACE_NAME_OR_ID>
 ```
 
 This starts the specified tool and provides you with the URL to access it.
@@ -282,10 +290,10 @@ Manage the SSH keys registered to your account directly from the external CLI. S
 ### Add a key
 
 ```bash
-rig ssh-key add laptop
+rig ssh-key add <KEY_NAME>
 ```
 
-This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it with your account.
+This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it with your account under the name you provide (for example, `laptop` or `desktop`).
 
 ### List keys
 
@@ -304,7 +312,7 @@ desktop   SHA256:xyz789ghi012...                     1 week ago
 ### Remove a key
 
 ```bash
-rig ssh-key rm laptop
+rig ssh-key rm <KEY_NAME>
 ```
 
 For more details on SSH access, including connecting to workspaces and using the TUI dashboard, see the [SSH Access guide](/guides/ssh-access).

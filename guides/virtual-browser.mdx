@@ -209,11 +209,11 @@ print(f"Workspace running: {workspace_id}")
 
 ### Start a local web app
 
-SSH into the workspace and start your web application:
+SSH into the workspace and start your web application. Replace `<APP_DIR>` with the path to your project (for example, `/home/developer/my-app`):
 
 ```bash
 # Inside the VM
-cd /home/developer/my-app
+cd <APP_DIR>
 npm run dev -- --port 3000 &
 ```
 

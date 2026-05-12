@@ -66,9 +66,11 @@ When an app's visibility is set to **private** or **privileged**, requests from 
 Any valid API key (`rb_*`) will work as the value:
 
 ```bash
-curl https://my-app.rigbox.dev/endpoint \
+curl https://<APP_NAME>.rigbox.dev/endpoint \
   -H "X-Rigbox-Key: $RIGBOX_API_KEY"
 ```
+
+Replace `<APP_NAME>` with the name of your app (the value you passed to `rig app new` or the app create endpoint).
 
 <Note>
 Requests made from inside the workspace (e.g. between services on `localhost`) do not need this header. It is only required for requests arriving from the public internet.

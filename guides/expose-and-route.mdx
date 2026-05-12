@@ -11,12 +11,12 @@ The flow from a running service to a public URL:
 
 ```mermaid
 flowchart LR
-    A[Your service\nport 8080 inside VM] --> B[App created\nname: my-api]
+    A[Your service\nport 8080 inside VM] --> B[App created\nname: your-app]
     B --> C[Reverse proxy\nconfigured]
-    C --> D[my-api.rigbox.dev]
+    C --> D[your-app.rigbox.dev]
 ```
 
-Each app gets a unique subdomain on `rigbox.dev`. HTTPS is handled automatically - your service only needs to listen on HTTP inside the VM.
+Each app gets a unique subdomain on `rigbox.dev` of the form `<APP_NAME>.rigbox.dev`, where `<APP_NAME>` is the name you choose when creating the app. HTTPS is handled automatically - your service only needs to listen on HTTP inside the VM.
 
 <Note>
 App subdomains are globally unique across all Rigbox users. If a name is taken, you'll need to choose a different one.
@@ -50,7 +50,7 @@ See [List Listening Ports](/api-reference/apps/listening-ports) for the full res
 
 ## Create an App Manually
 
-If you know the port and want full control over the app name, create it directly.
+If you know the port and want full control over the app name, create it directly. Replace `<APP_NAME>` with a name of your choice - it will become the public subdomain.
 
 <CodeGroup>
 ```bash cURL
@@ -59,7 +59,7 @@ curl -X POST https://api.rigbox.dev/api/v1/apps \
   -H "Content-Type: application/json" \
   -d '{
     "workspace_id": "'$WORKSPACE_ID'",
-    "name": "my-api",
+    "name": "<APP_NAME>",
     "port": 8080
   }'
 ```
@@ -70,7 +70,7 @@ response = requests.post(
     headers={"Authorization": f"Bearer {api_key}"},
     json={
         "workspace_id": workspace_id,
-        "name": "my-api",
+        "name": "<APP_NAME>",
         "port": 8080,
     },
 )

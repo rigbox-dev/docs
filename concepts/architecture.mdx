@@ -25,11 +25,11 @@ When you expose a port from a workspace, Rigbox creates a public URL with automa
 
 ```mermaid
 flowchart LR
-    BROWSER[Browser] -->|HTTPS| SUB["my-app.rigbox.dev"]
+    BROWSER[Browser] -->|HTTPS| SUB["your-app.rigbox.dev"]
     SUB --> VM["Your service\nport 3000"]
 ```
 
-- Each app gets a unique subdomain: `{name}.rigbox.dev`
+- Each app gets a unique subdomain of the form `<APP_NAME>.rigbox.dev`, where `<APP_NAME>` is the name you chose when creating the app
 - HTTPS termination is automatic - your service only needs to listen on HTTP inside the VM
 - Routes are created and removed dynamically as you add or delete apps
 - [Visibility controls](/guides/visibility) determine who can access each app (public, private, or privileged)
