@@ -21,7 +21,7 @@ Private is the default for all newly created apps. You must explicitly change th
 
 ## How Access is Enforced
 
-When a request arrives at an app subdomain (e.g., `my-api.rigbox.dev`), Rigbox checks the visibility mode before forwarding the request to your service:
+When a request arrives at an app subdomain (e.g., `<APP_NAME>.rigbox.dev`), Rigbox checks the visibility mode before forwarding the request to your service:
 
 - **Public**: the request is forwarded immediately with no authentication check.
 - **Private**: the request must include valid authentication matching the workspace owner. Unauthenticated requests receive a 403 response.
@@ -252,7 +252,7 @@ When your app is private or privileged, requests from outside the workspace need
 
 <CodeGroup>
 ```bash cURL
-curl https://my-api.rigbox.dev/data \
+curl https://<APP_NAME>.rigbox.dev/data \
   -H "X-Rigbox-Key: $RIGBOX_API_KEY" \
   -H "Content-Type: application/json"
 ```
@@ -261,7 +261,7 @@ curl https://my-api.rigbox.dev/data \
 import requests
 
 response = requests.get(
-    "https://my-api.rigbox.dev/data",
+    "https://<APP_NAME>.rigbox.dev/data",
     headers={"X-Rigbox-Key": api_key},
 )
 print(response.json())

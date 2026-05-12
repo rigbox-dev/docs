@@ -15,7 +15,7 @@ This guide walks you through creating a workspace, starting it, reconciling temp
 
 ## Step 1: Quick Deploy an OpenClaw Workspace
 
-Quick Deploy creates a workspace with template defaults. For OpenClaw, this provisions an `openclaw` image workspace.
+Quick Deploy creates a workspace with template defaults. For OpenClaw, this provisions an `openclaw` image workspace. Replace `<WORKSPACE_NAME>` with a name of your choice (this walkthrough uses `my-bot`).
 
 <CodeGroup>
 
@@ -25,7 +25,7 @@ curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
   -H "Content-Type: application/json" \
   -d '{
     "template_id": "openclaw",
-    "name": "my-bot"
+    "name": "<WORKSPACE_NAME>"
   }'
 ```
 
@@ -35,7 +35,7 @@ import requests
 resp = requests.post(
     "https://api.rigbox.dev/api/v1/quick-deploy",
     headers={"Authorization": "Bearer YOUR_API_KEY"},
-    json={"template_id": "openclaw", "name": "my-bot"}
+    json={"template_id": "openclaw", "name": "<WORKSPACE_NAME>"}
 )
 print(resp.json())
 ```
@@ -49,7 +49,7 @@ const resp = await fetch("https://api.rigbox.dev/api/v1/quick-deploy", {
   },
   body: JSON.stringify({
     template_id: "openclaw",
-    name: "my-bot"
+    name: "<WORKSPACE_NAME>"
   })
 });
 const data = await resp.json();

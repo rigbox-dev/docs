@@ -271,12 +271,12 @@ curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/apps \
   -H "Authorization: Bearer $RIGBOX_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "my-web-app",
+    "name": "<APP_NAME>",
     "port": 3000
   }'
 ```
 
-The app gets a unique URL (e.g., `my-web-app-ws123.rigbox.dev`) that routes to port 3000 inside the workspace where your service spec is running.
+The app gets a unique URL of the form `<APP_NAME>.rigbox.dev` that routes to port 3000 inside the workspace where your service spec is running.
 
 ## Example: Full-Stack Application
 

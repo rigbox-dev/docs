@@ -29,6 +29,8 @@ To connect via SSH, you first need to register your public key with Rigbox.
 
 ### Via the API
 
+Replace `<KEY_NAME>` with a label you'll recognize (for example, `laptop`).
+
 <CodeGroup>
 
 ```bash cURL
@@ -36,7 +38,7 @@ curl -X POST https://api.rigbox.dev/api/v1/ssh-keys \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "laptop",
+    "name": "<KEY_NAME>",
     "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your-email@example.com"
   }'
 ```
@@ -48,7 +50,7 @@ response = requests.post(
     "https://api.rigbox.dev/api/v1/ssh-keys",
     headers={"Authorization": "Bearer YOUR_API_KEY"},
     json={
-        "name": "laptop",
+        "name": "<KEY_NAME>",
         "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your-email@example.com",
     },
 )
@@ -64,10 +66,10 @@ print(f"Registered key: {key['id']}")
 If you have the Rigbox CLI installed:
 
 ```bash
-rig ssh-key add laptop
+rig ssh-key add <KEY_NAME>
 ```
 
-This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it automatically.
+This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it automatically under the name you provide.
 
 <Tip>
   You can register multiple SSH keys for different machines - for example, one for your laptop and one for your desktop. Give each a descriptive name so you can identify them later.
@@ -108,14 +110,18 @@ This copies all your registered public keys into the workspace VM's `~/.ssh/auth
 When you create a workspace, Rigbox gives you an SSH command in this format:
 
 ```bash
-ssh {workspace-name}-{workspace-id}@{region}.rigbox.dev
+ssh <WORKSPACE_NAME>-<WORKSPACE_ID_SUFFIX>@<REGION>.rigbox.dev
 ```
+
+`<WORKSPACE_ID_SUFFIX>` is the workspace ID with the leading `ws-` stripped, and `<REGION>` is the workspace's region (for example, `eu-west-1`).
 
 For example, if your workspace is named `my-project` with ID `ws-ctbxi8lb` in the `eu-west-1` region:
 
 ```bash
 ssh my-project-ctbxi8lb@eu-west-1.rigbox.dev
 ```
+
+The examples below continue with `my-project` / `ws-ctbxi8lb` / `eu-west-1`. Replace those with your own workspace name, ID suffix, and region.
 
 The SSH server identifies you by your registered key and routes the connection directly to your workspace VM.
 
@@ -233,7 +239,7 @@ curl -X DELETE https://api.rigbox.dev/api/v1/ssh-keys/{key_id} \
 ```
 
 ```bash CLI
-rig ssh-key rm laptop
+rig ssh-key rm <KEY_NAME>
 ```
 
 </CodeGroup>
@@ -252,7 +258,7 @@ If you get `Connection refused`, verify:
 
 1. Your workspace is running (check with `GET /api/v1/workspaces/{id}` or `rig ls`)
 2. Your SSH key is registered and synced
-3. You're using the correct username format: `{workspace-name}-{id}@{region}.rigbox.dev`
+3. You're using the correct username format: `<WORKSPACE_NAME>-<WORKSPACE_ID_SUFFIX>@<REGION>.rigbox.dev`
 
 ### Permission denied
 

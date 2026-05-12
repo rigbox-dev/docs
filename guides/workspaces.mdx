@@ -37,7 +37,7 @@ A stopped workspace retains its disk contents. You can restart it at any time wi
 
 ## Creating a Workspace
 
-To create a workspace, send a POST request with the VM configuration.
+To create a workspace, send a POST request with the VM configuration. Replace `<WORKSPACE_NAME>` with a name of your choice (for example, `my-project`).
 
 <CodeGroup>
 ```bash cURL
@@ -45,7 +45,7 @@ curl -X POST https://api.rigbox.dev/api/v1/workspaces \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "my-project",
+    "name": "<WORKSPACE_NAME>",
     "image": "base",
     "ram_mb": 512,
     "disk_size_mb": 3072,
@@ -60,7 +60,7 @@ response = requests.post(
     "https://api.rigbox.dev/api/v1/workspaces",
     headers={"Authorization": f"Bearer {api_key}"},
     json={
-        "name": "my-project",
+        "name": "<WORKSPACE_NAME>",
         "image": "base",
         "ram_mb": 512,
         "disk_size_mb": 3072,
