@@ -169,11 +169,7 @@ Streams workspace system logs in real time. Press `Ctrl+C` to stop.
 rig ssh-info my-project
 ```
 
-Prints the canonical `ssh user@host` command for a workspace, plus the underlying user, region host, and status. Use `--format json` for scripting or `--format spawn-ssh` to get a bare `user@host` string suitable for piping into [OpenRouter spawn](https://github.com/OpenRouterTeam/spawn)'s `link` command:
-
-```bash
-spawn link "$(rig ssh-info my-project --format spawn-ssh)"
-```
+Prints the canonical `ssh user@host` command for a workspace, plus the underlying user, region host, and status. Use `--format json` for scripting.
 
 The output uses region-direct routing (e.g. `eu-west-1.rigbox.dev`) — see the [SSH Access guide](/guides/ssh-access) for the full connection model.
 

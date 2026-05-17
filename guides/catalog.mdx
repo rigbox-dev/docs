@@ -90,7 +90,7 @@ curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app 
   -d '{"catalog_id": "claude"}'
 ```
 
-Then SSH in and run the agent — `rig ssh-info <workspace>` will print the right `ssh` command, or pipe it into [OpenRouter spawn](https://github.com/OpenRouterTeam/spawn) with `spawn link "$(rig ssh-info my-ws --format spawn-ssh)"`.
+Then SSH in and run the agent — `rig ssh-info <workspace>` will print the right `ssh` command.
 
 <Note>
 CLI-shape recipes don't appear in the [Start App](/api-reference/apps/start) / [Stop App](/api-reference/apps/stop) / visibility endpoints — there's no daemon to control. To uninstall, delete the app row; the catalog's cleanup paths (e.g. `/etc/profile.d/codex-routing.sh`) are removed automatically.
