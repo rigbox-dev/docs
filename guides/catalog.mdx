@@ -50,7 +50,6 @@ See [List Catalog Apps](/api-reference/app-catalog/list) for the underlying HTTP
 | File Browser | `filebrowser` | 8080 | `files` | Web-based file manager with upload/download |
 | Excalidraw | `excalidraw` | 3000 | `excalidraw` | Collaborative whiteboard and diagramming |
 | PGWeb | `pgweb` | 8081 | `pgweb` | PostgreSQL web client with query builder |
-| Chat Starter | `chat` | 3000 | `chat` | Minimal chat UI template with OpenAI integration |
 
 <Note>
 Subdomains are prefixed with the workspace name. For example, if your workspace is named `my-workspace` and you install the VS Code catalog app, the resulting app name is `my-workspace-vscode` and the full URL is `https://my-workspace-vscode.rigbox.dev`. Replace `my-workspace` with whatever name you gave your workspace.
@@ -135,13 +134,15 @@ See [Delete App](/api-reference/apps/delete) for the API form.
 
 ## App Details
 
-### VS Code Server
-
-A full browser-based VS Code instance with extension support, integrated terminal, and file editing. Runs [code-server](https://github.com/coder/code-server).
+Each app installs with the same one-liner — swap in the catalog ID from the table above:
 
 ```bash
 rig catalog install vscode --workspace <WORKSPACE_NAME>
 ```
+
+### VS Code Server
+
+A full browser-based VS Code instance with extension support, integrated terminal, and file editing. Runs [code-server](https://github.com/coder/code-server).
 
 <Tip>
 VS Code Server supports installing extensions from the Open VSX registry. Search and install extensions directly from the browser UI.
@@ -151,61 +152,25 @@ VS Code Server supports installing extensions from the Open VSX registry. Search
 
 Interactive notebooks for Python, Julia, R, and more. Supports inline visualizations, markdown cells, and kernel management.
 
-```bash
-rig catalog install jupyter --workspace <WORKSPACE_NAME>
-```
-
 ### Marimo
 
 Reactive Python notebooks where cells automatically re-execute when dependencies change. An alternative to Jupyter with a focus on reproducibility.
-
-```bash
-rig catalog install marimo --workspace <WORKSPACE_NAME>
-```
 
 ### Streamlit
 
 Build interactive data dashboards and web apps in Python. Write a Python script and Streamlit renders it as a web application.
 
-```bash
-rig catalog install streamlit --workspace <WORKSPACE_NAME>
-```
-
 ### File Browser
 
 A web-based file manager with drag-and-drop upload, download, and file editing. Useful for managing files inside the workspace without SSH.
 
-```bash
-rig catalog install filebrowser --workspace <WORKSPACE_NAME>
-```
-
 ### Excalidraw
 
-A collaborative whiteboard for sketching diagrams, wireframes, and architecture drawings. Runs locally inside the workspace - no external dependencies.
-
-```bash
-rig catalog install excalidraw --workspace <WORKSPACE_NAME>
-```
+A collaborative whiteboard for sketching diagrams, wireframes, and architecture drawings. Runs locally inside the workspace — no external dependencies.
 
 ### PGWeb
 
 A web-based PostgreSQL client with a query editor, table browser, and export functionality. Useful for inspecting databases running inside the workspace.
-
-```bash
-rig catalog install pgweb --workspace <WORKSPACE_NAME>
-```
-
-### Chat Starter
-
-A minimal chat UI template with OpenAI API integration. Use it as a starting point for building conversational AI applications.
-
-```bash
-rig catalog install chat --workspace <WORKSPACE_NAME>
-```
-
-<Warning>
-Chat Starter requires Node.js, which is available in the `base`, `dev`, and `full` images but not in `openclaw`. Check your workspace image before installing.
-</Warning>
 
 ## Image Compatibility
 
@@ -220,7 +185,6 @@ Most catalog apps work on all images, but some have dependencies that not every 
 | File Browser | Yes | Yes | Yes | Yes |
 | Excalidraw | Yes | Yes | Yes | Yes |
 | PGWeb | Yes | Yes | Yes | Yes |
-| Chat Starter | Yes | Yes | Yes | No (needs Node.js) |
 
 <Tip>
 The `base` image has pre-warmed npm caches for Jupyter, Marimo, Streamlit, and Excalidraw. Installation on `base` is significantly faster than on other images because dependencies are already downloaded.
