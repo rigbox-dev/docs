@@ -10,11 +10,24 @@ The Rigbox app catalog provides curated, pre-packaged applications that you can 
 When you install a catalog app:
 
 1. Rigbox downloads and configures the app inside your workspace
-2. A **systemd service** is created so the app starts automatically and restarts on failure
-3. An **app route** is created, mapping the app's port to a `*.rigbox.dev` subdomain
-4. The app is immediately accessible once installation completes
+2. For **Service-shape** apps: a systemd service is created, an app route maps the port to a `*.rigbox.dev` subdomain, and a readiness probe waits for the service to come up
+3. For **CLI-shape** apps: the binary is dropped into `$PATH` (and any routing/profile.d shims are written), then the install returns — no systemd unit, no port, no route, no probe
+4. The app row is registered either way, so the workspace UI shows the app as installed
 
-You manage installed catalog apps with the same endpoints you use for any other app - start, stop, restart, delete, and change visibility.
+You manage installed Service-shape apps with the same endpoints you use for any other app — start, stop, restart, delete, and change visibility. CLI-shape apps don't expose those endpoints; you invoke them interactively over SSH.
+
+## App shapes
+
+| Shape | What you get | What's missing | Typical use |
+| --- | --- | --- | --- |
+| **Service** | systemd unit, Caddy route, subdomain, health probe | — | VS Code, Jupyter, Streamlit, PGWeb, … |
+| **CLI** | Binary on `$PATH`, optional profile.d routing shim | systemd, route, subdomain, port, probe | `claude`, `codex`, `opencode`, `kilocode` |
+
+For CLI-shape apps the `install-app` job is finished as soon as `install.sh` exits — there is no service readiness to wait on. Once the job status is `completed`, SSH into the workspace and run the agent directly. See [AI Coding Tools](/guides/ai-coding-tools) for usage patterns once a recipe is installed, and [Managed AI Proxy](/guides/managed-proxy) for how credits are metered for the requests each agent makes.
+
+<Note>
+User-created apps (those you `POST` to [`/apps`](/api-reference/apps/create) directly, instead of installing a catalog recipe) accept the same `app_kind: "service" | "cli"` field. CLI-shape apps must have `port: 0` and omit `protocol`; Service-shape apps default to port `3000` and require a protocol.
+</Note>
 
 ## Available Apps
 
@@ -40,7 +53,7 @@ for app in response.json():
 
 See [List Catalog Apps](/api-reference/app-catalog/list) for the full response schema.
 
-### Catalog Reference
+### Service-shape Catalog Reference
 
 | App | Catalog ID | Port | Subdomain | Description |
 |-----|-----------|------|-----------|-------------|
@@ -55,6 +68,32 @@ See [List Catalog Apps](/api-reference/app-catalog/list) for the full response s
 
 <Note>
 Subdomains are prefixed with the workspace name. For example, if your workspace is named `my-workspace` and you install the VS Code catalog app, the resulting app name is `my-workspace-vscode` and the full URL is `https://my-workspace-vscode.rigbox.dev`. Replace `my-workspace` with whatever name you gave your workspace.
+</Note>
+
+### CLI-shape Catalog Reference
+
+These recipes install an interactive AI coding agent into the workspace's `$PATH`. They route through the managed AI proxy (Rigbox's OpenRouter gateway), so no provider API key is required when the workspace is in managed AI mode.
+
+| Agent | Catalog ID | Invoke as | Routing notes |
+|-------|-----------|-----------|---------------|
+| Claude Code | `claude` | `claude` | `OPENROUTER_*` injected; `profile.d` shim adds Anthropic-compatible env |
+| Codex CLI | `codex` | `codex` | `OPENROUTER_*` → translated to `OPENAI_BASE_URL` / `OPENAI_API_KEY` by `profile.d` |
+| OpenCode | `opencode` | `opencode` | Reads `OPENROUTER_API_KEY` natively — no env translation needed |
+| Kilo Code | `kilocode` | `kilocode` | `OPENROUTER_*` → `KILO_OPEN_ROUTER_API_KEY` by `profile.d` |
+
+Install one of them the same way as a Service-shape app:
+
+```bash
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"catalog_id": "claude"}'
+```
+
+Then SSH in and run the agent — `rig ssh-info <workspace>` will print the right `ssh` command, or pipe it into [OpenRouter spawn](https://github.com/OpenRouterTeam/spawn) with `spawn link "$(rig ssh-info my-ws --format spawn-ssh)"`.
+
+<Note>
+CLI-shape recipes don't appear in the [Start App](/api-reference/apps/start) / [Stop App](/api-reference/apps/stop) / visibility endpoints — there's no daemon to control. To uninstall, delete the app row; the catalog's cleanup paths (e.g. `/etc/profile.d/codex-routing.sh`) are removed automatically.
 </Note>
 
 ## Installing a Catalog App

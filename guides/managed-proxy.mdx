@@ -9,32 +9,36 @@ The managed AI proxy lets your workspace code call supported AI providers withou
 
 ## How It Works
 
-Every workspace can reach the proxy at `http://172.16.0.1:9090` from inside the VM. When managed mode is active, AI SDK requests can be routed through that bridge-local proxy. The proxy:
+Every workspace can reach the proxy at `http://172.16.0.1:9090` from inside the VM. When managed mode is active, AI SDK requests are routed through that bridge-local proxy, which fronts an OpenRouter gateway. The proxy:
 
 1. Intercepts the request from your workspace VM
 2. Resolves the workspace from the VM's source IP on the compute bridge
-3. Injects the correct provider API key (which never enters your VM)
-4. Forwards the request to the upstream provider
+3. Injects Rigbox's managed OpenRouter key (your VM never sees it)
+4. Forwards the request to OpenRouter, which routes to the appropriate upstream provider for the requested model
 5. Logs token usage and deducts from your credit balance
 6. Returns the response to your code
 
-Your workspace code uses normal SDKs and HTTP clients. For OpenAI-compatible tools, point the base URL at `/v1`. For provider-native SDKs, use the provider path such as `/google`.
+OpenRouter acts as a single gateway in front of every supported model family, so you only point your SDK at one endpoint regardless of which provider's model you ask for. Pick the upstream provider by choosing the model slug (e.g.&nbsp;`anthropic/claude-sonnet-4`, `openai/gpt-4o`, `google/gemini-2.5-pro`).
 
 <Tip>
-Provider SDK environment variables are opt-in. Rigbox exposes `RIGBOX_AI_PROXY_URL` globally for discovery, and writes `~/.rigbox/proxy.env` for shells or projects that want to route through the proxy.
+Managed workspaces inject `OPENROUTER_BASE_URL=http://172.16.0.1:9090/v1` and `OPENROUTER_API_KEY` at workspace boot, so SDKs and CLI tools that read OpenRouter env vars work out of the box. `rig proxy on` is still available inside the workspace shell to print equivalent `export` statements for use in scripts or CI.
 </Tip>
 
-## Supported Providers
+## Endpoints
 
-Managed provider availability depends on the keys configured for the current Rigbox environment. Use `rig proxy status` inside a workspace to see the proxy URLs available to your shell.
+The proxy speaks two HTTP shapes — OpenAI-compatible (used by most SDKs and tools) and an Anthropic-shaped passthrough for Claude Code. Both terminate on the same OpenRouter gateway behind the scenes.
 
-| Surface | Endpoint | Notes |
-|----------|----------|-------|
-| **OpenAI-compatible gateway** | `http://172.16.0.1:9090/v1` | Supports `/models`, `/chat/completions`, `/responses`, and `/embeddings` when a managed OpenAI key is configured |
-| **Google Gemini provider path** | `http://172.16.0.1:9090/google` | Provider-native Gemini REST shape |
-| **Anthropic provider path** | `http://172.16.0.1:9090/anthropic` | Provider-native Anthropic shape when configured |
-| **OpenAI provider path** | `http://172.16.0.1:9090/openai` | Legacy/provider-native OpenAI path |
-| **Brave Search** | `http://172.16.0.1:9090/brave` | Web Search API when configured |
+| Endpoint | Shape | Notes |
+|----------|-------|-------|
+| `http://172.16.0.1:9090/v1/chat/completions` | OpenAI | Default route for everything OpenAI-compatible. Pick the upstream model with the `model` field (`anthropic/...`, `openai/...`, `google/...`, etc.). |
+| `http://172.16.0.1:9090/v1/embeddings` | OpenAI | Embedding models. |
+| `http://172.16.0.1:9090/v1/models` | OpenAI | List models available to your account. |
+| `http://172.16.0.1:9090/v1/messages` | Anthropic | Native Anthropic Messages-API passthrough used by Claude Code. Streams via byte forwarding; credit metering for streaming responses on this endpoint is currently deferred. |
+| `http://172.16.0.1:9090/brave` | Brave Search | Web Search API when configured for your environment. |
+
+<Note>
+A small set of free-tier models is also exposed through a `free` alias when Rigbox has the matching managed key. They consume credits at zero rate but otherwise behave identically.
+</Note>
 
 ## Credit Tiers
 
@@ -106,19 +110,19 @@ console.log(config);
 
 ### Via the CLI (Inside a Workspace VM)
 
-If you are already inside a running workspace, the `rig` CLI can configure your current shell to use the proxy.
+Managed workspaces already inject `OPENROUTER_BASE_URL` and `OPENROUTER_API_KEY` into every login shell, so most tools work without any setup step. The `rig proxy on` helper is a convenience for scripts or CI where you want the exports printed explicitly:
 
 ```bash
 eval "$(rig proxy on)"
 ```
 
 This command:
-- Prints shell `export` statements that set the correct base URLs for each AI SDK
-- Uses `managed-by-rigbox` placeholder API keys where SDKs require a non-empty key
+- Prints shell `export` statements for `OPENROUTER_BASE_URL` and `OPENROUTER_API_KEY` (plus a small set of compatibility variables for SDKs that prefer provider-native names)
+- Uses `managed-by-rigbox` placeholder API keys where SDKs require a non-empty key and don't read `OPENROUTER_API_KEY`
 - Routes subsequent AI SDK calls in that shell through the Rigbox proxy
 
 <Tip>
-Use `rig proxy status` to see available provider URLs, current shell state, and credit balance.
+Use `rig proxy status` to see the configured endpoints, current shell state, and credit balance.
 </Tip>
 
 To deactivate:
@@ -214,19 +218,16 @@ curl -X PUT https://api.rigbox.dev/api/v1/workspaces/ws_abc123/ai-config \
 **Step 2 - Inside the workspace VM, configure the shell and make a call:**
 
 ```bash
-# Apply proxy environment variables
+# (Optional — managed workspaces export these at login already.)
 eval "$(rig proxy on)"
 
-curl -sS \
+curl -sS "$OPENROUTER_BASE_URL/chat/completions" \
+  -H "Authorization: Bearer $OPENROUTER_API_KEY" \
   -H "Content-Type: application/json" \
-  -X POST "$RIGBOX_AI_PROXY_URL/google/v1beta/models/gemini-2.5-flash-lite:generateContent" \
   -d '{
-    "contents": [
-      {
-        "parts": [
-          {"text": "Explain microVMs in one paragraph."}
-        ]
-      }
+    "model": "google/gemini-2.5-flash-lite",
+    "messages": [
+      {"role": "user", "content": "Explain microVMs in one paragraph."}
     ]
   }' | jq .
 ```
@@ -243,22 +244,24 @@ curl -s https://api.rigbox.dev/api/v1/users/me/credits \
 Credit deduction happens synchronously - the balance is updated before the proxy returns the response to your code, so the credits endpoint always reflects the latest usage.
 </Note>
 
-## Switching Providers
+## Switching Providers and Models
 
-You can change the provider and model at any time without restarting the workspace, as long as the selected managed provider is configured for your environment. The next AI API call will use the new configuration.
+Because the managed gateway is OpenRouter, you can switch the upstream provider and model at any time by changing the `model` field on your request — there's no environment change, no proxy restart, and no separate "configure provider" step:
 
 ```bash
-# Switch to OpenAI when the managed OpenAI gateway is configured
-curl -X PUT https://api.rigbox.dev/api/v1/workspaces/ws_abc123/ai-config \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+# Same endpoint, different upstream model
+curl -sS "$OPENROUTER_BASE_URL/chat/completions" \
+  -H "Authorization: Bearer $OPENROUTER_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"mode": "managed", "provider": "openai", "model": "gpt-4o"}'
+  -d '{"model": "openai/gpt-4o", "messages": [{"role": "user", "content": "hi"}]}'
 ```
 
-If you are using the CLI inside the VM, run `eval "$(rig proxy on)"` again to refresh the environment variables for the new provider.
+The workspace-level `ai-config` (set via the API or UI) defines the default provider and model used by tools that don't ask for one explicitly, and is also surfaced by `rig proxy status`.
 
 ## Next Steps
 
+- [AI Coding Tools](/guides/ai-coding-tools) - use Rigbox credits with Claude Code, Codex, OpenCode, and Kilocode
+- [App Catalog](/guides/catalog#cli-shape-catalog-reference) - one-click install of the four CLI-shape agent recipes
 - [Bring Your Own Keys](/guides/byok) - use your own API keys for unlimited usage
 - [Setup Scripts](/guides/setup-scripts) - automate SDK installation in new workspaces
 - [Service Specs](/guides/service-specs) - run AI-powered services as background daemons
