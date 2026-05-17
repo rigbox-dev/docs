@@ -308,8 +308,7 @@
           {
             "group": "Other",
             "pages": [
-              "api-reference/other/capacity",
-              "api-reference/other/images"
+              "api-reference/other/capacity"
             ]
           }
         ]

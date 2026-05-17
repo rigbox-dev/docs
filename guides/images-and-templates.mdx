@@ -46,25 +46,32 @@ All images are built on Debian 12 (Bookworm) and include Python 3.12 and Node.js
 
 ### Listing Available Images
 
+Images are not exposed as a standalone API. The set of images you can boot is implied by the templates the server publishes — every template's `image` field names the base image it uses. To see which images are currently available, list templates and read the `image` field:
+
 <CodeGroup>
 ```bash cURL
-curl -s https://api.rigbox.dev/api/v1/images \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+curl -s https://api.rigbox.dev/api/v1/templates \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq '[.templates[].image] | unique'
+```
+
+```bash CLI
+rig template ls
 ```
 
 ```python Python
 import requests
 
 response = requests.get(
-    "https://api.rigbox.dev/api/v1/images",
+    "https://api.rigbox.dev/api/v1/templates",
     headers={"Authorization": f"Bearer {api_key}"},
 )
-for image in response.json():
-    print(f"{image['name']:12} {image['size_mb']} MB")
+images = sorted({t["image"] for t in response.json()["templates"]})
+for image in images:
+    print(image)
 ```
 </CodeGroup>
 
-See [List Images](/api-reference/other/images) for the full response schema.
+See [List Templates](/api-reference/templates/list) for the full response schema.
 
 ## Templates
 
@@ -81,11 +88,18 @@ Templates are pre-configured workspace definitions that pair an image with sensi
 
 ### Listing Available Templates
 
-```bash
-rig templates
+<CodeGroup>
+```bash CLI
+rig template ls
 ```
 
-See [List Templates](/api-reference/templates/list) for the underlying HTTP shape.
+```bash cURL
+curl -s https://api.rigbox.dev/api/v1/templates \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```
+</CodeGroup>
+
+See [List Templates](/api-reference/templates/list) for the full response schema.
 
 ## Choosing the Right Image
 
