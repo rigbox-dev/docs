@@ -47,9 +47,8 @@ flowchart LR
 
 - Provider API keys never enter your VM - the proxy injects them at request time
 - Token usage is metered and deducted from your credit balance
-- Workspaces discover the proxy through `RIGBOX_AI_PROXY_URL=http://172.16.0.1:9090`
-- Provider SDK environment variables are opt-in; source `~/.rigbox/proxy.env` or run `eval "$(rig proxy on)"` inside the VM
-- The OpenAI-compatible gateway is available at `/v1`; provider-native routes remain available under `/google`, `/anthropic`, `/openai`, and `/brave` when that managed provider is configured
+- Workspaces export `OPENROUTER_BASE_URL=http://172.16.0.1:9090/v1` and `OPENROUTER_API_KEY` at login so SDKs and CLI tools work out of the box; `rig proxy on` is available for shells/tools that need provider-native compatibility exports
+- The proxy fronts an OpenRouter gateway: `/v1/chat/completions`, `/v1/embeddings`, and `/v1/models` for OpenAI-shape clients, plus `/v1/messages` for the native Anthropic shape used by Claude Code; `/brave` exposes Brave Search when configured
 
 See [Managed AI Proxy](/guides/managed-proxy) for usage details and [BYOK](/guides/byok) for using your own keys.
 

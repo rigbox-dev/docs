@@ -7,6 +7,10 @@ description: Use your own AI provider API keys instead of Rigbox-managed credits
 
 Bring Your Own Keys (BYOK) mode lets you use your own AI provider API keys with Rigbox workspaces. Your keys are stored securely and injected into the workspace runtime - you get unlimited usage billed directly by your provider, with no Rigbox credit limits.
 
+<Note>
+[Managed mode](/guides/managed-proxy) routes traffic through Rigbox's OpenRouter gateway and meters it against your credit balance. BYOK skips OpenRouter entirely and connects your workspace directly to the provider you specify, using the key you supply.
+</Note>
+
 ## When to Use BYOK
 
 BYOK is the right choice when:

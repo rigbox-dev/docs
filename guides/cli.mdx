@@ -23,7 +23,15 @@ Inside a workspace, `rig` automatically switches into workspace-scoped mode. You
 
 ### On your local machine
 
-Download the latest release for your platform:
+The simplest path is the one-line installer:
+
+```bash
+curl -fsSL https://rigbox.dev/install.sh | sh
+```
+
+This detects your OS and CPU, downloads the latest release, and installs both `rig` and `rigbox` (same binary) to `$HOME/.local/bin`. Override the install location with `RIG_INSTALL_DIR=/usr/local/bin` or pin a version with `RIG_VERSION=v0.3.4`.
+
+If you'd rather pull a specific binary directly:
 
 <CodeGroup>
 
@@ -155,6 +163,16 @@ rig logs <WORKSPACE_NAME_OR_ID> --follow
 
 Streams workspace system logs in real time. Press `Ctrl+C` to stop.
 
+### Get the SSH command
+
+```bash
+rig ssh-info my-project
+```
+
+Prints the canonical `ssh user@host` command for a workspace, plus the underlying user, region host, and status. Use `--format json` for scripting.
+
+The output uses region-direct routing (e.g. `eu-west-1.rigbox.dev`) — see the [SSH Access guide](/guides/ssh-access) for the full connection model.
+
 ### Delete a workspace
 
 ```bash
@@ -194,6 +212,8 @@ rig app new <APP_NAME> --port 3000
 ```
 
 This creates an app route that maps a public subdomain to the specified port inside your workspace. The app will be reachable at `<APP_NAME>.rigbox.dev`.
+
+Pass `--kind cli` for interactive tools you'll invoke over SSH rather than expose as a public service — CLI-shape apps have no port, no protocol, and no Caddy route. Defaults to `service`. The same field is available on the API as `app_kind: "service" | "cli"`; see [Catalog Apps](/guides/catalog#app-shapes) for the full Service-vs-CLI breakdown.
 
 ### Start, stop, and restart
 
@@ -261,6 +281,19 @@ This installs VS Code Server into your current workspace, making it accessible v
   The catalog includes popular tools like VS Code, Jupyter, and database clients. Run `rig catalog` to see the full list.
 </Tip>
 
+### Install an AI coding CLI
+
+The catalog also ships **CLI-shape recipes** for terminal-first coding agents — `claude`, `codex`, `opencode`, and `kilocode`. These install the binary into `$PATH` and route through the managed AI proxy; there is no port, subdomain, or systemd service:
+
+```bash
+rig catalog install claude
+ssh my-project-ctbxi8lb@eu-west-1.rigbox.dev
+# inside the workspace
+claude
+```
+
+See [Catalog Apps](/guides/catalog) for the full list of Service- and CLI-shape recipes and the differences between them.
+
 ---
 
 ## Tools
@@ -321,33 +354,34 @@ For more details on SSH access, including connecting to workspaces and using the
 
 ## AI Proxy
 
-The managed AI proxy lets you use supported AI providers through Rigbox's credit system without putting provider keys in your workspace.
+The managed AI proxy lets you use supported AI providers through Rigbox's credit system without putting provider keys in your workspace. See [Managed AI Proxy](/guides/managed-proxy) for the full architecture.
+
+### Default environment
+
+Managed workspaces export OpenRouter-shape variables to every login shell:
+
+```bash
+export OPENROUTER_BASE_URL='http://172.16.0.1:9090/v1'
+export OPENROUTER_API_KEY='managed-by-rigbox'   # opaque placeholder; real key never enters the VM
+```
+
+Most modern AI SDKs and CLIs read these directly. The catalog recipes for `claude`, `codex`, `opencode`, and `kilocode` each layer a `/etc/profile.d/*-routing.sh` shim on top that translates these into the provider-native env vars each agent prefers.
 
 ### Configure the current shell
 
-From inside a workspace VM:
+If you need provider-native exports for tools that don't read OpenRouter env vars (Gemini CLI, Aider, etc.), run:
 
 ```bash
 eval "$(rig proxy on)"
 ```
 
-This prints and applies SDK environment variables for the current shell:
-
-```bash
-export RIGBOX_AI_PROXY_URL='http://172.16.0.1:9090'
-export OPENAI_BASE_URL='http://172.16.0.1:9090/v1'
-export OPENAI_API_KEY='managed-by-rigbox'
-export GEMINI_BASE_URL='http://172.16.0.1:9090/google'
-export GOOGLE_API_KEY='managed-by-rigbox'
-```
-
-You can also source the generated env file directly:
+This prints compatibility `export` statements (`OPENAI_BASE_URL`, `ANTHROPIC_BASE_URL`, `GOOGLE_API_KEY`, …) wired to the same proxy. You can also source the generated env file directly:
 
 ```bash
 source ~/.rigbox/proxy.env
 ```
 
-Provider SDK variables are opt-in. Rigbox does not globally export `OPENAI_BASE_URL`, `ANTHROPIC_BASE_URL`, or `GEMINI_BASE_URL` for every shell session, because that can hijack other tools that you authenticate separately.
+These compatibility variables are opt-in to avoid hijacking tools you authenticate separately.
 
 ### Deactivate the proxy
 
