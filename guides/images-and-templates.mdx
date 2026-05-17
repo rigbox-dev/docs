@@ -81,23 +81,11 @@ Templates are pre-configured workspace definitions that pair an image with sensi
 
 ### Listing Available Templates
 
-<CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/templates \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```bash
+rig templates
 ```
 
-```python Python
-response = requests.get(
-    "https://api.rigbox.dev/api/v1/templates",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-for tmpl in response.json():
-    print(f"{tmpl['id']:20} image={tmpl['image']:10} ram={tmpl['ram_mb']}MB")
-```
-</CodeGroup>
-
-See [List Templates](/api-reference/templates/list) for the full response schema.
+See [List Templates](/api-reference/templates/list) for the underlying HTTP shape.
 
 ## Choosing the Right Image
 
@@ -126,91 +114,37 @@ You can always install additional packages inside any workspace with `apt-get`. 
 
 ## Quick Deploy with a Template
 
-The fastest way to create a workspace is quick deploy with a template ID.
+The fastest way to create a workspace is `rig spawn` with a template ID:
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "template_id": "dev"
-  }'
+```bash
+rig spawn my-project --template dev
 ```
 
-```python Python
-import requests
-
-response = requests.post(
-    "https://api.rigbox.dev/api/v1/quick-deploy",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={"template_id": "dev"},
-)
-workspace = response.json()
-print(f"Workspace ID: {workspace['id']}")
-print(f"Status: {workspace['status']}")
-```
-</CodeGroup>
-
-Quick deploy creates the workspace and starts it in a single call. Poll the workspace status until it's `running`.
-
-See [Quick Deploy](/api-reference/templates/quick-deploy) for the full request/response schema.
+`rig spawn` creates the workspace, boots it, and waits until it's ready — all in one call. See [Quick Deploy](/api-reference/templates/quick-deploy) for the API form.
 
 ## Custom Workspace with a Specific Image
 
 If the template defaults don't fit your needs, create a workspace manually and specify the image along with custom resource settings.
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "heavy-compute",
-    "image": "dev",
-    "ram_mb": 2048,
-    "disk_size_mb": 8192,
-    "vcpu_count": 2
-  }'
+```bash
+rig new heavy-compute --image dev --ram 2048 --vcpu 2 --disk 8192
 ```
 
-```python Python
-response = requests.post(
-    "https://api.rigbox.dev/api/v1/workspaces",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={
-        "name": "heavy-compute",
-        "image": "dev",
-        "ram_mb": 2048,
-        "disk_size_mb": 8192,
-        "vcpu_count": 2,
-    },
-)
-workspace = response.json()
-print(f"Created: {workspace['id']} with image={workspace['image']}")
-```
-</CodeGroup>
-
-See [Create Workspace](/api-reference/workspaces/create) for the full request/response schema.
+See [Create Workspace](/api-reference/workspaces/create) for the API form.
 
 ## Resizing After Creation
 
 You can change the RAM, vCPU, and disk size of an existing workspace without switching images. The workspace must be stopped first.
 
 ```bash
-# Stop the workspace
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/stop \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+rig stop my-project
 
-# Resize
 curl -X PUT https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/resources \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"ram_mb": 2048, "vcpu_count": 2}'
 
-# Restart
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/start \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+rig start my-project
 ```
 
 <Warning>

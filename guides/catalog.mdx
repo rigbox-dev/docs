@@ -3,7 +3,7 @@ title: Catalog Apps
 description: Install pre-packaged apps like VS Code, Jupyter, and Streamlit in one call.
 ---
 
-The Rigbox app catalog provides curated, pre-packaged applications that you can install into any workspace with a single API call. Each catalog app is configured with the correct port, subdomain, and systemd service - no manual setup required.
+The Rigbox app catalog provides curated, pre-packaged applications that you can install into any workspace with a single CLI command. Each catalog app is configured with the correct port, subdomain, and systemd service — no manual setup required.
 
 ## How It Works
 
@@ -31,27 +31,13 @@ User-created apps (those you `POST` to [`/apps`](/api-reference/apps/create) dir
 
 ## Available Apps
 
-Browse the catalog to see what's available.
+List the catalog from any workspace or from your local machine:
 
-<CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/app-catalog \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```bash
+rig catalog
 ```
 
-```python Python
-import requests
-
-response = requests.get(
-    "https://api.rigbox.dev/api/v1/app-catalog",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-for app in response.json():
-    print(f"{app['id']:16} port={app['port']:5} - {app['description']}")
-```
-</CodeGroup>
-
-See [List Catalog Apps](/api-reference/app-catalog/list) for the full response schema.
+See [List Catalog Apps](/api-reference/app-catalog/list) for the underlying HTTP shape.
 
 ### Service-shape Catalog Reference
 
@@ -84,13 +70,10 @@ These recipes install an interactive AI coding agent into the workspace's `$PATH
 Install one of them the same way as a Service-shape app:
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"catalog_id": "claude"}'
+rig catalog install claude --workspace <WORKSPACE_NAME>
 ```
 
-Then SSH in and run the agent — `rig ssh-info <workspace>` will print the right `ssh` command.
+Inside a workspace VM, drop the `--workspace` flag — `rig` infers it from the ambient identity. Then SSH in and run the agent — `rig ssh-info <workspace>` will print the right `ssh` command.
 
 <Note>
 CLI-shape recipes don't appear in the [Start App](/api-reference/apps/start) / [Stop App](/api-reference/apps/stop) / visibility endpoints — there's no daemon to control. To uninstall, delete the app row; the catalog's cleanup paths (e.g. `/etc/profile.d/codex-routing.sh`) are removed automatically.
@@ -98,65 +81,19 @@ CLI-shape recipes don't appear in the [Start App](/api-reference/apps/start) / [
 
 ## Installing a Catalog App
 
-Install an app by sending the catalog ID. The endpoint returns a job ID you can use to track installation progress.
+Install an app by its catalog ID:
 
-### Start the installation
-
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "catalog_id": "vscode"
-  }'
+```bash
+rig catalog install vscode --workspace <WORKSPACE_NAME>
 ```
 
-```python Python
-response = requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/install-app",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={"catalog_id": "vscode"},
-)
-result = response.json()
-job_id = result["job_id"]
-print(f"Installation started - job: {job_id}")
-```
-</CodeGroup>
+`rig catalog install` blocks until the install job completes and returns the app's name and URL when it's done. From inside a workspace VM, omit `--workspace`.
 
-See [Install Catalog App](/api-reference/app-catalog/install) for the full request/response schema.
-
-### Track installation progress
-
-Poll the job endpoint to check progress.
-
-<CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/jobs/$JOB_ID \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
-```
-
-```python Python
-import time
-
-while True:
-    resp = requests.get(
-        f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/jobs/{job_id}",
-        headers={"Authorization": f"Bearer {api_key}"},
-    )
-    job = resp.json()
-    print(f"Status: {job['status']} - {job.get('message', '')}")
-    if job["status"] in ("completed", "failed"):
-        break
-    time.sleep(3)
-```
-</CodeGroup>
-
-See [Get Job Status](/api-reference/app-catalog/job-status) for the response schema.
+For programmatic installs that need to fire-and-forget or track the job ID separately, use [Install Catalog App](/api-reference/app-catalog/install) and [Get Job Status](/api-reference/app-catalog/job-status) directly.
 
 ### Access the installed app
 
-Once completed, the app is running and accessible at its subdomain URL.
+Once installed, a Service-shape app is running and accessible at its subdomain URL. CLI-shape apps are invoked over SSH (see [App shapes](#app-shapes) above).
 
 
 ## Managing Installed Apps
@@ -165,28 +102,17 @@ After installation, catalog apps behave like any other app. Use the standard app
 
 ### Start and Stop
 
-<CodeGroup>
-```bash cURL (stop)
-curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/stop \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```bash
+rig app start <APP_NAME>
+rig app stop <APP_NAME>
+rig app restart <APP_NAME>
 ```
 
-```bash cURL (start)
-curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/start \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
-```
-
-```bash cURL (restart)
-curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/restart \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
-```
-</CodeGroup>
-
-See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop), and [Restart App](/api-reference/apps/restart) for details.
+See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop), and [Restart App](/api-reference/apps/restart) for the API form.
 
 ### Change Visibility
 
-Catalog apps are private by default. Make them public or share with specific people.
+Catalog apps are private by default. Visibility is managed through the API:
 
 ```bash
 curl -X PUT https://api.rigbox.dev/api/v1/apps/$APP_ID/visibility \
@@ -195,18 +121,17 @@ curl -X PUT https://api.rigbox.dev/api/v1/apps/$APP_ID/visibility \
   -d '{"visibility": "public"}'
 ```
 
-See [App Visibility](/guides/visibility) for all visibility options.
+See [App Visibility](/guides/visibility) for the full set of options and [Update App Visibility](/api-reference/apps/update-visibility) for the API reference.
 
 ### Delete
 
-Deleting an installed app removes both the route and the systemd service inside the workspace.
+Deleting an installed app removes both the route and the systemd service inside the workspace:
 
 ```bash
-curl -X DELETE https://api.rigbox.dev/api/v1/apps/$APP_ID \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+rig app rm <APP_NAME>
 ```
 
-See [Delete App](/api-reference/apps/delete) for details.
+See [Delete App](/api-reference/apps/delete) for the API form.
 
 ## App Details
 
@@ -215,10 +140,7 @@ See [Delete App](/api-reference/apps/delete) for details.
 A full browser-based VS Code instance with extension support, integrated terminal, and file editing. Runs [code-server](https://github.com/coder/code-server).
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"catalog_id": "vscode"}'
+rig catalog install vscode --workspace <WORKSPACE_NAME>
 ```
 
 <Tip>
@@ -230,10 +152,7 @@ VS Code Server supports installing extensions from the Open VSX registry. Search
 Interactive notebooks for Python, Julia, R, and more. Supports inline visualizations, markdown cells, and kernel management.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"catalog_id": "jupyter"}'
+rig catalog install jupyter --workspace <WORKSPACE_NAME>
 ```
 
 ### Marimo
@@ -241,10 +160,7 @@ curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app 
 Reactive Python notebooks where cells automatically re-execute when dependencies change. An alternative to Jupyter with a focus on reproducibility.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"catalog_id": "marimo"}'
+rig catalog install marimo --workspace <WORKSPACE_NAME>
 ```
 
 ### Streamlit
@@ -252,10 +168,7 @@ curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app 
 Build interactive data dashboards and web apps in Python. Write a Python script and Streamlit renders it as a web application.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"catalog_id": "streamlit"}'
+rig catalog install streamlit --workspace <WORKSPACE_NAME>
 ```
 
 ### File Browser
@@ -263,10 +176,7 @@ curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app 
 A web-based file manager with drag-and-drop upload, download, and file editing. Useful for managing files inside the workspace without SSH.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"catalog_id": "filebrowser"}'
+rig catalog install filebrowser --workspace <WORKSPACE_NAME>
 ```
 
 ### Excalidraw
@@ -274,10 +184,7 @@ curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app 
 A collaborative whiteboard for sketching diagrams, wireframes, and architecture drawings. Runs locally inside the workspace - no external dependencies.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"catalog_id": "excalidraw"}'
+rig catalog install excalidraw --workspace <WORKSPACE_NAME>
 ```
 
 ### PGWeb
@@ -285,10 +192,7 @@ curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app 
 A web-based PostgreSQL client with a query editor, table browser, and export functionality. Useful for inspecting databases running inside the workspace.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"catalog_id": "pgweb"}'
+rig catalog install pgweb --workspace <WORKSPACE_NAME>
 ```
 
 ### Chat Starter
@@ -296,10 +200,7 @@ curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app 
 A minimal chat UI template with OpenAI API integration. Use it as a starting point for building conversational AI applications.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/install-app \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"catalog_id": "chat"}'
+rig catalog install chat --workspace <WORKSPACE_NAME>
 ```
 
 <Warning>
@@ -327,50 +228,14 @@ The `base` image has pre-warmed npm caches for Jupyter, Marimo, Streamlit, and E
 
 ## Complete Example: Install VS Code and Jupyter
 
-This walkthrough installs both VS Code and Jupyter Lab into a single workspace.
+Install both into the same workspace:
 
-```python
-import requests
-import time
-
-API_URL = "https://api.rigbox.dev/api/v1"
-HEADERS = {"Authorization": f"Bearer {api_key}"}
-
-workspace_id = "your-workspace-id"
-
-# Install VS Code
-vscode_result = requests.post(
-    f"{API_URL}/workspaces/{workspace_id}/install-app",
-    headers=HEADERS,
-    json={"catalog_id": "vscode"},
-).json()
-print(f"VS Code install started - job: {vscode_result['job_id']}")
-
-# Install Jupyter
-jupyter_result = requests.post(
-    f"{API_URL}/workspaces/{workspace_id}/install-app",
-    headers=HEADERS,
-    json={"catalog_id": "jupyter"},
-).json()
-print(f"Jupyter install started - job: {jupyter_result['job_id']}")
-
-# Wait for both to complete
-for name, job_id in [("VS Code", vscode_result["job_id"]), ("Jupyter", jupyter_result["job_id"])]:
-    while True:
-        job = requests.get(
-            f"{API_URL}/workspaces/{workspace_id}/jobs/{job_id}",
-            headers=HEADERS,
-        ).json()
-        if job["status"] == "completed":
-            print(f"{name} installed successfully")
-            break
-        elif job["status"] == "failed":
-            print(f"{name} installation failed: {job.get('message', '')}")
-            break
-        time.sleep(3)
-
-print("Both apps installed and accessible at their subdomain URLs.")
+```bash
+rig catalog install vscode --workspace my-project
+rig catalog install jupyter --workspace my-project
 ```
+
+Each command blocks until the install completes and prints the app's URL. After both finish, the apps are accessible at `https://my-project-vscode.rigbox.dev` and `https://my-project-jupyter.rigbox.dev`.
 
 ## Next Steps
 

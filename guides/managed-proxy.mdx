@@ -133,24 +133,13 @@ eval "$(rig proxy off)"
 
 ## Check Your Credit Balance
 
-Query your remaining credits at any time.
+The fastest path is the CLI:
 
-<CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/users/me/credits \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+```bash
+rig status
 ```
 
-```json Response
-{
-  "remaining": 1800,
-  "total": 2000,
-  "mode": "managed"
-}
-```
-</CodeGroup>
-
-See the [Credits API reference](/api-reference/ai/get-credits) for full response schema.
+`rig status` prints your remaining credits, monthly total, current mode, and active workspaces. For programmatic access, see the [Credits API reference](/api-reference/ai/get-credits).
 
 ## View Usage Breakdown
 

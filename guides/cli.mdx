@@ -23,34 +23,30 @@ Inside a workspace, `rig` automatically switches into workspace-scoped mode. You
 
 ### On your local machine
 
-The simplest path is the one-line installer:
+Install with one command:
 
 ```bash
-curl -fsSL https://rigbox.dev/install.sh | sh
+curl -fsSL https://rigbox.dev/install.sh | bash
 ```
 
-This detects your OS and CPU, downloads the latest release, and installs both `rig` and `rigbox` (same binary) to `$HOME/.local/bin`. Override the install location with `RIG_INSTALL_DIR=/usr/local/bin` or pin a version with `RIG_VERSION=v0.3.4`.
+The installer detects your OS and CPU, downloads the latest release, and installs both `rig` and `rigbox` (same binary) to `$HOME/.local/bin`. Two optional environment variables tune behaviour:
 
-If you'd rather pull a specific binary directly:
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `RIG_INSTALL_DIR` | Install location for the binary. | `$HOME/.local/bin` |
+| `RIG_VERSION` | Pin to a specific release tag instead of `latest`. | `latest` |
 
-<CodeGroup>
-
-```bash macOS (Apple Silicon)
-curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rigbox-darwin-arm64 -o /usr/local/bin/rig
-chmod +x /usr/local/bin/rig
+```bash
+# Install to /usr/local/bin and pin a version
+RIG_INSTALL_DIR=/usr/local/bin RIG_VERSION=v0.3.4 \
+  bash -c "curl -fsSL https://rigbox.dev/install.sh | bash"
 ```
 
-```bash macOS (Intel)
-curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rigbox-darwin-amd64 -o /usr/local/bin/rig
-chmod +x /usr/local/bin/rig
-```
+Confirm the install with:
 
-```bash Linux (x86_64)
-curl -fsSL https://github.com/rigbox-dev/cli/releases/latest/download/rigbox-linux-amd64 -o /usr/local/bin/rig
-chmod +x /usr/local/bin/rig
+```bash
+rig --version
 ```
-
-</CodeGroup>
 
 ---
 
