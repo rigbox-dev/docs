@@ -38,9 +38,13 @@ The installer detects your OS and CPU, downloads the latest release, and install
 
 ```bash
 # Install to /usr/local/bin and pin a version
-RIG_INSTALL_DIR=/usr/local/bin RIG_VERSION=v0.6.11 \
-  bash -c "curl -fsSL https://rigbox.dev/install.sh | bash"
+curl -fsSL https://rigbox.dev/install.sh | \
+  RIG_INSTALL_DIR=/usr/local/bin RIG_VERSION=v0.6.11 bash
 ```
+
+<Note>
+The env vars must sit on the `bash` that runs the script — not on the `curl`. With a pipeline, prefixed variables only apply to the command they precede, so `RIG_VERSION=… curl … | bash` would set them on `curl` and the installer would still see the defaults.
+</Note>
 
 Confirm the install with:
 
