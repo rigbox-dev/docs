@@ -97,7 +97,7 @@ The output should show `workspace_ip` or equivalent bridge identity as the auth 
 Workspaces are isolated micro-VMs where your code runs. On your local machine, the CLI provides full lifecycle management across your account.
 
 <Note>
-  Workspace lifecycle commands such as `rig ls`, `rig new`, `rig spawn`, `rig start`, `rig stop`, `rig restart`, and `rig rm` are external-mode commands. Inside a workspace VM, `rig` is scoped to the current workspace and these account-wide commands are not shown in `rig -h`.
+  Workspace lifecycle commands such as `rig workspace ls`, `rig workspace new`, `rig workspace spawn`, `rig workspace start`, `rig workspace stop`, `rig workspace restart`, and `rig workspace rm` are external-mode commands. Inside a workspace VM, `rig` is scoped to the current workspace and these account-wide commands are not shown in `rig -h`.
 </Note>
 
 <Note>
@@ -107,7 +107,7 @@ Workspaces are isolated micro-VMs where your code runs. On your local machine, t
 ### List workspaces
 
 ```bash
-rig ls
+rig workspace ls
 ```
 
 Output:
@@ -122,29 +122,31 @@ ml-notebook   running   dev      1 day ago
 ### Create a workspace
 
 ```bash
-rig new <WORKSPACE_NAME> --image dev
+rig workspace new --name <WORKSPACE_NAME> --template dev
 ```
 
-This creates a workspace but does not start it. Available images include `base` (minimal) and `dev` (includes development tools, sidecar, and more).
+This creates a workspace but does not start it. Available templates include `base` (minimal) and `dev` (includes development tools, sidecar, and more). `--image` is still accepted as a deprecated alias for template lookup.
 
 ### Create and start in one command
 
 ```bash
-rig spawn <WORKSPACE_NAME>
+rig workspace spawn --name <WORKSPACE_NAME>
 ```
 
 <Tip>
-  Use `rig spawn` for the fastest path from zero to a running workspace. It creates the workspace, starts the VM, and waits until it is ready - all in one command.
+  Use `rig workspace spawn` for the fastest path from zero to a running workspace. It creates the workspace, starts the VM, and waits until it is ready - all in one command.
 </Tip>
 
 ### Start and stop
 
-`rig start`, `rig stop`, `rig restart`, `rig logs`, and `rig rm` accept either a workspace name or a workspace ID (`ws-...`). The placeholder `<WORKSPACE_NAME_OR_ID>` reflects that you can paste either.
+`rig workspace start`, `rig workspace stop`, `rig workspace restart`, `rig workspace logs`, and `rig workspace rm` accept either a workspace name or a workspace ID (`ws-...`). The placeholder `<WORKSPACE_NAME_OR_ID>` reflects that you can paste either.
 
 ```bash
-rig start <WORKSPACE_NAME_OR_ID>     # Boot the VM
-rig stop <WORKSPACE_NAME_OR_ID>      # Shut down the VM (preserves disk)
+rig workspace start --name <WORKSPACE_NAME_OR_ID>     # Boot the VM
+rig workspace stop --name <WORKSPACE_NAME_OR_ID>      # Shut down the VM (preserves disk)
 ```
+
+Add `--wait-for-apps` to `rig workspace start` when you also want the command to wait for workspace apps to report active.
 
 ### Check status
 
@@ -157,7 +159,7 @@ This shows a dashboard with your account quota, resource usage across all worksp
 ### Stream logs
 
 ```bash
-rig logs <WORKSPACE_NAME_OR_ID> --follow
+rig workspace logs --name <WORKSPACE_NAME_OR_ID> --follow
 ```
 
 Streams workspace system logs in real time. Press `Ctrl+C` to stop.
@@ -165,7 +167,7 @@ Streams workspace system logs in real time. Press `Ctrl+C` to stop.
 ### Get the SSH command
 
 ```bash
-rig ssh-info my-project
+rig workspace ssh-info --name my-project
 ```
 
 Prints the canonical `ssh user@host` command for a workspace, plus the underlying user, region host, and status. Use `--format json` for scripting.
@@ -175,7 +177,7 @@ The output uses region-direct routing (e.g. `eu-west-1.rigbox.dev`) — see the 
 ### Delete a workspace
 
 ```bash
-rig rm <WORKSPACE_NAME_OR_ID>
+rig workspace rm --name <WORKSPACE_NAME_OR_ID>
 ```
 
 <Warning>
@@ -423,8 +425,8 @@ Shown in VM mode:
 Hidden in VM mode:
 
 - `rig login` and `rig logout`
-- `rig ls`, `rig new`, `rig spawn`, `rig start`, `rig stop`, `rig restart`, and `rig rm`
-- `rig template`, `rig catalog`, `rig tool`, and `rig ssh-key`
+- `rig workspace ls`, `rig workspace new`, `rig workspace spawn`, `rig workspace start`, `rig workspace stop`, `rig workspace restart`, and `rig workspace rm`
+- `rig template`, `rig catalog`, `rig tools`, and `rig ssh`
 
 Those commands remain available from your local machine after `rig login`.
 

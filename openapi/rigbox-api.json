@@ -5640,6 +5640,113 @@
           }
         }
       },
+      "ApiApp": {
+        "type": "object",
+        "description": "OpenAPI-facing mirror of the canonical app payload.\n\nResponse types can keep serializing `rig_data_store::models::App` while\npointing schema generation at this local mirror to avoid cross-crate derive\ncoupling in `utoipa`.",
+        "required": [
+          "id",
+          "name",
+          "subdomain",
+          "user_id",
+          "node_id",
+          "workspace_id",
+          "port",
+          "visibility",
+          "allowed_emails",
+          "status",
+          "metadata",
+          "system_tags",
+          "protocol",
+          "app_kind",
+          "managed",
+          "depends_on",
+          "custom_domain_verified",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "allowed_emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "app_kind": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "custom_domain": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "custom_domain_verified": {
+            "type": "boolean"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "managed": {
+            "type": "boolean"
+          },
+          "metadata": {},
+          "name": {
+            "type": "string"
+          },
+          "node_id": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AppStatus"
+          },
+          "subdomain": {
+            "type": "string"
+          },
+          "system_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/Visibility"
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
       "ApiErrorBody": {
         "type": "object",
         "description": "JSON body returned for all errors.",
@@ -5690,6 +5797,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "app_kind": {
+            "type": "string"
           },
           "created_at": {
             "type": "string",
@@ -6160,6 +6270,13 @@
             "format": "double"
           }
         }
+      },
+      "AppView": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiApp"
+          }
+        ]
       },
       "CatalogResponse": {
         "type": "object",
@@ -6837,6 +6954,13 @@
           }
         }
       },
+      "CreateAppKind": {
+        "type": "string",
+        "enum": [
+          "service",
+          "cli"
+        ]
+      },
       "CreateAppLogSourceRequest": {
         "type": "object",
         "required": [
@@ -6871,6 +6995,9 @@
           "workspace_id"
         ],
         "properties": {
+          "app_kind": {
+            "$ref": "#/components/schemas/CreateAppKind"
+          },
           "description": {
             "type": [
               "string",
@@ -6882,7 +7009,10 @@
             "type": "string"
           },
           "port": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "format": "int32",
             "minimum": 0
           },
@@ -7046,6 +7176,12 @@
             "items": {
               "type": "string"
             }
+          },
+          "template_id": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "vcpu_count": {
             "type": [
@@ -7265,7 +7401,6 @@
           "category",
           "resources",
           "app_kind",
-          "exposure",
           "configurable_params",
           "credentials_declared",
           "warnings"
@@ -7311,8 +7446,15 @@
             "type": "string"
           },
           "exposure": {
-            "$ref": "#/components/schemas/DeployExposure",
-            "description": "Daemon-shape exposure fields. For `app_kind: \"cli\"`, port is 0 and\nthe strings are empty \u2014 the UI should render a CLI-shaped affordance\ninstead of a `protocol://port` endpoint pill."
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/DeployExposure",
+                "description": "Daemon-shape exposure fields. Present only when `app_kind` is\n`\"service\"`. Omitted entirely for `\"cli\"` items \u2014 the UI should\nrender a CLI-shaped affordance with no port/protocol pill."
+              }
+            ]
           },
           "icon": {
             "type": "string"
@@ -7880,7 +8022,7 @@
         ],
         "properties": {
           "app": {
-            "$ref": "#/components/schemas/App"
+            "$ref": "#/components/schemas/AppView"
           }
         }
       },
@@ -7899,7 +8041,7 @@
           "apps": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/App"
+              "$ref": "#/components/schemas/AppView"
             }
           },
           "limits": {
@@ -8073,7 +8215,7 @@
         ],
         "properties": {
           "app": {
-            "$ref": "#/components/schemas/App"
+            "$ref": "#/components/schemas/AppView"
           },
           "credentials": {
             "type": [
@@ -8678,7 +8820,7 @@
           "apps": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/App"
+              "$ref": "#/components/schemas/AppView"
             }
           }
         }
@@ -9258,13 +9400,13 @@
           "created": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/App"
+              "$ref": "#/components/schemas/AppView"
             }
           },
           "existing": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/App"
+              "$ref": "#/components/schemas/AppView"
             }
           },
           "install_jobs": {
@@ -9372,7 +9514,7 @@
         ],
         "properties": {
           "app": {
-            "$ref": "#/components/schemas/App"
+            "$ref": "#/components/schemas/AppView"
           },
           "message": {
             "type": "string"

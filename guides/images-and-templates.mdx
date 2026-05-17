@@ -75,7 +75,7 @@ See [List Templates](/api-reference/templates/list) for the full response schema
 
 ## Templates
 
-Templates are pre-configured workspace definitions that pair an image with sensible resource defaults. Use them with [quick deploy](/api-reference/templates/quick-deploy) for one-call workspace creation.
+Templates are pre-configured workspace definitions that pair an image with sensible resource defaults. Use them with [quick deploy](/api-reference/templates/quick-deploy) for one-call workspace creation. Requests below a template's RAM, vCPU, or disk floor are raised before the workspace is created or started.
 
 | Template | Image | RAM | vCPU | Disk | Use case |
 |----------|-------|-----|------|------|----------|
@@ -128,20 +128,20 @@ You can always install additional packages inside any workspace with `apt-get`. 
 
 ## Quick Deploy with a Template
 
-The fastest way to create a workspace is `rig spawn` with a template ID:
+The fastest way to create a workspace is `rig workspace spawn` with a template ID:
 
 ```bash
-rig spawn my-project --template dev
+rig workspace spawn --name my-project --template dev
 ```
 
-`rig spawn` creates the workspace, boots it, and waits until it's ready — all in one call. See [Quick Deploy](/api-reference/templates/quick-deploy) for the API form.
+`rig workspace spawn` creates the workspace, boots it, and waits until it's ready - all in one call. See [Quick Deploy](/api-reference/templates/quick-deploy) for the API form.
 
-## Custom Workspace with a Specific Image
+## Custom Workspace with a Specific Template
 
-If the template defaults don't fit your needs, create a workspace manually and specify the image along with custom resource settings.
+If the template defaults don't fit your needs, create a workspace manually and specify the template along with custom resource settings.
 
 ```bash
-rig new heavy-compute --image dev --ram 2048 --vcpu 2 --disk 8192
+rig workspace new --name heavy-compute --template dev --ram 2048 --vcpu 2 --disk 8192
 ```
 
 See [Create Workspace](/api-reference/workspaces/create) for the API form.
@@ -151,18 +151,18 @@ See [Create Workspace](/api-reference/workspaces/create) for the API form.
 You can change the RAM, vCPU, and disk size of an existing workspace without switching images. The workspace must be stopped first.
 
 ```bash
-rig stop my-project
+rig workspace stop --name my-project
 
 curl -X PUT https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/resources \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"ram_mb": 2048, "vcpu_count": 2}'
 
-rig start my-project
+rig workspace start --name my-project
 ```
 
 <Warning>
-You cannot change the image of an existing workspace. To switch images, create a new workspace with the desired image.
+You cannot change the image of an existing workspace. `--image` remains available as a deprecated CLI alias for template lookup, but new workspace flows should use `--template`.
 </Warning>
 
 See [Update Workspace Resources](/api-reference/workspaces/update-resources) for details.

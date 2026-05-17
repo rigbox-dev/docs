@@ -4,4 +4,4 @@ openapi: POST /api/v1/workspaces
 description: Provision a new micro-VM workspace with custom resources.
 ---
 
-The workspace starts in `provisioned` status. Call [Start Workspace](/api-reference/workspaces/start) to boot it.
+The workspace starts in `provisioned` status. Pass `template_id` to create it from a template; requested RAM, vCPU, and disk values below the template/catalog floor are raised before the workspace is stored. Call [Start Workspace](/api-reference/workspaces/start) to boot it.

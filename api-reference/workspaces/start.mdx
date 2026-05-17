@@ -3,3 +3,5 @@ title: Start Workspace
 openapi: POST /api/v1/workspaces/{id}/start
 description: Boot a provisioned or stopped workspace.
 ---
+
+If a stopped workspace is below its template/catalog resource floor, Rigbox raises the stored RAM, vCPU, and disk values before booting. If the account cannot fit the raised resources, the start request fails before the VM is started.

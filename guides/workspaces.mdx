@@ -40,10 +40,10 @@ A stopped workspace retains its disk contents. You can restart it at any time wi
 Use the [Rigbox CLI](/guides/cli) to create a workspace. Replace `<WORKSPACE_NAME>` with a name of your choice (for example, `my-project`):
 
 ```bash
-rig new <WORKSPACE_NAME> --image base --ram 512 --vcpu 1 --disk 3072
+rig workspace new --name <WORKSPACE_NAME> --template base --ram 512 --vcpu 1 --disk 3072
 ```
 
-The flags are optional — leave them off to take the account defaults. `rig new` prints the new workspace's ID, status, and connection info on stdout.
+The flags are optional - leave them off to use the `base` template. If requested resources are below the template or catalog floor, Rigbox raises them before creating the workspace. `rig workspace new` prints the new workspace's ID, status, and connection info on stdout.
 
 For the underlying HTTP shape, see [Create Workspace](/api-reference/workspaces/create) in the API reference.
 
@@ -52,20 +52,20 @@ For the underlying HTTP shape, see [Create Workspace](/api-reference/workspaces/
 If you don't need custom sizing, deploy from a pre-configured template in one command:
 
 ```bash
-rig spawn <WORKSPACE_NAME> --template dev
+rig workspace spawn --name <WORKSPACE_NAME> --template dev
 ```
 
-`rig spawn` creates the workspace, starts it, and waits until it's ready — all in one call. See [Images & Templates](/guides/images-and-templates) for the list of templates, or [Quick Deploy](/api-reference/templates/quick-deploy) for the API.
+`rig workspace spawn` creates the workspace, starts it, and waits until it's ready - all in one call. See [Images & Templates](/guides/images-and-templates) for the list of templates, or [Quick Deploy](/api-reference/templates/quick-deploy) for the API.
 
 ## Starting a Workspace
 
 Boot a previously-stopped workspace and wait for it to become `running`:
 
 ```bash
-rig start <WORKSPACE_NAME_OR_ID>
+rig workspace start --name <WORKSPACE_NAME_OR_ID>
 ```
 
-`rig start` polls the workspace status internally and returns once the VM is up. For scripting, `rig status <NAME>` prints the current state. See [Start Workspace](/api-reference/workspaces/start) for the API form.
+`rig workspace start` polls the workspace status internally and returns once the VM is up. If a stopped workspace is below its template or catalog resource floor, Rigbox raises the stored resources before booting. Add `--wait-for-apps` to wait for workspace apps to report active before the command returns. For scripting, `rig workspace ls` prints the current state. See [Start Workspace](/api-reference/workspaces/start) for the API form.
 
 ### Workspace is ready
 
@@ -76,7 +76,7 @@ Once `running`, you can SSH in, expose ports, install catalog apps, and more.
 Stopping a workspace shuts down the VM but preserves the disk. You can restart it later.
 
 ```bash
-rig stop <WORKSPACE_NAME_OR_ID>
+rig workspace stop --name <WORKSPACE_NAME_OR_ID>
 ```
 
 <Tip>
@@ -186,8 +186,8 @@ See [Get Metrics](/api-reference/workspaces/get-metrics) for the full response s
 Tail recent workspace system logs or follow them in real time:
 
 ```bash
-rig logs <WORKSPACE_NAME_OR_ID>          # recent logs
-rig logs <WORKSPACE_NAME_OR_ID> --follow # live stream
+rig workspace logs --name <WORKSPACE_NAME_OR_ID>          # recent logs
+rig workspace logs --name <WORKSPACE_NAME_OR_ID> --follow # live stream
 ```
 
 For programmatic access (e.g.&nbsp;ingesting log lines into another system), see [Get Logs](/api-reference/workspaces/get-logs) and [Stream Logs](/api-reference/workspaces/stream-logs) — `/logs/stream` returns Server-Sent Events.
@@ -199,23 +199,23 @@ Deleting a workspace is **irreversible**. All files, installed packages, and con
 </Warning>
 
 ```bash
-rig rm <WORKSPACE_NAME_OR_ID>
+rig workspace rm --name <WORKSPACE_NAME_OR_ID>
 ```
 
 See [Delete Workspace](/api-reference/workspaces/delete) for the API form.
 
 ## Complete Example: Spawn a Workspace
 
-End-to-end with a single command — `rig spawn` creates the workspace, boots it, and waits until it's ready:
+End-to-end with a single command - `rig workspace spawn` creates the workspace, boots it, and waits until it's ready:
 
 ```bash
-rig spawn demo-workspace --image base --ram 512 --vcpu 1 --disk 3072
+rig workspace spawn --name demo-workspace --template base --ram 512 --vcpu 1 --disk 3072
 ```
 
 When it returns, the workspace is running and SSH-reachable. Get the connection string with:
 
 ```bash
-rig ssh-info demo-workspace
+rig workspace ssh-info --name demo-workspace
 ```
 
 ## Next Steps
