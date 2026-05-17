@@ -179,18 +179,13 @@ pip install aider-chat
 
 ## Monitor Credit Usage
 
-AI coding tools can consume credits quickly - especially agentic tools that make many API calls in a loop. Monitor your balance:
-
-```bash
-curl -s https://api.rigbox.dev/api/v1/users/me/credits \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
-```
-
-Or from inside the workspace:
+AI coding tools can consume credits quickly — especially agentic tools that make many API calls in a loop. Monitor your balance:
 
 ```bash
 rig status
 ```
+
+For programmatic access (e.g.&nbsp;polling from a CI job), see [Get Credits](/api-reference/ai/get-credits).
 
 <Warning>
 Agentic tools like Claude Code and Codex can make dozens of API calls per task. A single complex refactoring session might use 50-200 credits depending on the model and codebase size. Monitor your balance if you're on the free tier.

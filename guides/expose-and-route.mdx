@@ -50,36 +50,15 @@ See [List Listening Ports](/api-reference/apps/listening-ports) for the full res
 
 ## Create an App Manually
 
-If you know the port and want full control over the app name, create it directly. Replace `<APP_NAME>` with a name of your choice - it will become the public subdomain.
+If you know the port and want full control over the app name, create it directly. Replace `<APP_NAME>` with a name of your choice — it will become the public subdomain.
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/apps \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "workspace_id": "'$WORKSPACE_ID'",
-    "name": "<APP_NAME>",
-    "port": 8080
-  }'
+```bash
+rig app new <APP_NAME> --port 8080
 ```
 
-```python Python
-response = requests.post(
-    "https://api.rigbox.dev/api/v1/apps",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={
-        "workspace_id": workspace_id,
-        "name": "<APP_NAME>",
-        "port": 8080,
-    },
-)
-app = response.json()
-print(f"App URL: https://{app['name']}.rigbox.dev")
-```
-</CodeGroup>
+From outside the workspace, add `--workspace <WORKSPACE_NAME>` to target a specific VM. Pass `--kind cli` for interactive tools you'll invoke over SSH rather than expose as a public service.
 
-See [Create App](/api-reference/apps/create) for the full request/response schema.
+See [Create App](/api-reference/apps/create) for the API form.
 
 ## Expose Port Shortcut
 
@@ -151,24 +130,13 @@ See [App Health](/api-reference/apps/health-check) for the response schema.
 
 ## App Lifecycle: Start, Stop, Restart
 
-Control the routing for an app without affecting the underlying service.
+Control the routing for an app without affecting the underlying service:
 
-<CodeGroup>
-```bash cURL (stop)
-curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/stop \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```bash
+rig app stop <APP_NAME>
+rig app start <APP_NAME>
+rig app restart <APP_NAME>
 ```
-
-```bash cURL (start)
-curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/start \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
-```
-
-```bash cURL (restart)
-curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/restart \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
-```
-</CodeGroup>
 
 | Action | Effect |
 |--------|--------|
@@ -176,7 +144,7 @@ curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/restart \
 | `start` | Re-enables the public route. |
 | `restart` | Removes and re-adds the route. Useful if the proxy is in a bad state. |
 
-See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop), and [Restart App](/api-reference/apps/restart) for details.
+See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop), and [Restart App](/api-reference/apps/restart) for the API form.
 
 ## Update an App
 
@@ -213,21 +181,11 @@ See [Update App](/api-reference/apps/update) for the full schema.
 
 Deleting an app removes the public route. The service inside the VM is unaffected.
 
-<CodeGroup>
-```bash cURL
-curl -X DELETE https://api.rigbox.dev/api/v1/apps/$APP_ID \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```bash
+rig app rm <APP_NAME>
 ```
 
-```python Python
-requests.delete(
-    f"https://api.rigbox.dev/api/v1/apps/{app_id}",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-```
-</CodeGroup>
-
-See [Delete App](/api-reference/apps/delete) for details.
+See [Delete App](/api-reference/apps/delete) for the API form.
 
 ## Complete Example: Deploy a Python Server
 
@@ -244,44 +202,21 @@ python3 -m http.server 8080 &
 
 ### Expose the port
 
-From your local machine, expose port 8080:
+From inside the same workspace (or from your laptop with `--workspace <NAME>`):
 
-```python
-import requests
-
-API_URL = "https://api.rigbox.dev/api/v1"
-HEADERS = {"Authorization": f"Bearer {api_key}"}
-
-# Expose port 8080
-app = requests.post(
-    f"{API_URL}/workspaces/{workspace_id}/expose-port",
-    headers=HEADERS,
-    json={"port": 8080},
-).json()
-
-app_id = app["id"]
-app_url = f"https://{app['name']}.rigbox.dev"
-print(f"App created: {app_url}")
+```bash
+rig app new my-server --port 8080
 ```
+
+`rig app new` prints the resulting subdomain — `https://my-server.rigbox.dev`. If you'd rather have Rigbox detect the listening process and pick a name automatically, the [Expose Port](/api-reference/apps/expose-port) API endpoint does both in one shot.
 
 ### Verify health
 
-```python
-import time
-
-# Wait a moment for the route to propagate
-time.sleep(3)
-
-health = requests.get(
-    f"{API_URL}/apps/{app_id}/health",
-    headers=HEADERS,
-).json()
-
-if health["healthy"]:
-    print(f"App is live at {app_url}")
-else:
-    print("App is not healthy yet - check the service is running")
+```bash
+curl -sf https://my-server.rigbox.dev/ -o /dev/null && echo "live" || echo "not ready yet"
 ```
+
+For programmatic health checks via Rigbox's own probe, see [App Health](/api-reference/apps/health-check).
 
 ### Share the URL
 
