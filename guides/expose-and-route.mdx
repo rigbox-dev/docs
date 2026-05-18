@@ -53,7 +53,7 @@ See [List Listening Ports](/api-reference/apps/listening-ports) for the full res
 If you know the port and want full control over the app name, create it directly. Replace `<APP_NAME>` with a name of your choice — it will become the public subdomain.
 
 ```bash
-rig app new <APP_NAME> --port 8080
+rig app new --name <APP_NAME> --port 8080
 ```
 
 From outside the workspace, add `--workspace <WORKSPACE_NAME>` to target a specific VM. Pass `--kind cli` for interactive tools you'll invoke over SSH rather than expose as a public service.
@@ -205,7 +205,7 @@ python3 -m http.server 8080 &
 From inside the same workspace (or from your laptop with `--workspace <NAME>`):
 
 ```bash
-rig app new my-server --port 8080
+rig app new --name my-server --port 8080
 ```
 
 `rig app new` prints the resulting subdomain — `https://my-server.rigbox.dev`. If you'd rather have Rigbox detect the listening process and pick a name automatically, the [Expose Port](/api-reference/apps/expose-port) API endpoint does both in one shot.

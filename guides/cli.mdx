@@ -273,10 +273,10 @@ rig catalog
 ### Install from catalog
 
 ```bash
-rig catalog install vscode
+rig catalog install --item vscode --workspace <WORKSPACE_NAME>
 ```
 
-This installs VS Code Server into your current workspace, making it accessible via a browser.
+This installs VS Code Server into the named workspace, making it accessible via a browser. Inside a workspace VM, the `--workspace` flag can be omitted — it defaults to the current workspace.
 
 <Tip>
   The catalog includes popular tools like VS Code, Jupyter, and database clients. Run `rig catalog` to see the full list.
@@ -287,7 +287,7 @@ This installs VS Code Server into your current workspace, making it accessible v
 The catalog also ships **CLI-shape recipes** for terminal-first coding agents — `claude`, `codex`, `opencode`, and `kilocode`. These install the binary into `$PATH` and route through the managed AI proxy; there is no port, subdomain, or systemd service:
 
 ```bash
-rig catalog install claude
+rig catalog install --item claude --workspace <WORKSPACE_NAME>
 ssh my-project-ctbxi8lb@eu-west-1.rigbox.dev
 # inside the workspace
 claude
@@ -304,13 +304,13 @@ Tools are interactive applications that run alongside your workspace.
 ### List available tools
 
 ```bash
-rig tool ls <WORKSPACE_NAME_OR_ID>
+rig tools ls --workspace <WORKSPACE_NAME_OR_ID>
 ```
 
 ### Launch a tool
 
 ```bash
-rig tool launch architecture-explorer <WORKSPACE_NAME_OR_ID>
+rig tools launch --tool architecture-explorer --workspace <WORKSPACE_NAME_OR_ID>
 ```
 
 This starts the specified tool and provides you with the URL to access it.
@@ -324,7 +324,7 @@ Manage the SSH keys registered to your account directly from the external CLI. S
 ### Add a key
 
 ```bash
-rig ssh-key add <KEY_NAME>
+rig ssh add --name <KEY_NAME>
 ```
 
 This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it with your account under the name you provide (for example, `laptop` or `desktop`).
@@ -332,7 +332,7 @@ This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it wi
 ### List keys
 
 ```bash
-rig ssh-key ls
+rig ssh ls
 ```
 
 Output:
@@ -346,7 +346,7 @@ desktop   SHA256:xyz789ghi012...                     1 week ago
 ### Remove a key
 
 ```bash
-rig ssh-key rm <KEY_NAME>
+rig ssh rm --name <KEY_NAME>
 ```
 
 For more details on SSH access, including connecting to workspaces and using the TUI dashboard, see the [SSH Access guide](/guides/ssh-access).

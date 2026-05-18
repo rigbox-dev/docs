@@ -39,7 +39,7 @@ flowchart LR
 For the four supported recipes, one call is all you need:
 
 ```bash
-rig catalog install claude     # or: codex, opencode, kilocode
+rig catalog install --item claude --workspace <WORKSPACE_NAME>     # or: codex, opencode, kilocode
 ```
 
 This drops the binary into `$PATH`, writes the per-agent routing shim into `/etc/profile.d/`, and exits — there's no service to wait on. SSH into the workspace and invoke the agent directly. See [Catalog Apps → CLI-shape recipes](/guides/catalog#cli-shape-catalog-reference) for the routing details and equivalent API call.
@@ -100,7 +100,7 @@ Use the `dev` or `full` image for AI coding tools. They include build toolchains
 
 ### Claude Code
 
-`rig catalog install claude` writes a `profile.d` shim that points `ANTHROPIC_BASE_URL` at the proxy's `/v1/messages` Anthropic passthrough and sets `ANTHROPIC_API_KEY` to a managed placeholder. After SSH-ing in, just run:
+`rig catalog install --item claude` writes a `profile.d` shim that points `ANTHROPIC_BASE_URL` at the proxy's `/v1/messages` Anthropic passthrough and sets `ANTHROPIC_API_KEY` to a managed placeholder. After SSH-ing in, just run:
 
 ```bash
 claude
@@ -114,7 +114,7 @@ Claude Code uses Claude Sonnet by default. To use Opus, pass `--model claude-opu
 
 ### Codex CLI
 
-`rig catalog install codex` configures the agent to route through OpenAI-shape requests to OpenRouter, picking up `OPENAI_BASE_URL` / `OPENAI_API_KEY` from the routing shim:
+`rig catalog install --item codex` configures the agent to route through OpenAI-shape requests to OpenRouter, picking up `OPENAI_BASE_URL` / `OPENAI_API_KEY` from the routing shim:
 
 ```bash
 codex "add error handling to the API routes in src/routes/"
@@ -130,7 +130,7 @@ opencode
 
 ### Kilo Code
 
-`rig catalog install kilocode` writes a shim that maps `OPENROUTER_*` to the `KILO_*` environment variables the agent expects:
+`rig catalog install --item kilocode` writes a shim that maps `OPENROUTER_*` to the `KILO_*` environment variables the agent expects:
 
 ```bash
 kilocode
@@ -168,8 +168,8 @@ If you want every new workspace to come pre-loaded with a coding agent, attach a
 
 ```bash
 #!/bin/bash
-# One-line catalog install (uses the workspace's RIGBOX_API_KEY)
-rig catalog install claude
+# One-line catalog install (run from inside the workspace)
+rig catalog install --item claude
 
 # Or, for tools without a catalog recipe:
 pip install aider-chat

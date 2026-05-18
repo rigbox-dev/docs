@@ -69,7 +69,7 @@ These recipes install an interactive AI coding agent into the workspace's `$PATH
 Install one of them the same way as a Service-shape app:
 
 ```bash
-rig catalog install claude --workspace <WORKSPACE_NAME>
+rig catalog install --item claude --workspace <WORKSPACE_NAME>
 ```
 
 Inside a workspace VM, drop the `--workspace` flag — `rig` infers it from the ambient identity. Then SSH in and run the agent — `rig ssh-info <workspace>` will print the right `ssh` command.
@@ -83,7 +83,7 @@ CLI-shape recipes don't appear in the [Start App](/api-reference/apps/start) / [
 Install an app by its catalog ID:
 
 ```bash
-rig catalog install vscode --workspace <WORKSPACE_NAME>
+rig catalog install --item vscode --workspace <WORKSPACE_NAME>
 ```
 
 `rig catalog install` blocks until the install job completes and returns the app's name and URL when it's done. From inside a workspace VM, omit `--workspace`.
@@ -137,7 +137,7 @@ See [Delete App](/api-reference/apps/delete) for the API form.
 Each app installs with the same one-liner — swap in the catalog ID from the table above:
 
 ```bash
-rig catalog install vscode --workspace <WORKSPACE_NAME>
+rig catalog install --item vscode --workspace <WORKSPACE_NAME>
 ```
 
 ### VS Code Server
@@ -195,8 +195,8 @@ The `base` image has pre-warmed npm caches for Jupyter, Marimo, Streamlit, and E
 Install both into the same workspace:
 
 ```bash
-rig catalog install vscode --workspace my-project
-rig catalog install jupyter --workspace my-project
+rig catalog install --item vscode --workspace my-project
+rig catalog install --item jupyter --workspace my-project
 ```
 
 Each command blocks until the install completes and prints the app's URL. After both finish, the apps are accessible at `https://my-project-vscode.rigbox.dev` and `https://my-project-jupyter.rigbox.dev`.
