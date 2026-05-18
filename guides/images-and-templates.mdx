@@ -151,18 +151,18 @@ See [Create Workspace](/api-reference/workspaces/create) for the API form.
 You can change the RAM, vCPU, and disk size of an existing workspace without switching images. The workspace must be stopped first.
 
 ```bash
-rig workspace stop --name my-project
+rig workspace stop --workspace my-project
 
 curl -X PUT https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/resources \
   -H "Authorization: Bearer $RIGBOX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"ram_mb": 2048, "vcpu_count": 2}'
 
-rig workspace start --name my-project
+rig workspace start --workspace my-project
 ```
 
 <Warning>
-You cannot change the image of an existing workspace. `--image` remains available as a deprecated CLI alias for template lookup, but new workspace flows should use `--template`.
+You cannot change the template of an existing workspace. To switch templates, create a new workspace with `--template` set to the one you want.
 </Warning>
 
 See [Update Workspace Resources](/api-reference/workspaces/update-resources) for details.

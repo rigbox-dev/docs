@@ -66,7 +66,7 @@ print(f"Registered key: {key['id']}")
 If you have the Rigbox CLI installed:
 
 ```bash
-rig ssh-key add <KEY_NAME>
+rig ssh add --name <KEY_NAME>
 ```
 
 This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it automatically under the name you provide.
@@ -215,7 +215,7 @@ curl https://api.rigbox.dev/api/v1/ssh-keys \
 ```
 
 ```bash CLI
-rig ssh-key ls
+rig ssh ls
 ```
 
 </CodeGroup>
@@ -239,7 +239,7 @@ curl -X DELETE https://api.rigbox.dev/api/v1/ssh-keys/{key_id} \
 ```
 
 ```bash CLI
-rig ssh-key rm <KEY_NAME>
+rig ssh rm --name <KEY_NAME>
 ```
 
 </CodeGroup>
