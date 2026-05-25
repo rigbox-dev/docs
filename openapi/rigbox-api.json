@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Rigbox API",
-    "description": "Manage workspaces, apps, snapshots, tools, and more on the Rigbox platform.",
+    "title": "Rigbox Public API",
+    "description": "Gateway-owned public API for Rigbox. The gateway composes its local lifecycle API with service-owned exported specs.",
     "contact": {
       "name": "Rigbox",
       "url": "https://rigbox.dev"
@@ -15,10 +15,539 @@
   "servers": [
     {
       "url": "https://api.rigbox.dev",
-      "description": "Production (EU-West, auto-routed)"
+      "description": "Production gateway"
     }
   ],
   "paths": {
+    "/api/v1/access-control/bindings": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "list_bindings",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Canonical resource ref",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bindings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BindingsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "create_binding",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBindingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Binding created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessBinding"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "delete_binding",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteBindingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Binding deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessControlDeleteResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "update_binding",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBindingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Binding updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessBinding"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/access-control/principals": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "search_principals",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Canonical resource ref",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "description": "Email or display-name search text",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Optional result limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Principals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrincipalLookupResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/access-control/role-presets": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "list_role_presets",
+        "parameters": [
+          {
+            "name": "scope_kind",
+            "in": "query",
+            "description": "Optional role preset scope",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role presets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolePresetsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/access-control/simulate": {
+      "post": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "simulate_access",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulateAccessRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Simulation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulateAccessResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/access-control/tags": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "get_tags",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Canonical resource ref",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "put_tags",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Tags updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/access-control/throttle-binding": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "get_throttle_binding",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Canonical resource ref",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Throttle binding",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThrottleBindingResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "put_throttle_binding",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateThrottleBindingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Throttle binding updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThrottleBindingResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/access-control/throttle-presets": {
+      "get": {
+        "tags": [
+          "Access Control"
+        ],
+        "operationId": "list_throttle_presets",
+        "parameters": [
+          {
+            "name": "resource",
+            "in": "query",
+            "description": "Canonical resource ref",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Throttle presets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThrottlePresetsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/api-keys": {
+      "get": {
+        "tags": [
+          "API Keys"
+        ],
+        "operationId": "list_api_keys",
+        "responses": {
+          "200": {
+            "description": "API keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeysListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "API Keys"
+        ],
+        "operationId": "create_api_key",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApiKeyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "API key created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateApiKeyResponseFull"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/api-keys/{id}": {
+      "delete": {
+        "tags": [
+          "API Keys"
+        ],
+        "operationId": "delete_api_key",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "API key ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API key deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthMessageResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/app-catalog": {
       "get": {
         "tags": [
@@ -916,6 +1445,455 @@
         "responses": {
           "200": {
             "description": "Verification result"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/change-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "change_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthMessageResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/cli-session": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Create a pending CLI session. Called by the CLI before opening the browser.",
+        "operationId": "create_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCliSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "CLI session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCliSessionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/cli-session/{code}": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Poll a CLI session. Called by the CLI while waiting for browser approval.",
+        "operationId": "poll_session",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "description": "CLI session code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CLI session status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollCliSessionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/cli-session/{code}/approve": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Approve a CLI session. Called by the web app after the user logs in.",
+        "description": "Rotates the canonical `\"CLI login\"` API key: any prior row is\ndeleted (logs the user out on any other machine using that key),\nthen a fresh key is minted and handed to the polling CLI. The\nrotation matches what other cloud CLIs (`gcloud auth login`,\n`aws sso login`, `kubectl auth login`) do \u2014 a fresh `login` is a\nfresh credential, and old credentials are invalidated.\n\nUsers who want a separate, named key per machine can still create\nthem manually via `POST /v1/api-keys`; this endpoint only manages\nthe canonical CLI-login slot.",
+        "operationId": "approve_session",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "description": "CLI session code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CLI session approved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApproveCliSessionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/create-checkout-session": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "POST /auth/create-checkout-session - Create a Stripe Checkout session and return the URL",
+        "operationId": "create_checkout_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UrlResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/create-portal-session": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "POST /auth/create-portal-session - Create Stripe Customer Portal session",
+        "operationId": "create_portal_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Portal URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UrlResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/force-change-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "POST /auth/force-change-password - Used after admin resets a user's password.\nVerifies the temporary password, sets the new one, and clears the must_change_password flag.",
+        "operationId": "force_change_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForceChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseWithUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseWithUser"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "get_me",
+        "responses": {
+          "200": {
+            "description": "Current user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/signup": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "signup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Signed up",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseWithUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/stripe-webhook": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "POST /auth/stripe-webhook - Handle Stripe webhook events",
+        "operationId": "stripe_webhook",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook accepted"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/subscription-status": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "GET /auth/subscription-status - Check current subscription status",
+        "operationId": "get_subscription_status",
+        "responses": {
+          "200": {
+            "description": "Subscription status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionStatusResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/switch-plan": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "POST /auth/switch-plan - Switch between pro_byok and pro_managed (proration)",
+        "operationId": "switch_plan",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Plan switched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwitchPlanResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/validate": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "GET /auth/validate - Validate token for forward_auth",
+        "operationId": "validate_token",
+        "responses": {
+          "200": {
+            "description": "Token valid"
           }
         },
         "security": [
@@ -2282,9 +3260,8 @@
     "/api/v1/quick-deploy": {
       "post": {
         "tags": [
-          "Templates"
+          "Workspaces"
         ],
-        "summary": "Create a workspace from a template.",
         "operationId": "quick_deploy",
         "requestBody": {
           "content": {
@@ -2312,7 +3289,8 @@
           {
             "bearer": []
           }
-        ]
+        ],
+        "summary": "Create a workspace from a template."
       }
     },
     "/api/v1/roadmap/votes": {
@@ -3285,25 +4263,14 @@
         "tags": [
           "Workspaces"
         ],
-        "summary": "List all workspaces for the authenticated user.",
         "operationId": "list_vms",
         "responses": {
           "200": {
-            "description": "List of user workspaces",
+            "description": "Workspaces",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ListWorkspacesResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
                 }
               }
             }
@@ -3313,13 +4280,13 @@
           {
             "bearer": []
           }
-        ]
+        ],
+        "summary": "List all workspaces for the authenticated user."
       },
       "post": {
         "tags": [
           "Workspaces"
         ],
-        "summary": "Create a new workspace.",
         "operationId": "create_vm",
         "requestBody": {
           "content": {
@@ -3341,47 +4308,27 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Resource limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
           }
         },
         "security": [
           {
             "bearer": []
           }
-        ]
+        ],
+        "summary": "Create a new workspace."
       }
     },
     "/api/v1/workspaces/from-definition": {
       "post": {
         "tags": [
-          "Community v1"
+          "Workspaces"
         ],
-        "summary": "Deploy a v1 workspace definition: provisions a real VM via `quick_deploy_with_template`\nfor `@rigbox/...` catalog apps, then dispatches community app installs via\n`launch_deploy_ref_for_workspace` for each non-rigbox ref.",
-        "operationId": "deploy_workspace_v1",
+        "operationId": "deploy_from_definition",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DeployV1WorkspaceRequest"
+                "$ref": "#/components/schemas/DeployFromDefinitionRequest"
               }
             }
           },
@@ -3389,39 +4336,11 @@
         },
         "responses": {
           "202": {
-            "description": "Deploy request accepted",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request or invalid definition",
+            "description": "Workspace definition accepted",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Feature not enabled",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Definition not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
+                  "$ref": "#/components/schemas/QuickDeployResponse"
                 }
               }
             }
@@ -3431,15 +4350,15 @@
           {
             "bearer": []
           }
-        ]
+        ],
+        "summary": "Deploy a v1 workspace definition: provisions a real VM via `quick_deploy_with_template`\nfor `@rigbox/...` catalog apps, then dispatches community app installs via\n`launch_deploy_ref_for_workspace` for each non-rigbox ref."
       }
     },
     "/api/v1/workspaces/from-legacy-workspace-definition": {
       "post": {
         "tags": [
-          "Templates"
+          "Workspaces"
         ],
-        "summary": "Deploy a legacy workspace definition (built-in or community) end-to-end.",
         "operationId": "deploy_from_legacy_workspace_definition",
         "requestBody": {
           "content": {
@@ -3467,7 +4386,8 @@
           {
             "bearer": []
           }
-        ]
+        ],
+        "summary": "Deploy a legacy workspace definition (built-in or community) end-to-end."
       }
     },
     "/api/v1/workspaces/{id}": {
@@ -3475,53 +4395,7 @@
         "tags": [
           "Workspaces"
         ],
-        "summary": "Get a workspace by ID.",
         "operationId": "get_vm",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Workspace ID (e.g. ws-xxxxxxxx)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Workspace details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetWorkspaceResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Workspaces"
-        ],
-        "summary": "Delete a workspace.",
-        "operationId": "delete_vm",
         "parameters": [
           {
             "name": "id",
@@ -3535,21 +4409,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Workspace deleted",
+            "description": "Workspace",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MessageResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
+                  "$ref": "#/components/schemas/GetWorkspaceResponse"
                 }
               }
             }
@@ -3559,7 +4423,52 @@
           {
             "bearer": []
           }
-        ]
+        ],
+        "summary": "Get a workspace by ID."
+      },
+      "delete": {
+        "tags": [
+          "Workspaces"
+        ],
+        "operationId": "delete_vm",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "force",
+            "in": "query",
+            "description": "Force delete when allowed",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace deletion queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a workspace."
       }
     },
     "/api/v1/workspaces/{id}/ai-config": {
@@ -3741,7 +4650,6 @@
         "tags": [
           "Workspaces"
         ],
-        "summary": "Cancel a workspace that is currently provisioning or starting.",
         "operationId": "cancel_vm",
         "parameters": [
           {
@@ -3756,31 +4664,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Workspace cancellation accepted",
+            "description": "Workspace creation cancelled",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetWorkspaceResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Workspace is not in a cancellable state",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
                 }
               }
             }
@@ -3790,7 +4678,8 @@
           {
             "bearer": []
           }
-        ]
+        ],
+        "summary": "Cancel a workspace that is currently provisioning or starting."
       }
     },
     "/api/v1/workspaces/{id}/deploy/launch": {
@@ -4436,7 +5325,6 @@
         "tags": [
           "Workspaces"
         ],
-        "summary": "Retry a workspace that failed during provisioning.",
         "operationId": "retry_vm",
         "parameters": [
           {
@@ -4451,41 +5339,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Retry accepted; workspace re-entered Provisioning",
+            "description": "Workspace retry queued",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetWorkspaceResponse"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Retry would exceed account limits",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Workspace is not in a retryable failed state",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
                 }
               }
             }
@@ -4495,7 +5353,8 @@
           {
             "bearer": []
           }
-        ]
+        ],
+        "summary": "Retry a workspace that failed during provisioning."
       }
     },
     "/api/v1/workspaces/{id}/services": {
@@ -4886,7 +5745,6 @@
         "tags": [
           "Workspaces"
         ],
-        "summary": "Start a workspace.",
         "operationId": "start_vm",
         "parameters": [
           {
@@ -4901,41 +5759,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Workspace started",
+            "description": "Workspace start queued",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetWorkspaceResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Already running or provisioning",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Trial expired",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
                 }
               }
             }
@@ -4945,7 +5773,8 @@
           {
             "bearer": []
           }
-        ]
+        ],
+        "summary": "Start a workspace."
       }
     },
     "/api/v1/workspaces/{id}/stop": {
@@ -4953,7 +5782,6 @@
         "tags": [
           "Workspaces"
         ],
-        "summary": "Stop a workspace.",
         "operationId": "stop_vm",
         "parameters": [
           {
@@ -4968,31 +5796,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Workspace stopped",
+            "description": "Workspace stop queued",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetWorkspaceResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Not running",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
                 }
               }
             }
@@ -5002,7 +5810,8 @@
           {
             "bearer": []
           }
-        ]
+        ],
+        "summary": "Stop a workspace."
       }
     },
     "/api/v1/workspaces/{id}/tasks": {
@@ -5363,10 +6172,117 @@
           }
         ]
       }
+    },
+    "/api/ws/terminal/{id}": {
+      "get": {
+        "tags": [
+          "Workspace Runtime"
+        ],
+        "summary": "WebSocket terminal handler - upgrades HTTP to WebSocket",
+        "operationId": "ws_terminal_handler",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "JWT token for websocket authentication",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cols",
+            "in": "query",
+            "description": "Initial terminal columns",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "rows",
+            "in": "query",
+            "description": "Initial terminal rows",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "WebSocket terminal upgrade"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
     "schemas": {
+      "AccessBinding": {
+        "type": "object",
+        "required": [
+          "principal_ref",
+          "resource_ref",
+          "role",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "principal_ref": {
+            "type": "string"
+          },
+          "resource_ref": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AccessControlDeleteResponse": {
+        "type": "object",
+        "required": [
+          "deleted"
+        ],
+        "properties": {
+          "deleted": {
+            "type": "boolean"
+          }
+        }
+      },
       "AddSshKeyRequest": {
         "type": "object",
         "required": [
@@ -5772,6 +6688,61 @@
           "details": {},
           "message": {
             "type": "string"
+          }
+        }
+      },
+      "ApiKeyResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "key_preview",
+          "is_workspace_key",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_workspace_key": {
+            "type": "boolean"
+          },
+          "key_preview": {
+            "type": "string"
+          },
+          "last_used_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "raw_key": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "ApiKeysListResponse": {
+        "type": "object",
+        "required": [
+          "api_keys"
+        ],
+        "properties": {
+          "api_keys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiKeyResponse"
+            }
           }
         }
       },
@@ -6278,6 +7249,60 @@
           }
         ]
       },
+      "ApproveCliSessionResponse": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthMessageResponse": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthResponseWithUser": {
+        "type": "object",
+        "required": [
+          "token",
+          "user"
+        ],
+        "properties": {
+          "must_change_password": {
+            "type": "boolean"
+          },
+          "token": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserResponse"
+          }
+        }
+      },
+      "BindingsResponse": {
+        "type": "object",
+        "required": [
+          "bindings"
+        ],
+        "properties": {
+          "bindings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccessBinding"
+            }
+          }
+        }
+      },
       "CatalogResponse": {
         "type": "object",
         "required": [
@@ -6289,6 +7314,21 @@
             "items": {
               "$ref": "#/components/schemas/AppCatalogItem"
             }
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "properties": {
+          "current_password": {
+            "type": "string"
+          },
+          "new_password": {
+            "type": "string"
           }
         }
       },
@@ -6347,6 +7387,23 @@
         "properties": {
           "linked": {
             "type": "boolean"
+          }
+        }
+      },
+      "CheckoutRequest": {
+        "type": "object",
+        "required": [
+          "plan"
+        ],
+        "properties": {
+          "plan": {
+            "type": "string"
+          },
+          "return_url": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -6954,6 +8011,32 @@
           }
         }
       },
+      "CreateApiKeyRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CreateApiKeyResponseFull": {
+        "type": "object",
+        "required": [
+          "id",
+          "key"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          }
+        }
+      },
       "CreateAppKind": {
         "type": "string",
         "enum": [
@@ -7023,6 +8106,47 @@
             ]
           },
           "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateBindingRequest": {
+        "type": "object",
+        "required": [
+          "principal",
+          "resource",
+          "role"
+        ],
+        "properties": {
+          "principal": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateCliSessionRequest": {
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateCliSessionResponse": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
             "type": "string"
           }
         }
@@ -7193,6 +8317,25 @@
           }
         }
       },
+      "DeleteBindingRequest": {
+        "type": "object",
+        "required": [
+          "principal",
+          "resource",
+          "role"
+        ],
+        "properties": {
+          "principal": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
       "DeleteSnapshotFileRequest": {
         "type": "object",
         "required": [
@@ -7240,9 +8383,97 @@
           }
         }
       },
+      "DeployFromDefinitionRequest": {
+        "type": "object",
+        "required": [
+          "definition_ref"
+        ],
+        "properties": {
+          "app_params": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "type": "string"
+              }
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "definition_ref": {
+            "type": "string"
+          },
+          "disk_size_mb": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "env_vars": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "ram_mb": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "service_spec_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "setup_script_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "vcpu_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "workspace_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "DeployFromLegacyWorkspaceDefinitionRequest": {
         "type": "object",
-        "description": "Request body for `POST /v1/workspaces/from-legacy-workspace-definition`.",
         "required": [
           "ref"
         ],
@@ -7252,7 +8483,6 @@
               "object",
               "null"
             ],
-            "description": "Per-child param values keyed by the child's deploy_ref.",
             "additionalProperties": {
               "type": "object",
               "additionalProperties": {
@@ -7279,7 +8509,6 @@
               "object",
               "null"
             ],
-            "description": "Workspace environment variables to overlay on top of definition defaults.",
             "additionalProperties": {
               "type": "string"
             },
@@ -7291,8 +8520,7 @@
             "type": [
               "string",
               "null"
-            ],
-            "description": "Optional workspace name. Defaults to a generated id from the slug."
+            ]
           },
           "ram_mb": {
             "type": [
@@ -7303,8 +8531,7 @@
             "minimum": 0
           },
           "ref": {
-            "type": "string",
-            "description": "Legacy workspace definition deploy_ref, e.g. `@alice/data-lab@1.0.0` or\n`@rigbox/openclaw@builtin`."
+            "type": "string"
           },
           "service_spec_ids": {
             "type": [
@@ -7313,8 +8540,7 @@
             ],
             "items": {
               "type": "string"
-            },
-            "description": "User-selected service specs from their library."
+            }
           },
           "setup_script_ids": {
             "type": [
@@ -7323,8 +8549,7 @@
             ],
             "items": {
               "type": "string"
-            },
-            "description": "User-selected setup scripts from their library."
+            }
           },
           "vcpu_count": {
             "type": [
@@ -7923,6 +9148,25 @@
           }
         }
       },
+      "ForceChangePasswordRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "temporary_password",
+          "new_password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "new_password": {
+            "type": "string"
+          },
+          "temporary_password": {
+            "type": "string"
+          }
+        }
+      },
       "GetAiDefaultsResponse": {
         "type": "object",
         "required": [
@@ -8052,6 +9296,17 @@
             "items": {
               "$ref": "#/components/schemas/Vm"
             }
+          }
+        }
+      },
+      "GetMeResponse": {
+        "type": "object",
+        "required": [
+          "user"
+        ],
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserResponse"
           }
         }
       },
@@ -8341,7 +9596,6 @@
       },
       "LegacyWorkspaceDefinitionChildInstall": {
         "type": "object",
-        "description": "One child install handle returned to the client so the UI can poll status.",
         "required": [
           "deploy_ref",
           "source",
@@ -8989,6 +10243,21 @@
           }
         }
       },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
       "LookupByEmailRequest": {
         "type": "object",
         "required": [
@@ -9187,6 +10456,79 @@
           "textarea"
         ]
       },
+      "PollCliSessionResponse": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "api_key": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "PortalRequest": {
+        "type": "object",
+        "properties": {
+          "return_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "PrincipalLookupResponse": {
+        "type": "object",
+        "required": [
+          "principals"
+        ],
+        "properties": {
+          "principals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrincipalLookupResult"
+            }
+          }
+        }
+      },
+      "PrincipalLookupResult": {
+        "type": "object",
+        "required": [
+          "principal",
+          "user_id",
+          "email"
+        ],
+        "properties": {
+          "display_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": "string"
+          },
+          "principal": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
       "PublishCommunityLegacyWorkspaceDefinitionRequest": {
         "type": "object",
         "required": [
@@ -9272,7 +10614,6 @@
               "object",
               "null"
             ],
-            "description": "User-supplied parameter values for template expected apps, keyed by app name.\nE.g. `{ \"gateway\": { \"ai_provider\": \"anthropic\", \"telegram_bot_token\": \"...\" } }`",
             "additionalProperties": {
               "type": "object",
               "additionalProperties": {
@@ -9290,8 +10631,7 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "description": "Optional catalog app IDs to pre-install (Phase 3 legacy workspace definition)."
+            }
           },
           "disk_size_mb": {
             "type": [
@@ -9334,8 +10674,7 @@
             ],
             "items": {
               "type": "string"
-            },
-            "description": "User-selected service specs from their library. None keeps legacy default behavior."
+            }
           },
           "setup_script_ids": {
             "type": [
@@ -9344,8 +10683,7 @@
             ],
             "items": {
               "type": "string"
-            },
-            "description": "User-selected setup scripts from their library. None keeps legacy default behavior."
+            }
           },
           "template_id": {
             "type": "string"
@@ -9371,15 +10709,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/App"
-            },
-            "description": "Expected apps created for this template (status=Installing).\nFrontend should track these for install progress."
+            }
           },
           "installed_apps": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "description": "Catalog apps that were pre-installed."
+            }
           },
           "message": {
             "type": "string"
@@ -9502,6 +10838,68 @@
           },
           "workspace_id": {
             "type": "string"
+          }
+        }
+      },
+      "RolePreset": {
+        "type": "object",
+        "required": [
+          "scope_kind",
+          "role",
+          "permissions",
+          "required_resource_tags",
+          "match_tag_keys",
+          "system_managed",
+          "updated_at"
+        ],
+        "properties": {
+          "match_tag_keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_resource_tags": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "role": {
+            "type": "string"
+          },
+          "scope_kind": {
+            "type": "string"
+          },
+          "system_managed": {
+            "type": "boolean"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RolePresetsResponse": {
+        "type": "object",
+        "required": [
+          "presets"
+        ],
+        "properties": {
+          "presets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RolePreset"
+            }
           }
         }
       },
@@ -9819,6 +11217,75 @@
           }
         }
       },
+      "SignupRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "SimulateAccessRequest": {
+        "type": "object",
+        "required": [
+          "resource",
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "principal": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resource": {
+            "type": "string"
+          }
+        }
+      },
+      "SimulateAccessResponse": {
+        "type": "object",
+        "required": [
+          "principal",
+          "resource",
+          "action",
+          "allowed",
+          "reason"
+        ],
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "allowed": {
+            "type": "boolean"
+          },
+          "principal": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          }
+        }
+      },
       "SnapshotView": {
         "type": "object",
         "description": "Read-only projection of a workspace snapshot.",
@@ -9946,6 +11413,50 @@
           }
         }
       },
+      "SubscriptionStatusResponse": {
+        "type": "object",
+        "required": [
+          "active",
+          "status",
+          "plan",
+          "trial_expired"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "plan": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trial_expired": {
+            "type": "boolean"
+          },
+          "trial_expires_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SwitchPlanResponse": {
+        "type": "object",
+        "required": [
+          "message",
+          "plan"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "plan": {
+            "type": "string"
+          }
+        }
+      },
       "SyncSshKeysResponse": {
         "type": "object",
         "required": [
@@ -9988,6 +11499,27 @@
           "synced": {
             "type": "integer",
             "minimum": 0
+          }
+        }
+      },
+      "TagsResponse": {
+        "type": "object",
+        "required": [
+          "resource",
+          "tags"
+        ],
+        "properties": {
+          "resource": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
           }
         }
       },
@@ -10122,6 +11654,59 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WorkspaceTemplate"
+            }
+          }
+        }
+      },
+      "ThrottleBindingResponse": {
+        "type": "object",
+        "required": [
+          "resource"
+        ],
+        "properties": {
+          "profile": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resource": {
+            "type": "string"
+          }
+        }
+      },
+      "ThrottlePreset": {
+        "type": "object",
+        "required": [
+          "name",
+          "rules",
+          "system_managed",
+          "updated_at"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "rules": {},
+          "system_managed": {
+            "type": "boolean"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ThrottlePresetsResponse": {
+        "type": "object",
+        "required": [
+          "presets"
+        ],
+        "properties": {
+          "presets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ThrottlePreset"
             }
           }
         }
@@ -10479,6 +12064,29 @@
           }
         }
       },
+      "UpdateBindingRequest": {
+        "type": "object",
+        "required": [
+          "principal",
+          "resource",
+          "current_role",
+          "new_role"
+        ],
+        "properties": {
+          "current_role": {
+            "type": "string"
+          },
+          "new_role": {
+            "type": "string"
+          },
+          "principal": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          }
+        }
+      },
       "UpdateCommunityProfileRequest": {
         "type": "object",
         "properties": {
@@ -10578,6 +12186,44 @@
               "null"
             ],
             "format": "int32"
+          }
+        }
+      },
+      "UpdateTagsRequest": {
+        "type": "object",
+        "required": [
+          "resource",
+          "tags"
+        ],
+        "properties": {
+          "resource": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "UpdateThrottleBindingRequest": {
+        "type": "object",
+        "required": [
+          "resource"
+        ],
+        "properties": {
+          "profile": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resource": {
+            "type": "string"
           }
         }
       },
@@ -10689,6 +12335,17 @@
           }
         }
       },
+      "UrlResponse": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
       "UsageExample": {
         "type": "object",
         "description": "A copy-pasteable API usage example for a template app.",
@@ -10739,6 +12396,31 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "subscription"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "subscription": {
+            "type": "string"
           }
         }
       },
@@ -11607,10 +13289,6 @@
             "type": "boolean",
             "description": "True when this template's apps/services live inside the image\n(e.g. firecrawl, openclaw) rather than being installed onto a\nminimal base image at provision time. Mirrors the rule in\n`domain::community::export::image_bound` so the catalog and\n/templates UI can show the same `composable` / `image-bound`\ndistinction."
           },
-          "managed_ai_config": {
-            "type": "boolean",
-            "description": "If true, this template supports managed AI mode (proxy + credits)."
-          },
           "name": {
             "type": "string"
           },
@@ -11716,6 +13394,18 @@
   },
   "tags": [
     {
+      "name": "Workspaces"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "API Keys"
+    },
+    {
+      "name": "Access Control"
+    },
+    {
       "name": "AI"
     },
     {
@@ -11762,9 +13452,6 @@
     },
     {
       "name": "User Settings"
-    },
-    {
-      "name": "Workspaces"
     }
   ]
 }
