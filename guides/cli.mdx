@@ -1,13 +1,30 @@
 ---
 title: The Rigbox CLI
-description: Manage workspaces, apps, tools, and AI credits from the command line.
+description: Deploy apps, manage workspaces, and script the Rigbox API from the terminal.
 ---
 
-The `rig` CLI (alias for `rigbox`) gives you full control over your Rigbox workspaces, apps, and AI credits from the terminal. It is pre-installed in every workspace VM, and you can also install it on your local machine.
+The `rig` CLI (and its `rigbox` alias — the same binary) is the primary way to deploy and operate Rigbox from a terminal. It is pre-installed in every workspace VM, and you can install it on your local machine too.
+
+This page is the command reference. It is organised as:
+
+<CardGroup cols={2}>
+  <Card title="Install & authenticate" icon="download" href="#install">
+    Get the binary and log in.
+  </Card>
+  <Card title="Global flags" icon="terminal" href="#global-flags">
+    Output formats, JMESPath queries, scripted input, and `rig api`.
+  </Card>
+  <Card title="Deploy & rig.yaml" icon="rocket" href="#deploy">
+    `rig deploy`, `.env` loading, and the full manifest schema.
+  </Card>
+  <Card title="Command groups" icon="list" href="#command-reference">
+    workspace, app, snapshot, volume, build/release/rollback, and more.
+  </Card>
+</CardGroup>
 
 ---
 
-## Installation
+## Install
 
 ### Inside a workspace
 
@@ -17,7 +34,7 @@ The CLI is already installed in every Rigbox workspace. Open a terminal and run:
 rig --version
 ```
 
-Inside a workspace, `rig` automatically switches into workspace-scoped mode. You do not need to log in, and account-wide commands are intentionally hidden.
+Inside a workspace, `rig` automatically switches into **workspace-scoped mode** (see [Runtime modes](#runtime-modes)). You do not need to log in, and account-wide commands are intentionally hidden.
 
 ### On your local machine
 
@@ -27,417 +44,591 @@ Install the latest release with one command:
 curl -fsSL https://rigbox.dev/install.sh | bash
 ```
 
-The installer detects your OS and CPU, downloads the latest release, and installs both `rig` and `rigbox` (same binary) to `$HOME/.local/bin`. Confirm the install with:
+The installer detects your OS and CPU, downloads the latest release, and installs both `rig` and `rigbox` to `$HOME/.local/bin`. Confirm with `rig --version`.
 
-```bash
-rig --version
-```
-
-#### Advanced: pin a version or change the install directory
+#### Pin a version or change the install directory
 
 For CI or reproducibility, the installer honours two environment variables:
 
 | Variable | Purpose | Default |
 | --- | --- | --- |
 | `RIG_INSTALL_DIR` | Install location for the binary. | `$HOME/.local/bin` |
-| `RIG_VERSION` | Pin to a specific release tag (e.g.&nbsp;`v0.6.11`). | `latest` |
+| `RIG_VERSION` | Pin to a specific release tag (e.g.&nbsp;`v0.12.33`). | `latest` |
 
 ```bash
 curl -fsSL https://rigbox.dev/install.sh | \
-  RIG_INSTALL_DIR=/usr/local/bin RIG_VERSION=v0.6.11 bash
+  RIG_INSTALL_DIR=/usr/local/bin RIG_VERSION=v0.12.33 bash
 ```
 
 <Note>
-The env vars must sit on the `bash` that runs the script — not on the `curl`. With a pipeline, prefixed variables only apply to the command they precede, so `RIG_VERSION=… curl … | bash` would set them on `curl` and the installer would still see the defaults.
+The env vars must sit on the `bash` that runs the script — not on the `curl`. In a pipeline, `RIG_VERSION=… curl … | bash` would set them on `curl` and the installer would still see the defaults.
 </Note>
+
+#### Shell completions
+
+```bash
+rig completions --install        # detect your shell and wire it up
+rig completions bash --no-rc     # print the script instead of editing your rc
+```
+
+To remove the local install entirely, use `rig uninstall` (add `--purge-config` to also drop saved credentials).
 
 ---
 
-## Authentication and Runtime Modes
+## Authentication
 
-The CLI has two modes depending on where it runs.
-
-| Context | Auth method | Command surface |
-|---------|-------------|-----------------|
-| Inside a workspace VM | Ambient workspace identity from the VM bridge | Workspace-local commands only |
-| On your local machine | OAuth token via `rig login` | Full account and workspace control |
-
-### Outside a workspace
-
-Before using the CLI on your laptop or another external machine, log in:
+### Log in (local machine)
 
 ```bash
 rig login
 ```
 
-This opens your browser for OAuth authentication and stores your token locally.
-
-<Note>
-  External CLI configuration is stored in `~/.rigbox/config.json`. This includes your auth token and default settings.
-</Note>
-
-### Inside a workspace
-
-Inside a workspace, `rig` detects `/etc/rigbox/workspace.json` and talks to the VM-local bridge API at `http://172.16.0.1:9090/rig/v1`.
-
-No bearer token is sent for normal workspace-scoped operations. The bridge resolves your workspace from the VM's source IP on the compute node, so editing local config files cannot switch the workspace identity.
-
-Run:
+This opens your browser for OAuth and stores the token locally. Two non-interactive variants exist for headless environments:
 
 ```bash
-rig whoami
+rig login --token            # paste a token instead of opening a browser
+rig login --import-token     # read a token from stdin and validate it
 ```
 
-The output should show `workspace_ip` or equivalent bridge identity as the auth method.
+`rig logout` removes saved credentials (`--purge` also clears legacy config paths). `rig whoami` prints the current user and workspace.
+
+<Note>
+External CLI configuration is stored in `~/.rigbox/config.json`, including your auth token and persisted defaults.
+</Note>
+
+### API keys
+
+API keys (`rb_…`) are full-account credentials, shown once at creation and stored hash-only:
+
+```bash
+rig api-key create --name ci-runner   # plaintext printed once — copy it now
+rig api-key ls
+rig api-key rm --id <KEY_ID>
+```
+
+### Runtime modes
+
+The CLI behaves differently depending on where it runs:
+
+| Context | Auth method | Command surface |
+| --- | --- | --- |
+| On your local machine | OAuth token via `rig login` | Full account + workspace control |
+| Inside a workspace VM | Ambient workspace identity from the VM bridge | Workspace-local commands only |
+
+Inside a workspace, `rig` detects `/etc/rigbox/workspace.json` and talks to the VM-local bridge at `http://172.16.0.1:9090/rig/v1`. No bearer token is sent — the bridge resolves your workspace from the VM's source IP, so editing local config cannot switch identity. Account-wide commands (`login`, most `workspace` subcommands, `template`, `recipe`, `ssh`) are hidden in this mode; deploy, app, snapshot, volume, tools, and proxy helpers remain available.
 
 ---
 
-## Workspace Management
+## Global flags
 
-Workspaces are isolated micro-VMs where your code runs. On your local machine, the CLI provides full lifecycle management across your account.
+Every command accepts these global flags (they work before or after the subcommand):
+
+| Flag | Purpose |
+| --- | --- |
+| `--output <human\|json\|yaml>` | Output format. Defaults to `human`; set a persistent default with `rig config set output yaml`. |
+| `--query <JMESPATH>` | Filter/transform the structured output with a [JMESPath](https://jmespath.org) expression. |
+| `--cli-input-json <FILE>` | Read command inputs from a JSON file, or `-` for stdin. |
+| `--cli-input-yaml <FILE>` | Read command inputs from a YAML file, or `-` for stdin (conflicts with `--cli-input-json`). |
+| `--generate-cli-skeleton` | Print a fillable input template for the command, then exit. |
+| `--no-pager` | Do not pipe help output through a pager. |
+
+```bash
+rig workspace ls --output json --query "[?status=='running'].name"
+rig workspace spawn --generate-cli-skeleton > spawn.json
+# edit spawn.json …
+rig workspace spawn --cli-input-json spawn.json
+```
+
+### Persisted defaults
+
+```bash
+rig config set output yaml     # default output format for every command
+rig config get output
+rig config list
+rig config unset output        # revert to the built-in default
+```
+
+### Raw API access
+
+`rig api` sends an authenticated request to any Rigbox API path, reusing your stored credentials:
+
+```bash
+rig api GET /v1/workspaces
+rig api POST /v1/snapshots --body snapshot.json      # JSON body from a file
+echo '{"name":"x"}' | rig api POST /v1/snapshots --body -   # or from stdin
+```
+
+---
+
+## Deploy
+
+`rig deploy` is the core workflow. It reads a [`rig.yaml`](#the-rigyaml-manifest) in the project directory, rsyncs your source into a workspace VM, runs the install/build steps, and brings the app up as a managed systemd unit reachable at `<slug>.rigbox.dev`.
+
+```bash
+rig deploy                              # deploy cwd into its bound/auto workspace
+rig deploy --from-dir ./service         # deploy a specific directory
+rig deploy --workspace my-project       # target a named/id'd workspace
+rig deploy --name my-project            # name to use when spawning a fresh workspace
+rig deploy --app api                    # multi-app project: deploy only one app
+rig deploy --watch                      # re-deploy on source changes (single-app)
+```
+
+When `--workspace` is unset, deploy reuses the workspace bound in `.rig.lock`, or spawns a fresh one. `rig deploy --prune-stale` drops `.rig.lock` bindings to workspaces that no longer exist, then exits without deploying.
 
 <Note>
-  Workspace lifecycle commands such as `rig workspace ls`, `rig workspace new`, `rig workspace spawn`, `rig workspace start`, `rig workspace stop`, `rig workspace restart`, and `rig workspace rm` are external-mode commands. Inside a workspace VM, `rig` is scoped to the current workspace and these account-wide commands are not shown in `rig -h`.
+`rig.yaml` is the source of truth. A redeploy re-applies everything declared in it — including visibility, limits, and volumes — so transient CLI/UI edits get overwritten on the next deploy.
 </Note>
+
+### Loading `.env` files
+
+Deploy auto-loads dotenv files from the project directory and merges them into the environment used to resolve `secrets:` and `env:`. Disable with `--no-env-file`.
+
+```bash
+rig deploy --stage production
+```
+
+With `--stage <name>` (or `$RIG_ENV`), deploy loads stage-specific files. Precedence, highest to lowest:
+
+1. real shell environment
+2. `.env.<stage>.local`
+3. `.env.local`
+4. `.env.<stage>`
+5. `.env`
+
+### Blue-green and promote
+
+Stage a change as a sibling app, verify it, then swap production traffic atomically:
+
+```bash
+rig deploy --bluegreen v2              # deploy as <base>-v2 with its own subdomain
+rig deploy --bluegreen v2 --promote    # stage then swap production in one transaction
+```
+
+`--promote` requires `--bluegreen`. The previous production app is retained as a rollback target until you delete it.
+
+### Scaffold a manifest
+
+```bash
+rig init                               # scaffold rig.yaml in cwd
+rig init --name my-api --port 8080 --from ./service --force
+```
+
+---
+
+## The rig.yaml manifest
+
+`rig.yaml` describes the app(s) to deploy. Multi-word fields use **camelCase** primarily, with `snake_case` accepted as an alias. There are two surface forms.
+
+### Single-app form
+
+Three fields are required: `name`, `port`, and `start` (with `install` needed in practice for anything with dependencies).
+
+```yaml
+name: notes-api               # required — slugified to the subdomain (a-z0-9-, 2–64 chars)
+port: 5000                    # required — port the app listens on
+start: gunicorn app:app       # required — the systemd ExecStart command
+install: pip install -r requirements.txt   # dependency install (runs server-side)
+build: python manage.py collectstatic       # optional — runs after install, before start
+
+env:                          # static env vars baked into the unit
+  LOG_LEVEL: info
+
+secrets:                      # forward local env vars into the deploy (read at deploy time)
+  - STRIPE_KEY                          # forward $STRIPE_KEY as STRIPE_KEY
+  - { name: APP_DB, from: DATABASE_URL } # forward $DATABASE_URL as APP_DB
+  - { name: SENTRY_DSN, optional: true } # skip (don't fail) if unset locally
+
+credentials:                  # platform-generated values injected as env vars
+  api_key:
+    generate: true            # mint a random value on first deploy
+    envVar: NOTES_API_KEY     # runtime var name (defaults to CRED_<UPPER_KEY>)
+
+health:                       # HTTP readiness probe (defaults to GET / with a 60s budget)
+  path: /healthz              # must start with /
+  timeoutSeconds: 30
+
+dependsOn: [postgresql, redis-server]   # workspace backing services this app needs
+restartPolicy: on-failure     # always (default) | on-failure | no
+workingDirectory: /opt/notes  # where the payload is extracted (default: ~/.rigbox/deploys/<slug>)
+protocol: http                # http (default) | https | tcp
+
+visibility: private           # private (default) | public | privileged allow-list
+# visibility:                 # privileged form — owner plus listed emails
+#   emails: [alice@example.com, bob@x.dev]
+
+source:                       # where the code comes from
+  kind: git                   # local (default; rsync the dir) | git (clone on the VM)
+  repo: https://github.com/you/repo.git
+  branch: main
+
+ai:                           # opt this app into the managed AI proxy
+  managed: true
+  providers: [openai]         # defaults to [openai]; injects OPENAI_BASE_URL/_API_KEY
+
+params:                       # user-configurable knobs surfaced in the workspace UI
+  - key: max_items
+    label: Max items
+    description: Upper bound on returned rows
+    type: number              # string (default) | number | boolean | secret | select | email | url | textarea
+    default: "100"
+    required: false
+    envVar: MAX_ITEMS         # surface the value as this env var on the unit
+    group: Limits
+    order: 1
+  - key: tier
+    label: Plan tier
+    type: select
+    default: free
+    options:
+      - { value: free, label: Free }
+      - { value: pro,  label: Pro }
+
+limits:                       # per-app runtime caps applied to the systemd unit
+  memoryMaxMb: 2048           # systemd MemoryMax
+  cpuPercent: 150             # CPUQuota as percent of one core (150 = 1.5 cores)
+  tasksMax: 100               # systemd TasksMax
+
+volumes:                      # persistent volumes mounted into the app
+  - name: data
+    mountPath: /var/lib/data
+    sizeMb: 4096
+```
 
 <Note>
-  Placeholders below use the form `<WORKSPACE_NAME>` and `<APP_NAME>` to make it obvious where you should substitute your own values. Replace the whole placeholder, including the angle brackets, with the actual name (e.g. `my-project`). The walkthrough examples that follow use `my-project` and `my-api` as illustrative names.
+`secrets:` values are read from your **local** shell at deploy time. Deploy fails fast (before anything ships) if a non-optional secret is unset, so you can export them all in one go.
 </Note>
 
-### List workspaces
+#### Field reference
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `name` | string | **Required.** Slugified (`[a-z0-9-]`, 2–64 chars) to form the subdomain. |
+| `port` | number | **Required.** Port the app listens on. |
+| `start` | string | **Required.** systemd `ExecStart`. |
+| `install` | string | Dependency-install command, compiled into the server-side install script. |
+| `build` | string | Build command run after `install`, before start. |
+| `env` | map | Static env vars baked into the unit. |
+| `secrets` | list | Local env vars forwarded at deploy time (`NAME`, `{name, from}`, or `{name, optional}`). |
+| `credentials` | map | Platform-minted values (`generate`, `envVar`). |
+| `health` | object | `path` (must start `/`), `timeoutSeconds` (default 60). |
+| `params` | list | UI knobs — see field list below. |
+| `dependsOn` | list | Workspace services that must be alive. |
+| `restartPolicy` | string | `always` (default), `on-failure`, `no`. |
+| `workingDirectory` | string | Payload extraction path. |
+| `protocol` | string | `http` (default), `https`, `tcp`. |
+| `visibility` | string/object | `private` (default), `public`, or `{ emails: [...] }`. |
+| `source` | object | `kind: local` (default) or `kind: git` with `repo`/`branch`. |
+| `ai` | object | `managed: true` + optional `providers` to route through the AI proxy. |
+| `limits` | object | `memoryMaxMb`, `cpuPercent`, `tasksMax` (all optional). |
+| `volumes` | list | `name`, `mountPath`, `sizeMb` per entry. |
+| `publish` | object | Metadata for `rig publish` (`vendor`, `slug`, `version`, `summary`, `tags`, …). |
+
+Each `params:` entry accepts: `key` (required), `label`, `description`, `type` (`string` default, `number`, `boolean`, `secret`, `select`, `email`, `url`, `textarea`), `default`, `required`, `sensitive`, `options` (for `select`: `{value, label}`), `group`, `order`, `helpUrl`, `validationPattern`, and `envVar` (surface the value as this env var on the unit — without it the value lands in metadata but the process can't see it).
+
+### Multi-app form
+
+A top-level `apps:` map switches to project form: an optional `workspace:` envelope plus a name-keyed map of apps. Each app is either a local build context (`path:`) **or** a published recipe (`ref:`).
+
+```yaml
+workspace:
+  image: dev                  # base template/image for the VM
+  resources:
+    ramMb: 4096               # workspace VM resources (all optional)
+    vcpuCount: 2
+    diskSizeMb: 20480
+  env:                        # merged UNDER each app's own env (app wins per key)
+    SHARED_FLAG: "1"
+
+apps:
+  api:
+    path: ./api               # local build context (relative to project dir)
+    port: 8080
+    start: node server.js
+    install: npm ci
+    dependsOn: [postgresql]
+  worker:
+    path: ./worker
+    start: python3 worker.py
+    install: pip install -r requirements.txt
+    dependsOn: [api]          # topo-ordered against sibling apps
+  cache:
+    ref: "@vendor/redis@1.2.0"  # launch a published recipe by ref instead of building
+```
+
+Every entry under `apps:` accepts the same inline fields as the single-app form (minus `name`, which is the map key). `dependsOn` is topo-sorted across siblings. Mixing single-app keys (`start`/`port` at the top level) with `apps:` is rejected.
+
+---
+
+## Command reference
+
+<Note>
+Placeholders use `<WORKSPACE>` (a name or `ws-…` id) and `<APP>` (a name or `app-…` id). Most lifecycle commands accept either form.
+</Note>
+
+### Account
+
+| Command | Description |
+| --- | --- |
+| `rig login` / `rig logout` | Authenticate / clear credentials. |
+| `rig whoami` | Show the current user and workspace. |
+| `rig status` | Dashboard summary for the account (quota, usage). |
+| `rig limits` | Effective resource limits and current usage. |
+| `rig capacity` | Fleet workspace-slot capacity. |
+| `rig api-key create\|ls\|rm` | Manage account API keys. |
+| `rig ai defaults` | Set account AI defaults (`--provider`, `--model`, `--mode managed\|byok`). |
+| `rig ai usage` | Show AI usage history. |
+| `rig config set\|get\|unset\|list` | Persisted CLI defaults. |
+| `rig completions` | Generate/install shell completions. |
+| `rig uninstall` | Remove the local CLI install (`--purge-config`). |
+
+### workspace
+
+Manage workspace lifecycle and configuration.
 
 ```bash
 rig workspace ls
+rig workspace spawn --name my-project --template dev --auto-size
+rig workspace new   --name my-project --template dev      # create without starting
+rig workspace start --workspace my-project --wait-for-apps
+rig workspace stop  --workspace my-project
+rig workspace restart --workspace my-project
+rig workspace logs  --workspace my-project --follow
+rig workspace rm    --workspace my-project --force
 ```
 
-Output:
-
-```
-NAME          STATUS    IMAGE    CREATED
-my-project    running   dev      2 hours ago
-api-service   stopped   base     3 days ago
-ml-notebook   running   dev      1 day ago
-```
-
-### Create a workspace
-
-```bash
-rig workspace new --name <WORKSPACE_NAME> --template dev
-```
-
-This creates a workspace but does not start it. Available templates include `base` (minimal) and `dev` (includes development tools, sidecar, and more).
-
-### Create and start in one command
-
-```bash
-rig workspace spawn --name <WORKSPACE_NAME>
-```
-
-<Tip>
-  Use `rig workspace spawn` for the fastest path from zero to a running workspace. It creates the workspace, starts the VM, and waits until it is ready - all in one command.
-</Tip>
-
-### Start and stop
-
-`rig workspace start`, `rig workspace stop`, `rig workspace restart`, `rig workspace logs`, and `rig workspace rm` accept either a workspace name or a workspace ID (`ws-...`). The placeholder `<WORKSPACE_NAME_OR_ID>` reflects that you can paste either.
-
-```bash
-rig workspace start --workspace <WORKSPACE_NAME_OR_ID>     # Boot the VM
-rig workspace stop --workspace <WORKSPACE_NAME_OR_ID>      # Shut down the VM (preserves disk)
-```
-
-Add `--wait-for-apps` to `rig workspace start` when you also want the command to wait for workspace apps to report active.
-
-### Check status
-
-```bash
-rig status
-```
-
-This shows a dashboard with your account quota, resource usage across all workspaces, and current plan limits.
-
-### Stream logs
-
-```bash
-rig workspace logs --workspace <WORKSPACE_NAME_OR_ID> --follow
-```
-
-Streams workspace system logs in real time. Press `Ctrl+C` to stop.
-
-### Get the SSH command
-
-```bash
-rig workspace ssh-info --workspace my-project
-```
-
-Prints the canonical `ssh user@host` command for a workspace, plus the underlying user, region host, and status. Use `--format json` for scripting.
-
-The output uses region-direct routing (e.g. `eu-west-1.rigbox.dev`) — see the [SSH Access guide](/guides/ssh-access) for the full connection model.
-
-### Delete a workspace
-
-```bash
-rig workspace rm --workspace <WORKSPACE_NAME_OR_ID>
-```
+| Subcommand | Key flags | Description |
+| --- | --- | --- |
+| `ls` | — | List all workspaces. |
+| `spawn` | `--name`, `--template`, `--ram`, `--vcpu`, `--disk`, `--catalog` (repeat), `--env`, `--setup-script-id`, `--service-spec-id`, `--app-param`, `--wait-for-apps`, `--auto-size` | Create and start in one step. |
+| `new` | `--name`, `--template`, `--ram`, `--vcpu`, `--disk`, `--catalog`, `--setup-script-id`, `--service-spec-id` | Create without starting. |
+| `start` / `stop` / `restart` | `--workspace`, (`--wait-for-apps` on start) | VM lifecycle. |
+| `rm` / `cancel` / `retry` | `--workspace`, `--force` | Delete, cancel in-progress creation, retry a failed creation. |
+| `logs` | `--workspace`, `--follow` | Stream workspace logs. |
+| `ssh-info` | `--workspace` | Print the canonical SSH connection info. |
+| `metrics` | `--workspace` | Live CPU/RAM/disk. |
+| `services` | `--workspace` | Background services tracked in the workspace. |
+| `ports` | `--workspace` | Ports the workspace is listening on. |
+| `resize` | `--workspace`, `--ram`, `--vcpu`, `--disk` | Resize VM resources. |
+| `reconcile` | `--workspace` | Reconcile apps with the template. |
+| `env set\|unset\|get` | `--workspace`, (`--reveal` on get) | Workspace env vars. |
+| `ai mode\|show` | `--workspace`, (`--reveal` on show) | Workspace AI configuration. |
 
 <Warning>
-  Deleting a workspace permanently destroys the VM and its disk. This action cannot be undone. Make sure to back up any important files first.
+`rig workspace rm` permanently destroys the VM and its disk. Back up anything important first.
 </Warning>
 
----
+### app
 
-## App Management
-
-Apps are services running inside your workspace that are exposed to the internet via a unique subdomain (`{name}.rigbox.dev`).
-
-Inside a workspace VM, app commands are always scoped to the current workspace. Passing another workspace ID does not change the target workspace.
-
-### List apps
+Manage apps inside a workspace. Inside a VM these are always scoped to the current workspace.
 
 ```bash
-rig app ls
+rig app ls --workspace my-project
+rig app new --name my-api --port 3000 --kind service
+rig app logs --app my-api --follow
+rig app start --app my-api
+rig app share --app my-api --public
+rig app rm --app my-api
 ```
 
-Output:
+| Subcommand | Key flags | Description |
+| --- | --- | --- |
+| `ls` | `--workspace` (optional) | List apps in a workspace or across all. |
+| `new` | `--name`, `--port`, `--kind service\|cli`, `--workspace`, `--description` | Create an app. |
+| `start` / `stop` / `restart` | `--app` | App lifecycle. |
+| `logs` | `--app`, `--follow` | Stream app logs. |
+| `rm` | `--app`, `--workspace`, `--force`, `--force-delete` | Delete an app. |
+| `share` | `--app`, `--public` / `--private` / `--emails a,b,c` | Set route visibility (pick one mode). |
+| `health` | `--app` | Show runtime health. |
+| `expose-port` | `--workspace`, `--port`, `--name`, `--wrap` | Detect or expose a workspace port as an app. |
+| `domain set` | `--app`, `--domain` | Attach a custom domain. |
+| `verify-domain` | `--app` | Re-check DNS for a custom domain. |
+| `param ls\|get\|set\|unset` | `--app`, then `key`/`KEY=VALUE` | Read and write catalog-app parameters. |
+| `log-source ls\|add\|update\|rm` | `--app`, `--type`, `--ref`, `--name`, `--primary`, `--source` | Manage app log sources (`systemd_unit`, `docker_container`, `file_path`). |
 
-```
-NAME       PORT    STATUS    URL
-my-api     3000    running   my-api.rigbox.dev
-frontend   5173    running   frontend.rigbox.dev
-```
+`rig app new --kind` is `service` (long-lived server at a subdomain) or `cli` (interactive binary over SSH, no Caddy route). See [Catalog Apps](/guides/catalog#app-shapes).
 
-### Create an app
+### snapshot
 
 ```bash
-rig app new --name <APP_NAME> --port 3000
+rig snapshot create  --workspace my-project --name pre-upgrade
+rig snapshot ls      --workspace my-project       # omit --workspace to list all
+rig snapshot restore --workspace my-project --snapshot <SNAP_ID>
+rig snapshot rm      --workspace my-project --snapshot <SNAP_ID>
 ```
 
-This creates an app route that maps a public subdomain to the specified port inside your workspace. The app will be reachable at `<APP_NAME>.rigbox.dev`.
+See the [Snapshots guide](/guides/snapshots) for the full model.
 
-Pass `--kind cli` for interactive tools you'll invoke over SSH rather than expose as a public service — CLI-shape apps have no port, no protocol, and no Caddy route. Defaults to `service`. The same field is available on the API as `app_kind: "service" | "cli"`; see [Catalog Apps](/guides/catalog#app-shapes) for the full Service-vs-CLI breakdown.
+### volume
 
-### Start, stop, and restart
-
-`rig app start`, `rig app stop`, `rig app restart`, `rig app logs`, and `rig app rm` accept either an app name or an app ID (`app-...`).
+Manage persistent volumes that survive across deploys and reboots.
 
 ```bash
-rig app start --app <APP_NAME_OR_ID>      # Start the app service
-rig app stop --app <APP_NAME_OR_ID>       # Stop the app service
-rig app restart --app <APP_NAME_OR_ID>    # Restart the app service
+rig volume create --workspace my-project --name data --size-mb 4096 --mount-path /var/lib/data
+rig volume ls     --workspace my-project          # omit --workspace to list all
+rig volume resize --workspace my-project --volume <VOL_ID> --size-mb 8192
+rig volume rm     --workspace my-project --volume <VOL_ID>
 ```
 
-### Stream app logs
+You can also declare volumes inline in `rig.yaml` under [`volumes:`](#single-app-form) so a deploy provisions and mounts them automatically.
+
+<Note>
+`volume` commands back the **PersistentVolumes** server feature. They may be unavailable until that feature flag is enabled for your account.
+</Note>
+
+### build, release, rollback
+
+Reproducible deploys separate **build** (produce an immutable image artifact) from **run** (activate a release that pins an image digest).
 
 ```bash
-rig app logs --app <APP_NAME_OR_ID> --follow
+# Build an immutable image for a workspace
+rig build --workspace my-project --base-image dev \
+  --install "npm ci && npm run build" \
+  --source-repo https://github.com/you/repo.git --source-commit "$(git rev-parse HEAD)"
+
+# Pin that image digest into a release
+rig release create --workspace my-project --image-digest sha256:… \
+  --run-config '{"execStart":"node server.js","port":3000}'
+
+rig release ls --workspace my-project
+rig release activate --workspace my-project --release <RELEASE_ID>
+
+# Roll back = activate a prior release (alias for `release activate`)
+rig rollback --workspace my-project --release <RELEASE_ID>
 ```
 
-### Delete an app
+| Command | Key flags | Description |
+| --- | --- | --- |
+| `build` | `--workspace`, `--base-image`, `--install`, `--source-repo`, `--source-commit` | Build a reproducible image and print its digest. |
+| `release create` | `--workspace`, `--image-digest`, `--run-config` | Create a release pinning an image digest. |
+| `release ls` | `--workspace` | List releases for a workspace. |
+| `release activate` | `--workspace`, `--release` | Activate a release. |
+| `rollback` | `--workspace`, `--release` | Activate a release (rollback alias). |
+
+<Note>
+`build`, `release`, and `rollback` back the **ReproducibleBuilds** server feature. They may be unavailable until that feature flag is enabled for your account.
+</Note>
+
+### ssh
+
+Manage SSH public keys for your account.
 
 ```bash
-rig app rm --app <APP_NAME_OR_ID>
+rig ssh add  --name laptop --file ~/.ssh/id_ed25519.pub
+rig ssh ls                          # account keys; add --workspace to list workspace keys
+rig ssh rm   --name laptop
+rig ssh sync --workspace my-project  # push your keys into a workspace
 ```
 
----
-
-## Templates and Catalog
-
-Templates, catalog browsing, and account-level tool management are available from the external CLI. They are hidden inside workspace VM mode.
-
-### Browse templates
-
-Templates are pre-configured workspace setups for common use cases:
+A handy one-liner combines `ssh-info` with your SSH client:
 
 ```bash
-rig template
+ssh "$(rig workspace ssh-info --workspace my-project --output json | jq -r .ssh_target)"
 ```
 
-Output:
+See the [SSH Access guide](/guides/ssh-access) for the full connection model.
 
-```
-NAME                  DESCRIPTION
-ai-agent-starter      AI agent with tool use and memory
-openclaw              Telegram bot with AI backend
-web-fullstack         React + Node.js full-stack starter
-python-ml             Python ML workspace with Jupyter
-```
+### tools
 
-### Browse installable apps
-
-The catalog lists applications you can install into a running workspace:
+Launch and manage interactive workspace tools (architecture explorer, virtual browser, …).
 
 ```bash
-rig catalog
+rig tools ls       --workspace my-project
+rig tools launch   --tool architecture-explorer --workspace my-project
+rig tools stop     --tool architecture-explorer --workspace my-project
+rig tools install  --workspace my-project --tool virtual-browser
+rig tools install-status --workspace my-project --tool virtual-browser --job-id <JOB_ID>
 ```
 
-### Install from catalog
+### template
 
 ```bash
-rig catalog install --item vscode --workspace <WORKSPACE_NAME>
+rig template ls
+rig template deploy --template dev --name my-project --catalog vscode,jupyter
 ```
 
-This installs VS Code Server into the named workspace, making it accessible via a browser. Inside a workspace VM, the `--workspace` flag can be omitted — it defaults to the current workspace.
+### recipe
 
-<Tip>
-  The catalog includes popular tools like VS Code, Jupyter, and database clients. Run `rig catalog` to see the full list.
-</Tip>
-
-### Install an AI coding CLI
-
-The catalog also ships **CLI-shape recipes** for terminal-first coding agents — `claude`, `codex`, `opencode`, and `kilocode`. These install the binary into `$PATH` and route through the managed AI proxy; there is no port, subdomain, or systemd service:
+Publish and install community recipes. There are two kinds: **app** recipes (install into an existing workspace) and **composition** recipes (deploy a whole workspace).
 
 ```bash
-rig catalog install --item claude --workspace <WORKSPACE_NAME>
-ssh my-project-ctbxi8lb@eu-west-1.rigbox.dev
-# inside the workspace
-claude
-```
+# App recipes
+rig recipe app init --vendor you ...   # scaffold an app recipe directory
+rig recipe app ls   --type community
+rig recipe app lint  rig.yaml
+rig recipe app info  rig.yaml          # or an exact recipe ref
+rig recipe app install --ref "@vendor/slug@1.0.0" --workspace my-project
+rig recipe app versions --ref "@vendor/slug"
+rig recipe app delete   --ref "@vendor/slug@1.0.0"
+rig recipe app yank\|deprecate --ref "@vendor/slug@1.0.0"
+rig recipe app profile                 # show/update your community profile
+rig recipe app health
+rig recipe app test composition.yaml
 
-See [Catalog Apps](/guides/catalog) for the full list of Service- and CLI-shape recipes and the differences between them.
-
----
-
-## Tools
-
-Tools are interactive applications that run alongside your workspace.
-
-### List available tools
-
-```bash
-rig tools ls --workspace <WORKSPACE_NAME_OR_ID>
-```
-
-### Launch a tool
-
-```bash
-rig tools launch --tool architecture-explorer --workspace <WORKSPACE_NAME_OR_ID>
-```
-
-This starts the specified tool and provides you with the URL to access it.
-
----
-
-## SSH Key Management
-
-Manage the SSH keys registered to your account directly from the external CLI. SSH key commands are account-wide and are not shown inside workspace VM mode.
-
-### Add a key
-
-```bash
-rig ssh add --name <KEY_NAME>
-```
-
-This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it with your account under the name you provide (for example, `laptop` or `desktop`).
-
-### List keys
-
-```bash
-rig ssh ls
-```
-
-Output:
-
-```
-NAME      FINGERPRINT                               CREATED
-laptop    SHA256:abc123def456...                     2 days ago
-desktop   SHA256:xyz789ghi012...                     1 week ago
-```
-
-### Remove a key
-
-```bash
-rig ssh rm --name <KEY_NAME>
-```
-
-For more details on SSH access, including connecting to workspaces and using the TUI dashboard, see the [SSH Access guide](/guides/ssh-access).
-
----
-
-## AI Proxy
-
-The managed AI proxy lets you use supported AI providers through Rigbox's credit system without putting provider keys in your workspace. See [Managed AI Proxy](/guides/managed-proxy) for the full architecture.
-
-### Default environment
-
-Managed workspaces export OpenRouter-shape variables to every login shell:
-
-```bash
-export OPENROUTER_BASE_URL='http://172.16.0.1:9090/v1'
-export OPENROUTER_API_KEY='managed-by-rigbox'   # opaque placeholder; real key never enters the VM
-```
-
-Most modern AI SDKs and CLIs read these directly. The catalog recipes for `claude`, `codex`, `opencode`, and `kilocode` each layer a `/etc/profile.d/*-routing.sh` shim on top that translates these into the provider-native env vars each agent prefers.
-
-### Configure the current shell
-
-If you need provider-native exports for tools that don't read OpenRouter env vars (Gemini CLI, Aider, etc.), run:
-
-```bash
-eval "$(rig proxy on)"
-```
-
-This prints compatibility `export` statements (`OPENAI_BASE_URL`, `ANTHROPIC_BASE_URL`, `GOOGLE_API_KEY`, …) wired to the same proxy. You can also source the generated env file directly:
-
-```bash
-source ~/.rigbox/proxy.env
-```
-
-These compatibility variables are opt-in to avoid hijacking tools you authenticate separately.
-
-### Deactivate the proxy
-
-```bash
-eval "$(rig proxy off)"
-```
-
-### Check proxy status
-
-```bash
-rig proxy status
-```
-
-This shows the bridge URL, available provider base URLs, whether your current shell environment matches them, and your credit balance when available.
-
-You can also check credits through the public API from outside the VM:
-
-```bash
-curl https://api.rigbox.dev/api/v1/users/me/credits \
-  -H "Authorization: Bearer YOUR_API_KEY"
+# Composition recipes (whole workspaces)
+rig recipe composition init --vendor you --slug stack --name "My Stack" --app "@v/a@1.0.0"
+rig recipe composition lint\|ls\|info\|versions\|delete\|yank\|deprecate ...
+rig recipe composition deploy --ref "@vendor/stack@1.0.0"
 ```
 
 <Note>
-  The proxy bridge is only reachable from inside a workspace VM. It listens at `http://172.16.0.1:9090`, resolves the workspace by bridge source IP, injects managed provider keys upstream, and meters usage against your credits.
+Registry refs use the required `-r`/`--ref` flag (`install`, `versions`, `delete`, `yank`, `deprecate`). Positional arguments are for **local** file paths only (`lint`, `info`).
 </Note>
 
+### publish
+
+Publish a `rig.yaml` (or a rendered manifest) to the community registry:
+
+```bash
+rig publish --vendor you --slug notes --version 1.0.0
+rig publish --app api                  # multi-app: publish only one child
+rig publish --from-manifest manifest.json   # publish a pre-rendered manifest ('-' = stdin)
+rig publish --dry-run                  # print the rendered manifest without calling the API
+```
+
+The `publish:` block in `rig.yaml` supplies default vendor/slug/version/metadata; flags override it.
+
+### setup-script & service-spec
+
+Reusable first-boot configuration attached to workspaces at creation time.
+
+```bash
+rig setup-script ls
+rig setup-script create --name bootstrap --file ./bootstrap.sh
+rig setup-script update --id <ID> --name new-name --file ./bootstrap.sh
+rig setup-script rm     --id <ID>
+
+rig service-spec ls
+rig service-spec create --file ./spec.yaml
+rig service-spec update --id <ID> --file ./spec.yaml
+rig service-spec rm     --id <ID>
+```
+
+See [Setup Scripts](/guides/setup-scripts) and [Service Specs](/guides/service-specs).
+
+### proxy (workspace-only)
+
+Inside a workspace VM, the managed AI proxy helpers wire your shell to the credit-metered proxy:
+
+```bash
+rig proxy status                 # bridge URL, routes, credit balance
+eval "$(rig proxy on)"           # export OPENAI_/ANTHROPIC_ vars wired to the proxy
+eval "$(rig proxy off)"          # unset them
+rig proxy dotenv ./.env          # write a .env with proxy config
+rig proxy path                   # path to the sourceable proxy.env file
+```
+
+`on`/`off`/`env` accept an optional route alias (`openrouter`, `openai`, `v1`). See [Managed AI Proxy](/guides/managed-proxy).
+
 ---
 
-## Workspace VM Command Surface
-
-Inside a workspace VM, `rig` is intentionally smaller. Run `rig -h` in the VM to see only workspace-safe commands.
-
-Shown in VM mode:
-
-- `rig whoami`
-- `rig status`
-- `rig app ...`
-- `rig proxy ...`
-
-Hidden in VM mode:
-
-- `rig login` and `rig logout`
-- `rig workspace ls`, `rig workspace new`, `rig workspace spawn`, `rig workspace start`, `rig workspace stop`, `rig workspace restart`, and `rig workspace rm`
-- `rig template`, `rig catalog`, `rig tools`, and `rig ssh`
-
-Those commands remain available from your local machine after `rig login`.
-
----
-
-## API Reference
+## API reference
 
 The CLI wraps the Rigbox REST API. For programmatic access, see:
 
-- [Workspaces API](/api-reference/workspaces/list) - Create, manage, and monitor workspaces
-- [Apps API](/api-reference/apps/list) - Manage app routes and services
-- [SSH Keys API](/api-reference/ssh-keys/list) - Register and manage SSH keys
-- [Templates API](/api-reference/templates/list) - Browse available templates
-- [AI & Credits API](/api-reference/ai/get-credits) - Credits, usage, and AI configuration
+- [Workspaces API](/api-reference/workspaces/list) — create, manage, and monitor workspaces
+- [Apps API](/api-reference/apps/list) — manage app routes and services
+- [SSH Keys API](/api-reference/ssh-keys/list) — register and manage SSH keys
+- [Templates API](/api-reference/templates/list) — browse available templates
+- [AI & Credits API](/api-reference/ai/get-credits) — credits, usage, and AI configuration
+
+Or hit any endpoint directly with `rig api GET /v1/workspaces`.
