@@ -484,13 +484,35 @@
           "API Keys"
         ],
         "operationId": "list_api_keys",
+        "parameters": [
+          {
+            "name": "max_results",
+            "in": "query",
+            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor returned by a prior call's `next_cursor`. Omit on the\nfirst page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "API keys",
+            "description": "API keys page",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiKeysListResponse"
+                  "$ref": "#/components/schemas/Page_ApiKeyResponse"
                 }
               }
             }
@@ -598,15 +620,46 @@
         "tags": [
           "Apps"
         ],
-        "summary": "List all apps for the authenticated user.",
+        "summary": "List apps for the authenticated user (or scoped to a workspace via\n`?workspace_id=`). Cursor-paginated under the shared `Page<T>` envelope.",
         "operationId": "list_apps",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "query",
+            "description": "Restrict to one workspace",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "max_results",
+            "in": "query",
+            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor returned by a prior call's `next_cursor`. Omit on the\nfirst page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "List of user apps",
+            "description": "Apps page",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListAppsResponse"
+                  "$ref": "#/components/schemas/Page_AppView"
                 }
               }
             }
@@ -838,6 +891,53 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/apps/{id}/env": {
+      "put": {
+        "tags": [
+          "Apps"
+        ],
+        "summary": "Replace this app's env vars and propagate them to the running VM's\ncanonical env sink.",
+        "operationId": "update_app_env",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "App ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAppEnvRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "App env updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAppResponse"
                 }
               }
             }
@@ -1478,6 +1578,53 @@
         ]
       }
     },
+    "/api/v1/apps/{id}/visibility": {
+      "put": {
+        "tags": [
+          "Apps"
+        ],
+        "summary": "Update app visibility.",
+        "operationId": "update_app_visibility",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "App ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAppVisibilityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "App visibility updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAppResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/auth/change-password": {
       "post": {
         "tags": [
@@ -1932,15 +2079,37 @@
         "tags": [
           "App Catalog"
         ],
-        "summary": "List exact deployable catalog refs for the current user.",
+        "summary": "Cursor-paginated list of exact deployable catalog refs for the current\nuser. Same offset-under-opaque-cursor approach as `list_recipes`.",
         "operationId": "list_versioned_catalog",
+        "parameters": [
+          {
+            "name": "max_results",
+            "in": "query",
+            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor returned by a prior call's `next_cursor`. Omit on the\nfirst page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Versioned official and community catalog items",
+            "description": "Catalog page",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CommunityCatalogResponse"
+                  "$ref": "#/components/schemas/Page_DeployPreviewResponse"
                 }
               }
             }
@@ -2058,6 +2227,220 @@
           },
           "403": {
             "description": "Feature not enabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/app-recipes/{vendor}/{slug}": {
+      "delete": {
+        "tags": [
+          "Community v1"
+        ],
+        "summary": "Delete an entire v1 App Recipe (all versions) owned by the caller.",
+        "operationId": "delete_app_recipe_all",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor (lowercase)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Recipe slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recipe deleted",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "403": {
+            "description": "Not the vendor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/app-recipes/{vendor}/{slug}/versions": {
+      "get": {
+        "tags": [
+          "Community v1"
+        ],
+        "summary": "List every published version of a v1 App Recipe (newest first).",
+        "operationId": "list_app_recipe_versions",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor (lowercase)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Recipe slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "max_results",
+            "in": "query",
+            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor returned by a prior call's `next_cursor`. Omit on the\nfirst page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Versions page (newest first)",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Recipe not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/app-recipes/{vendor}/{slug}/visibility": {
+      "patch": {
+        "tags": [
+          "Community v1"
+        ],
+        "summary": "Set the visibility of an app recipe the caller owns.",
+        "operationId": "set_app_recipe_visibility",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor (lowercase)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Recipe slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetVisibilityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Visibility updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid visibility",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the owning vendor",
             "content": {
               "application/json": {
                 "schema": {
@@ -2247,252 +2630,6 @@
         ]
       }
     },
-    "/api/v1/community/legacy-workspace-definitions": {
-      "get": {
-        "tags": [
-          "Community"
-        ],
-        "summary": "List published community legacy workspace definitions the current user can see.",
-        "description": "Returns the caller's own items first (any visibility), then community-visible\nitems filtered by the caller's `community_items_preference`.",
-        "operationId": "list_legacy_workspace_definitions",
-        "responses": {
-          "200": {
-            "description": "Published community legacy workspace definitions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommunityLegacyWorkspaceDefinitionListResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "Community"
-        ],
-        "summary": "Publish a private or Community legacy workspace definition version.",
-        "operationId": "publish_legacy_workspace_definition",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PublishCommunityLegacyWorkspaceDefinitionRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "410": {
-            "description": "Endpoint retired \u2014 use POST /v1/community/workspace-definitions (v1)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/community/legacy-workspace-definitions/{vendor}/{slug}/{version}": {
-      "delete": {
-        "tags": [
-          "Community"
-        ],
-        "summary": "Unpublish a community legacy workspace definition version. Only the owning vendor can delete.\nBuilt-in legacy workspace definitions (`vendor=rigbox`) cannot be deleted.",
-        "operationId": "delete_legacy_workspace_definition",
-        "parameters": [
-          {
-            "name": "vendor",
-            "in": "path",
-            "description": "Vendor username",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "in": "path",
-            "description": "Legacy workspace definition slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "description": "Exact version (semver)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Legacy workspace definition version deleted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Not the vendor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/community/legacy-workspace-definitions/{vendor}/{slug}/{version}/deprecate": {
-      "post": {
-        "tags": [
-          "Community"
-        ],
-        "summary": "Deprecate a community legacy workspace definition version. Only the owning vendor can mutate it.",
-        "operationId": "deprecate_legacy_workspace_definition",
-        "parameters": [
-          {
-            "name": "vendor",
-            "in": "path",
-            "description": "Vendor username",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "in": "path",
-            "description": "Legacy workspace definition slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "description": "Exact version (semver)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Legacy workspace definition version deprecated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommunityLegacyWorkspaceDefinitionLifecycleResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/community/legacy-workspace-definitions/{vendor}/{slug}/{version}/yank": {
-      "post": {
-        "tags": [
-          "Community"
-        ],
-        "summary": "Yank a community legacy workspace definition version. Only the owning vendor can mutate it.",
-        "operationId": "yank_legacy_workspace_definition",
-        "parameters": [
-          {
-            "name": "vendor",
-            "in": "path",
-            "description": "Vendor username",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "in": "path",
-            "description": "Legacy workspace definition slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "description": "Exact version (semver)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Legacy workspace definition version yanked",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommunityLegacyWorkspaceDefinitionLifecycleResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/api/v1/community/profile": {
       "get": {
         "tags": [
@@ -2558,16 +2695,38 @@
         "tags": [
           "Community"
         ],
-        "summary": "List published community app recipes the current user can see.",
-        "description": "Returns the user's own items first (any visibility) then community-visible\nitems filtered by the caller's `community_items_preference`.",
+        "summary": "Cursor-paginated list of published community app recipes the caller can see.",
+        "description": "Returns the user's own items first (any visibility) then community-visible\nitems filtered by the caller's `community_items_preference`.\n\nUses **offset** under the opaque cursor (not keyset): the sort is\npartitioned (vendored-first, then community by `published_at`), and the\ncomposed list already lives in memory after fan-out from the DB. Offset\nover the composed list is cheaper than retro-fitting a keyset DB query.",
         "operationId": "list_recipes",
+        "parameters": [
+          {
+            "name": "max_results",
+            "in": "query",
+            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor returned by a prior call's `next_cursor`. Omit on the\nfirst page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Published community recipes",
+            "description": "Community recipes page",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CommunityCatalogResponse"
+                  "$ref": "#/components/schemas/Page_DeployPreviewResponse"
                 }
               }
             }
@@ -2961,6 +3120,220 @@
         ]
       }
     },
+    "/api/v1/community/workspace-definitions/{vendor}/{slug}": {
+      "delete": {
+        "tags": [
+          "Community v1"
+        ],
+        "summary": "Delete an entire v1 Workspace Definition (all versions) owned by the caller.",
+        "operationId": "delete_workspace_definition_all",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor (lowercase)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Workspace definition slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace definition deleted",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "403": {
+            "description": "Not the vendor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/workspace-definitions/{vendor}/{slug}/versions": {
+      "get": {
+        "tags": [
+          "Community v1"
+        ],
+        "summary": "List every published version of a v1 Workspace Definition (newest first).",
+        "operationId": "list_workspace_definition_versions",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor (lowercase)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Workspace definition slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "max_results",
+            "in": "query",
+            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor returned by a prior call's `next_cursor`. Omit on the\nfirst page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Versions page (newest first)",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Definition not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/workspace-definitions/{vendor}/{slug}/visibility": {
+      "patch": {
+        "tags": [
+          "Community v1"
+        ],
+        "summary": "Set the visibility of a workspace definition the caller owns.",
+        "operationId": "set_workspace_definition_visibility",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor (lowercase)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Workspace definition slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetVisibilityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Visibility updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid visibility",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the owning vendor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/community/workspace-definitions/{vendor}/{slug}/{version}": {
       "get": {
         "tags": [
@@ -3124,43 +3497,6 @@
         ]
       }
     },
-    "/api/v1/deploy/legacy-workspace-definitions/preview": {
-      "get": {
-        "tags": [
-          "Deploy"
-        ],
-        "summary": "Preview an exact Community legacy workspace definition ref.",
-        "operationId": "preview_legacy_workspace_definition",
-        "parameters": [
-          {
-            "name": "ref",
-            "in": "query",
-            "description": "Exact legacy workspace definition ref, e.g. @alice/data-lab@1.0.0",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Legacy workspace definition deploy preview",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LegacyWorkspaceDefinitionPreviewResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/api/v1/deploy/preview": {
       "get": {
         "tags": [
@@ -3221,7 +3557,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LegacyWorkspaceDefinitionPreviewResponse"
+                  "$ref": "#/components/schemas/WorkspaceDefinitionPreviewResponse"
                 }
               }
             }
@@ -3734,15 +4070,37 @@
         "tags": [
           "Snapshots"
         ],
-        "summary": "List all snapshots for the authenticated user.",
+        "summary": "Cursor-paginated list of all snapshots owned by the authenticated user\n(independent of workspace existence).",
         "operationId": "list_user_snapshots",
+        "parameters": [
+          {
+            "name": "max_results",
+            "in": "query",
+            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor returned by a prior call's `next_cursor`. Omit on the\nfirst page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "User snapshots",
+            "description": "User snapshots page",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListSnapshotsResponse"
+                  "$ref": "#/components/schemas/Page_SnapshotView"
                 }
               }
             }
@@ -4287,13 +4645,35 @@
           "Workspaces"
         ],
         "operationId": "list_vms",
+        "parameters": [
+          {
+            "name": "max_results",
+            "in": "query",
+            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor returned by a prior call's `next_cursor`. Omit on the\nfirst page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Workspaces",
+            "description": "Workspaces page",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListWorkspacesResponse"
+                  "$ref": "#/components/schemas/Page_Vm"
                 }
               }
             }
@@ -4374,41 +4754,6 @@
         ]
       }
     },
-    "/api/v1/workspaces/from-legacy-workspace-definition": {
-      "post": {
-        "tags": [
-          "Workspaces"
-        ],
-        "operationId": "deploy_from_legacy_workspace_definition",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeployFromLegacyWorkspaceDefinitionRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Workspace created from legacy workspace definition",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DeployFromLegacyWorkspaceDefinitionResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/api/v1/workspaces/{id}": {
       "get": {
         "tags": [
@@ -4476,88 +4821,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/workspaces/{id}/ai-config": {
-      "get": {
-        "tags": [
-          "AI"
-        ],
-        "summary": "Get the AI configuration for a workspace.",
-        "operationId": "get_workspace_ai_config",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Workspace ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Workspace AI configuration",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WorkspaceAiConfigResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "AI"
-        ],
-        "summary": "Update workspace AI configuration.",
-        "operationId": "update_workspace_ai_config",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Workspace ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateWorkspaceAiConfigRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Updated AI configuration",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WorkspaceAiConfigResponse"
                 }
               }
             }
@@ -4721,6 +4984,54 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/LaunchDeployRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Deploy launched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeployLaunchResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/deploy/launch-from-manifest": {
+      "post": {
+        "tags": [
+          "Deploy"
+        ],
+        "summary": "Install a recipe from an inline manifest, bypassing the registry.",
+        "description": "Used by `rig app deploy --bluegreen <suffix>` for preview deploys:\nthe CLI renders the local rig.yaml to a canonical AppManifest and\nhands it directly to this endpoint, skipping the publish + lookup-\nby-ref round trip that would mint a `@user/<base>-<suffix>@<ver>`\nrow in the registry the user doesn't care about. Stable per-recipe\npublishes still go through `/deploy/launch`.",
+        "operationId": "launch_deploy_from_manifest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LaunchFromManifestRequest"
               }
             }
           },
@@ -5512,7 +5823,7 @@
         "tags": [
           "Snapshots"
         ],
-        "summary": "List snapshots for a workspace.",
+        "summary": "Cursor-paginated list of snapshots for one workspace.",
         "operationId": "list_workspace_snapshots",
         "parameters": [
           {
@@ -5523,15 +5834,35 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "max_results",
+            "in": "query",
+            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor returned by a prior call's `next_cursor`. Omit on the\nfirst page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Workspace snapshots",
+            "description": "Workspace snapshots page",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListSnapshotsResponse"
+                  "$ref": "#/components/schemas/Page_SnapshotView"
                 }
               }
             }
@@ -5686,7 +6017,8 @@
         "tags": [
           "SSH Keys"
         ],
-        "summary": "List SSH keys currently in the workspace.",
+        "summary": "Cursor-paginated list of SSH keys currently in the workspace.",
+        "description": "Note: this endpoint reads `authorized_keys` from the running VM rather\nthan the database. The host always loads the full file in one round-trip,\nso pagination is purely client-side slicing on the parsed list. Wire\nshape stays uniform with the rest of the contract.",
         "operationId": "list_workspace_ssh_keys",
         "parameters": [
           {
@@ -5697,15 +6029,35 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "max_results",
+            "in": "query",
+            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor returned by a prior call's `next_cursor`. Omit on the\nfirst page.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Workspace SSH keys",
+            "description": "Workspace SSH keys page",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListWorkspaceSshKeysResponse"
+                  "$ref": "#/components/schemas/Page_SshKeyEntry"
                 }
               }
             }
@@ -6174,6 +6526,183 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ToolStopResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/volumes": {
+      "get": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "List a workspace's persistent volumes.",
+        "operationId": "list_workspace_volumes",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace volumes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListVolumesResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Create a persistent volume on a workspace.",
+        "operationId": "create_workspace_volume",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVolumeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Volume created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/volumes/{volume_id}": {
+      "delete": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Delete a persistent volume from a workspace.",
+        "operationId": "delete_workspace_volume",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "volume_id",
+            "in": "path",
+            "description": "Volume ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Volume deleted"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/volumes/{volume_id}/resize": {
+      "post": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Resize a persistent volume on a workspace.",
+        "operationId": "resize_workspace_volume",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "volume_id",
+            "in": "path",
+            "description": "Volume ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResizeVolumeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Volume resized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumeResponse"
                 }
               }
             }
@@ -6709,7 +7238,6 @@
         "required": [
           "id",
           "key_preview",
-          "is_workspace_key",
           "created_at"
         ],
         "properties": {
@@ -6718,9 +7246,6 @@
           },
           "id": {
             "type": "string"
-          },
-          "is_workspace_key": {
-            "type": "boolean"
           },
           "key_preview": {
             "type": "string"
@@ -6736,26 +7261,6 @@
               "string",
               "null"
             ]
-          },
-          "raw_key": {
-            "type": [
-              "string",
-              "null"
-            ]
-          }
-        }
-      },
-      "ApiKeysListResponse": {
-        "type": "object",
-        "required": [
-          "api_keys"
-        ],
-        "properties": {
-          "api_keys": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ApiKeyResponse"
-            }
           }
         }
       },
@@ -7420,6 +7925,42 @@
           }
         }
       },
+      "ChildAppInstall": {
+        "type": "object",
+        "description": "Result of attempting to install a child app onto a workspace at\ndeploy time. Returned by the gateway's\n`enqueue_catalog_install_plans` for every catalog/community child\nplan, regardless of which deploy path (quick-deploy, v1 definition,\nor any future surface) created it.",
+        "required": [
+          "deploy_ref",
+          "source",
+          "trust_tier",
+          "status"
+        ],
+        "properties": {
+          "app_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "deploy_ref": {
+            "type": "string"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trust_tier": {
+            "type": "string"
+          }
+        }
+      },
       "CommunityCatalogDetailResponse": {
         "type": "object",
         "required": [
@@ -7469,20 +8010,6 @@
           },
           "vendor_user_id": {
             "type": "string"
-          }
-        }
-      },
-      "CommunityCatalogResponse": {
-        "type": "object",
-        "required": [
-          "items"
-        ],
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DeployPreviewResponse"
-            }
           }
         }
       },
@@ -7626,247 +8153,6 @@
         "properties": {
           "install": {
             "$ref": "#/components/schemas/CommunityInstall"
-          }
-        }
-      },
-      "CommunityLegacyWorkspaceDefinitionItem": {
-        "type": "object",
-        "required": [
-          "id",
-          "vendor_user_id",
-          "slug",
-          "created_at",
-          "updated_at"
-        ],
-        "properties": {
-          "category": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "type": "string"
-          },
-          "latest_version": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "slug": {
-            "type": "string"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "vendor_user_id": {
-            "type": "string"
-          }
-        }
-      },
-      "CommunityLegacyWorkspaceDefinitionLifecycleResponse": {
-        "type": "object",
-        "required": [
-          "deploy_ref",
-          "item",
-          "version",
-          "message"
-        ],
-        "properties": {
-          "deploy_ref": {
-            "type": "string"
-          },
-          "item": {
-            "$ref": "#/components/schemas/CommunityLegacyWorkspaceDefinitionItem"
-          },
-          "message": {
-            "type": "string"
-          },
-          "version": {
-            "$ref": "#/components/schemas/CommunityLegacyWorkspaceDefinitionVersion"
-          }
-        }
-      },
-      "CommunityLegacyWorkspaceDefinitionListItem": {
-        "type": "object",
-        "required": [
-          "item",
-          "version"
-        ],
-        "properties": {
-          "item": {
-            "$ref": "#/components/schemas/CommunityLegacyWorkspaceDefinitionItem"
-          },
-          "vendor_username": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "version": {
-            "$ref": "#/components/schemas/CommunityLegacyWorkspaceDefinitionListVersion"
-          }
-        }
-      },
-      "CommunityLegacyWorkspaceDefinitionListResponse": {
-        "type": "object",
-        "required": [
-          "items"
-        ],
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CommunityLegacyWorkspaceDefinitionListItem"
-            }
-          }
-        }
-      },
-      "CommunityLegacyWorkspaceDefinitionListVersion": {
-        "type": "object",
-        "required": [
-          "id",
-          "item_id",
-          "version",
-          "manifest_json",
-          "manifest_digest",
-          "visibility",
-          "trust_tier",
-          "effective_trust_tier",
-          "status",
-          "created_at"
-        ],
-        "properties": {
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "deprecated_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "effective_trust_tier": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "item_id": {
-            "type": "string"
-          },
-          "manifest_digest": {
-            "type": "string"
-          },
-          "manifest_json": {},
-          "published_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "status": {
-            "type": "string"
-          },
-          "trust_tier": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          },
-          "visibility": {
-            "type": "string"
-          },
-          "yanked_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          }
-        }
-      },
-      "CommunityLegacyWorkspaceDefinitionVersion": {
-        "type": "object",
-        "required": [
-          "id",
-          "item_id",
-          "version",
-          "manifest_yaml",
-          "manifest_json",
-          "manifest_digest",
-          "visibility",
-          "trust_tier",
-          "effective_trust_tier",
-          "status",
-          "lint_results",
-          "compiled_preview",
-          "created_at"
-        ],
-        "properties": {
-          "compiled_preview": {},
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "deprecated_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "effective_trust_tier": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "item_id": {
-            "type": "string"
-          },
-          "lint_results": {},
-          "manifest_digest": {
-            "type": "string"
-          },
-          "manifest_json": {},
-          "manifest_yaml": {
-            "type": "string"
-          },
-          "published_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "status": {
-            "type": "string"
-          },
-          "trust_tier": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          },
-          "visibility": {
-            "type": "string"
-          },
-          "yanked_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
           }
         }
       },
@@ -8256,6 +8542,27 @@
           }
         }
       },
+      "CreateVolumeRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "size_mb",
+          "mount_path"
+        ],
+        "properties": {
+          "mount_path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "size_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "CreateWorkspaceRequest": {
         "type": "object",
         "required": [
@@ -8482,117 +8789,6 @@
               "string",
               "null"
             ]
-          }
-        }
-      },
-      "DeployFromLegacyWorkspaceDefinitionRequest": {
-        "type": "object",
-        "required": [
-          "ref"
-        ],
-        "properties": {
-          "app_params": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "additionalProperties": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "propertyNames": {
-                "type": "string"
-              }
-            },
-            "propertyNames": {
-              "type": "string"
-            }
-          },
-          "disk_size_mb": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "minimum": 0
-          },
-          "env_vars": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "additionalProperties": {
-              "type": "string"
-            },
-            "propertyNames": {
-              "type": "string"
-            }
-          },
-          "name": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "ram_mb": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "minimum": 0
-          },
-          "ref": {
-            "type": "string"
-          },
-          "service_spec_ids": {
-            "type": [
-              "array",
-              "null"
-            ],
-            "items": {
-              "type": "string"
-            }
-          },
-          "setup_script_ids": {
-            "type": [
-              "array",
-              "null"
-            ],
-            "items": {
-              "type": "string"
-            }
-          },
-          "vcpu_count": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "minimum": 0
-          }
-        }
-      },
-      "DeployFromLegacyWorkspaceDefinitionResponse": {
-        "type": "object",
-        "required": [
-          "workspace",
-          "message",
-          "installs"
-        ],
-        "properties": {
-          "installs": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LegacyWorkspaceDefinitionChildInstall"
-            }
-          },
-          "message": {
-            "type": "string"
-          },
-          "workspace": {
-            "$ref": "#/components/schemas/Vm"
           }
         }
       },
@@ -9580,6 +9776,31 @@
           }
         }
       },
+      "LaunchFromManifestRequest": {
+        "type": "object",
+        "description": "Install a recipe whose manifest the caller is supplying inline,\nwithout going through the recipe registry. Used by\n`rig app deploy --bluegreen <suffix>` to skip the publish step for\npreview deploys: the local rig.yaml renders straight to a manifest\nthat the workspace installs and then forgets, leaving no `@user/<base>-<suffix>@<ver>`\nrows cluttering the registry.",
+        "required": [
+          "manifest"
+        ],
+        "properties": {
+          "manifest": {
+            "description": "Inline `AppManifest` (the same canonical JSON shape recipes\nstore under `manifest`). Validation runs server-side via\n`validate_app_recipe` with the caller's publish context."
+          },
+          "params": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "User-supplied values for the app's configurable params.",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "LaunchRequest": {
         "type": "object",
         "properties": {
@@ -9604,432 +9825,6 @@
               "string",
               "null"
             ]
-          }
-        }
-      },
-      "LegacyWorkspaceDefinitionChildInstall": {
-        "type": "object",
-        "required": [
-          "deploy_ref",
-          "source",
-          "trust_tier",
-          "status"
-        ],
-        "properties": {
-          "app_id": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "deploy_ref": {
-            "type": "string"
-          },
-          "error": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "source": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "trust_tier": {
-            "type": "string"
-          }
-        }
-      },
-      "LegacyWorkspaceDefinitionChildPreview": {
-        "type": "object",
-        "required": [
-          "deploy_ref",
-          "source",
-          "trust_tier",
-          "status",
-          "catalog_id",
-          "slug",
-          "version",
-          "name",
-          "resources",
-          "depends_on"
-        ],
-        "properties": {
-          "catalog_id": {
-            "type": "string"
-          },
-          "configurable_params": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ParamSpec"
-            },
-            "description": "Configurable parameters this child app exposes. The deploy form uses\nthese to render per-app `ParamFields` editors when launching the\nlegacy workspace definition into a workspace."
-          },
-          "credentials_declared": {
-            "type": "boolean",
-            "description": "True if this child declares default credentials (server-generated or\npre-filled). Surfaces a \"credentials required\" hint in the deploy form."
-          },
-          "depends_on": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "deploy_ref": {
-            "type": "string"
-          },
-          "managed": {
-            "type": "boolean",
-            "description": "True if the recipe opts into Rigbox's managed AI proxy when installed."
-          },
-          "name": {
-            "type": "string"
-          },
-          "resources": {
-            "$ref": "#/components/schemas/DeployResourceRequirements"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "source": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "trust_tier": {
-            "type": "string"
-          },
-          "vendor": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "version": {
-            "type": "string"
-          }
-        }
-      },
-      "LegacyWorkspaceDefinitionExpectedAppPreview": {
-        "type": "object",
-        "required": [
-          "name",
-          "port",
-          "protocol",
-          "managed",
-          "depends_on"
-        ],
-        "properties": {
-          "configurable_params": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ParamSpec"
-            }
-          },
-          "credentials_declared": {
-            "type": "boolean"
-          },
-          "depends_on": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "managed": {
-            "type": "boolean"
-          },
-          "name": {
-            "type": "string"
-          },
-          "port": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "protocol": {
-            "type": "string"
-          },
-          "system_tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "usage_examples": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UsageExample"
-            }
-          }
-        }
-      },
-      "LegacyWorkspaceDefinitionLogSourcePreview": {
-        "type": "object",
-        "required": [
-          "source_type",
-          "source_ref",
-          "is_primary"
-        ],
-        "properties": {
-          "display_name": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "is_primary": {
-            "type": "boolean"
-          },
-          "source_ref": {
-            "type": "string"
-          },
-          "source_type": {
-            "type": "string"
-          }
-        }
-      },
-      "LegacyWorkspaceDefinitionPreviewResponse": {
-        "type": "object",
-        "required": [
-          "deploy_ref",
-          "source",
-          "trust_tier",
-          "effective_trust_tier",
-          "status",
-          "base_template_id",
-          "name",
-          "description",
-          "category",
-          "resources",
-          "apps",
-          "warnings"
-        ],
-        "properties": {
-          "apps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LegacyWorkspaceDefinitionChildPreview"
-            }
-          },
-          "base_template_id": {
-            "type": "string"
-          },
-          "base_template_minimums": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/LegacyWorkspaceDefinitionResourcePlanResponse",
-                "description": "Floor minimums sourced from the base template (used by client UI as floors)."
-              }
-            ]
-          },
-          "category": {
-            "type": "string"
-          },
-          "deploy_ref": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "effective_trust_tier": {
-            "type": "string"
-          },
-          "expected_apps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LegacyWorkspaceDefinitionExpectedAppPreview"
-            },
-            "description": "Apps pre-installed in the base template image (only for built-in legacy workspace definitions)."
-          },
-          "image": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Final image the workspace boots from (e.g. \"base\", \"firecrawl\").\nLifted from `manifest.workspace.image` so the catalog UI can show\nthe actual VM image without reading the raw manifest."
-          },
-          "image_bound": {
-            "type": "boolean",
-            "description": "True when this legacy workspace definition's apps/services live inside `image`\nrather than being installed via app recipes at provision time.\nImage-bound definitions (e.g. firecrawl) start faster but the\nmanifest can't fully describe what's inside the image."
-          },
-          "log_sources": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LegacyWorkspaceDefinitionLogSourcePreview"
-            },
-            "description": "Log source presets shipped with the base template (file paths,\nsystemd units) for the workspace-level Logs panel."
-          },
-          "manifest_digest": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "manifest_json": {
-            "description": "Raw manifest JSON for the \"View manifest\" affordance."
-          },
-          "name": {
-            "type": "string"
-          },
-          "portability_notes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Author-declared notes describing what the image carries that the\nmanifest can't fully describe. Only populated when image_bound."
-          },
-          "resources": {
-            "$ref": "#/components/schemas/LegacyWorkspaceDefinitionResourcePlanResponse"
-          },
-          "service_specs": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LegacyWorkspaceDefinitionServiceSpecPreview"
-            },
-            "description": "Available systemd service specs shipped with the base template."
-          },
-          "setup_scripts": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LegacyWorkspaceDefinitionSetupScriptPreview"
-            },
-            "description": "Available setup scripts shipped with the base template."
-          },
-          "source": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "trust_tier": {
-            "type": "string"
-          },
-          "verify_binaries": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Binaries the workspace expects pre-installed in `image` (checked\nat first boot via `which`). Lifted from\n`manifest.template.verify_binaries` so the catalog UI can show\nusers what binaries the image carries."
-          },
-          "warnings": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "workspace_services": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LegacyWorkspaceDefinitionWorkspaceServicePreview"
-            },
-            "description": "Backing services (databases, brokers) provisioned by the base template."
-          }
-        }
-      },
-      "LegacyWorkspaceDefinitionResourcePlanResponse": {
-        "type": "object",
-        "required": [
-          "ram_mb",
-          "vcpu_count",
-          "disk_mb"
-        ],
-        "properties": {
-          "disk_mb": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "ram_mb": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "vcpu_count": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          }
-        }
-      },
-      "LegacyWorkspaceDefinitionServiceSpecPreview": {
-        "type": "object",
-        "required": [
-          "name",
-          "working_directory",
-          "restart_policy",
-          "auto_enable"
-        ],
-        "properties": {
-          "auto_enable": {
-            "type": "boolean"
-          },
-          "name": {
-            "type": "string"
-          },
-          "restart_policy": {
-            "type": "string"
-          },
-          "working_directory": {
-            "type": "string"
-          }
-        }
-      },
-      "LegacyWorkspaceDefinitionSetupScriptPreview": {
-        "type": "object",
-        "required": [
-          "name",
-          "run_on",
-          "order"
-        ],
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "order": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "run_on": {
-            "type": "string"
-          }
-        }
-      },
-      "LegacyWorkspaceDefinitionWorkspaceServicePreview": {
-        "type": "object",
-        "required": [
-          "name",
-          "kind",
-          "exposed"
-        ],
-        "properties": {
-          "exposed": {
-            "type": "boolean"
-          },
-          "kind": {
-            "type": "string"
-          },
-          "log_sources": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LegacyWorkspaceDefinitionLogSourcePreview"
-            }
-          },
-          "name": {
-            "type": "string"
-          },
-          "port": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "minimum": 0
           }
         }
       },
@@ -10074,20 +9869,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AppLogSource"
-            }
-          }
-        }
-      },
-      "ListAppsResponse": {
-        "type": "object",
-        "required": [
-          "apps"
-        ],
-        "properties": {
-          "apps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AppView"
             }
           }
         }
@@ -10148,20 +9929,6 @@
           }
         }
       },
-      "ListSnapshotsResponse": {
-        "type": "object",
-        "required": [
-          "snapshots"
-        ],
-        "properties": {
-          "snapshots": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SnapshotView"
-            }
-          }
-        }
-      },
       "ListTasksResponse": {
         "type": "object",
         "required": [
@@ -10176,17 +9943,24 @@
           }
         }
       },
-      "ListWorkspaceSshKeysResponse": {
+      "ListVolumesResponse": {
         "type": "object",
         "required": [
-          "keys"
+          "items"
         ],
         "properties": {
-          "keys": {
+          "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SshKeyEntry"
+              "$ref": "#/components/schemas/Volume"
             }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Always `null` \u2014 volume lists are small and unpaginated. Present so the\nCLI's `{items, next_cursor}` envelope is uniform across resources."
           }
         }
       },
@@ -10352,20 +10126,486 @@
           }
         }
       },
-      "OpenClawMode": {
-        "type": "string",
-        "enum": [
-          "managed",
-          "byok"
-        ]
+      "Page_ApiKeyResponse": {
+        "type": "object",
+        "description": "Paginated response envelope. `next_cursor: None` \u21d2 last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "key_preview",
+                "created_at"
+              ],
+              "properties": {
+                "created_at": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "key_preview": {
+                  "type": "string"
+                },
+                "last_used_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
       },
-      "OpenClawProvider": {
-        "type": "string",
-        "enum": [
-          "google",
-          "openai",
-          "anthropic"
-        ]
+      "Page_AppView": {
+        "type": "object",
+        "description": "Paginated response envelope. `next_cursor: None` \u21d2 last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ApiApp"
+                }
+              ]
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Page_DeployPreviewResponse": {
+        "type": "object",
+        "description": "Paginated response envelope. `next_cursor: None` \u21d2 last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "deploy_ref",
+                "source",
+                "trust_tier",
+                "status",
+                "catalog_id",
+                "slug",
+                "version",
+                "name",
+                "description",
+                "icon",
+                "category",
+                "resources",
+                "app_kind",
+                "configurable_params",
+                "credentials_declared",
+                "warnings"
+              ],
+              "properties": {
+                "app_kind": {
+                  "type": "string",
+                  "description": "Whether this recipe is a daemon `\"service\"` (has port + Caddy route)\nor an interactive `\"cli\"` (install-only; user invokes via SSH).\nMirrors `AppKind` on the catalog item."
+                },
+                "catalog_id": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "community_version_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "configurable_params": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ParamSpec"
+                  }
+                },
+                "credentials_declared": {
+                  "type": "boolean"
+                },
+                "depends_on": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Backing services this app expects on the workspace (community only)."
+                },
+                "deploy_ref": {
+                  "type": "string",
+                  "description": "Canonical exact ref that will be installed."
+                },
+                "description": {
+                  "type": "string"
+                },
+                "exposure": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "$ref": "#/components/schemas/DeployExposure",
+                      "description": "Daemon-shape exposure fields. Present only when `app_kind` is\n`\"service\"`. Omitted entirely for `\"cli\"` items \u2014 the UI should\nrender a CLI-shaped affordance with no port/protocol pill."
+                    }
+                  ]
+                },
+                "icon": {
+                  "type": "string"
+                },
+                "install_script_preview": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "install_stats": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CommunityCatalogVersionInstallStats"
+                    }
+                  ]
+                },
+                "managed": {
+                  "type": "boolean",
+                  "description": "True if this recipe opts into Rigbox's managed AI proxy when installed."
+                },
+                "manifest_digest": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "manifest_json": {
+                  "description": "Raw manifest JSON for the \"View manifest\" affordance. Community only."
+                },
+                "name": {
+                  "type": "string"
+                },
+                "resources": {
+                  "$ref": "#/components/schemas/DeployResourceRequirements"
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "`official` or `community`."
+                },
+                "status": {
+                  "type": "string"
+                },
+                "system_tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Discovery tags from the recipe manifest (community only)."
+                },
+                "trust_tier": {
+                  "type": "string",
+                  "description": "`official`, `verified`, `community`, or `private`."
+                },
+                "usage_examples": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsageExample"
+                  },
+                  "description": "Copy-pasteable usage examples shown in the catalog detail \"Usage\" tab."
+                },
+                "vendor": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "version": {
+                  "type": "string"
+                },
+                "warnings": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Page_SnapshotView": {
+        "type": "object",
+        "description": "Paginated response envelope. `next_cursor: None` \u21d2 last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "Read-only projection of a workspace snapshot.",
+              "required": [
+                "id",
+                "workspace_id",
+                "name",
+                "size_mb",
+                "created_at"
+              ],
+              "properties": {
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "size_mb": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "workspace_id": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Page_SshKeyEntry": {
+        "type": "object",
+        "description": "Paginated response envelope. `next_cursor: None` \u21d2 last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "An SSH key entry from a workspace's authorized_keys.",
+              "required": [
+                "fingerprint",
+                "key_type",
+                "comment"
+              ],
+              "properties": {
+                "comment": {
+                  "type": "string"
+                },
+                "fingerprint": {
+                  "type": "string"
+                },
+                "key_type": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Page_Vm": {
+        "type": "object",
+        "description": "Paginated response envelope. `next_cursor: None` \u21d2 last page.",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "user_id",
+                "node_id",
+                "name",
+                "status",
+                "image",
+                "ram_mb",
+                "vcpu_count",
+                "disk_size_mb",
+                "created_at",
+                "updated_at"
+              ],
+              "properties": {
+                "ai_mode": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Per-workspace override for the AI mode (`managed` or `byok`).\n`None` means inherit from `users.ai_mode` (the per-account default)."
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_attempts": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "creation_started_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "disk_size_mb": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                },
+                "env_vars": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "propertyNames": {
+                    "type": "string"
+                  }
+                },
+                "failure_code": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "failure_reason": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "string"
+                },
+                "ip_address": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "node_id": {
+                  "type": "string"
+                },
+                "ram_mb": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                },
+                "service_spec_ids": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "setup_script_ids": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "status": {
+                  "$ref": "#/components/schemas/VmStatus"
+                },
+                "template_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "user_id": {
+                  "type": "string"
+                },
+                "vcpu_count": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
       },
       "ParamOption": {
         "type": "object",
@@ -10539,43 +10779,6 @@
           },
           "user_id": {
             "type": "string"
-          }
-        }
-      },
-      "PublishCommunityLegacyWorkspaceDefinitionRequest": {
-        "type": "object",
-        "required": [
-          "manifest"
-        ],
-        "properties": {
-          "manifest": {
-            "description": "Parsed legacy workspace definition manifest."
-          },
-          "manifest_yaml": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Optional original YAML text used for digesting and review display."
-          }
-        }
-      },
-      "PublishCommunityLegacyWorkspaceDefinitionResponse": {
-        "type": "object",
-        "required": [
-          "deploy_ref",
-          "item",
-          "version"
-        ],
-        "properties": {
-          "deploy_ref": {
-            "type": "string"
-          },
-          "item": {
-            "$ref": "#/components/schemas/CommunityLegacyWorkspaceDefinitionItem"
-          },
-          "version": {
-            "$ref": "#/components/schemas/CommunityLegacyWorkspaceDefinitionVersion"
           }
         }
       },
@@ -10792,6 +10995,19 @@
         "properties": {
           "token": {
             "type": "string"
+          }
+        }
+      },
+      "ResizeVolumeRequest": {
+        "type": "object",
+        "required": [
+          "size_mb"
+        ],
+        "properties": {
+          "size_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         }
       },
@@ -11109,6 +11325,19 @@
             "items": {
               "$ref": "#/components/schemas/ServiceSpecResponse"
             }
+          }
+        }
+      },
+      "SetVisibilityRequest": {
+        "type": "object",
+        "description": "Body for the visibility PATCH endpoints.",
+        "required": [
+          "visibility"
+        ],
+        "properties": {
+          "visibility": {
+            "type": "string",
+            "description": "`private` (owner-only) or `community` (listed for everyone)."
           }
         }
       },
@@ -11952,6 +12181,23 @@
           }
         }
       },
+      "UpdateAppEnvRequest": {
+        "type": "object",
+        "required": [
+          "env_vars"
+        ],
+        "properties": {
+          "env_vars": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "UpdateAppLogSourceRequest": {
         "type": "object",
         "properties": {
@@ -12044,6 +12290,13 @@
               "null"
             ],
             "description": "Toggle status: \"active\" or \"inactive\""
+          },
+          "swap_subdomain_with": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Atomically swap this app's subdomain with another app in the same\nworkspace. Both apps trade `name` (and therefore Caddy subdomain)\nin a single DB transaction + a single Caddy resync pass. Mutually\nexclusive with every other field on this body \u2014 combining them\nreturns 400.\n\nThe two apps must satisfy a blue-green sibling relationship\n(`other.name == \"{app.name}-<suffix>\"` or vice versa), share the\nsame `(user_id, workspace_id)`, agree on `visibility` and\n`allowed_emails`, and neither may have a custom domain attached.\nSee the security checklist in the swap handler for full\nrejection conditions."
           },
           "visibility": {
             "oneOf": [
@@ -12280,44 +12533,6 @@
             ]
           }
         }
-      },
-      "UpdateWorkspaceAiConfigRequest": {
-        "type": "object",
-        "properties": {
-          "api_key": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "mode": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/OpenClawMode"
-              }
-            ]
-          },
-          "model": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "provider": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/OpenClawProvider"
-              }
-            ]
-          }
-        },
-        "additionalProperties": false
       },
       "UpdateWorkspaceAiModeRequest": {
         "type": "object",
@@ -12718,41 +12933,67 @@
           "failed"
         ]
       },
-      "WorkspaceAiConfigResponse": {
+      "Volume": {
         "type": "object",
+        "description": "A persistent volume attached to a workspace VM.\n\nBacked by a host ext4 file (`host_path`) mounted in-guest at `mount_path`\nvia a second Firecracker drive. Separate from the rootfs image, so its data\nsurvives a rootfs/image swap. Serialized over the wire for `rig volume`.",
         "required": [
-          "mode",
-          "provider",
-          "model",
-          "status",
-          "updated_at"
+          "id",
+          "workspace_id",
+          "node_id",
+          "name",
+          "size_mb",
+          "mount_path",
+          "host_path",
+          "created_at"
         ],
         "properties": {
-          "mode": {
-            "$ref": "#/components/schemas/OpenClawMode"
-          },
-          "model": {
-            "type": "string"
-          },
-          "provider": {
-            "$ref": "#/components/schemas/OpenClawProvider"
-          },
-          "status": {
-            "$ref": "#/components/schemas/WorkspaceAiConfigStatus"
-          },
-          "updated_at": {
+          "created_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "host_path": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "migrated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Set once the one-time rootfs->volume data copy has run (advisory; the\nin-guest sentinel on the volume is authoritative)."
+          },
+          "mount_path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "node_id": {
+            "type": "string"
+          },
+          "size_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "workspace_id": {
+            "type": "string"
           }
         }
       },
-      "WorkspaceAiConfigStatus": {
-        "type": "string",
-        "enum": [
-          "managed_active",
-          "byok_active",
-          "invalid_missing_key"
-        ]
+      "VolumeResponse": {
+        "type": "object",
+        "required": [
+          "volume"
+        ],
+        "properties": {
+          "volume": {
+            "$ref": "#/components/schemas/Volume"
+          }
+        }
       },
       "WorkspaceAiModeResponse": {
         "type": "object",
@@ -12777,6 +13018,397 @@
           "workspace",
           "user_default"
         ]
+      },
+      "WorkspaceDefinitionChildPreview": {
+        "type": "object",
+        "required": [
+          "deploy_ref",
+          "source",
+          "trust_tier",
+          "status",
+          "catalog_id",
+          "slug",
+          "version",
+          "name",
+          "resources",
+          "depends_on"
+        ],
+        "properties": {
+          "catalog_id": {
+            "type": "string"
+          },
+          "configurable_params": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParamSpec"
+            },
+            "description": "Configurable parameters this child app exposes. The deploy form uses\nthese to render per-app `ParamFields` editors when launching the\nworkspace definition into a workspace."
+          },
+          "credentials_declared": {
+            "type": "boolean",
+            "description": "True if this child declares default credentials (server-generated or\npre-filled). Surfaces a \"credentials required\" hint in the deploy form."
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deploy_ref": {
+            "type": "string"
+          },
+          "managed": {
+            "type": "boolean",
+            "description": "True if the recipe opts into Rigbox's managed AI proxy when installed."
+          },
+          "name": {
+            "type": "string"
+          },
+          "resources": {
+            "$ref": "#/components/schemas/DeployResourceRequirements"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trust_tier": {
+            "type": "string"
+          },
+          "vendor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkspaceDefinitionExpectedAppPreview": {
+        "type": "object",
+        "required": [
+          "name",
+          "port",
+          "protocol",
+          "managed",
+          "depends_on"
+        ],
+        "properties": {
+          "configurable_params": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParamSpec"
+            }
+          },
+          "credentials_declared": {
+            "type": "boolean"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "managed": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "system_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "usage_examples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsageExample"
+            }
+          }
+        }
+      },
+      "WorkspaceDefinitionLogSourcePreview": {
+        "type": "object",
+        "required": [
+          "source_type",
+          "source_ref",
+          "is_primary"
+        ],
+        "properties": {
+          "display_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_primary": {
+            "type": "boolean"
+          },
+          "source_ref": {
+            "type": "string"
+          },
+          "source_type": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkspaceDefinitionPreviewResponse": {
+        "type": "object",
+        "required": [
+          "deploy_ref",
+          "source",
+          "trust_tier",
+          "effective_trust_tier",
+          "status",
+          "base_template_id",
+          "name",
+          "description",
+          "category",
+          "resources",
+          "apps",
+          "warnings"
+        ],
+        "properties": {
+          "apps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceDefinitionChildPreview"
+            }
+          },
+          "base_template_id": {
+            "type": "string"
+          },
+          "base_template_minimums": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/WorkspaceDefinitionResourcePlanResponse",
+                "description": "Floor minimums sourced from the base template (used by client UI as floors)."
+              }
+            ]
+          },
+          "category": {
+            "type": "string"
+          },
+          "deploy_ref": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "effective_trust_tier": {
+            "type": "string"
+          },
+          "expected_apps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceDefinitionExpectedAppPreview"
+            },
+            "description": "Apps pre-installed in the base template image (only for built-in workspace definitions)."
+          },
+          "image": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Final image the workspace boots from (e.g. \"base\", \"firecrawl\").\nLifted from `manifest.workspace.image` so the catalog UI can show\nthe actual VM image without reading the raw manifest."
+          },
+          "image_bound": {
+            "type": "boolean",
+            "description": "True when this workspace definition's apps/services live inside `image`\nrather than being installed via app recipes at provision time.\nImage-bound definitions (e.g. firecrawl) start faster but the\nmanifest can't fully describe what's inside the image."
+          },
+          "log_sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceDefinitionLogSourcePreview"
+            },
+            "description": "Log source presets shipped with the base template (file paths,\nsystemd units) for the workspace-level Logs panel."
+          },
+          "manifest_digest": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "manifest_json": {
+            "description": "Raw manifest JSON for the \"View manifest\" affordance."
+          },
+          "name": {
+            "type": "string"
+          },
+          "portability_notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Author-declared notes describing what the image carries that the\nmanifest can't fully describe. Only populated when image_bound."
+          },
+          "resources": {
+            "$ref": "#/components/schemas/WorkspaceDefinitionResourcePlanResponse"
+          },
+          "service_specs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceDefinitionServiceSpecPreview"
+            },
+            "description": "Available systemd service specs shipped with the base template."
+          },
+          "setup_scripts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceDefinitionSetupScriptPreview"
+            },
+            "description": "Available setup scripts shipped with the base template."
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trust_tier": {
+            "type": "string"
+          },
+          "verify_binaries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Binaries the workspace expects pre-installed in `image` (checked\nat first boot via `which`). Lifted from\n`manifest.template.verify_binaries` so the catalog UI can show\nusers what binaries the image carries."
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "workspace_services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceDefinitionWorkspaceServicePreview"
+            },
+            "description": "Backing services (databases, brokers) provisioned by the base template."
+          }
+        }
+      },
+      "WorkspaceDefinitionResourcePlanResponse": {
+        "type": "object",
+        "required": [
+          "ram_mb",
+          "vcpu_count",
+          "disk_mb"
+        ],
+        "properties": {
+          "disk_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "ram_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "vcpu_count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "WorkspaceDefinitionServiceSpecPreview": {
+        "type": "object",
+        "required": [
+          "name",
+          "working_directory",
+          "restart_policy",
+          "auto_enable"
+        ],
+        "properties": {
+          "auto_enable": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "restart_policy": {
+            "type": "string"
+          },
+          "working_directory": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkspaceDefinitionSetupScriptPreview": {
+        "type": "object",
+        "required": [
+          "name",
+          "run_on",
+          "order"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "run_on": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkspaceDefinitionWorkspaceServicePreview": {
+        "type": "object",
+        "required": [
+          "name",
+          "kind",
+          "exposed"
+        ],
+        "properties": {
+          "exposed": {
+            "type": "boolean"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "log_sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceDefinitionLogSourcePreview"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "port": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
       },
       "WorkspaceFailure": {
         "type": "object",
