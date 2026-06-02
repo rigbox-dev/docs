@@ -1,0 +1,123 @@
+---
+title: Releases & Rollback
+description: Every reproducible deploy records an immutable release. List history, roll back to a known-good image, or pin a release manually.
+---
+
+A **release** is an immutable record of what ran: an image digest plus its run-config. Every reproducible `rig deploy` (one with a Dockerfile or prebuilt image in `rig.yaml`) auto-records a release, giving you a linear history you can roll back to at any time.
+
+Because the image is content-addressed and frozen, activating an old release boots the workspace from the exact environment that release captured — not an approximate rebuild.
+
+## How releases are recorded
+
+When `rig deploy` takes the [reproducible path](/guides/deploying#reproducible-deploy), it freezes the environment into a content-addressed image and records a release pointing at that digest. Standard (rsync-only) deploys do not produce releases — there is no frozen image to pin.
+
+```text
+$ rig deploy
+→ reusing cached image sha256:9f3c…
+→ rsyncing app code · health GET /healthz → 200 OK
+✓ deployed to https://ai-chat.rigbox.dev   (release rel_02ab…)
+```
+
+## List release history
+
+```bash
+rig release ls
+```
+
+```text
+RELEASE      IMAGE DIGEST       CREATED        ACTIVE
+rel_02ab…    sha256:9f3c…       2 minutes ago  *
+rel_01cd…    sha256:7b1e…       1 hour ago
+rel_00ef…    sha256:2a4d…       yesterday
+```
+
+Over the API:
+
+```bash
+curl -s https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/releases \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+```
+
+## Roll back to a previous release
+
+To return to a known-good version, activate its release. `rig rollback` is an alias for `rig release activate`:
+
+<CodeGroup>
+```bash rig
+# Both forms are equivalent
+rig release activate --release rel_01cd
+rig rollback --release rel_01cd
+```
+
+```bash cURL
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/releases/{release_id}/activate \
+  -H "Authorization: Bearer $RIGBOX_TOKEN"
+```
+</CodeGroup>
+
+Activating a release boots the workspace from that release's frozen image digest. Your app code for that release rides on top exactly as it did originally.
+
+<Note>
+Rolling back changes the **image** and run-config, not your [persistent volumes](/guides/persistent-volumes). Data under `$DATA_DIR` is unaffected by an activate — only the environment and code revert.
+</Note>
+
+## Pin a release manually
+
+If you have an image digest in hand — for example, from a `rig build` — you can create a release that points at it without going through a full deploy:
+
+```bash
+rig release create --image-digest sha256:7b1e…
+```
+
+This is useful for promoting an image you built and tested separately, or for codifying a specific digest as a named release before activating it.
+
+## rig build: the explicit image build
+
+`rig build` is the explicit, standalone image build. It builds an image from your Dockerfile (the same content-addressed mechanism `rig deploy` uses) and returns a digest and cache key:
+
+```bash
+rig build
+```
+
+```text
+→ building image from Dockerfile (FROM rigbox-base)
+✓ image built
+  digest: sha256:7b1e…
+  key:    a1b2c3…
+```
+
+Over the API:
+
+```bash
+curl -X POST https://api.rigbox.dev/api/v1/builds \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "dockerfile": "FROM rigbox-base\nRUN pip install --break-system-packages flask" }'
+```
+
+`rig build` is complementary to the auto-build inside `rig deploy`: deploy builds and mounts in one step, while `rig build` lets you produce a digest first and then pin it as a release with `rig release create --image-digest`.
+
+## Putting it together
+
+A typical reproducible workflow:
+
+<Steps>
+<Step title="Deploy">
+`rig deploy` builds (or reuses) the image and records a release automatically.
+</Step>
+<Step title="Inspect history">
+`rig release ls` shows the linear history and which release is active.
+</Step>
+<Step title="Roll back if needed">
+`rig rollback --release <id>` boots the previous release's frozen image — instant, no rebuild.
+</Step>
+<Step title="Pin a tested image">
+Build separately with `rig build`, then `rig release create --image-digest <d>` to capture it as a release before activating.
+</Step>
+</Steps>
+
+## Next steps
+
+- [Deploying with rig deploy](/guides/deploying) — reproducible deploys and the hybrid build model.
+- [Persistent Volumes](/guides/persistent-volumes) — data that survives a rollback.
+- [Snapshots](/guides/snapshots) — full-disk checkpoints, complementary to image-level releases.
