@@ -50,6 +50,14 @@
             ]
           },
           {
+            "group": "Deploying",
+            "pages": [
+              "guides/deploying",
+              "guides/persistent-volumes",
+              "guides/releases-and-rollback"
+            ]
+          },
+          {
             "group": "App Hosting",
             "pages": [
               "guides/expose-and-route",

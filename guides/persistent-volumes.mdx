@@ -1,0 +1,99 @@
+---
+title: Persistent Volumes
+description: Durable ext4 storage that survives redeploys and stop→start — the right home for SQLite databases, uploads, and logs.
+---
+
+A persistent volume is an ext4 drive attached to a workspace as a **second disk**, separate from the workspace's root filesystem. Because it lives outside the directory that `rig deploy` rsyncs, anything you write there survives redeploys, restarts, and stop→start cycles.
+
+## Why you need one
+
+`rig deploy` **wipes and re-rsyncs the synced app directory on every deploy**. That makes deploys clean and reproducible, but it means you must never store durable data inside the app dir — a redeploy would erase it.
+
+Durable state belongs on a persistent volume. The default `data` volume mounts at `/home/developer/data`, and the convention is to expose that path as `DATA_DIR`:
+
+```yaml
+env:
+  DATA_DIR: /home/developer/data
+```
+
+Store SQLite databases, uploaded files, and logs under `$DATA_DIR` and they stay put across deploys.
+
+<Note>
+A persistent volume survives **redeploys** (the rsync wipe), **app restarts**, and **stop→start** of the workspace. It is destroyed only when you delete the volume or the workspace itself.
+</Note>
+
+## Declare a volume in rig.yaml
+
+The simplest path is to declare volumes under an app's `volumes:` block in `rig.yaml`. The volume is created (or reattached) on deploy, and the mount is available to your process.
+
+```yaml
+name: markdown-notes
+port: 8080
+build:
+  dockerfile: Dockerfile
+start: gunicorn --bind 0.0.0.0:8080 app:app
+health: { path: /healthz, timeoutSeconds: 30 }
+env:
+  DATA_DIR: /home/developer/data
+volumes:
+  - name: data
+    mountPath: /home/developer/data
+```
+
+The default `data` volume mounts at `/home/developer/data` — point `DATA_DIR` at the same path and your app reads and writes durable state there.
+
+## Manage volumes with the CLI
+
+You can also create and manage volumes imperatively, independent of a deploy:
+
+```bash
+rig volume create --name data --size 1G   # create a volume
+rig volume ls                             # list volumes for a workspace
+rig volume resize --name data --size 5G   # grow a volume
+rig volume rm --name data                 # delete a volume (destroys its data)
+```
+
+The same operations are available on the REST API under the workspace's volumes endpoint:
+
+```bash
+# List volumes
+curl -s https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/volumes \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+
+# Create a volume
+curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/volumes \
+  -H "Authorization: Bearer $RIGBOX_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "name": "data", "mount_path": "/home/developer/data" }'
+```
+
+<Warning>
+Deleting a volume (`rig volume rm` or the DELETE endpoint) permanently destroys the data on it. This is separate from deleting the workspace — but deleting the workspace destroys its volumes too.
+</Warning>
+
+## The SQLite-under-$DATA_DIR pattern
+
+The most common use is a SQLite database that outlives deploys. Two pieces make it work:
+
+1. Set `DATA_DIR=/home/developer/data` in `env:` and put the database file under it.
+2. `mkdir -p "$DATA_DIR"` at startup — a fresh workspace may not have the directory yet.
+
+```python
+import os, sqlite3
+
+DATA_DIR = os.environ.get("DATA_DIR", "/home/developer/data")
+os.makedirs(DATA_DIR, exist_ok=True)        # the dir may not exist on a fresh workspace
+db = sqlite3.connect(os.path.join(DATA_DIR, "notes.db"))
+```
+
+Because `notes.db` lives on the volume, not in the synced app directory, a `rig deploy` rsyncs your new code over the app dir while the database file is left untouched.
+
+<Tip>
+To verify persistence, deploy the app, create some data, run `rig deploy` again, and confirm the data is still there. The rsync wipe replaces your code; `$DATA_DIR` survives.
+</Tip>
+
+## Next steps
+
+- [Deploying with rig deploy](/guides/deploying) — the full deploy workflow and the rsync model.
+- [Releases & Rollback](/guides/releases-and-rollback) — roll the environment back without touching volume data.
+- [Snapshots](/guides/snapshots) — capture the *entire* disk (including the volume) for checkpoint and recovery.
