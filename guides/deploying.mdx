@@ -263,53 +263,7 @@ rig deploy
 
 ## Blue-green deploys and promotion
 
-Stage a change, verify it, then swap production over atomically. There are two flavors — pick by what the workspace is.
-
-### `--bluegreen preview` — clone the whole workspace
-
-Best for production **service hosts**. `preview` copy-on-write clones the **entire workspace** into a hidden preview VM, overlays your new code onto it, and serves it at `<app>-pv-<id>.rigbox.dev`. Production is untouched until you promote.
-
-```bash
-# Clone prod -> hidden preview, overlay this build, print the preview URL
-rig deploy --bluegreen preview
-
-# Verify the <app>-pv-<id> URL, then cut production over (zero-downtime):
-rig deploy --bluegreen preview --promote
-```
-
-Because the preview is a separate VM, every app runs on its **same** declared port (no `$PORT` juggling), the whole multi-app workspace is previewed as a unit, and promote re-homes production onto the preview VM with **no restart** — an in-place edge route swap. The promoted VM inherits the **workspace name and SSH routing**, so it's indistinguishable from the old production by name.
-
-<Note>
-Promote **swaps the underlying VM.** That's seamless for HTTP, but an open SSH session can't follow it — it stays on the old VM, which is retired ~1h later. The promote warns you if anyone's actively in the old VM, and the old VM is never auto-retired while a session is live. Re-attach with `rig ssh <workspace>` after promote to land on the new VM.
-</Note>
-
-**Rollback.** The old production VM is parked as `<name>-rollback-<id>` and kept as an instant rollback target until it's retired. To revert a promote before then, call the rollback endpoint on the promoted workspace:
-
-```bash
-rig api POST /workspaces/<workspace-id>/rollback
-```
-
-### `--bluegreen <suffix>` — in-VM sibling
-
-Best for a workspace people actively work **in**. `<suffix>` stages a sibling app `<base>-<suffix>` on its own subdomain **inside the same workspace VM**. The VM never changes — so SSH sessions, files, and other processes survive — but apps must bind `$PORT`, and promote does a brief (~1s) app restart.
-
-```bash
-rig deploy --bluegreen v2              # stage <base>-v2 on its own subdomain
-rig deploy --bluegreen v2 --promote    # swap production to the sibling
-```
-
-`--promote` atomically swaps the production subdomain to the sibling, keeping the old app as a rollback target until you delete it.
-
-### Which to use
-
-| Your workspace is… | Use | Why |
-| --- | --- | --- |
-| A **production service host** — nobody's SSH'd in doing live work | `--bluegreen preview` | zero-downtime, same port everywhere, whole-workspace; old VM retired cleanly |
-| A **live dev environment** — people SSH in, run processes, edit files | `--bluegreen <suffix>` or [deploy in place](#deploy-modes) | the VM never changes, so sessions / files / in-VM state survive |
-
-<Tip>
-Blue-green pairs naturally with reproducible deploys: a previewed clone (or a staged sibling booted from its own frozen image) is byte-for-byte what production becomes on promote.
-</Tip>
+For zero-downtime rollouts, stage a change, verify it, then swap production over atomically — either a whole-workspace clone (`rig deploy --bluegreen preview`) or an in-VM sibling (`rig deploy --bluegreen <suffix>`), each cut over with `--promote`. See **[Blue-green deploys & promotion](/guides/bluegreen)** for both flows, the service-host-vs-live-environment boundary, and rollback.
 
 ---
 
@@ -335,4 +289,4 @@ See [Releases & Rollback](/guides/releases-and-rollback) for the release lifecyc
 - [Releases & Rollback](/guides/releases-and-rollback) — pin and roll back image digests.
 - [Visibility](/guides/visibility) — private, public, and email-allow-listed apps.
 - [Expose and Route](/guides/expose-and-route) — how apps map to subdomains.
-- [The Rigbox CLI](/guides/cli) — the full command surface.
+- [The Rigbox CLI](/cli-reference/cli) — the full command surface.

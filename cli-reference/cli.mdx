@@ -209,7 +209,7 @@ rig deploy --bluegreen v2
 rig deploy --bluegreen v2 --promote
 ```
 
-`--promote` requires `--bluegreen`. Use `preview` for production service hosts (zero-downtime, swaps to a new VM, same ports); use `<suffix>` for a workspace people actively work in (same VM, so SSH sessions and state survive). See [Blue-green deploys and promotion](/guides/deploying#blue-green-deploys-and-promotion) for the full flow, the boundary, and rollback.
+`--promote` requires `--bluegreen`. Use `preview` for production service hosts (zero-downtime, swaps to a new VM, same ports); use `<suffix>` for a workspace people actively work in (same VM, so SSH sessions and state survive). See [Blue-green deploys and promotion](/guides/bluegreen) for the full flow, the boundary, and rollback.
 
 ### Scaffold a manifest
 
