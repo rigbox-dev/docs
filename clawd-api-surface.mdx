@@ -11,7 +11,7 @@ Use this guide as an API map when building your own Clawd-like experience.
 
 | Group | What it does | Should you use it in your own app? |
 | --- | --- | --- |
-| Core Rigbox APIs | Workspaces, apps, routing, logs, metrics, snapshots, tools, tasks | Yes, these are the foundation |
+| Core Rigbox APIs | Workspaces, apps, routing, logs, metrics, snapshots, tools | Yes, these are the foundation |
 | AI Config APIs | AI provider settings, managed/BYOK state, credits, usage | Yes, if you integrate AI providers |
 | Clawd billing/plan APIs | Checkout, plan switching, portal sessions | Optional; use your own billing stack if preferred |
 
@@ -34,7 +34,6 @@ Use this guide as an API map when building your own Clawd-like experience.
 | `GET /capacity` | Capacity checks before create flows |
 | `GET /api-keys`, `POST /api-keys`, `DELETE /api-keys/{id}` | Programmatic access management |
 | `GET /workspaces/{id}/tools`, `POST /workspaces/{id}/tools/{tool}/install` | Tool management |
-| `GET /workspaces/{id}/tasks` | Task sync and display |
 | `GET /setup-scripts`, `POST /setup-scripts` | Workspace initialization automation |
 | `GET /service-specs`, `POST /service-specs` | Service configuration templates |
 
@@ -44,16 +43,15 @@ These are the APIs that manage AI provider configuration:
 
 | Endpoint | Responsibility |
 | --- | --- |
-| `GET /workspaces/{id}/ai-config` | Read current AI provider configuration |
-| `PUT /workspaces/{id}/ai-config` | Update AI config (mode/provider/api_key/model) |
-| `POST /workspaces/{id}/env` | Generic env writes (legacy/fallback path) |
+| `GET /workspaces/{id}/mode` | Read the workspace's effective AI mode |
+| `PUT /workspaces/{id}/mode` | Set the workspace AI mode (managed/BYOK) |
+| `GET /users/me/ai-defaults`, `PUT /users/me/ai-defaults` | Read/set the account default provider and model |
+| `POST /workspaces/{id}/env` | Provide a BYOK provider key as a workspace env var |
 | `GET /users/me/credits` | Managed AI credit balance |
 | `GET /users/me/ai-usage` | AI usage history |
-| `GET /users/me/ai-defaults` | Default AI provider settings |
-| `PUT /users/me/ai-defaults` | Update default AI settings |
 
 <Note>
-  Prefer `PUT /workspaces/{id}/ai-config` for AI provider changes. It is normalized and safer than raw env mutation.
+  AI config is split: `PUT /workspaces/{id}/mode` sets a workspace's managed/BYOK mode, and `PUT /users/me/ai-defaults` sets the account-wide default provider and model. There is no combined per-workspace `ai-config` endpoint.
 </Note>
 
 ## Billing and Subscriptions
@@ -66,7 +64,7 @@ Clawd handles billing through its own integration layer. If you build your own d
 2. Start and poll workspace state until running.
 3. Call `POST /workspaces/{id}/reconcile-apps`.
 4. Use `GET /apps/{id}/health` before surfacing app URLs as live.
-5. Save AI settings through `PUT /workspaces/{id}/ai-config`.
+5. Set the workspace AI mode through `PUT /workspaces/{id}/mode` (and account-wide provider/model defaults via `PUT /users/me/ai-defaults`).
 6. Show plan/credit context with `GET /users/me/limits` and `GET /users/me/credits`.
 
 For runtime internals (AI proxy and credit enforcement pipeline), continue to [/clawd-runtime-services](/clawd-runtime-services).

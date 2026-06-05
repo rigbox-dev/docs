@@ -191,12 +191,11 @@ Agentic tools like Claude Code and Codex can make dozens of API calls per task. 
 
 ## BYOK Alternative
 
-If you burn through managed credits quickly, switch to [BYOK mode](/guides/byok) and use your own API keys for unlimited usage:
+If you burn through managed credits quickly, switch to [BYOK mode](/guides/byok) and use your own API keys for unlimited usage. Flip the workspace mode, then set your provider key as a workspace environment variable:
 
 ```bash
-rig api PUT /v1/workspaces/<workspace_id>/ai-config --body - <<'JSON'
-{"mode": "byok", "provider": "anthropic", "api_key": "sk-ant-..."}
-JSON
+rig workspace ai mode --workspace <workspace_id> byok
+rig workspace env set --workspace <workspace_id> ANTHROPIC_API_KEY=sk-ant-...
 ```
 
 Then run `eval "$(rig proxy on)"` again to update the environment.

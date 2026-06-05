@@ -1,7 +1,7 @@
 ---
-title: Update Workspace AI Config
-openapi: PUT /api/v1/workspaces/{id}/ai-config
-description: Update AI provider settings for a workspace.
+title: Update Workspace AI Mode
+openapi: PUT /api/v1/workspaces/{id}/mode
+description: Set a workspace's AI mode (managed or BYOK).
 ---
 
-Accepts `mode`, `provider`, `api_key`, and `model`. Omitted fields keep their current value. Set a field to `null` to clear it.
+Accepts `mode` — `"managed"`, `"byok"`, or `null` to clear the per-workspace override and fall back to your account default. Provider and model are account-level; set them with [Update AI Defaults](/api-reference/ai/update-defaults). For BYOK, supply your provider key to the workspace as an environment variable (e.g. `ANTHROPIC_API_KEY`).

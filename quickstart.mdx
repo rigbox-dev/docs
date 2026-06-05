@@ -78,19 +78,11 @@ For workspaces with AI integration, set the AI mode:
 rig workspace ai mode --workspace my-project managed
 ```
 
-To also pin a provider and model, use the typed config endpoint via `rig api`:
+Provider and model are account-level defaults — set them once with `rig ai defaults`:
 
 ```bash
-rig api PUT /v1/workspaces/<WORKSPACE_ID>/ai-config --body - <<'JSON'
-{
-  "mode": "managed",
-  "provider": "google",
-  "model": "google/gemini-2.5-pro"
-}
-JSON
+rig ai defaults --provider google --model google/gemini-2.5-pro
 ```
-
-Use `null` on nullable fields (for example `api_key`) to explicitly clear values. Omitted fields keep their existing values.
 
 ## Next Steps
 
@@ -108,7 +100,7 @@ Use `null` on nullable fields (for example `api_key`) to explicitly clear values
     Save and restore workspace state
   </Card>
   <Card title="AI Configuration" icon="sparkles" href="/api-reference/ai/get-workspace-ai-config">
-    Manage AI provider settings and credits
+    Workspace AI mode, account defaults, and credits
   </Card>
   <Card title="API Keys" icon="key" href="/api-reference/api-keys/list">
     Manage programmatic access

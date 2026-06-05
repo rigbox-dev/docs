@@ -59,16 +59,10 @@ Set a workspace to managed mode with `rig workspace ai mode`:
 rig workspace ai mode --workspace <workspace_id> managed
 ```
 
-To also pin the upstream provider and model, send the full config through `rig api`:
+Provider and model are account-level defaults — set them once with `rig ai defaults`:
 
 ```bash
-rig api PUT /v1/workspaces/<workspace_id>/ai-config --body - <<'JSON'
-{
-  "mode": "managed",
-  "provider": "google",
-  "model": "google/gemini-2.5-pro"
-}
-JSON
+rig ai defaults --provider google --model google/gemini-2.5-pro
 ```
 
 ### Inside a Workspace VM
@@ -160,9 +154,8 @@ Here is a complete flow: activate managed mode, make an AI call from inside the 
 **Step 1 - Activate managed mode for a workspace:**
 
 ```bash
-rig api PUT /v1/workspaces/ws_abc123/ai-config --body - <<'JSON'
-{"mode": "managed", "provider": "google", "model": "gemini-2.5-flash-lite"}
-JSON
+rig workspace ai mode --workspace ws_abc123 managed
+rig ai defaults --provider google --model gemini-2.5-flash-lite
 ```
 
 **Step 2 - Inside the workspace VM, configure the shell and make a call:**
@@ -207,7 +200,7 @@ curl -sS "$OPENROUTER_BASE_URL/chat/completions" \
   -d '{"model": "openai/gpt-4o", "messages": [{"role": "user", "content": "hi"}]}'
 ```
 
-The workspace-level `ai-config` (set via the API or UI) defines the default provider and model used by tools that don't ask for one explicitly, and is also surfaced by `rig proxy status`.
+The account-level AI defaults (set with `rig ai defaults`) define the default provider and model used by tools that don't ask for one explicitly, and are also surfaced by `rig proxy status`.
 
 ## Next Steps
 
