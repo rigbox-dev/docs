@@ -3,7 +3,7 @@ title: Bring Your Own Keys
 description: Use your own AI provider API keys instead of Rigbox-managed credits.
 ---
 
-Bring Your Own Keys (BYOK) mode lets you use your own AI provider API keys with Rigbox workspaces. Your keys are stored securely and injected into the workspace runtime - you get unlimited usage billed directly by your provider, with no Rigbox credit limits.
+Bring Your Own Keys (BYOK) mode lets you use your own AI provider API keys with Rigbox workspaces. You set the workspace to BYOK mode and provide your provider key as a workspace environment variable - you get unlimited usage billed directly by your provider, with no Rigbox credit limits.
 
 <Note>
 [Managed mode](/guides/managed-proxy) routes traffic through Rigbox's OpenRouter gateway and meters it against your credit balance. BYOK skips OpenRouter entirely and connects your workspace directly to the provider you specify, using the key you supply.
@@ -24,100 +24,64 @@ If you are just getting started or prototyping, [managed mode](/guides/managed-p
 
 ## Set BYOK Mode
 
-Configure a workspace to use your own API key by setting the AI config to `byok` mode. The `rig workspace ai mode` command flips the mode; to attach a provider, key, and model in one shot, send the full config through `rig api`:
+BYOK is two steps: flip the workspace's AI mode to `byok`, then set your provider key as a workspace environment variable using the standard name your SDK expects (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, …).
 
 ```bash
-rig api PUT /v1/workspaces/<workspace_id>/ai-config --body - <<'JSON'
-{
-  "mode": "byok",
-  "provider": "openai",
-  "api_key": "sk-proj-...",
-  "model": "gpt-4o"
-}
-JSON
+rig workspace ai mode --workspace <workspace_id> byok
+
+rig workspace env set --workspace <workspace_id> ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-<Warning>
-The CLI never returns your API key in responses. Once set, you can update or clear the key, but you cannot read it back. Treat it as a write-only field.
-</Warning>
+Rigbox detects BYOK from the presence of a provider key in the workspace environment and routes your code straight to that provider, bypassing the managed proxy.
+
+<Note>
+Environment changes apply on the next workspace start. Restart the workspace (`rig workspace stop` then `rig workspace start`) if it is already running.
+</Note>
 
 ## How Keys Are Stored and Injected
 
 When you set a BYOK key:
 
-1. **Encrypted at rest** - the key is encrypted before being written to the database
-2. **Injected at runtime** - when the workspace starts, the key is injected as an environment variable inside the VM
-3. **Never logged** - keys are redacted from all request logs and audit trails
-4. **Scoped to the workspace** - each workspace has its own AI config; changing one does not affect others
+1. **Stored with the workspace** - the value is saved as one of the workspace's environment variables
+2. **Masked by default** - `rig workspace env get` shows secret-shaped values (like `*_API_KEY`) as `<masked>`; pass `--reveal` to print the real value
+3. **Injected at runtime** - the key is exported into the workspace environment, so SDKs pick it up with no extra setup
+4. **Scoped to the workspace** - each workspace has its own environment; changing one does not affect others
 
 The key is available inside the workspace as the standard environment variable for the provider SDK (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`).
 
 ## Clear a Key
 
-To remove an API key from a workspace without changing the mode, set `api_key` to `null`:
+To remove a provider key from a workspace, unset the environment variable:
 
 ```bash
-rig api PUT /v1/workspaces/<workspace_id>/ai-config --body - <<'JSON'
-{
-  "mode": "byok",
-  "provider": "openai",
-  "api_key": null
-}
-JSON
+rig workspace env unset --workspace <workspace_id> ANTHROPIC_API_KEY
 ```
 
-Setting `api_key` to `null` removes the stored key. The workspace will no longer have access to the provider until you set a new key.
+The workspace will no longer have access to the provider until you set a new key.
 
 ## Switch Back to Managed Mode
 
-You can switch from BYOK to managed mode at any time. This clears the stored key and starts using Rigbox-managed credits instead. The quickest path is `rig workspace ai mode`:
+You can switch from BYOK to managed mode at any time. This starts routing through Rigbox-managed credits again:
 
 ```bash
 rig workspace ai mode --workspace <workspace_id> managed
 ```
 
-To also pin the managed provider and model in the same step, send the full config through `rig api`:
-
-```bash
-rig api PUT /v1/workspaces/<workspace_id>/ai-config --body - <<'JSON'
-{
-  "mode": "managed",
-  "provider": "anthropic",
-  "model": "claude-sonnet-4-20250514"
-}
-JSON
-```
+Switching the mode does not delete your provider key — managed mode simply injects its own credentials and ignores it. To fully remove the key, unset the environment variable as shown above.
 
 <Note>
-Switching modes takes effect on the next AI API call - no workspace restart required.
+Mode changes take effect on the next AI API call. A new provider key requires a workspace restart to be injected.
 </Note>
 
 ## Set Defaults for New Workspaces
 
-If you use the same provider and key across most of your workspaces, set a default so new workspaces inherit your BYOK configuration automatically.
-
-For a default mode, provider, and model, use `rig ai defaults`:
+If you use BYOK across most of your workspaces, set an account default so new workspaces start in BYOK mode with your preferred provider and model:
 
 ```bash
 rig ai defaults --mode byok --provider anthropic --model claude-sonnet-4-20250514
 ```
 
-To also store a default API key (so new BYOK workspaces inherit it), send the full defaults payload through `rig api`:
-
-```bash
-rig api PUT /v1/users/me/ai-defaults --body - <<'JSON'
-{
-  "mode": "byok",
-  "provider": "anthropic",
-  "api_key": "sk-ant-...",
-  "model": "claude-sonnet-4-20250514"
-}
-JSON
-```
-
-New workspaces will use these defaults unless you explicitly override the AI config at creation time.
-
-See the [AI Defaults API reference](/api-reference/ai/update-defaults) for the full schema.
+Account defaults cover mode, provider, and model only — the provider **key** is always set per workspace (with `rig workspace env set`), so it is never stored account-wide. See the [AI Defaults API reference](/api-reference/ai/update-defaults) for the full schema.
 
 ## Managed vs. BYOK Comparison
 
@@ -136,14 +100,8 @@ See the [AI Defaults API reference](/api-reference/ai/update-defaults) for the f
 ### Anthropic (Claude)
 
 ```bash
-rig api PUT /v1/workspaces/<workspace_id>/ai-config --body - <<'JSON'
-{
-  "mode": "byok",
-  "provider": "anthropic",
-  "api_key": "sk-ant-api03-...",
-  "model": "claude-sonnet-4-20250514"
-}
-JSON
+rig workspace ai mode --workspace <workspace_id> byok
+rig workspace env set --workspace <workspace_id> ANTHROPIC_API_KEY=sk-ant-api03-...
 ```
 
 Inside the workspace:
@@ -164,14 +122,8 @@ print(message.content[0].text)
 ### OpenAI (GPT)
 
 ```bash
-rig api PUT /v1/workspaces/<workspace_id>/ai-config --body - <<'JSON'
-{
-  "mode": "byok",
-  "provider": "openai",
-  "api_key": "sk-proj-...",
-  "model": "gpt-4o"
-}
-JSON
+rig workspace ai mode --workspace <workspace_id> byok
+rig workspace env set --workspace <workspace_id> OPENAI_API_KEY=sk-proj-...
 ```
 
 Inside the workspace:
@@ -191,14 +143,8 @@ print(response.choices[0].message.content)
 ### Google (Gemini)
 
 ```bash
-rig api PUT /v1/workspaces/<workspace_id>/ai-config --body - <<'JSON'
-{
-  "mode": "byok",
-  "provider": "google",
-  "api_key": "AIza...",
-  "model": "google/gemini-2.5-pro"
-}
-JSON
+rig workspace ai mode --workspace <workspace_id> byok
+rig workspace env set --workspace <workspace_id> GOOGLE_API_KEY=AIza...
 ```
 
 Inside the workspace:
@@ -215,10 +161,10 @@ print(response.text)
 ## Security Best Practices
 
 <Warning>
-Never set API keys using raw environment variables or `.env` files inside the workspace. Always set the AI config with the CLI - it ensures keys are encrypted, scoped, and never exposed in logs.
+Set provider keys with `rig workspace env set`, not by hardcoding them in your code or committing a `.env` file to your repo. The CLI keeps the value in the workspace environment and masks it in `rig workspace env get` by default.
 </Warning>
 
-- **Rotate keys regularly** - update the key with the CLI; no workspace restart needed
+- **Rotate keys regularly** - update the key with `rig workspace env set`, then restart the workspace
 - **Use scoped keys** - if your provider supports project-scoped or restricted keys, prefer those over organization-wide keys
 - **Audit usage** - monitor your provider dashboard for unexpected usage patterns
 - **One key per workspace** - avoid sharing the same key across many workspaces; this makes it easier to revoke access to a single workspace
