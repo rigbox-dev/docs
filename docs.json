@@ -106,8 +106,7 @@
               "api-reference/workspaces/update-resources",
               "api-reference/workspaces/get-metrics",
               "api-reference/workspaces/get-logs",
-              "api-reference/workspaces/stream-logs",
-              "api-reference/workspaces/tasks"
+              "api-reference/workspaces/stream-logs"
             ]
           },
           {
