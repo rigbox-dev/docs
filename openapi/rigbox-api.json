@@ -2666,89 +2666,6 @@
         ]
       }
     },
-    "/api/v1/community/recipes": {
-      "get": {
-        "tags": [
-          "Community"
-        ],
-        "summary": "Cursor-paginated list of published community app recipes the caller can see.",
-        "description": "Returns the user's own items first (any visibility) then community-visible\nitems filtered by the caller's `community_items_preference`.\n\nUses **offset** under the opaque cursor (not keyset): the sort is\npartitioned (vendored-first, then community by `published_at`), and the\ncomposed list already lives in memory after fan-out from the DB. Offset\nover the composed list is cheaper than retro-fitting a keyset DB query.",
-        "operationId": "list_recipes",
-        "parameters": [
-          {
-            "name": "max_results",
-            "in": "query",
-            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "description": "Opaque cursor returned by a prior call's `next_cursor`. Omit on the\nfirst page.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Community recipes page",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Page_DeployPreviewResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "Community"
-        ],
-        "summary": "Publish a private or Community app recipe version.",
-        "operationId": "publish_recipe",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PublishCommunityRecipeRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "410": {
-            "description": "Endpoint retired \u2014 use POST /v1/community/app-recipes (v1)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/api/v1/community/recipes/{vendor}/{slug}/{version}": {
       "delete": {
         "tags": [
@@ -3593,6 +3510,35 @@
         ]
       }
     },
+    "/api/v1/metrics": {
+      "post": {
+        "tags": [
+          "Telemetry"
+        ],
+        "operationId": "ingest_metrics",
+        "requestBody": {
+          "description": "OTLP/HTTP protobuf metric export",
+          "content": {
+            "application/x-protobuf": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Metrics accepted and forwarded to the collector"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/quick-deploy": {
       "post": {
         "tags": [
@@ -4280,6 +4226,35 @@
             }
           }
         }
+      }
+    },
+    "/api/v1/traces": {
+      "post": {
+        "tags": [
+          "Telemetry"
+        ],
+        "operationId": "ingest_traces",
+        "requestBody": {
+          "description": "OTLP/HTTP protobuf trace export",
+          "content": {
+            "application/x-protobuf": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Traces accepted and forwarded to the collector"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/v1/users/me/ai-defaults": {
@@ -5593,6 +5568,44 @@
         ]
       }
     },
+    "/api/v1/workspaces/{id}/reconcile-apps": {
+      "post": {
+        "tags": [
+          "Apps"
+        ],
+        "summary": "Reconcile apps for a workspace against a template.",
+        "description": "Ensure expected template apps exist for a workspace. Template is resolved\nin order: (1) explicit `template_id` query param, (2) `RIGBOX_TEMPLATE_ID`\nfrom workspace env vars, (3) fallback to image-based lookup.",
+        "operationId": "reconcile_apps",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Apps reconciled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReconcileAppsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/workspaces/{id}/resources": {
       "put": {
         "tags": [
@@ -6163,88 +6176,6 @@
           }
         ],
         "summary": "Stop a workspace."
-      }
-    },
-    "/api/v1/workspaces/{id}/tasks": {
-      "get": {
-        "tags": [
-          "Workspaces"
-        ],
-        "summary": "List tasks for a workspace.",
-        "operationId": "list_workspace_tasks",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Workspace ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Workspace tasks",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ListTasksResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "Workspaces"
-        ],
-        "summary": "Sync tasks from td running inside a workspace VM.",
-        "operationId": "sync_workspace_tasks",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Workspace ID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SyncTasksRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Tasks synced",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SyncTasksResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
       }
     },
     "/api/v1/workspaces/{id}/tools": {
@@ -9915,20 +9846,6 @@
           }
         }
       },
-      "ListTasksResponse": {
-        "type": "object",
-        "required": [
-          "tasks"
-        ],
-        "properties": {
-          "tasks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/WorkspaceTask"
-            }
-          }
-        }
-      },
       "ListVolumesResponse": {
         "type": "object",
         "required": [
@@ -10476,6 +10393,13 @@
                   ],
                   "description": "Per-workspace override for the AI mode (`managed` or `byok`).\n`None` means inherit from `users.ai_mode` (the per-account default)."
                 },
+                "cloned_from": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Bluegreen preview lineage. `None` = a normal workspace. `Some(source_id)`\n= this VM is a COW clone of `source_id`, booted as a hidden preview;\npromote repoints the prod subdomain's edge route to it. See\n[`Vm::is_preview`]."
+                },
                 "created_at": {
                   "type": "string",
                   "format": "date-time"
@@ -10525,6 +10449,13 @@
                 },
                 "image": {
                   "type": "string"
+                },
+                "image_digest": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Content-addressed image this workspace is pinned to. When set, the\nworkspace boots from this registry image (staged as the rootfs on first\nboot) instead of the named base in `image`. `None` = the named-base path."
                 },
                 "ip_address": {
                   "type": [
@@ -10765,43 +10696,6 @@
           },
           "user_id": {
             "type": "string"
-          }
-        }
-      },
-      "PublishCommunityRecipeRequest": {
-        "type": "object",
-        "required": [
-          "manifest"
-        ],
-        "properties": {
-          "manifest": {
-            "description": "Parsed app recipe manifest."
-          },
-          "manifest_yaml": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Optional original YAML text used for digesting and review display."
-          }
-        }
-      },
-      "PublishCommunityRecipeResponse": {
-        "type": "object",
-        "required": [
-          "deploy_ref",
-          "item",
-          "version"
-        ],
-        "properties": {
-          "deploy_ref": {
-            "type": "string"
-          },
-          "item": {
-            "$ref": "#/components/schemas/CommunityCatalogItem"
-          },
-          "version": {
-            "$ref": "#/components/schemas/CommunityCatalogVersion"
           }
         }
       },
@@ -11704,32 +11598,6 @@
           }
         }
       },
-      "SyncTasksRequest": {
-        "type": "object",
-        "required": [
-          "tasks"
-        ],
-        "properties": {
-          "tasks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TaskInput"
-            }
-          }
-        }
-      },
-      "SyncTasksResponse": {
-        "type": "object",
-        "required": [
-          "synced"
-        ],
-        "properties": {
-          "synced": {
-            "type": "integer",
-            "minimum": 0
-          }
-        }
-      },
       "TagsResponse": {
         "type": "object",
         "required": [
@@ -11748,50 +11616,6 @@
             "propertyNames": {
               "type": "string"
             }
-          }
-        }
-      },
-      "TaskInput": {
-        "type": "object",
-        "required": [
-          "id",
-          "title"
-        ],
-        "properties": {
-          "created_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "id": {
-            "type": "string"
-          },
-          "implementer": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "priority": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "updated_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
           }
         }
       },
@@ -12798,6 +12622,13 @@
             ],
             "description": "Per-workspace override for the AI mode (`managed` or `byok`).\n`None` means inherit from `users.ai_mode` (the per-account default)."
           },
+          "cloned_from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Bluegreen preview lineage. `None` = a normal workspace. `Some(source_id)`\n= this VM is a COW clone of `source_id`, booted as a hidden preview;\npromote repoints the prod subdomain's edge route to it. See\n[`Vm::is_preview`]."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -12847,6 +12678,13 @@
           },
           "image": {
             "type": "string"
+          },
+          "image_digest": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Content-addressed image this workspace is pinned to. When set, the\nworkspace boots from this registry image (staged as the rootfs on first\nboot) instead of the named base in `image`. `None` = the named-base path."
           },
           "ip_address": {
             "type": [
@@ -13803,57 +13641,6 @@
           }
         }
       },
-      "WorkspaceTask": {
-        "type": "object",
-        "required": [
-          "id",
-          "workspace_id",
-          "user_id",
-          "title",
-          "status",
-          "priority",
-          "type",
-          "updated_at",
-          "created_at"
-        ],
-        "properties": {
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "type": "string"
-          },
-          "implementer": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "priority": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "user_id": {
-            "type": "string"
-          },
-          "workspace_id": {
-            "type": "string"
-          }
-        }
-      },
       "WorkspaceTemplate": {
         "type": "object",
         "required": [
@@ -14026,6 +13813,9 @@
   "tags": [
     {
       "name": "Workspaces"
+    },
+    {
+      "name": "Telemetry"
     },
     {
       "name": "Auth"
