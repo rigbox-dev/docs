@@ -63,7 +63,7 @@ Use `always` for servers and daemons that should run continuously. Use `on-failu
 Pass `--service-spec-id` (repeatable) when spawning a workspace.
 
 ```bash
-rig workspace spawn --name fullstack-app --template tpl_node \
+rig workspace spawn --name fullstack-app --template dev \
   --service-spec-id svc_abc123 \
   --service-spec-id svc_def456
 ```
@@ -186,7 +186,7 @@ rig service-spec create --file app-server.yaml
 **Step 3 - Spawn a workspace with both:**
 
 ```bash
-rig workspace spawn --name production-app --template tpl_node \
+rig workspace spawn --name production-app --template dev \
   --setup-script-id ss_install_deps \
   --service-spec-id svc_app_server
 ```

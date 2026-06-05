@@ -29,22 +29,20 @@ You open the noVNC URL in your own browser and get a live, interactive view of t
 
 ## Requirements
 
-Virtual Browser requires **Xvfb** and **x11vnc** to be installed in the workspace. These are pre-installed in the `full` image along with Chromium and Firefox via Playwright.
+Virtual Browser requires **Xvfb** and **x11vnc** to be installed in the workspace, along with Chromium and Firefox via Playwright. None of these come pre-installed, so you install them as part of the tool.
 
 | Image | Status | What's included |
 |-------|--------|-----------------|
-| `full` | Ready to launch | Xvfb, x11vnc, Chromium, Firefox, Playwright |
 | `base` | Requires installation | None of the above |
 | `dev` | Requires installation | None of the above |
-| `openclaw` | Requires installation | None of the above |
 
 <Tip>
-The `full` image has browsers pre-installed, so launching is nearly instant. On other images, installation downloads Chromium and Firefox which can take several minutes.
+Installation downloads Chromium and Firefox, which can take several minutes on either image.
 </Tip>
 
 ## Installation
 
-If your workspace doesn't use the `full` image, install Virtual Browser first. This installs Playwright along with Chromium and Firefox browsers. The install runs asynchronously and prints a job id you can poll.
+Install Virtual Browser before launching it. This installs Playwright along with Chromium and Firefox browsers. The install runs asynchronously and prints a job id you can poll.
 
 ```bash
 rig tools install --workspace $WORKSPACE --tool virtual-browser
@@ -68,7 +66,7 @@ See [Installation Status](/api-reference/tools/install-status) for the response 
 
 ## Launching Virtual Browser
 
-Once installed (or immediately on the `full` image), launch the browser.
+Once installed, launch the browser.
 
 ```bash
 rig tools launch --workspace $WORKSPACE --tool virtual-browser
@@ -118,12 +116,12 @@ See [Stop Tool](/api-reference/tools/stop) for details.
 
 This walkthrough starts a web app inside the workspace and uses Virtual Browser to view it.
 
-### Create a workspace with the full image
+### Create a workspace with the dev image
 
-`rig workspace spawn` creates the workspace from the `full` template, boots it, and waits until it's ready:
+`rig workspace spawn` creates the workspace from the `dev` template, boots it, and waits until it's ready:
 
 ```bash
-rig workspace spawn --name browser-demo --template full
+rig workspace spawn --name browser-demo --template dev
 ```
 
 ### Start a local web app
@@ -185,5 +183,5 @@ Virtual Browser (the VNC-based UI) and Playwright scripts use separate browser i
 ## Next Steps
 
 - [Architecture Explorer](/guides/architecture-explorer) - visualize code structure and dependencies
-- [Images & Templates](/guides/images-and-templates) - choose the `full` image for pre-installed tools
+- [Images & Templates](/guides/images-and-templates) - choose the `dev` image for a richer development environment
 - [Catalog Apps](/guides/catalog) - install VS Code, Jupyter, and other pre-packaged apps

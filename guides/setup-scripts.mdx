@@ -74,7 +74,7 @@ Always use `set -e` at the top of your scripts. Without it, a failing command wi
 Pass `--setup-script-id` (repeatable) when spawning a workspace. Scripts run in the order you list them.
 
 ```bash
-rig workspace spawn --name ml-workspace --template tpl_python \
+rig workspace spawn --name ml-workspace --template dev \
   --setup-script-id ss_abc123 \
   --setup-script-id ss_def456
 ```
@@ -163,13 +163,13 @@ Templates can include their own setup scripts. When you create a workspace with 
 ```json
 {
   "name": "custom-workspace",
-  "template_id": "tpl_node_fullstack",
+  "template_id": "dev",
   "setup_script_ids": ["ss_my_custom_config"]
 }
 ```
 
 Execution order:
-1. Template `tpl_node_fullstack` scripts (e.g., install Node.js, npm packages)
+1. Template `dev` scripts (e.g., install Node.js, npm packages)
 2. Your script `ss_my_custom_config` (e.g., clone your repo, set up environment)
 
 This layering lets you build on top of standard templates without duplicating their setup logic.

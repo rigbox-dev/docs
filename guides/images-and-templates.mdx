@@ -13,11 +13,9 @@ Images determine what software is available inside your workspace out of the box
 |-------|------|----------|----------|
 | `base` | 3 GB | Python 3.12, Node.js 22, uv, git, vim, tmux, GitHub CLI | General development, scripts, web apps |
 | `dev` | 4 GB | Everything in base + Docker CLI, cmake, build tools, strace, gdb, PostgreSQL client | Systems programming, native builds |
-| `full` | 5 GB | Everything in base + Architecture Explorer, Virtual Browser pre-installed | Full tooling, code analysis |
-| `openclaw` | 2.5 GB | Node.js 22, OpenClaw gateway pre-installed | AI bot deployment (Telegram, web) |
 
 <Note>
-All images are built on Debian 12 (Bookworm) and include Python 3.12 and Node.js 22 except where noted. The `openclaw` image is specialized and does not include Python.
+Both images are built on Debian 12 (Bookworm) and include Python 3.12 and Node.js 22. Specialized software — VS Code, Jupyter, Architecture Explorer, Virtual Browser, and more — is layered on top of a workspace as [app recipes](/guides/catalog) and [tools](/guides/architecture-explorer), not baked into a dedicated image.
 </Note>
 
 ### What's in each image
@@ -34,15 +32,6 @@ All images are built on Debian 12 (Bookworm) and include Python 3.12 and Node.js
 - cmake, make, gcc, g++
 - strace, gdb, ltrace for debugging
 - PostgreSQL client (`psql`)
-
-**full** adds pre-installed Rigbox tools:
-- Architecture Explorer - ready to launch without installation
-- Virtual Browser (Chromium + Firefox via Playwright) - ready to launch
-- Xvfb and x11vnc for headless display
-
-**openclaw** is a minimal image for AI bot workloads:
-- Node.js 22 with the OpenClaw gateway pre-configured
-- Designed for Telegram bots, web chat bots, and similar agents
 
 ### Listing Available Images
 
@@ -68,9 +57,6 @@ Templates are pre-configured workspace definitions that pair an image with sensi
 |----------|-------|-----|------|------|----------|
 | `base` | base | 512 MB | 1 | 3 GB | Minimal workspace for scripts and web apps |
 | `dev` | dev | 1 GB | 1 | 4 GB | Developer environment with build tools |
-| `full` | full | 1 GB | 1 | 5 GB | Full tooling pre-installed (Architecture Explorer, Virtual Browser) |
-| `openclaw` | openclaw | 1 GB | 1 | 2.5 GB | AI bot workspace with OpenClaw gateway |
-| `ai-agent-starter` | base | 1 GB | 2 | 3 GB | AI sandbox with Open Terminal for agent workloads |
 | `custom-repo` | base | 1 GB | 1 | 3 GB | Clone and run a git repository |
 
 ### Listing Available Templates
@@ -85,13 +71,9 @@ See [List Templates](/api-reference/templates/list) for the full response schema
 
 Use this decision tree to pick the image that fits your workload:
 
-### Do you need AI bot deployment?
-
-If you're building a Telegram bot, web chat agent, or similar AI-powered service, use the **openclaw** image. It has the OpenClaw gateway pre-installed.
-
 ### Do you need Architecture Explorer or Virtual Browser?
 
-If you want to visualize code structure or run a remote browser without installing anything, use the **full** image. Both tools are pre-installed and ready to launch.
+Spawn a **dev** workspace and install the tool you need with `rig tools install` — see [Architecture Explorer](/guides/architecture-explorer) and [Virtual Browser](/guides/virtual-browser).
 
 ### Do you need Docker, cmake, or native build tools?
 

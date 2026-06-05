@@ -41,7 +41,7 @@ curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
   -H "Content-Type: application/json" \
   -d '{
     "name": "user-abc-workspace",
-    "template": "ai-agent-starter"
+    "template": "dev"
   }'
 ```
 
@@ -54,7 +54,7 @@ const response = await fetch("https://api.rigbox.dev/api/v1/quick-deploy", {
   },
   body: JSON.stringify({
     name: "user-abc-workspace",
-    template: "ai-agent-starter",
+    template: "dev",
   }),
 });
 
@@ -71,7 +71,7 @@ response = requests.post(
     headers={"Authorization": "Bearer YOUR_API_KEY"},
     json={
         "name": "user-abc-workspace",
-        "template": "ai-agent-starter",
+        "template": "dev",
     },
 )
 
@@ -84,15 +84,15 @@ print(f"Provisioned workspace: {workspace['id']}")
 
 Store the returned `workspace_id` in your database, linked to the user. This is how you will manage their workspace going forward.
 
-Available templates include:
+The built-in templates are:
 
 | Template | Use case |
 |----------|----------|
-| `ai-agent-starter` | AI agent with tool use and memory |
-| `openclaw` | Telegram bot with AI backend |
-| `web-fullstack` | React + Node.js starter |
 | `base` | Minimal workspace, no extras |
 | `dev` | Full development environment |
+| `custom-repo` | Clone and run a git repository |
+
+For app-specific stacks — bots, dashboards, scrapers — provision a `dev` workspace and install an [app recipe](/guides/catalog) (`@rigbox/<id>@builtin`) on top.
 
 <Tip>
   Start with `quick-deploy` for the simplest provisioning flow. It creates the workspace, applies the template, and starts the VM in a single API call.
@@ -338,7 +338,7 @@ curl -X DELETE https://api.rigbox.dev/api/v1/workspaces/{workspace_id} \
 
 [Clawd](https://clawd.rigbox.dev) is an AI bot hosting platform built on Rigbox. Here is what makes it unique:
 
-- **Template**: Uses `openclaw` for Telegram bot deployment
+- **Bot runtime**: Runs the OpenClaw bot gateway (installed as an app recipe) for Telegram bot deployment
 - **Billing**: Integrates Stripe for credit pack sales (billing is handled outside the Rigbox API)
 - **Dashboard**: Shows real-time metrics and AI credit balance
 - **AI config**: Lets users pick their provider and model through a settings UI

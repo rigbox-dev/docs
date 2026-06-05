@@ -62,7 +62,7 @@ Clawd handles billing through its own integration layer. If you build your own d
 
 ## Minimal Clawd-Like Integration Flow
 
-1. Call `POST /quick-deploy` with `template_id: "openclaw"`.
+1. Provision a workspace with `POST /quick-deploy` (`template_id: "dev"`), then install the OpenClaw bot gateway as an app recipe.
 2. Start and poll workspace state until running.
 3. Call `POST /workspaces/{id}/reconcile-apps`.
 4. Use `GET /apps/{id}/health` before surfacing app URLs as live.

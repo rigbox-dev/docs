@@ -1,9 +1,9 @@
 ---
 title: Quickstart
-description: Launch your first workspace and app with production-safe API steps
+description: Launch your first workspace and install your first app with production-safe CLI steps
 ---
 
-This guide walks you through creating a workspace, starting it, reconciling template apps, and validating live routing.
+This guide walks you through creating a workspace, installing an app recipe onto it, and validating live routing — all with the `rig` CLI.
 
 ## Prerequisites
 
@@ -18,67 +18,40 @@ The CLI opens your browser to sign in and stores credentials locally, so the res
 rig login
 ```
 
-## Step 1: Deploy an OpenClaw Workspace
+## Step 1: Create a Workspace
 
-`rig template deploy` creates a workspace with template defaults. For OpenClaw, this provisions an `openclaw` image workspace. Replace `<WORKSPACE_NAME>` with a name of your choice (this walkthrough uses `my-bot`).
-
-```bash
-rig template deploy --template openclaw --name my-bot
-```
-
-Example output:
-
-```json
-{
-  "workspace": {
-    "id": "ws-a1b2c3d4",
-    "name": "my-bot",
-    "image": "openclaw",
-    "status": "provisioned",
-    "ram_mb": 4096,
-    "disk_size_mb": 10240,
-    "vcpu_count": 2,
-    "created_at": "2025-01-15T10:30:00Z",
-    "updated_at": "2025-01-15T10:30:00Z"
-  },
-  "message": "Workspace 'my-bot' created from template 'OpenClaw Bot'. Start it to begin working.",
-  "installed_apps": [],
-  "expected_apps": []
-}
-```
-
-## Step 2: Start the Workspace
-
-Start the workspace by name. Add `--wait-for-apps` to block until its apps come up, so you can skip the manual wait below.
+`rig workspace spawn` creates the workspace, boots it, and waits until it's ready — all in one call. The `dev` template is a general-purpose development image with Node.js, Python, and common build tools. Replace `my-project` with a name of your choice.
 
 ```bash
-rig workspace start --workspace my-bot
+rig workspace spawn --name my-project --template dev
 ```
 
-## Step 3: Wait Until Running
+The built-in templates are `base` (minimal) and `dev` (full toolchain). Everything else — VS Code, Jupyter, Firecrawl, and so on — is installed as an **app recipe** on top of a workspace, which is the next step.
 
-Check the workspace's status until it reports `running`:
+<Tip>
+`spawn` blocks until the workspace is `running`. To create without starting, use `rig workspace new` instead and start it later with `rig workspace start --workspace my-project`.
+</Tip>
+
+## Step 2: Install an App
+
+App recipes are pre-packaged applications you install into a workspace with a single command. Official recipes are addressed as `@rigbox/<id>@builtin`. Install the VS Code Server recipe:
 
 ```bash
-rig workspace ls
+rig recipe app install -r @rigbox/vscode@builtin -w my-project
 ```
 
-The workspace takes a few seconds to boot. Re-run the command until `my-bot` shows `running`, or start it with `--wait-for-apps` to block automatically.
+The install blocks until the app is live, then prints its name and URL. The app is served at `https://<APP_NAME>.rigbox.dev` — here, `https://my-project-vscode.rigbox.dev`.
 
-## Step 4: Reconcile Template Apps
+<Tip>
+Preview any official recipe before installing it with `rig recipe app info @rigbox/<id>@builtin`. See [Catalog Apps](/guides/catalog) for the full list of built-in app recipes (Jupyter, Streamlit, Firecrawl, and more).
+</Tip>
 
-Ensure expected template apps (for example the OpenClaw gateway) exist:
+## Step 3: List Apps and Validate Live Health
 
-```bash
-rig workspace reconcile --workspace my-bot
-```
-
-## Step 5: List Apps and Validate Live Health
-
-List apps:
+List the apps in your workspace:
 
 ```bash
-rig app ls --workspace my-bot
+rig app ls --workspace my-project
 ```
 
 Check a specific app is reachable before surfacing its URL in your own UI:
@@ -102,7 +75,7 @@ Expected output:
 For workspaces with AI integration, set the AI mode:
 
 ```bash
-rig workspace ai mode --workspace my-bot managed
+rig workspace ai mode --workspace my-project managed
 ```
 
 To also pin a provider and model, use the typed config endpoint via `rig api`:
@@ -122,6 +95,9 @@ Use `null` on nullable fields (for example `api_key`) to explicitly clear values
 ## Next Steps
 
 <CardGroup cols={2}>
+  <Card title="Catalog Apps" icon="grid" href="/guides/catalog">
+    Install VS Code, Jupyter, Streamlit, and more as app recipes
+  </Card>
   <Card title="Workspace API" icon="server" href="/api-reference/workspaces/list">
     Full workspace lifecycle management
   </Card>
@@ -134,16 +110,7 @@ Use `null` on nullable fields (for example `api_key`) to explicitly clear values
   <Card title="AI Configuration" icon="sparkles" href="/api-reference/ai/get-workspace-ai-config">
     Manage AI provider settings and credits
   </Card>
-  <Card title="Tools" icon="wrench" href="/api-reference/tools/list">
-    Install and manage workspace tools
-  </Card>
-  <Card title="Setup Scripts" icon="scroll" href="/api-reference/setup-scripts/list">
-    Automate workspace initialization
-  </Card>
   <Card title="API Keys" icon="key" href="/api-reference/api-keys/list">
     Manage programmatic access
-  </Card>
-  <Card title="Clawd API Surface" icon="sparkles" href="/clawd-api-surface">
-    See the exact endpoint groups used by clawd.rigbox.dev
   </Card>
 </CardGroup>
