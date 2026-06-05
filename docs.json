@@ -76,9 +76,7 @@
               "guides/catalog",
               "guides/architecture-explorer",
               "guides/virtual-browser",
-              "guides/firecrawl",
-              "guides/td-task-manager",
-              "guides/sidecar-dashboard"
+              "guides/firecrawl"
             ]
           },
           {
