@@ -21,31 +21,13 @@ The workspace runs on **2 vCPU, 4 GB RAM, and 8 GB disk**.
 
 ## Deploying Firecrawl
 
-You can deploy Firecrawl with a single click from the template gallery, or use the API.
+You can deploy Firecrawl with a single click from the template gallery, or with the CLI. The `/quick-deploy` endpoint provisions the workspace, applies the Firecrawl template defaults, and starts it in one call (the path drops the `/api/v1` prefix; `rig` is already authenticated via `rig login`):
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "template_id": "firecrawl"
-  }'
+```bash
+echo '{"template_id": "firecrawl"}' | rig api POST /v1/quick-deploy --body -
 ```
 
-```python Python
-import requests
-
-response = requests.post(
-    "https://api.rigbox.dev/api/v1/quick-deploy",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={"template_id": "firecrawl"},
-)
-workspace = response.json()
-subdomain = workspace["apps"][0]["name"]
-print(f"Firecrawl API: https://{subdomain}.rigbox.dev")
-```
-</CodeGroup>
+The response includes the created workspace and its apps. The Firecrawl API is served at `https://<APP_NAME>.rigbox.dev`, where `<APP_NAME>` is the name of the first app in the response.
 
 Once the workspace is running, your Firecrawl API is live and ready to accept requests.
 

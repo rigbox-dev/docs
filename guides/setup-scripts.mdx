@@ -22,65 +22,18 @@ Use `first_boot` for one-time setup like installing packages or cloning repos. U
 
 ## Create a Setup Script
 
-Create a reusable setup script via the API. Once created, you can attach it to any number of workspaces.
+Write the script to a local file, then create it with the CLI. Once created, you can attach it to any number of workspaces.
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/setup-scripts \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "python-data-stack",
-    "content": "#!/bin/bash\nset -e\npip install pandas numpy scikit-learn matplotlib\necho \"Data stack installed successfully\"",
-    "run_on": "first_boot"
-  }'
+```bash
+cat > python-data-stack.sh <<'EOF'
+#!/bin/bash
+set -e
+pip install pandas numpy scikit-learn matplotlib
+echo "Data stack installed successfully"
+EOF
+
+rig setup-script create --name python-data-stack --file python-data-stack.sh
 ```
-
-```python Python
-import requests
-
-response = requests.post(
-    "https://api.rigbox.dev/api/v1/setup-scripts",
-    headers={"Authorization": f"Bearer {token}"},
-    json={
-        "name": "python-data-stack",
-        "content": (
-            "#!/bin/bash\n"
-            "set -e\n"
-            "pip install pandas numpy scikit-learn matplotlib\n"
-            'echo "Data stack installed successfully"'
-        ),
-        "run_on": "first_boot"
-    }
-)
-
-script = response.json()
-print(script["id"])  # "ss_abc123"
-```
-
-```javascript JavaScript
-const response = await fetch("https://api.rigbox.dev/api/v1/setup-scripts", {
-  method: "POST",
-  headers: {
-    "Authorization": `Bearer ${token}`,
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    name: "python-data-stack",
-    content: [
-      "#!/bin/bash",
-      "set -e",
-      "pip install pandas numpy scikit-learn matplotlib",
-      'echo "Data stack installed successfully"',
-    ].join("\n"),
-    run_on: "first_boot",
-  }),
-});
-
-const script = await response.json();
-console.log(script.id); // "ss_abc123"
-```
-</CodeGroup>
 
 See the [Setup Scripts API reference](/api-reference/setup-scripts/create) for the full request and response schema.
 
@@ -118,32 +71,13 @@ Always use `set -e` at the top of your scripts. Without it, a failing command wi
 
 ## Attach Scripts to a Workspace
 
-Include `setup_script_ids` when creating a workspace. Scripts run in the order they appear in the array.
+Pass `--setup-script-id` (repeatable) when spawning a workspace. Scripts run in the order you list them.
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "ml-workspace",
-    "template_id": "tpl_python",
-    "setup_script_ids": ["ss_abc123", "ss_def456"]
-  }'
+```bash
+rig workspace spawn --name ml-workspace --template tpl_python \
+  --setup-script-id ss_abc123 \
+  --setup-script-id ss_def456
 ```
-
-```python Python
-response = requests.post(
-    "https://api.rigbox.dev/api/v1/workspaces",
-    headers={"Authorization": f"Bearer {token}"},
-    json={
-        "name": "ml-workspace",
-        "template_id": "tpl_python",
-        "setup_script_ids": ["ss_abc123", "ss_def456"]
-    }
-)
-```
-</CodeGroup>
 
 ### Script Ordering
 
@@ -165,9 +99,8 @@ Scripts execute sequentially in array order. This is important when scripts have
 Retrieve all setup scripts in your account.
 
 <CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/setup-scripts \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+```bash CLI
+rig setup-script ls
 ```
 
 ```json Response
@@ -194,17 +127,19 @@ See the [List Setup Scripts API reference](/api-reference/setup-scripts/list) fo
 
 ## Update a Script
 
-Modify an existing script's content, name, or run mode.
+Modify an existing script's name and/or body. Pass `--name`, `--file`, or both.
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/v1/setup-scripts/ss_abc123 \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "python-data-stack-v2",
-    "content": "#!/bin/bash\nset -e\npip install pandas numpy scikit-learn matplotlib seaborn\necho \"Data stack v2 installed\"",
-    "run_on": "first_boot"
-  }'
+cat > python-data-stack.sh <<'EOF'
+#!/bin/bash
+set -e
+pip install pandas numpy scikit-learn matplotlib seaborn
+echo "Data stack v2 installed"
+EOF
+
+rig setup-script update --id ss_abc123 \
+  --name python-data-stack-v2 \
+  --file python-data-stack.sh
 ```
 
 <Note>
@@ -214,8 +149,7 @@ Updating a script affects all future workspace starts that reference it. Already
 ## Delete a Script
 
 ```bash
-curl -X DELETE https://api.rigbox.dev/api/v1/setup-scripts/ss_abc123 \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
+rig setup-script rm --id ss_abc123
 ```
 
 <Warning>
@@ -304,8 +238,7 @@ If a setup script fails, the workspace will still start, but the script's exit c
 To check script execution results, look at the workspace status after it starts:
 
 ```bash
-curl -s https://api.rigbox.dev/api/v1/workspaces/{workspace_id} \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq '.setup_status'
+rig api GET /v1/workspaces/{workspace_id} --query setup_status
 ```
 
 <Tip>

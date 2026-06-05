@@ -8,55 +8,25 @@ This guide walks you through creating a workspace, starting it, reconciling temp
 ## Prerequisites
 
 - A Rigbox account ([sign up here](https://rigbox.dev/signup))
-- An API key (get one from **Settings → API Keys** in the dashboard)
-- `jq` installed locally for parsing JSON in shell examples
+- The Rigbox CLI installed: `curl -fsSL https://rigbox.dev/install.sh | bash`
 
-## Step 1: Quick Deploy an OpenClaw Workspace
+## Step 0: Authenticate
 
-Quick Deploy creates a workspace with template defaults. For OpenClaw, this provisions an `openclaw` image workspace. Replace `<WORKSPACE_NAME>` with a name of your choice (this walkthrough uses `my-bot`).
+The CLI opens your browser to sign in and stores credentials locally, so the rest of these commands need no tokens or headers.
 
-<CodeGroup>
-
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "template_id": "openclaw",
-    "name": "<WORKSPACE_NAME>"
-  }'
+```bash
+rig login
 ```
 
-```python Python
-import requests
+## Step 1: Deploy an OpenClaw Workspace
 
-resp = requests.post(
-    "https://api.rigbox.dev/api/v1/quick-deploy",
-    headers={"Authorization": "Bearer YOUR_API_KEY"},
-    json={"template_id": "openclaw", "name": "<WORKSPACE_NAME>"}
-)
-print(resp.json())
+`rig template deploy` creates a workspace with template defaults. For OpenClaw, this provisions an `openclaw` image workspace. Replace `<WORKSPACE_NAME>` with a name of your choice (this walkthrough uses `my-bot`).
+
+```bash
+rig template deploy --template openclaw --name my-bot
 ```
 
-```javascript JavaScript
-const resp = await fetch("https://api.rigbox.dev/api/v1/quick-deploy", {
-  method: "POST",
-  headers: {
-    "Authorization": "Bearer YOUR_API_KEY",
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    template_id: "openclaw",
-    name: "<WORKSPACE_NAME>"
-  })
-});
-const data = await resp.json();
-console.log(data);
-```
-
-</CodeGroup>
-
-Example response:
+Example output:
 
 ```json
 {
@@ -79,36 +49,28 @@ Example response:
 
 ## Step 2: Start the Workspace
 
-```bash
-WORKSPACE_ID="ws-a1b2c3d4"
-
-curl -X POST "https://api.rigbox.dev/api/v1/workspaces/${WORKSPACE_ID}/start" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-## Step 3: Poll Until Running
+Start the workspace by name. Add `--wait-for-apps` to block until its apps come up, so you can skip the manual wait below.
 
 ```bash
-for i in {1..60}; do
-  STATUS=$(curl -s "https://api.rigbox.dev/api/v1/workspaces/${WORKSPACE_ID}" \
-    -H "Authorization: Bearer YOUR_API_KEY" | jq -r '.vm.status')
-
-  echo "status=${STATUS}"
-  if [ "${STATUS}" = "running" ]; then
-    break
-  fi
-
-  sleep 2
-done
+rig workspace start --workspace my-bot
 ```
+
+## Step 3: Wait Until Running
+
+Check the workspace's status until it reports `running`:
+
+```bash
+rig workspace ls
+```
+
+The workspace takes a few seconds to boot. Re-run the command until `my-bot` shows `running`, or start it with `--wait-for-apps` to block automatically.
 
 ## Step 4: Reconcile Template Apps
 
-Ensure expected template apps (for example OpenClaw gateway) exist:
+Ensure expected template apps (for example the OpenClaw gateway) exist:
 
 ```bash
-curl -X POST "https://api.rigbox.dev/api/v1/workspaces/${WORKSPACE_ID}/reconcile-apps" \
-  -H "Authorization: Bearer YOUR_API_KEY"
+rig workspace reconcile --workspace my-bot
 ```
 
 ## Step 5: List Apps and Validate Live Health
@@ -116,20 +78,16 @@ curl -X POST "https://api.rigbox.dev/api/v1/workspaces/${WORKSPACE_ID}/reconcile
 List apps:
 
 ```bash
-curl https://api.rigbox.dev/api/v1/apps \
-  -H "Authorization: Bearer YOUR_API_KEY"
+rig app ls --workspace my-bot
 ```
 
 Check a specific app is reachable before surfacing its URL in your own UI:
 
 ```bash
-APP_ID="app-x1y2z3"
-
-curl "https://api.rigbox.dev/api/v1/apps/${APP_ID}/health" \
-  -H "Authorization: Bearer YOUR_API_KEY"
+rig app health --app <APP_NAME>
 ```
 
-Expected response:
+Expected output:
 
 ```json
 {
@@ -141,17 +99,22 @@ Expected response:
 
 ## Optional: Configure AI Settings
 
-For workspaces with AI integration, use the typed config endpoint:
+For workspaces with AI integration, set the AI mode:
 
 ```bash
-curl -X PUT "https://api.rigbox.dev/api/v1/workspaces/${WORKSPACE_ID}/ai-config" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "mode": "managed",
-    "provider": "google",
-    "model": "google/gemini-2.5-pro"
-  }'
+rig workspace ai mode --workspace my-bot managed
+```
+
+To also pin a provider and model, use the typed config endpoint via `rig api`:
+
+```bash
+rig api PUT /v1/workspaces/<WORKSPACE_ID>/ai-config --body - <<'JSON'
+{
+  "mode": "managed",
+  "provider": "google",
+  "model": "google/gemini-2.5-pro"
+}
+JSON
 ```
 
 Use `null` on nullable fields (for example `api_key`) to explicitly clear values. Omitted fields keep their existing values.

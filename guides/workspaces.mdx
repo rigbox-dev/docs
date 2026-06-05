@@ -89,30 +89,9 @@ See [Stop Workspace](/api-reference/workspaces/stop) for the API form.
 
 You can change the RAM, vCPU count, and disk size of a workspace. The workspace must be stopped first.
 
-<CodeGroup>
-```bash cURL
-curl -X PUT https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/resources \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "ram_mb": 1024,
-    "vcpu_count": 2,
-    "disk_size_mb": 5120
-  }'
+```bash
+rig workspace resize --workspace $WORKSPACE_ID --ram 1024 --vcpu 2 --disk 5120
 ```
-
-```python Python
-requests.put(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/resources",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={
-        "ram_mb": 1024,
-        "vcpu_count": 2,
-        "disk_size_mb": 5120,
-    },
-)
-```
-</CodeGroup>
 
 <Warning>
 The workspace must be in a `stopped` state before resizing. Start it again after the resize completes.
@@ -124,32 +103,11 @@ See [Update Workspace Resources](/api-reference/workspaces/update-resources) for
 
 Set environment variables that are injected into the workspace on boot.
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/env \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "env_vars": {
-      "DATABASE_URL": "postgres://localhost:5432/mydb",
-      "API_SECRET": "sk-abc123"
-    }
-  }'
+```bash
+rig workspace env set --workspace $WORKSPACE_ID \
+  DATABASE_URL=postgres://localhost:5432/mydb \
+  API_SECRET=sk-abc123
 ```
-
-```python Python
-requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/env",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={
-        "env_vars": {
-            "DATABASE_URL": "postgres://localhost:5432/mydb",
-            "API_SECRET": "sk-abc123",
-        }
-    },
-)
-```
-</CodeGroup>
 
 <Tip>
 Environment variables persist across restarts. You don't need to set them again after stopping and starting a workspace.
@@ -161,23 +119,15 @@ See [Update Workspace Environment](/api-reference/workspaces/update-env) for det
 
 Monitor CPU, RAM, and disk usage in real time.
 
-<CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/metrics \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```bash
+rig workspace metrics --workspace $WORKSPACE_ID
 ```
 
-```python Python
-response = requests.get(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/metrics",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-metrics = response.json()
-print(f"CPU: {metrics['cpu_percent']}%")
-print(f"RAM: {metrics['ram_used_mb']} / {metrics['ram_total_mb']} MB")
-print(f"Disk: {metrics['disk_used_mb']} / {metrics['disk_total_mb']} MB")
+For machine-readable output, add `--output json` and pipe to `jq`:
+
+```bash
+rig workspace metrics --workspace $WORKSPACE_ID --output json | jq
 ```
-</CodeGroup>
 
 See [Get Metrics](/api-reference/workspaces/get-metrics) for the full response schema.
 

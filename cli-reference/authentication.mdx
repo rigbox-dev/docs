@@ -1,26 +1,48 @@
 ---
 title: Authentication
-description: How to authenticate with the Rigbox API using API keys or session tokens.
+description: How to authenticate with the Rigbox CLI and API using login or API keys.
 ---
 
 # Authentication
 
-Every request to the Rigbox API (except [public endpoints](#public-endpoints)) must include an `Authorization` header with a valid credential.
+The `rig` CLI is the primary way to authenticate. Run `rig login` once and every subsequent command (including raw `rig api` calls) reuses your stored credentials — no headers to manage.
+
+## Log in with the CLI
+
+```bash
+rig login          # opens your browser for OAuth and stores the token locally
+rig whoami         # confirm the current user and workspace
+rig logout         # remove saved credentials
+```
+
+For headless environments, two non-interactive variants paste or import a token instead of opening a browser:
+
+```bash
+rig login --token          # paste a token at the prompt
+rig login --import-token   # read a token from stdin and validate it
+```
+
+Once logged in, any command works without further setup, for example:
+
+```bash
+rig workspace ls
+```
 
 ## API keys
 
-The simplest way to authenticate. Create one from the [dashboard](https://rigbox.dev) under **Settings → API Keys**, or via the [Create API Key](/api-reference/api-keys/create) endpoint.
+For backend services, CI, or agents, mint a long-lived API key. API keys (`rb_…`) are full-account credentials, shown once at creation and stored hash-only. Create one from the [dashboard](https://rigbox.dev) under **Settings → API Keys**, or with the CLI:
 
 ```bash
-curl https://api.rigbox.dev/api/v1/workspaces \
-  -H "Authorization: Bearer rb_your_api_key_here"
+rig api-key create --name ci-runner   # plaintext printed once — copy it now
+rig api-key ls
+rig api-key rm --id <KEY_ID>
 ```
 
 <Warning>
   API keys grant full access to your account. Store them in environment variables or a secrets manager - never commit them to source control.
 </Warning>
 
-All API keys use the `rb_` prefix:
+To authenticate raw HTTP calls from a non-Rigbox client, all API keys use the `rb_` prefix in a `Bearer` header:
 
 ```bash
 export RIGBOX_API_KEY="rb_..."
@@ -29,16 +51,18 @@ curl https://api.rigbox.dev/api/v1/workspaces \
   -H "Authorization: Bearer ${RIGBOX_API_KEY}"
 ```
 
-## Bearer tokens (JWT)
+## Raw API access
 
-If you authenticate through the dashboard login flow, you receive a JWT that can be used directly:
+To hit any endpoint directly without managing headers, use `rig api`. It reuses your stored credentials and sends an authenticated request:
 
 ```bash
-curl https://api.rigbox.dev/api/v1/workspaces \
-  -H "Authorization: Bearer eyJhbG..."
+rig api GET /v1/workspaces
+rig api POST /v1/snapshots --body snapshot.json
 ```
 
-JWTs expire after a set period. The dashboard handles refresh automatically.
+## Bearer tokens (JWT)
+
+If you authenticate through the dashboard login flow, you receive a short-lived JWT. The dashboard handles refresh automatically — for terminal use, prefer `rig login` (which manages the token for you) or an API key for non-interactive clients.
 
 ## Dashboard session tokens
 

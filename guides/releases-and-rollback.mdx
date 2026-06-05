@@ -31,29 +31,21 @@ rel_01cd…    sha256:7b1e…       1 hour ago
 rel_00ef…    sha256:2a4d…       yesterday
 ```
 
-Over the API:
+For a specific workspace, pass `--workspace`:
 
 ```bash
-curl -s https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/releases \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+rig release ls --workspace my-project
 ```
 
 ## Roll back to a previous release
 
 To return to a known-good version, activate its release. `rig rollback` is an alias for `rig release activate`:
 
-<CodeGroup>
-```bash rig
+```bash
 # Both forms are equivalent
-rig release activate --release rel_01cd
-rig rollback --release rel_01cd
+rig release activate --workspace my-project --release rel_01cd
+rig rollback --workspace my-project --release rel_01cd
 ```
-
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/releases/{release_id}/activate \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
-```
-</CodeGroup>
 
 Activating a release boots the workspace from that release's frozen image digest. Your app code for that release rides on top exactly as it did originally.
 
@@ -66,7 +58,7 @@ Rolling back changes the **image** and run-config, not your [persistent volumes]
 If you have an image digest in hand — for example, from a `rig build` — you can create a release that points at it without going through a full deploy:
 
 ```bash
-rig release create --image-digest sha256:7b1e…
+rig release create --workspace my-project --image-digest sha256:7b1e…
 ```
 
 This is useful for promoting an image you built and tested separately, or for codifying a specific digest as a named release before activating it.
@@ -86,13 +78,11 @@ rig build
   key:    a1b2c3…
 ```
 
-Over the API:
+To build against a specific workspace and base image explicitly, pass the flags:
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/builds \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{ "dockerfile": "FROM rigbox-base\nRUN pip install --break-system-packages flask" }'
+rig build --workspace my-project --base-image rigbox-base \
+  --install "pip install --break-system-packages flask"
 ```
 
 `rig build` is complementary to the auto-build inside `rig deploy`: deploy builds and mounts in one step, while `rig build` lets you produce a digest first and then pin it as a release with `rig release create --image-digest`.

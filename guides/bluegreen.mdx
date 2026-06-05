@@ -26,7 +26,7 @@ Promote **swaps the underlying VM.** That's seamless for HTTP, but an open SSH s
 **Rollback.** The old production VM is parked as `<name>-rollback-<id>` and kept as an instant rollback target until it's retired. To revert a promote before then, call the rollback endpoint on the promoted workspace:
 
 ```bash
-rig api POST /workspaces/<workspace-id>/rollback
+rig api POST /v1/workspaces/<workspace-id>/rollback
 ```
 
 ## `--bluegreen <suffix>` — in-VM sibling

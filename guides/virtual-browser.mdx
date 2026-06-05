@@ -44,24 +44,11 @@ The `full` image has browsers pre-installed, so launching is nearly instant. On 
 
 ## Installation
 
-If your workspace doesn't use the `full` image, install Virtual Browser first. This installs Playwright along with Chromium and Firefox browsers.
+If your workspace doesn't use the `full` image, install Virtual Browser first. This installs Playwright along with Chromium and Firefox browsers. The install runs asynchronously and prints a job id you can poll.
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/virtual-browser/install \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```bash
+rig tools install --workspace $WORKSPACE --tool virtual-browser
 ```
-
-```python Python
-import requests
-
-response = requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/virtual-browser/install",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-print(f"Installation started: {response.json()}")
-```
-</CodeGroup>
 
 <Note>
 Installation downloads browser binaries and their dependencies. This can take 3-5 minutes on a `base` image workspace depending on network speed.
@@ -71,34 +58,11 @@ See [Install Tool](/api-reference/tools/install) for the full response schema.
 
 ### Tracking Installation Progress
 
-Poll the installation status to know when the browser is ready.
+Poll the installation status with the job id from `rig tools install` to know when the browser is ready.
 
-<CodeGroup>
-```bash cURL
-while true; do
-  STATUS=$(curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/virtual-browser/install-status \
-    -H "Authorization: Bearer $RIGBOX_API_KEY" | jq -r '.status')
-  echo "Status: $STATUS"
-  [ "$STATUS" = "installed" ] && break
-  sleep 5
-done
+```bash
+rig tools install-status --workspace $WORKSPACE --tool virtual-browser --job-id $JOB_ID
 ```
-
-```python Python
-import time
-
-while True:
-    resp = requests.get(
-        f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/virtual-browser/install-status",
-        headers={"Authorization": f"Bearer {api_key}"},
-    )
-    status = resp.json()["status"]
-    print(f"Installation: {status}")
-    if status == "installed":
-        break
-    time.sleep(5)
-```
-</CodeGroup>
 
 See [Installation Status](/api-reference/tools/install-status) for the response schema.
 
@@ -106,20 +70,9 @@ See [Installation Status](/api-reference/tools/install-status) for the response 
 
 Once installed (or immediately on the `full` image), launch the browser.
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/virtual-browser/launch \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```bash
+rig tools launch --workspace $WORKSPACE --tool virtual-browser
 ```
-
-```python Python
-response = requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/virtual-browser/launch",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-print(f"Virtual Browser launched")
-```
-</CodeGroup>
 
 See [Launch Tool](/api-reference/tools/launch) for the response schema.
 
@@ -155,20 +108,9 @@ The noVNC client supports clipboard sharing. Copy text on your local machine and
 
 Stop the browser when you're done to free up resources.
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/virtual-browser/stop \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```bash
+rig tools stop --workspace $WORKSPACE --tool virtual-browser
 ```
-
-```python Python
-requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/virtual-browser/stop",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-print("Virtual Browser stopped")
-```
-</CodeGroup>
 
 See [Stop Tool](/api-reference/tools/stop) for details.
 
@@ -178,33 +120,10 @@ This walkthrough starts a web app inside the workspace and uses Virtual Browser 
 
 ### Create a workspace with the full image
 
-```python
-import requests
-import time
+`rig workspace spawn` creates the workspace from the `full` template, boots it, and waits until it's ready:
 
-API_URL = "https://api.rigbox.dev/api/v1"
-HEADERS = {"Authorization": f"Bearer {api_key}"}
-
-# Quick deploy with the full template
-workspace = requests.post(
-    f"{API_URL}/quick-deploy",
-    headers=HEADERS,
-    json={"template_id": "full"},
-).json()
-
-workspace_id = workspace["id"]
-
-# Wait for the workspace to be running
-while True:
-    status = requests.get(
-        f"{API_URL}/workspaces/{workspace_id}",
-        headers=HEADERS,
-    ).json()["status"]
-    if status == "running":
-        break
-    time.sleep(2)
-
-print(f"Workspace running: {workspace_id}")
+```bash
+rig workspace spawn --name browser-demo --template full
 ```
 
 ### Start a local web app
@@ -219,14 +138,11 @@ npm run dev -- --port 3000 &
 
 ### Launch Virtual Browser
 
-```python
-response = requests.post(
-    f"{API_URL}/workspaces/{workspace_id}/tools/virtual-browser/launch",
-    headers=HEADERS,
-)
-browser_url = f"https://browser-{workspace_id}.rigbox.dev"
-print(f"Open in your browser: {browser_url}")
+```bash
+rig tools launch --workspace browser-demo --tool virtual-browser
 ```
+
+Then open `https://browser-<workspace-id>.rigbox.dev` in your local browser.
 
 ### View your app in the remote browser
 
@@ -234,11 +150,8 @@ Open the noVNC URL in your local browser. In the remote Chromium browser, naviga
 
 ### Stop when done
 
-```python
-requests.post(
-    f"{API_URL}/workspaces/{workspace_id}/tools/virtual-browser/stop",
-    headers=HEADERS,
-)
+```bash
+rig tools stop --workspace browser-demo --tool virtual-browser
 ```
 
 

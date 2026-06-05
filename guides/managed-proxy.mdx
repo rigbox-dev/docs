@@ -51,62 +51,27 @@ Credits map roughly to API cost - one credit equals approximately $0.01 of upstr
 
 ## Activate Managed Mode
 
-### Via the API
+### With the CLI
 
-Set the AI configuration for a workspace to managed mode with your chosen provider and model.
+Set a workspace to managed mode with `rig workspace ai mode`:
 
-<CodeGroup>
-```bash cURL
-curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "mode": "managed",
-    "provider": "google",
-    "model": "google/gemini-2.5-pro"
-  }'
+```bash
+rig workspace ai mode --workspace <workspace_id> managed
 ```
 
-```python Python
-import requests
+To also pin the upstream provider and model, send the full config through `rig api`:
 
-response = requests.put(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config",
-    headers={"Authorization": f"Bearer {token}"},
-    json={
-        "mode": "managed",
-        "provider": "google",
-        "model": "google/gemini-2.5-pro"
-    }
-)
-
-print(response.json())
-# {"mode": "managed", "provider": "google", "model": "google/gemini-2.5-pro"}
+```bash
+rig api PUT /v1/workspaces/<workspace_id>/ai-config --body - <<'JSON'
+{
+  "mode": "managed",
+  "provider": "google",
+  "model": "google/gemini-2.5-pro"
+}
+JSON
 ```
 
-```javascript JavaScript
-const response = await fetch(
-  `https://api.rigbox.dev/api/v1/workspaces/${workspaceId}/ai-config`,
-  {
-    method: "PUT",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      mode: "managed",
-      provider: "google",
-      model: "google/gemini-2.5-pro",
-    }),
-  }
-);
-
-const config = await response.json();
-console.log(config);
-```
-</CodeGroup>
-
-### Via the CLI (Inside a Workspace VM)
+### Inside a Workspace VM
 
 Managed workspaces already inject `OPENROUTER_BASE_URL` and `OPENROUTER_API_KEY` into every login shell, so most tools work without any setup step. The `rig proxy on` helper is a convenience for scripts or CI where you want the exports printed explicitly:
 
@@ -144,9 +109,8 @@ rig status
 Get a daily breakdown of credit consumption across your workspaces.
 
 <CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/users/me/ai-usage \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+```bash CLI
+rig ai usage
 ```
 
 ```json Response
@@ -196,10 +160,9 @@ Here is a complete flow: activate managed mode, make an AI call from inside the 
 **Step 1 - Activate managed mode for a workspace:**
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/v1/workspaces/ws_abc123/ai-config \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"mode": "managed", "provider": "google", "model": "gemini-2.5-flash-lite"}'
+rig api PUT /v1/workspaces/ws_abc123/ai-config --body - <<'JSON'
+{"mode": "managed", "provider": "google", "model": "gemini-2.5-flash-lite"}
+JSON
 ```
 
 **Step 2 - Inside the workspace VM, configure the shell and make a call:**
@@ -221,9 +184,10 @@ curl -sS "$OPENROUTER_BASE_URL/chat/completions" \
 
 **Step 3 - Check remaining credits:**
 
+`rig status` prints your balance directly. For the raw payload, query the endpoint with `rig api`:
+
 ```bash
-curl -s https://api.rigbox.dev/api/v1/users/me/credits \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+rig api GET /v1/users/me/credits
 # {"remaining": 1795, "total": 2000, "mode": "managed"}
 ```
 

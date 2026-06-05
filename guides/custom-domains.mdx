@@ -17,36 +17,19 @@ Before you begin, make sure you have:
 
 ## Setting a Custom Domain
 
-You can set a custom domain from the Rigbox dashboard or via the API.
+You can set a custom domain from the Rigbox dashboard or with the CLI.
 
 ### Using the Dashboard
 
 Open your app, go to the **Access** tab, and enter your domain in the Custom Domain field.
 
-### Using the API
+### Using the CLI
 
-<CodeGroup>
-```bash cURL
-curl -X PATCH https://api.rigbox.dev/api/v1/apps/$APP_ID \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "custom_domain": "app.yourcompany.com"
-  }'
+```bash
+rig app domain set --app $APP --domain app.yourcompany.com
 ```
 
-```python Python
-import requests
-
-response = requests.patch(
-    f"https://api.rigbox.dev/api/v1/apps/{app_id}",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={"custom_domain": "app.yourcompany.com"},
-)
-app = response.json()
-print(f"Custom domain set to: {app['custom_domain']}")
-```
-</CodeGroup>
+The `--app` value can be an app id, name, or subdomain.
 
 ## Configuring DNS
 
@@ -70,23 +53,11 @@ Once the DNS record is in place, you need to verify that it resolves correctly. 
 
 Click the **Verify** button next to the custom domain field in the Access tab.
 
-### Using the API
+### Using the CLI
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/apps/$APP_ID/verify-domain \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```bash
+rig app verify-domain --app $APP
 ```
-
-```python Python
-response = requests.post(
-    f"https://api.rigbox.dev/api/v1/apps/{app_id}/verify-domain",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-result = response.json()
-print(f"Verified: {result['verified']}")
-```
-</CodeGroup>
 
 ## TLS Certificates
 
@@ -98,27 +69,11 @@ The initial request to your custom domain may be slightly slower while the certi
 
 ## Removing a Custom Domain
 
-If you no longer want a custom domain attached to your app, you can remove it from the Access tab in the dashboard or set `custom_domain` to an empty string via the API.
+If you no longer want a custom domain attached to your app, remove it from the Access tab in the dashboard, or clear `custom_domain` by setting it to an empty string. There's no dedicated remove command, so use a raw API call (the path drops the `/api/v1` prefix; `rig` is already authenticated via `rig login`):
 
-<CodeGroup>
-```bash cURL
-curl -X PATCH https://api.rigbox.dev/api/v1/apps/$APP_ID \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "custom_domain": ""
-  }'
+```bash
+echo '{"custom_domain": ""}' | rig api PATCH /v1/apps/$APP_ID --body -
 ```
-
-```python Python
-response = requests.patch(
-    f"https://api.rigbox.dev/api/v1/apps/{app_id}",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={"custom_domain": ""},
-)
-print("Custom domain removed")
-```
-</CodeGroup>
 
 After removing the custom domain, your app is still accessible at its default `*.rigbox.dev` subdomain.
 

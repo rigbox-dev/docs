@@ -46,30 +46,17 @@ All images are built on Debian 12 (Bookworm) and include Python 3.12 and Node.js
 
 ### Listing Available Images
 
-Images are not exposed as a standalone API. The set of images you can boot is implied by the templates the server publishes — every template's `image` field names the base image it uses. To see which images are currently available, list templates and read the `image` field:
+Images are not exposed as a standalone resource. The set of images you can boot is implied by the templates the server publishes — every template's `image` field names the base image it uses. To see which images are currently available, list templates and read the `image` column:
 
-<CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/templates \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq '[.templates[].image] | unique'
-```
-
-```bash CLI
+```bash
 rig template ls
 ```
 
-```python Python
-import requests
+To extract just the unique image names, filter the structured output with `--query`:
 
-response = requests.get(
-    "https://api.rigbox.dev/api/v1/templates",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-images = sorted({t["image"] for t in response.json()["templates"]})
-for image in images:
-    print(image)
+```bash
+rig template ls --output json --query "templates[].image"
 ```
-</CodeGroup>
 
 See [List Templates](/api-reference/templates/list) for the full response schema.
 
@@ -88,16 +75,9 @@ Templates are pre-configured workspace definitions that pair an image with sensi
 
 ### Listing Available Templates
 
-<CodeGroup>
-```bash CLI
+```bash
 rig template ls
 ```
-
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/templates \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
-```
-</CodeGroup>
 
 See [List Templates](/api-reference/templates/list) for the full response schema.
 
@@ -153,10 +133,7 @@ You can change the RAM, vCPU, and disk size of an existing workspace without swi
 ```bash
 rig workspace stop --workspace my-project
 
-curl -X PUT https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/resources \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"ram_mb": 2048, "vcpu_count": 2}'
+rig workspace resize --workspace my-project --ram 2048 --vcpu 2
 
 rig workspace start --workspace my-project
 ```

@@ -7,16 +7,13 @@ Rigbox gives you isolated Linux VMs - each with its own kernel, filesystem, and 
 
 ## Quick example
 
-Deploy a workspace in one API call:
+Deploy a workspace in one command:
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"template_id": "dev", "name": "<WORKSPACE_NAME>"}'
+rig template deploy --template dev --name <WORKSPACE_NAME>
 ```
 
-Replace `<WORKSPACE_NAME>` with a name of your choice and `YOUR_API_KEY` with the key from **Settings → API Keys** in the dashboard.
+Replace `<WORKSPACE_NAME>` with a name of your choice. The CLI is authenticated via `rig login` - no API key handling required.
 
 This provisions an isolated micro-VM with Python, Node.js, build tools, and SSH access - ready in seconds.
 

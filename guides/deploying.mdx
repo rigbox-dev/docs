@@ -269,14 +269,13 @@ For zero-downtime rollouts, stage a change, verify it, then swap production over
 
 ## Deploy via the API
 
-`rig deploy` orchestrates several REST calls. The image build step maps to the builds endpoint, and the resulting digest is recorded as a release:
+`rig deploy` orchestrates several REST calls. The image build step maps to the builds endpoint, and the resulting digest is recorded as a release. For endpoints without a dedicated command, `rig api` sends a raw authenticated request:
 
 ```bash
 # Kick off an explicit image build (the deploy auto-build uses the same endpoint)
-curl -X POST https://api.rigbox.dev/api/v1/builds \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{ "dockerfile": "FROM rigbox-base\nRUN pip install --break-system-packages flask" }'
+rig api POST /v1/builds --body - <<'JSON'
+{ "dockerfile": "FROM rigbox-base\nRUN pip install --break-system-packages flask" }
+JSON
 ```
 
 See [Releases & Rollback](/guides/releases-and-rollback) for the release lifecycle and the `rig build` command.

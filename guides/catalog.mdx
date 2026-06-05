@@ -111,13 +111,12 @@ See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop)
 
 ### Change Visibility
 
-Catalog apps are private by default. Visibility is managed through the API:
+Catalog apps are private by default. Use `rig app share` to change visibility — pick exactly one mode:
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/v1/apps/$APP_ID/visibility \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"visibility": "public"}'
+rig app share --app $APP_NAME --public                # visible to everyone
+rig app share --app $APP_NAME --private               # visible only to you
+rig app share --app $APP_NAME --emails a@x.com,b@y.com # allowlist specific emails
 ```
 
 See [App Visibility](/guides/visibility) for the full set of options and [Update App Visibility](/api-reference/apps/update-visibility) for the API reference.
