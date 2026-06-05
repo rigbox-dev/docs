@@ -9,7 +9,7 @@ This page documents how [Clawd](https://clawd.rigbox.dev) uses Rigbox's general-
 
 | API | How Clawd uses it | Guide |
 | --- | --- | --- |
-| [AI Config](/api-reference/ai/update-workspace-ai-config) (`PUT /workspaces/{id}/ai-config`) | Sets managed/BYOK mode, provider, and model for each bot workspace | [Managed Proxy](/guides/managed-proxy), [BYOK](/guides/byok) |
+| [Workspace AI Mode](/api-reference/ai/update-workspace-ai-config) (`PUT /workspaces/{id}/mode`) | Sets managed/BYOK mode for each bot workspace (provider/model are account defaults) | [Managed Proxy](/guides/managed-proxy), [BYOK](/guides/byok) |
 | [Managed AI Proxy](/guides/managed-proxy) | Routes AI SDK calls through Rigbox's proxy so bot workspaces don't need API keys | [Managed Proxy](/guides/managed-proxy) |
 | [Credits](/api-reference/ai/get-credits) (`GET /users/me/credits`) | Displays credit balance in the Clawd dashboard | [Resource Limits](/concepts/limits) |
 | [AI Usage](/api-reference/ai/get-usage) (`GET /users/me/ai-usage`) | Shows per-day, per-workspace usage breakdown | [Managed Proxy](/guides/managed-proxy) |
@@ -26,23 +26,29 @@ When a Clawd bot workspace is in managed mode:
 5. If credits run out, requests return `402` and the Clawd UI prompts an upgrade
 
 <Note>
-The managed AI proxy is a general Rigbox feature, not Clawd-specific. Any workspace can use it by setting `mode: "managed"` via the [AI Config API](/api-reference/ai/update-workspace-ai-config), then running `eval "$(rig proxy on)"` or sourcing `~/.rigbox/proxy.env` inside the VM.
+The managed AI proxy is a general Rigbox feature, not Clawd-specific. Any workspace can use it by setting `mode: "managed"` via the [Workspace AI Mode API](/api-reference/ai/update-workspace-ai-config), then running `eval "$(rig proxy on)"` or sourcing `~/.rigbox/proxy.env` inside the VM.
 </Note>
 
 ## AI config fields
 
-The `PUT /workspaces/{id}/ai-config` endpoint accepts:
+AI configuration is split across two endpoints. A workspace's mode is set with `PUT /workspaces/{id}/mode`:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `mode` | `"managed"` or `"byok"` | Proxy mode |
-| `provider` | `"google"`, `"openai"`, `"anthropic"` | AI provider |
-| `api_key` | `string` or `null` | BYOK provider key (null to clear) |
-| `model` | `string` or `null` | Model identifier (null to clear) |
+| `mode` | `"managed"`, `"byok"`, or `null` | Per-workspace mode; `null` clears the override and falls back to the account default |
+
+Provider and model are account-level defaults, set with `PUT /users/me/ai-defaults`:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `default_mode` | `"managed"` or `"byok"` | Default mode for new workspaces |
+| `default_provider` | `"google"`, `"openai"`, `"anthropic"` | Default AI provider |
+| `default_model` | `string` or `null` | Default model identifier |
+
+In BYOK mode, supply your provider key to the workspace as an environment variable (e.g. `ANTHROPIC_API_KEY`) via `POST /workspaces/{id}/env` — there is no `api_key` config field.
 
 - Omitted fields keep their current value
 - Set a field to `null` to clear it
-- Unknown fields are rejected with `400`
 
 ## Building something similar
 

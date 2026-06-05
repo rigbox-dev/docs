@@ -39,7 +39,7 @@ flowchart LR
 For the four supported recipes, one call is all you need:
 
 ```bash
-rig catalog install --item claude --workspace <WORKSPACE_NAME>     # or: codex, opencode, kilocode
+rig recipe app install -r @rigbox/claude@builtin -w <WORKSPACE_NAME>     # or: codex, opencode, kilocode
 ```
 
 This drops the binary into `$PATH`, writes the per-agent routing shim into `/etc/profile.d/`, and exits — there's no service to wait on. SSH into the workspace and invoke the agent directly. See [Catalog Apps → CLI-shape recipes](/guides/catalog#cli-shape-catalog-reference) for the routing details and equivalent API call.
@@ -100,7 +100,7 @@ Use the `dev` or `full` image for AI coding tools. They include build toolchains
 
 ### Claude Code
 
-`rig catalog install --item claude` writes a `profile.d` shim that points `ANTHROPIC_BASE_URL` at the proxy's `/v1/messages` Anthropic passthrough and sets `ANTHROPIC_API_KEY` to a managed placeholder. After SSH-ing in, just run:
+`rig recipe app install -r @rigbox/claude@builtin` writes a `profile.d` shim that points `ANTHROPIC_BASE_URL` at the proxy's `/v1/messages` Anthropic passthrough and sets `ANTHROPIC_API_KEY` to a managed placeholder. After SSH-ing in, just run:
 
 ```bash
 claude
@@ -114,7 +114,7 @@ Claude Code uses Claude Sonnet by default. To use Opus, pass `--model claude-opu
 
 ### Codex CLI
 
-`rig catalog install --item codex` configures the agent to route through OpenAI-shape requests to OpenRouter, picking up `OPENAI_BASE_URL` / `OPENAI_API_KEY` from the routing shim:
+`rig recipe app install -r @rigbox/codex@builtin` configures the agent to route through OpenAI-shape requests to OpenRouter, picking up `OPENAI_BASE_URL` / `OPENAI_API_KEY` from the routing shim:
 
 ```bash
 codex "add error handling to the API routes in src/routes/"
@@ -130,7 +130,7 @@ opencode
 
 ### Kilo Code
 
-`rig catalog install --item kilocode` writes a shim that maps `OPENROUTER_*` to the `KILO_*` environment variables the agent expects:
+`rig recipe app install -r @rigbox/kilocode@builtin` writes a shim that maps `OPENROUTER_*` to the `KILO_*` environment variables the agent expects:
 
 ```bash
 kilocode
@@ -169,7 +169,7 @@ If you want every new workspace to come pre-loaded with a coding agent, attach a
 ```bash
 #!/bin/bash
 # One-line catalog install (run from inside the workspace)
-rig catalog install --item claude
+rig recipe app install -r @rigbox/claude@builtin
 
 # Or, for tools without a catalog recipe:
 pip install aider-chat
@@ -191,13 +191,11 @@ Agentic tools like Claude Code and Codex can make dozens of API calls per task. 
 
 ## BYOK Alternative
 
-If you burn through managed credits quickly, switch to [BYOK mode](/guides/byok) and use your own API keys for unlimited usage:
+If you burn through managed credits quickly, switch to [BYOK mode](/guides/byok) and use your own API keys for unlimited usage. Flip the workspace mode, then set your provider key as a workspace environment variable:
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"mode": "byok", "provider": "anthropic", "api_key": "sk-ant-..."}'
+rig workspace ai mode --workspace <workspace_id> byok
+rig workspace env set --workspace <workspace_id> ANTHROPIC_API_KEY=sk-ant-...
 ```
 
 Then run `eval "$(rig proxy on)"` again to update the environment.
@@ -216,7 +214,7 @@ Then run `eval "$(rig proxy on)"` again to update the environment.
 
 - [Managed AI Proxy](/guides/managed-proxy) - how the OpenRouter-backed proxy and credit system work in detail
 - [App Catalog → CLI-shape recipes](/guides/catalog#cli-shape-catalog-reference) - what each recipe installs and how the routing shims translate env vars
-- [Rigbox CLI](/guides/cli) - manage workspaces, apps, and recipes from the terminal
+- [Rigbox CLI](/cli-reference/cli) - manage workspaces, apps, and recipes from the terminal
 - [Bring Your Own Keys](/guides/byok) - use your own API keys for unlimited usage
 - [Setup Scripts](/guides/setup-scripts) - automate tool installation across workspaces
 - [Images & Templates](/guides/images-and-templates) - choose the right base image for coding

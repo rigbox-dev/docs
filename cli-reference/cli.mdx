@@ -197,14 +197,19 @@ With `--stage <name>` (or `$RIG_ENV`), deploy loads stage-specific files. Preced
 
 ### Blue-green and promote
 
-Stage a change as a sibling app, verify it, then swap production traffic atomically:
+Stage a change, verify it, then swap production traffic atomically — two flavors:
 
 ```bash
-rig deploy --bluegreen v2              # deploy as <base>-v2 with its own subdomain
-rig deploy --bluegreen v2 --promote    # stage then swap production in one transaction
+# Whole-workspace: clone prod into a hidden preview, overlay, then cut over
+rig deploy --bluegreen preview
+rig deploy --bluegreen preview --promote
+
+# In-VM sibling: stage <base>-<suffix> on its own subdomain, then swap
+rig deploy --bluegreen v2
+rig deploy --bluegreen v2 --promote
 ```
 
-`--promote` requires `--bluegreen`. The previous production app is retained as a rollback target until you delete it.
+`--promote` requires `--bluegreen`. Use `preview` for production service hosts (zero-downtime, swaps to a new VM, same ports); use `<suffix>` for a workspace people actively work in (same VM, so SSH sessions and state survive). See [Blue-green deploys and promotion](/guides/bluegreen) for the full flow, the boundary, and rollback.
 
 ### Scaffold a manifest
 

@@ -31,10 +31,10 @@ User-created apps (those you `POST` to [`/apps`](/api-reference/apps/create) dir
 
 ## Available Apps
 
-List the catalog from any workspace or from your local machine:
+Catalog apps are official **app recipes**, addressed as `@rigbox/<id>@builtin`. The Service-shape and CLI-shape reference tables below list every available app and its catalog ID. Preview any one before installing:
 
 ```bash
-rig catalog
+rig recipe app info @rigbox/vscode@builtin
 ```
 
 See [List Catalog Apps](/api-reference/app-catalog/list) for the underlying HTTP shape.
@@ -69,7 +69,7 @@ These recipes install an interactive AI coding agent into the workspace's `$PATH
 Install one of them the same way as a Service-shape app:
 
 ```bash
-rig catalog install --item claude --workspace <WORKSPACE_NAME>
+rig recipe app install -r @rigbox/claude@builtin -w <WORKSPACE_NAME>
 ```
 
 Inside a workspace VM, drop the `--workspace` flag — `rig` infers it from the ambient identity. Then SSH in and run the agent — `rig ssh-info <workspace>` will print the right `ssh` command.
@@ -83,10 +83,10 @@ CLI-shape recipes don't appear in the [Start App](/api-reference/apps/start) / [
 Install an app by its catalog ID:
 
 ```bash
-rig catalog install --item vscode --workspace <WORKSPACE_NAME>
+rig recipe app install -r @rigbox/vscode@builtin -w <WORKSPACE_NAME>
 ```
 
-`rig catalog install` blocks until the install job completes and returns the app's name and URL when it's done. From inside a workspace VM, omit `--workspace`.
+`rig recipe app install` blocks until the install job completes and returns the app's name and URL when it's done. From inside a workspace VM, omit `-w`/`--workspace`.
 
 For programmatic installs that need to fire-and-forget or track the job ID separately, use [Install Catalog App](/api-reference/app-catalog/install) and [Get Job Status](/api-reference/app-catalog/job-status) directly.
 
@@ -111,13 +111,12 @@ See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop)
 
 ### Change Visibility
 
-Catalog apps are private by default. Visibility is managed through the API:
+Catalog apps are private by default. Use `rig app share` to change visibility — pick exactly one mode:
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/v1/apps/$APP_ID/visibility \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"visibility": "public"}'
+rig app share --app $APP_NAME --public                # visible to everyone
+rig app share --app $APP_NAME --private               # visible only to you
+rig app share --app $APP_NAME --emails a@x.com,b@y.com # allowlist specific emails
 ```
 
 See [App Visibility](/guides/visibility) for the full set of options and [Update App Visibility](/api-reference/apps/update-visibility) for the API reference.
@@ -137,7 +136,7 @@ See [Delete App](/api-reference/apps/delete) for the API form.
 Each app installs with the same one-liner — swap in the catalog ID from the table above:
 
 ```bash
-rig catalog install --item vscode --workspace <WORKSPACE_NAME>
+rig recipe app install -r @rigbox/vscode@builtin -w <WORKSPACE_NAME>
 ```
 
 ### VS Code Server
@@ -174,20 +173,10 @@ A web-based PostgreSQL client with a query editor, table browser, and export fun
 
 ## Image Compatibility
 
-Most catalog apps work on all images, but some have dependencies that not every image provides.
-
-| App | base | dev | full | openclaw |
-|-----|------|-----|------|----------|
-| VS Code Server | Yes | Yes | Yes | Yes |
-| Jupyter Lab | Yes | Yes | Yes | No (needs Python) |
-| Marimo | Yes | Yes | Yes | No (needs Python) |
-| Streamlit | Yes | Yes | Yes | No (needs Python) |
-| File Browser | Yes | Yes | Yes | Yes |
-| Excalidraw | Yes | Yes | Yes | Yes |
-| PGWeb | Yes | Yes | Yes | Yes |
+Every catalog app works on both the `base` and `dev` images — both ship Python 3.12 and Node.js 22.
 
 <Tip>
-The `base` image has pre-warmed npm caches for Jupyter, Marimo, Streamlit, and Excalidraw. Installation on `base` is significantly faster than on other images because dependencies are already downloaded.
+The `base` image has pre-warmed npm caches for Jupyter, Marimo, Streamlit, and Excalidraw. Installation on `base` is significantly faster because those dependencies are already downloaded.
 </Tip>
 
 ## Complete Example: Install VS Code and Jupyter
@@ -195,8 +184,8 @@ The `base` image has pre-warmed npm caches for Jupyter, Marimo, Streamlit, and E
 Install both into the same workspace:
 
 ```bash
-rig catalog install --item vscode --workspace my-project
-rig catalog install --item jupyter --workspace my-project
+rig recipe app install -r @rigbox/vscode@builtin -w my-project
+rig recipe app install -r @rigbox/jupyter@builtin -w my-project
 ```
 
 Each command blocks until the install completes and prints the app's URL. After both finish, the apps are accessible at `https://my-project-vscode.rigbox.dev` and `https://my-project-jupyter.rigbox.dev`.

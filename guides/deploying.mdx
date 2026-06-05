@@ -263,40 +263,19 @@ rig deploy
 
 ## Blue-green deploys and promotion
 
-For zero-downtime rollouts, stage a sibling app on a staging subdomain, verify it, then atomically swap production over.
-
-**Step 1 — stage a candidate:**
-
-```bash
-rig deploy --bluegreen v2
-```
-
-This deploys a sibling on a staging subdomain (suffixed with `v2`) without touching production.
-
-**Step 2 — verify the staged app**, then promote:
-
-```bash
-rig deploy --bluegreen v2 --promote
-```
-
-`--promote` atomically swaps production to the staged sibling with zero downtime, keeping the old version around as a rollback target.
-
-<Tip>
-Blue-green pairs naturally with reproducible deploys: the staged sibling is booted from its own frozen image, so what you verify on the staging subdomain is byte-for-byte what production becomes on promote.
-</Tip>
+For zero-downtime rollouts, stage a change, verify it, then swap production over atomically — either a whole-workspace clone (`rig deploy --bluegreen preview`) or an in-VM sibling (`rig deploy --bluegreen <suffix>`), each cut over with `--promote`. See **[Blue-green deploys & promotion](/guides/bluegreen)** for both flows, the service-host-vs-live-environment boundary, and rollback.
 
 ---
 
 ## Deploy via the API
 
-`rig deploy` orchestrates several REST calls. The image build step maps to the builds endpoint, and the resulting digest is recorded as a release:
+`rig deploy` orchestrates several REST calls. The image build step maps to the builds endpoint, and the resulting digest is recorded as a release. For endpoints without a dedicated command, `rig api` sends a raw authenticated request:
 
 ```bash
 # Kick off an explicit image build (the deploy auto-build uses the same endpoint)
-curl -X POST https://api.rigbox.dev/api/v1/builds \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{ "dockerfile": "FROM rigbox-base\nRUN pip install --break-system-packages flask" }'
+rig api POST /v1/builds --body - <<'JSON'
+{ "dockerfile": "FROM rigbox-base\nRUN pip install --break-system-packages flask" }
+JSON
 ```
 
 See [Releases & Rollback](/guides/releases-and-rollback) for the release lifecycle and the `rig build` command.
@@ -309,4 +288,4 @@ See [Releases & Rollback](/guides/releases-and-rollback) for the release lifecyc
 - [Releases & Rollback](/guides/releases-and-rollback) — pin and roll back image digests.
 - [Visibility](/guides/visibility) — private, public, and email-allow-listed apps.
 - [Expose and Route](/guides/expose-and-route) — how apps map to subdomains.
-- [The Rigbox CLI](/guides/cli) — the full command surface.
+- [The Rigbox CLI](/cli-reference/cli) — the full command surface.

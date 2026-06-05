@@ -47,28 +47,32 @@ The default `data` volume mounts at `/home/developer/data` — point `DATA_DIR` 
 You can also create and manage volumes imperatively, independent of a deploy:
 
 ```bash
-rig volume create --name data --size 1G   # create a volume
-rig volume ls                             # list volumes for a workspace
-rig volume resize --name data --size 5G   # grow a volume
-rig volume rm --name data                 # delete a volume (destroys its data)
+# create a volume (size in MiB, mounted at an absolute path)
+rig volume create --workspace <WORKSPACE_NAME> --name data --size-mb 1024 --mount-path /home/developer/data
+rig volume ls --workspace <WORKSPACE_NAME>                       # list volumes for a workspace
+rig volume resize --workspace <WORKSPACE_NAME> --volume <VOLUME_ID> --size-mb 5120   # grow a volume
+rig volume rm --workspace <WORKSPACE_NAME> --volume <VOLUME_ID>  # delete a volume (destroys its data)
 ```
 
-The same operations are available on the REST API under the workspace's volumes endpoint:
+<Note>
+`rig volume resize` and `rig volume rm` take the volume id (from `rig volume ls`), not its name.
+</Note>
+
+Each command targets a specific workspace with `--workspace`:
 
 ```bash
-# List volumes
-curl -s https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/volumes \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+# List volumes for a workspace
+rig volume ls --workspace <WORKSPACE_NAME>
 
-# Create a volume
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/volumes \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{ "name": "data", "mount_path": "/home/developer/data" }'
+# Create a volume (size in MiB, with an absolute mount path)
+rig volume create --workspace <WORKSPACE_NAME> \
+  --name data \
+  --size-mb 1024 \
+  --mount-path /home/developer/data
 ```
 
 <Warning>
-Deleting a volume (`rig volume rm` or the DELETE endpoint) permanently destroys the data on it. This is separate from deleting the workspace — but deleting the workspace destroys its volumes too.
+Deleting a volume (`rig volume rm`) permanently destroys the data on it. This is separate from deleting the workspace — but deleting the workspace destroys its volumes too.
 </Warning>
 
 ## The SQLite-under-$DATA_DIR pattern

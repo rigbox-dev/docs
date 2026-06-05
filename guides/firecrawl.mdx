@@ -3,11 +3,11 @@ title: Firecrawl
 description: Deploy a self-hosted Firecrawl web scraping API with one click.
 ---
 
-The **Firecrawl template** gives you a fully self-hosted [Firecrawl](https://firecrawl.dev) v2 API running inside a Rigbox workspace. It comes pre-configured with everything you need to scrape and crawl websites at scale.
+The **Firecrawl app recipe** gives you a fully self-hosted [Firecrawl](https://firecrawl.dev) v2 API running inside a Rigbox workspace. It comes pre-configured with everything you need to scrape and crawl websites at scale.
 
 ## What's Included
 
-The template provisions a complete Firecrawl stack:
+The recipe provisions a complete Firecrawl stack:
 
 | Component | Purpose |
 |-----------|---------|
@@ -17,40 +17,23 @@ The template provisions a complete Firecrawl stack:
 | **RabbitMQ** | Job queue for distributed crawl tasks |
 | **Playwright + Chromium** | Renders JavaScript-heavy pages for accurate scraping |
 
-The workspace runs on **2 vCPU, 4 GB RAM, and 8 GB disk**.
+Firecrawl runs comfortably on **2 vCPU, 4 GB RAM, and 8 GB disk**.
 
 ## Deploying Firecrawl
 
-You can deploy Firecrawl with a single click from the template gallery, or use the API.
+Firecrawl is an official app recipe (`@rigbox/firecrawl@builtin`). Spawn a workspace sized for the stack, then install the recipe into it — the install provisions the Firecrawl API plus its PostgreSQL, Redis, and RabbitMQ backing services and starts everything in one call (`rig` is already authenticated via `rig login`):
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "template_id": "firecrawl"
-  }'
+```bash
+rig workspace spawn --name scraper --template dev --ram 4096 --vcpu 2 --disk 8192
+rig recipe app install -r @rigbox/firecrawl@builtin -w scraper
 ```
 
-```python Python
-import requests
+The install blocks until Firecrawl is live, then prints the app's name and URL. The Firecrawl API is served at `https://<APP_NAME>.rigbox.dev`.
 
-response = requests.post(
-    "https://api.rigbox.dev/api/v1/quick-deploy",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={"template_id": "firecrawl"},
-)
-workspace = response.json()
-subdomain = workspace["apps"][0]["name"]
-print(f"Firecrawl API: https://{subdomain}.rigbox.dev")
-```
-</CodeGroup>
-
-Once the workspace is running, your Firecrawl API is live and ready to accept requests.
+Once the install completes, your Firecrawl API is live and ready to accept requests.
 
 <Note>
-The Firecrawl API key is generated automatically during deployment. You can find it in the **Usage** tab of your app in the dashboard.
+The Firecrawl API key is generated automatically during installation. You can find it in the **Usage** tab of your app in the dashboard.
 </Note>
 
 ## Scraping a Page

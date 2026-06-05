@@ -27,49 +27,17 @@ ssh-keygen -t ed25519 -C "your-email@example.com"
 
 To connect via SSH, you first need to register your public key with Rigbox.
 
-### Via the API
-
 Replace `<KEY_NAME>` with a label you'll recognize (for example, `laptop`).
-
-<CodeGroup>
-
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/ssh-keys \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "<KEY_NAME>",
-    "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your-email@example.com"
-  }'
-```
-
-```python Python
-import requests
-
-response = requests.post(
-    "https://api.rigbox.dev/api/v1/ssh-keys",
-    headers={"Authorization": "Bearer YOUR_API_KEY"},
-    json={
-        "name": "<KEY_NAME>",
-        "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your-email@example.com",
-    },
-)
-
-key = response.json()
-print(f"Registered key: {key['id']}")
-```
-
-</CodeGroup>
-
-### Via the CLI
-
-If you have the Rigbox CLI installed:
 
 ```bash
 rig ssh add --name <KEY_NAME>
 ```
 
-This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it automatically under the name you provide.
+This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it automatically under the name you provide. To register a key from a different path, pass `--file`:
+
+```bash
+rig ssh add --name <KEY_NAME> --file ~/.ssh/my_rigbox_key.pub
+```
 
 <Tip>
   You can register multiple SSH keys for different machines - for example, one for your laptop and one for your desktop. Give each a descriptive name so you can identify them later.
@@ -81,26 +49,14 @@ This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it au
 
 When you create a workspace, your registered SSH keys are typically synced automatically. If you add a new key while a workspace is already running, sync it manually:
 
-<CodeGroup>
-
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ssh-keys/sync \
-  -H "Authorization: Bearer YOUR_API_KEY"
+```bash
+rig ssh sync --workspace <WORKSPACE_ID>
 ```
-
-```python Python
-requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ssh-keys/sync",
-    headers={"Authorization": "Bearer YOUR_API_KEY"},
-)
-```
-
-</CodeGroup>
 
 This copies all your registered public keys into the workspace VM's `~/.ssh/authorized_keys` file.
 
 <Note>
-  Keys are synced automatically on workspace start for most templates. You only need the sync endpoint if you add a key to an already-running workspace.
+  Keys are synced automatically on workspace start for most templates. You only need to run `rig ssh sync` if you add a key to an already-running workspace.
 </Note>
 
 ---
@@ -111,6 +67,12 @@ When you create a workspace, Rigbox gives you an SSH command in this format:
 
 ```bash
 ssh <WORKSPACE_NAME>-<WORKSPACE_ID_SUFFIX>@<REGION>.rigbox.dev
+```
+
+To print the exact SSH target for a workspace at any time, run:
+
+```bash
+rig workspace ssh-info --workspace <WORKSPACE_ID>
 ```
 
 `<WORKSPACE_ID_SUFFIX>` is the workspace ID with the leading `ws-` stripped, and `<REGION>` is the workspace's region (for example, `eu-west-1`).
@@ -207,45 +169,26 @@ rsync -avz ./my-project/ my-project-ctbxi8lb@eu-west-1.rigbox.dev:/home/develope
 
 ### List your registered keys
 
-<CodeGroup>
-
-```bash cURL
-curl https://api.rigbox.dev/api/v1/ssh-keys \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-```bash CLI
+```bash
 rig ssh ls
 ```
-
-</CodeGroup>
 
 ### List keys synced to a workspace
 
 ```bash
-curl https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ssh-keys \
-  -H "Authorization: Bearer YOUR_API_KEY"
+rig ssh ls --workspace <WORKSPACE_ID>
 ```
 
 This returns the keys currently in the workspace's `authorized_keys` file.
 
 ### Remove a key
 
-<CodeGroup>
-
-```bash cURL
-curl -X DELETE https://api.rigbox.dev/api/v1/ssh-keys/{key_id} \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-```bash CLI
+```bash
 rig ssh rm --name <KEY_NAME>
 ```
 
-</CodeGroup>
-
 <Warning>
-  Removing a key from the API does not immediately remove it from running workspaces. The key will be removed the next time the workspace restarts or you manually trigger a sync.
+  Removing a key with the CLI does not immediately remove it from running workspaces. The key will be removed the next time the workspace restarts or you run `rig ssh sync`.
 </Warning>
 
 ---
@@ -256,7 +199,7 @@ rig ssh rm --name <KEY_NAME>
 
 If you get `Connection refused`, verify:
 
-1. Your workspace is running (check with `GET /api/v1/workspaces/{id}` or `rig ls`)
+1. Your workspace is running (check with `rig workspace ls`)
 2. Your SSH key is registered and synced
 3. You're using the correct username format: `<WORKSPACE_NAME>-<WORKSPACE_ID_SUFFIX>@<REGION>.rigbox.dev`
 
@@ -264,8 +207,8 @@ If you get `Connection refused`, verify:
 
 If you get `Permission denied (publickey)`:
 
-1. Check that your key is registered: `GET /api/v1/ssh-keys`
-2. Sync keys to the workspace: `POST /api/v1/workspaces/{id}/ssh-keys/sync`
+1. Check that your key is registered: `rig ssh ls`
+2. Sync keys to the workspace: `rig ssh sync --workspace <WORKSPACE_ID>`
 3. Verify you are using the correct identity file: `ssh -v my-project-ctbxi8lb@{region}.rigbox.dev`
 
 ### Slow connection

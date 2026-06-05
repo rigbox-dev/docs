@@ -49,29 +49,15 @@ Apps can declare which services they depend on using the `depends_on` field. Thi
 
 For example, a Firecrawl app might depend on PostgreSQL, Redis, and RabbitMQ. If one of those services goes unhealthy, you know immediately which apps are affected.
 
-## Listing Services via the API
+## Listing Services via the CLI
 
-Use the services endpoint to retrieve all backing services for a workspace along with their current health status.
+Use `rig workspace services` to retrieve all backing services for a workspace along with their current health status.
 
-<CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/services \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```bash
+rig workspace services --workspace <WORKSPACE_NAME>
 ```
 
-```python Python
-import requests
-
-response = requests.get(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/services",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-for service in response.json():
-    print(f"{service['name']:15} status={service['status']}")
-```
-</CodeGroup>
-
-The response includes each service's name, type, and current health status.
+The output includes each service's name, type, and current health status.
 
 ## Managed Automatically
 

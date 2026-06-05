@@ -26,23 +26,9 @@ App subdomains are globally unique across all Rigbox users. If a name is taken, 
 
 Before exposing a port, you can check which ports have active listeners inside the workspace.
 
-<CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/listening-ports \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```bash
+rig workspace ports --workspace $WORKSPACE_NAME
 ```
-
-```python Python
-import requests
-
-response = requests.get(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/listening-ports",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-for port_info in response.json():
-    print(f"Port {port_info['port']} - {port_info.get('process', 'unknown')}")
-```
-</CodeGroup>
 
 This scans the workspace for active TCP listeners and returns the port number along with the process name when available.
 
@@ -62,30 +48,13 @@ See [Create App](/api-reference/apps/create) for the API form.
 
 ## Expose Port Shortcut
 
-The expose-port endpoint detects the process listening on the specified port and creates an app in one call. This is the easiest way to make a service public.
+`rig app expose-port` detects the process listening on the specified port and, with `--wrap`, creates an app route in one call. This is the easiest way to make a service public. Omit `--wrap` to only detect the process without creating the route.
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/expose-port \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "port": 3000
-  }'
+```bash
+rig app expose-port --workspace $WORKSPACE_NAME --port 3000 --wrap
 ```
 
-```python Python
-response = requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/expose-port",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={"port": 3000},
-)
-app = response.json()
-print(f"Exposed at: https://{app['name']}.rigbox.dev")
-```
-</CodeGroup>
-
-The endpoint automatically detects the process name and uses it to generate a sensible app name.
+The command automatically detects the process name and uses it to generate a sensible app name.
 
 See [Expose Port](/api-reference/apps/expose-port) for details.
 
@@ -94,8 +63,7 @@ See [Expose Port](/api-reference/apps/expose-port) for details.
 If your workspace was created from a template that defines default apps (like a web server or API), you can ensure those apps exist with a reconcile call.
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/reconcile-apps \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+rig workspace reconcile --workspace $WORKSPACE_NAME
 ```
 
 This checks the template definition and creates any missing apps. It's idempotent - running it multiple times has no side effects.
@@ -106,24 +74,12 @@ See [Reconcile Apps](/api-reference/apps/reconcile) for details.
 
 Before sharing a URL, verify the app is reachable.
 
-<CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/apps/$APP_ID/health \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq
+```bash
+rig app health --app $APP_NAME
 ```
-
-```python Python
-response = requests.get(
-    f"https://api.rigbox.dev/api/v1/apps/{app_id}/health",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-health = response.json()
-print(f"Healthy: {health['healthy']}")
-```
-</CodeGroup>
 
 <Tip>
-If health returns unhealthy, check that your service is actually listening on the correct port inside the VM. Use the listening-ports endpoint to verify.
+If health returns unhealthy, check that your service is actually listening on the correct port inside the VM. Use `rig workspace ports` to verify.
 </Tip>
 
 See [App Health](/api-reference/apps/health-check) for the response schema.
@@ -148,28 +104,11 @@ See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop)
 
 ## Update an App
 
-You can rename an app or change its port. Renaming an app changes its public subdomain URL.
+You can rename an app or change its port. Renaming an app changes its public subdomain URL. There is no dedicated CLI subcommand for this, so use `rig api` to send the raw request:
 
-<CodeGroup>
-```bash cURL
-curl -X PATCH https://api.rigbox.dev/api/v1/apps/$APP_ID \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "new-name"
-  }'
+```bash
+echo '{"name": "new-name"}' | rig api PATCH /v1/apps/$APP_ID --body -
 ```
-
-```python Python
-response = requests.patch(
-    f"https://api.rigbox.dev/api/v1/apps/{app_id}",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={"name": "new-name"},
-)
-app = response.json()
-print(f"New URL: https://{app['name']}.rigbox.dev")
-```
-</CodeGroup>
 
 <Warning>
 Renaming an app changes its public URL. Any existing links to the old subdomain will stop working immediately.

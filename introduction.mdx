@@ -7,16 +7,13 @@ Rigbox gives you isolated Linux VMs - each with its own kernel, filesystem, and 
 
 ## Quick example
 
-Deploy a workspace in one API call:
+Deploy a workspace in one command:
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"template_id": "dev", "name": "<WORKSPACE_NAME>"}'
+rig template deploy --template dev --name <WORKSPACE_NAME>
 ```
 
-Replace `<WORKSPACE_NAME>` with a name of your choice and `YOUR_API_KEY` with the key from **Settings → API Keys** in the dashboard.
+Replace `<WORKSPACE_NAME>` with a name of your choice. The CLI is authenticated via `rig login` - no API key handling required.
 
 This provisions an isolated micro-VM with Python, Node.js, build tools, and SSH access - ready in seconds.
 
@@ -32,7 +29,7 @@ New to Rigbox? Follow the [Quickstart](/quickstart) for a step-by-step walkthrou
 | **App hosting** | Expose any port as a public URL with automatic HTTPS and subdomain routing |
 | **AI coding tools** | Run Claude Code, Codex, Aider with managed credits - no API keys needed |
 | **Development environments** | Reproducible dev environments with setup scripts, snapshots, and pre-installed tools |
-| **Bot deployment** | Deploy Telegram bots, chat interfaces, and AI agents with the OpenClaw template |
+| **Bot deployment** | Deploy Telegram bots, chat interfaces, and AI agents in isolated micro-VMs |
 | **Build a platform** | Use the API to build your own hosting service on top of Rigbox infrastructure |
 
 ## Core capabilities
@@ -70,7 +67,7 @@ New to Rigbox? Follow the [Quickstart](/quickstart) for a step-by-step walkthrou
   <Card title="Quickstart" icon="rocket" href="/quickstart">
     Deploy your first workspace and app in 5 steps
   </Card>
-  <Card title="Authentication" icon="key" href="/authentication">
+  <Card title="Authentication" icon="key" href="/cli-reference/authentication">
     API keys, JWTs, and session tokens
   </Card>
   <Card title="Guides" icon="book-open" href="/guides/workspaces">
@@ -86,4 +83,4 @@ All API requests go to:
 https://api.rigbox.dev/api/v1
 ```
 
-See the [API Reference](/api-reference/workspaces/list) for the full endpoint catalog, or the [Authentication](/authentication) page for how to authenticate.
+See the [API Reference](/api-reference/workspaces/list) for the full endpoint catalog, or the [Authentication](/cli-reference/authentication) page for how to authenticate.

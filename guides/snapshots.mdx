@@ -25,70 +25,16 @@ Stop the workspace first, then create a named snapshot.
 **Step 1 - Stop the workspace:**
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/stop \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
+rig workspace stop --workspace {workspace_id}
 ```
 
 **Step 2 - Create the snapshot:**
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "before-migration"
-  }'
+```bash
+rig snapshot create --workspace {workspace_id} --name before-migration
 ```
 
-```python Python
-import requests
-
-# Stop the workspace
-requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/stop",
-    headers={"Authorization": f"Bearer {token}"}
-)
-
-# Create the snapshot
-response = requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots",
-    headers={"Authorization": f"Bearer {token}"},
-    json={"name": "before-migration"}
-)
-
-snapshot = response.json()
-print(snapshot["id"])          # "snap_abc123"
-print(snapshot["size_bytes"])  # 2147483648
-```
-
-```javascript JavaScript
-// Stop the workspace
-await fetch(
-  `https://api.rigbox.dev/api/v1/workspaces/${workspaceId}/stop`,
-  {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${token}` },
-  }
-);
-
-// Create the snapshot
-const response = await fetch(
-  `https://api.rigbox.dev/api/v1/workspaces/${workspaceId}/snapshots`,
-  {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ name: "before-migration" }),
-  }
-);
-
-const snapshot = await response.json();
-console.log(snapshot.id); // "snap_abc123"
-```
-</CodeGroup>
+This prints the new snapshot's `id` (e.g. `snap_abc123`) and `size_bytes`.
 
 See the [Create Snapshot API reference](/api-reference/snapshots/create) for the full response schema.
 
@@ -101,9 +47,10 @@ Creating a snapshot while a workspace is running will return an error. Always st
 ### For a Specific Workspace
 
 ```bash
-curl -s https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+rig snapshot ls --workspace {workspace_id}
 ```
+
+The JSON form (`--output json`) returns:
 
 ```json
 [
@@ -126,11 +73,10 @@ curl -s https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots \
 
 ### All Your Snapshots
 
-To see snapshots across all your workspaces:
+To see snapshots across all your workspaces, omit the `--workspace` filter:
 
 ```bash
-curl -s https://api.rigbox.dev/api/v1/snapshots \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" | jq .
+rig snapshot ls
 ```
 
 See the [List Snapshots API reference](/api-reference/snapshots/list) for pagination and filtering options.
@@ -139,36 +85,10 @@ See the [List Snapshots API reference](/api-reference/snapshots/list) for pagina
 
 Restoring a snapshot replaces the workspace's current disk state with the snapshot's saved state.
 
-<CodeGroup>
-```bash cURL
+```bash
 # Workspace must be stopped
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots/{snapshot_id}/restore \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
+rig snapshot restore --workspace {workspace_id} --snapshot {snapshot_id}
 ```
-
-```python Python
-# Workspace must be stopped
-response = requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots/{snapshot_id}/restore",
-    headers={"Authorization": f"Bearer {token}"}
-)
-
-print(response.status_code)  # 200
-```
-
-```javascript JavaScript
-// Workspace must be stopped
-const response = await fetch(
-  `https://api.rigbox.dev/api/v1/workspaces/${workspaceId}/snapshots/${snapshotId}/restore`,
-  {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${token}` },
-  }
-);
-
-console.log(response.status); // 200
-```
-</CodeGroup>
 
 <Warning>
 Restoring a snapshot **overwrites** the current workspace disk state. Any changes made since the snapshot was taken will be lost. If you want to keep the current state, create a new snapshot before restoring.
@@ -177,15 +97,13 @@ Restoring a snapshot **overwrites** the current workspace disk state. Any change
 After restoring, start the workspace to boot into the restored state:
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/start \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
+rig workspace start --workspace {workspace_id}
 ```
 
 ## Delete a Snapshot
 
 ```bash
-curl -X DELETE https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/snapshots/{snapshot_id} \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
+rig snapshot rm --workspace {workspace_id} --snapshot {snapshot_id}
 ```
 
 <Note>
@@ -216,28 +134,16 @@ Snapshot before a live demo so you can instantly roll back if something breaks.
 
 ```bash
 # Before the demo
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/stop \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
-
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/snapshots \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "pre-demo-2026-04-07"}'
-
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/start \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
+rig workspace stop --workspace ws_demo
+rig snapshot create --workspace ws_demo --name pre-demo-2026-04-07
+rig workspace start --workspace ws_demo
 
 # ... run the demo ...
 
 # Something went wrong - restore and try again
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/stop \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
-
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/snapshots/snap_predemo/restore \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
-
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_demo/start \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
+rig workspace stop --workspace ws_demo
+rig snapshot restore --workspace ws_demo --snapshot snap_predemo
+rig workspace start --workspace ws_demo
 ```
 
 ### Experiment Branching
@@ -246,28 +152,16 @@ Try a risky change without fear. Snapshot first, experiment freely, restore if i
 
 ```bash
 # Checkpoint current state
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/stop \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
-
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/snapshots \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "stable-model-v2"}'
-
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/start \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
+rig workspace stop --workspace ws_ml
+rig snapshot create --workspace ws_ml --name stable-model-v2
+rig workspace start --workspace ws_ml
 
 # ... experiment with new model architecture ...
 # ... results are worse, roll back ...
 
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/stop \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
-
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/snapshots/snap_stable_v2/restore \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
-
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/ws_ml/start \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
+rig workspace stop --workspace ws_ml
+rig snapshot restore --workspace ws_ml --snapshot snap_stable_v2
+rig workspace start --workspace ws_ml
 # Back to the known-good state
 ```
 
@@ -282,16 +176,9 @@ WORKSPACE_ID="ws_production"
 DATE=$(date +%Y-%m-%d)
 
 # Stop, snapshot, start
-curl -X POST "https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/stop" \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
-
-curl -X POST "https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/snapshots" \
-  -H "Authorization: Bearer $RIGBOX_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d "{\"name\": \"daily-backup-$DATE\"}"
-
-curl -X POST "https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/start" \
-  -H "Authorization: Bearer $RIGBOX_TOKEN"
+rig workspace stop --workspace "$WORKSPACE_ID"
+rig snapshot create --workspace "$WORKSPACE_ID" --name "daily-backup-$DATE"
+rig workspace start --workspace "$WORKSPACE_ID"
 ```
 
 <Tip>
@@ -304,62 +191,22 @@ Share a known-good workspace state with your team. Create a snapshot at a stable
 
 ## Complete Workflow Example
 
-Here is a full checkpoint-and-restore flow using Python.
+Here is a full checkpoint-and-restore flow. `rig workspace stop` and `rig workspace start` poll status internally, so there's no manual wait loop.
 
-```python
-import requests
-import time
-
-BASE = "https://api.rigbox.dev/api/v1"
-HEADERS = {"Authorization": f"Bearer {token}"}
-WS_ID = "ws_abc123"
-
-
-def stop_workspace():
-    """Stop the workspace and wait for it to be fully stopped."""
-    requests.post(f"{BASE}/workspaces/{WS_ID}/stop", headers=HEADERS)
-    # Poll until stopped
-    while True:
-        r = requests.get(f"{BASE}/workspaces/{WS_ID}", headers=HEADERS)
-        if r.json()["status"] == "stopped":
-            break
-        time.sleep(2)
-
-
-def start_workspace():
-    """Start the workspace."""
-    requests.post(f"{BASE}/workspaces/{WS_ID}/start", headers=HEADERS)
-
-
-def create_snapshot(name: str) -> str:
-    """Create a snapshot and return its ID."""
-    r = requests.post(
-        f"{BASE}/workspaces/{WS_ID}/snapshots",
-        headers=HEADERS,
-        json={"name": name}
-    )
-    return r.json()["id"]
-
-
-def restore_snapshot(snapshot_id: str):
-    """Restore a snapshot."""
-    requests.post(
-        f"{BASE}/workspaces/{WS_ID}/snapshots/{snapshot_id}/restore",
-        headers=HEADERS
-    )
-
+```bash
+WS_ID="ws_abc123"
 
 # Workflow: checkpoint -> experiment -> restore
-stop_workspace()
-snap_id = create_snapshot("before-experiment")
-start_workspace()
+rig workspace stop --workspace "$WS_ID"
+SNAP_ID=$(rig snapshot create --workspace "$WS_ID" --name before-experiment --output json | jq -r .id)
+rig workspace start --workspace "$WS_ID"
 
 # ... make changes, run experiments ...
 
 # Something went wrong - roll back
-stop_workspace()
-restore_snapshot(snap_id)
-start_workspace()
+rig workspace stop --workspace "$WS_ID"
+rig snapshot restore --workspace "$WS_ID" --snapshot "$SNAP_ID"
+rig workspace start --workspace "$WS_ID"
 # Back to the checkpointed state
 ```
 

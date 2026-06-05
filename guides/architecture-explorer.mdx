@@ -28,74 +28,38 @@ Architecture Explorer scans up to **5 projects** at a maximum directory depth of
 
 ## Availability by Image
 
-Architecture Explorer comes **pre-installed** in the `full` image. For other images, you need to install it first.
+Architecture Explorer is not pre-installed on any image, so you need to install it first.
 
 | Image | Status | Action needed |
 |-------|--------|---------------|
-| `full` | Pre-installed | Launch directly |
 | `base` | Not installed | Install, then launch |
 | `dev` | Not installed | Install, then launch |
-| `openclaw` | Not installed | Install, then launch |
 
 <Tip>
-Use the `full` template if you want Architecture Explorer available immediately without an installation step. See [Images & Templates](/guides/images-and-templates) for details.
+Use the `dev` template if you want a richer development environment for working alongside Architecture Explorer. See [Images & Templates](/guides/images-and-templates) for details.
 </Tip>
 
 ## Installation
 
-If your workspace doesn't use the `full` image, install Architecture Explorer first.
+Install Architecture Explorer before launching it.
 
 ### Start the installation
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/architecture-explorer/install \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
-```
+The install runs asynchronously and prints a job id you can poll.
 
-```python Python
-import requests
-
-response = requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/architecture-explorer/install",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-print(f"Installation started: {response.json()}")
+```bash
+rig tools install --workspace $WORKSPACE --tool architecture-explorer
 ```
-</CodeGroup>
 
 See [Install Tool](/api-reference/tools/install) for the full response schema.
 
 ### Poll for installation status
 
-Installation takes 1-3 minutes depending on the workspace image. Poll until the status is `installed`.
+Installation takes 1-3 minutes depending on the workspace image. Poll with the job id from `rig tools install` until the status is `installed`.
 
-<CodeGroup>
-```bash cURL
-while true; do
-  STATUS=$(curl -s https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/architecture-explorer/install-status \
-    -H "Authorization: Bearer $RIGBOX_API_KEY" | jq -r '.status')
-  echo "Status: $STATUS"
-  [ "$STATUS" = "installed" ] && break
-  sleep 5
-done
+```bash
+rig tools install-status --workspace $WORKSPACE --tool architecture-explorer --job-id $JOB_ID
 ```
-
-```python Python
-import time
-
-while True:
-    resp = requests.get(
-        f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/architecture-explorer/install-status",
-        headers={"Authorization": f"Bearer {api_key}"},
-    )
-    status = resp.json()["status"]
-    print(f"Installation: {status}")
-    if status == "installed":
-        break
-    time.sleep(5)
-```
-</CodeGroup>
 
 See [Installation Status](/api-reference/tools/install-status) for the response schema.
 
@@ -106,23 +70,11 @@ Once installed, Architecture Explorer is ready to launch.
 
 ## Launching Architecture Explorer
 
-After installation (or immediately on the `full` image), launch the tool.
+After installation, launch the tool.
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/architecture-explorer/launch \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```bash
+rig tools launch --workspace $WORKSPACE --tool architecture-explorer
 ```
-
-```python Python
-response = requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/architecture-explorer/launch",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-launch = response.json()
-print(f"Architecture Explorer launched")
-```
-</CodeGroup>
 
 See [Launch Tool](/api-reference/tools/launch) for the response schema.
 
@@ -154,20 +106,9 @@ The visualization includes:
 
 When you're done, stop the tool to free up resources.
 
-<CodeGroup>
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/$WORKSPACE_ID/tools/architecture-explorer/stop \
-  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```bash
+rig tools stop --workspace $WORKSPACE --tool architecture-explorer
 ```
-
-```python Python
-requests.post(
-    f"https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/tools/architecture-explorer/stop",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-print("Architecture Explorer stopped")
-```
-</CodeGroup>
 
 See [Stop Tool](/api-reference/tools/stop) for details.
 
@@ -175,35 +116,12 @@ See [Stop Tool](/api-reference/tools/stop) for details.
 
 This walkthrough clones a Rust project into a workspace and visualizes its architecture.
 
-**1. Create a workspace with the full image**
+**1. Create a workspace with the dev image**
 
-```python
-import requests
-import time
+`rig workspace spawn` creates the workspace from the `dev` template, boots it, and waits until it's ready:
 
-API_URL = "https://api.rigbox.dev/api/v1"
-HEADERS = {"Authorization": f"Bearer {api_key}"}
-
-# Quick deploy with the full template (Architecture Explorer pre-installed)
-workspace = requests.post(
-    f"{API_URL}/quick-deploy",
-    headers=HEADERS,
-    json={"template_id": "full"},
-).json()
-
-workspace_id = workspace["workspace"]["id"]
-
-# Wait for the workspace to be running
-while True:
-    ws = requests.get(
-        f"{API_URL}/workspaces/{workspace_id}",
-        headers=HEADERS,
-    ).json()
-    if ws["vm"]["status"] == "running":
-        break
-    time.sleep(2)
-
-print(f"Workspace running: {workspace_id}")
+```bash
+rig workspace spawn --name arch-demo --template dev
 ```
 
 **2. Clone your project**
@@ -216,31 +134,26 @@ git clone https://github.com/your-org/your-rust-project.git
 
 **3. Launch Architecture Explorer**
 
-```python
-requests.post(
-    f"{API_URL}/workspaces/{workspace_id}/tools/architecture-explorer/launch",
-    headers=HEADERS,
-)
-print(f"Launched - open https://arch-{workspace_id}.rigbox.dev")
+```bash
+rig tools launch --workspace arch-demo --tool architecture-explorer
 ```
+
+Then open `https://arch-<workspace-id>.rigbox.dev` in your browser.
 
 **4. Explore the visualization**
 
-Open `https://arch-{workspace_id}.rigbox.dev` in your browser. Architecture Explorer will scan the cloned project, detect `Cargo.toml`, and build the dependency and call graphs.
+Open `https://arch-<workspace-id>.rigbox.dev` in your browser. Architecture Explorer will scan the cloned project, detect `Cargo.toml`, and build the dependency and call graphs.
 
 **5. Stop when done**
 
-```python
-requests.post(
-    f"{API_URL}/workspaces/{workspace_id}/tools/architecture-explorer/stop",
-    headers=HEADERS,
-)
+```bash
+rig tools stop --workspace arch-demo --tool architecture-explorer
 ```
 
 ## Tips
 
 <Tip>
-For the fastest experience, use the `full` template. Architecture Explorer is pre-installed and ready to launch immediately - no installation wait.
+For a richer development environment, use the `dev` template. Install Architecture Explorer once and launch it whenever you need it.
 </Tip>
 
 <Tip>

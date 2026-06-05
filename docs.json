@@ -25,8 +25,10 @@
             "group": "Getting Started",
             "pages": [
               "introduction",
-              "authentication",
-              "quickstart"
+              "quickstart",
+              "guides/workspaces",
+              "guides/ssh-access",
+              "guides/deploying"
             ]
           },
           {
@@ -34,67 +36,27 @@
             "pages": [
               "concepts/architecture",
               "concepts/security",
-              "concepts/limits"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Core Concepts",
-            "pages": [
-              "guides/workspaces",
+              "concepts/limits",
               "guides/images-and-templates"
             ]
           },
           {
-            "group": "Deploying",
+            "group": "Deploying & hosting",
             "pages": [
-              "guides/deploying",
+              "guides/bluegreen",
+              "guides/releases-and-rollback",
               "guides/persistent-volumes",
-              "guides/releases-and-rollback"
-            ]
-          },
-          {
-            "group": "App Hosting",
-            "pages": [
               "guides/expose-and-route",
               "guides/visibility",
               "guides/custom-domains"
             ]
           },
           {
-            "group": "Tools",
-            "pages": [
-              "guides/architecture-explorer",
-              "guides/virtual-browser"
-            ]
-          },
-          {
-            "group": "Templates",
-            "pages": [
-              "guides/firecrawl"
-            ]
-          },
-          {
-            "group": "Catalog Apps",
-            "pages": [
-              "guides/catalog"
-            ]
-          },
-          {
-            "group": "AI & Credits",
+            "group": "AI, automation & data",
             "pages": [
               "guides/managed-proxy",
               "guides/byok",
-              "guides/ai-coding-tools"
-            ]
-          },
-          {
-            "group": "Automation",
-            "pages": [
+              "guides/ai-coding-tools",
               "guides/setup-scripts",
               "guides/service-specs",
               "guides/workspace-services",
@@ -102,21 +64,23 @@
             ]
           },
           {
-            "group": "Access & SSH",
+            "group": "CLI Reference",
             "pages": [
-              "guides/ssh-access",
-              "guides/cli"
+              "cli-reference/cli",
+              "cli-reference/authentication"
             ]
           },
           {
-            "group": "Dev Tools",
+            "group": "Integrations & tools",
             "pages": [
-              "guides/td-task-manager",
-              "guides/sidecar-dashboard"
+              "guides/catalog",
+              "guides/architecture-explorer",
+              "guides/virtual-browser",
+              "guides/firecrawl"
             ]
           },
           {
-            "group": "Build With Rigbox",
+            "group": "Build on Rigbox",
             "pages": [
               "guides/build-hosting-platform",
               "sandbox-api-surface",

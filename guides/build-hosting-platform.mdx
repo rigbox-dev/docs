@@ -5,7 +5,11 @@ description: Use the Rigbox API to build your own app hosting service, like Claw
 
 Rigbox provides the infrastructure primitives - isolated VMs, app routing, AI proxy, and credit management - so you can build a hosting platform on top without managing servers.
 
-This guide walks through building a service like [Clawd](https://clawd.rigbox.dev) (an AI bot hosting platform) using the Rigbox API. By the end, you will have a working architecture for provisioning user workspaces, exposing apps, and managing AI credits.
+This guide walks through building a service like [Clawd](https://clawd.rigbox.dev) (an AI bot hosting platform) using the Rigbox REST API. By the end, you will have a working architecture for provisioning user workspaces, exposing apps, and managing AI credits.
+
+<Note>
+This is an integration guide for building your **own** backend on top of Rigbox, so the examples are in Python, JavaScript, and cURL rather than the `rig` CLI. Python is the default tab. If you just want to drive Rigbox from your terminal, use the [CLI](/cli-reference/cli) instead.
+</Note>
 
 ---
 
@@ -29,70 +33,83 @@ Each user gets their own isolated micro-VM. Your backend orchestrates lifecycle,
 
 ---
 
+## Setup
+
+Every example uses the same base URL and bearer auth. Replace `YOUR_API_KEY` with an [API key](/cli-reference/authentication#api-keys). The later snippets assume these are already defined.
+
+<CodeGroup>
+
+```python Python
+import requests
+
+BASE = "https://api.rigbox.dev/api/v1"
+headers = {"Authorization": "Bearer YOUR_API_KEY"}
+```
+
+```javascript JavaScript
+const BASE = "https://api.rigbox.dev/api/v1";
+const headers = {
+  Authorization: "Bearer YOUR_API_KEY",
+  "Content-Type": "application/json",
+};
+```
+
+```bash cURL
+export RIGBOX_API_KEY="YOUR_API_KEY"
+export BASE="https://api.rigbox.dev/api/v1"
+```
+
+</CodeGroup>
+
+---
+
 ## Step 1: Provision a Workspace
 
 When a user signs up on your platform, provision a workspace for them using the quick-deploy endpoint. This creates a workspace from a template with sensible defaults.
 
 <CodeGroup>
 
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/quick-deploy \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
+```python Python
+resp = requests.post(f"{BASE}/quick-deploy", headers=headers, json={
     "name": "user-abc-workspace",
-    "template": "ai-agent-starter"
-  }'
+    "template_id": "dev",
+})
+workspace = resp.json()
+# Store workspace["id"] in your database, linked to the user
+print("Provisioned workspace:", workspace["id"])
 ```
 
 ```javascript JavaScript
-const response = await fetch("https://api.rigbox.dev/api/v1/quick-deploy", {
+const res = await fetch(`${BASE}/quick-deploy`, {
   method: "POST",
-  headers: {
-    "Authorization": "Bearer YOUR_API_KEY",
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    name: "user-abc-workspace",
-    template: "ai-agent-starter",
-  }),
+  headers,
+  body: JSON.stringify({ name: "user-abc-workspace", template_id: "dev" }),
 });
-
-const workspace = await response.json();
+const workspace = await res.json();
 // Store workspace.id in your database, linked to the user
 console.log("Provisioned workspace:", workspace.id);
 ```
 
-```python Python
-import requests
-
-response = requests.post(
-    "https://api.rigbox.dev/api/v1/quick-deploy",
-    headers={"Authorization": "Bearer YOUR_API_KEY"},
-    json={
-        "name": "user-abc-workspace",
-        "template": "ai-agent-starter",
-    },
-)
-
-workspace = response.json()
-# Store workspace["id"] in your database, linked to the user
-print(f"Provisioned workspace: {workspace['id']}")
+```bash cURL
+curl -X POST "$BASE/quick-deploy" \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "name": "user-abc-workspace", "template_id": "dev" }'
 ```
 
 </CodeGroup>
 
 Store the returned `workspace_id` in your database, linked to the user. This is how you will manage their workspace going forward.
 
-Available templates include:
+The built-in templates are:
 
 | Template | Use case |
 |----------|----------|
-| `ai-agent-starter` | AI agent with tool use and memory |
-| `openclaw` | Telegram bot with AI backend |
-| `web-fullstack` | React + Node.js starter |
 | `base` | Minimal workspace, no extras |
 | `dev` | Full development environment |
+| `custom-repo` | Clone and run a git repository |
+
+For app-specific stacks — bots, dashboards, scrapers — provision a `dev` workspace and install an [app recipe](/guides/catalog) (`@rigbox/<id>@builtin`) on top.
 
 <Tip>
   Start with `quick-deploy` for the simplest provisioning flow. It creates the workspace, applies the template, and starts the VM in a single API call.
@@ -102,45 +119,113 @@ Available templates include:
 
 ## Step 2: Configure AI
 
-Set up the AI configuration for the workspace. You can use Rigbox's managed credits or let users bring their own keys (BYOK).
+AI configuration is split: a workspace's **mode** (managed vs BYOK) is set per workspace at `/workspaces/{id}/mode`, while the default **provider and model** are account-level at `/users/me/ai-defaults`.
 
 ### Managed mode (recommended for getting started)
 
-Rigbox injects API keys and tracks usage against the user's credit balance:
+Rigbox injects the provider key and meters usage against the account's credit balance. Put the workspace in managed mode, then set the account default provider and model:
 
-```bash
-curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "mode": "managed",
+<CodeGroup>
+
+```python Python
+# Put the workspace in managed mode
+requests.put(f"{BASE}/workspaces/{workspace_id}/mode",
+             headers=headers, json={"mode": "managed"})
+
+# Set the account default provider and model
+requests.put(f"{BASE}/users/me/ai-defaults", headers=headers, json={
+    "default_mode": "managed",
     "default_provider": "anthropic",
-    "default_model": "claude-sonnet-4-20250514"
-  }'
+    "default_model": "claude-sonnet-4-20250514",
+})
 ```
+
+```javascript JavaScript
+// Put the workspace in managed mode
+await fetch(`${BASE}/workspaces/${workspaceId}/mode`, {
+  method: "PUT",
+  headers,
+  body: JSON.stringify({ mode: "managed" }),
+});
+
+// Set the account default provider and model
+await fetch(`${BASE}/users/me/ai-defaults`, {
+  method: "PUT",
+  headers,
+  body: JSON.stringify({
+    default_mode: "managed",
+    default_provider: "anthropic",
+    default_model: "claude-sonnet-4-20250514",
+  }),
+});
+```
+
+```bash cURL
+# Put the workspace in managed mode
+curl -X PUT "$BASE/workspaces/$WORKSPACE_ID/mode" \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" -H "Content-Type: application/json" \
+  -d '{ "mode": "managed" }'
+
+# Set the account default provider and model
+curl -X PUT "$BASE/users/me/ai-defaults" \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" -H "Content-Type: application/json" \
+  -d '{ "default_mode": "managed", "default_provider": "anthropic", "default_model": "claude-sonnet-4-20250514" }'
+```
+
+</CodeGroup>
 
 ### BYOK mode
 
-Let users provide their own API keys:
+Let users bring their own provider key. Put the workspace in BYOK mode, then supply the key as a workspace environment variable:
 
-```bash
-curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/ai-config \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "mode": "byok",
-    "provider_keys": {
-      "openai": "sk-...",
-      "anthropic": "sk-ant-..."
-    }
-  }'
+<CodeGroup>
+
+```python Python
+# Switch the workspace to BYOK
+requests.put(f"{BASE}/workspaces/{workspace_id}/mode",
+             headers=headers, json={"mode": "byok"})
+
+# Provide the provider key as a workspace env var
+requests.post(f"{BASE}/workspaces/{workspace_id}/env", headers=headers, json={
+    "env_vars": {"ANTHROPIC_API_KEY": "sk-ant-..."},
+})
 ```
 
+```javascript JavaScript
+// Switch the workspace to BYOK
+await fetch(`${BASE}/workspaces/${workspaceId}/mode`, {
+  method: "PUT",
+  headers,
+  body: JSON.stringify({ mode: "byok" }),
+});
+
+// Provide the provider key as a workspace env var
+await fetch(`${BASE}/workspaces/${workspaceId}/env`, {
+  method: "POST",
+  headers,
+  body: JSON.stringify({ env_vars: { ANTHROPIC_API_KEY: "sk-ant-..." } }),
+});
+```
+
+```bash cURL
+# Switch the workspace to BYOK
+curl -X PUT "$BASE/workspaces/$WORKSPACE_ID/mode" \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" -H "Content-Type: application/json" \
+  -d '{ "mode": "byok" }'
+
+# Provide the provider key as a workspace env var
+curl -X POST "$BASE/workspaces/$WORKSPACE_ID/env" \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" -H "Content-Type: application/json" \
+  -d '{ "env_vars": { "ANTHROPIC_API_KEY": "sk-ant-..." } }'
+```
+
+</CodeGroup>
+
 <Warning>
-  In BYOK mode, API keys are stored securely in the control plane and injected into the VM at runtime. They are never exposed to the data plane or to other users.
+  Provider keys set on the workspace are stored in the control plane and injected into the VM at runtime. They are never exposed to other users.
 </Warning>
 
-Your UI can offer a settings page where users choose between managed and BYOK, and select their preferred provider and model.
+Your UI can offer a settings page where users choose between managed and BYOK, and (for managed) select the account's preferred provider and model.
 
 ---
 
@@ -150,14 +235,27 @@ Once the workspace is running, you need to create app routes so your users' serv
 
 ### Reconcile template apps
 
-If the workspace was created from a template, reconcile to create the default app routes:
+If the workspace was created from a template, reconcile to create the default app routes. This reads the template's app definitions and creates a route for each one.
 
-```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/reconcile-apps \
-  -H "Authorization: Bearer YOUR_API_KEY"
+<CodeGroup>
+
+```python Python
+requests.post(f"{BASE}/workspaces/{workspace_id}/reconcile-apps", headers=headers)
 ```
 
-This reads the template's app definitions and creates routes for each one.
+```javascript JavaScript
+await fetch(`${BASE}/workspaces/${workspaceId}/reconcile-apps`, {
+  method: "POST",
+  headers,
+});
+```
+
+```bash cURL
+curl -X POST "$BASE/workspaces/$WORKSPACE_ID/reconcile-apps" \
+  -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+</CodeGroup>
 
 ### Create a custom app route
 
@@ -165,93 +263,108 @@ For custom services, create an app route manually:
 
 <CodeGroup>
 
-```bash cURL
-curl -X POST https://api.rigbox.dev/api/v1/apps \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
+```python Python
+resp = requests.post(f"{BASE}/apps", headers=headers, json={
     "workspace_id": "ws_abc123",
     "name": "user-api",
     "port": 3000,
-    "subdomain": "user-abc-api"
-  }'
+})
+app = resp.json()
+# App is now live at https://{name}.rigbox.dev
+print("App URL:", f"https://{app['name']}.rigbox.dev")
 ```
 
 ```javascript JavaScript
-const app = await fetch("https://api.rigbox.dev/api/v1/apps", {
+const app = await fetch(`${BASE}/apps`, {
   method: "POST",
-  headers: {
-    "Authorization": "Bearer YOUR_API_KEY",
-    "Content-Type": "application/json",
-  },
+  headers,
   body: JSON.stringify({
     workspace_id: "ws_abc123",
     name: "user-api",
     port: 3000,
-    subdomain: "user-abc-api",
   }),
 }).then((r) => r.json());
 
-// App is now live at https://user-abc-api.rigbox.dev
-console.log("App URL:", `https://${app.subdomain}.rigbox.dev`);
+// App is now live at https://{name}.rigbox.dev
+console.log("App URL:", `https://${app.name}.rigbox.dev`);
 ```
 
-```python Python
-response = requests.post(
-    "https://api.rigbox.dev/api/v1/apps",
-    headers={"Authorization": "Bearer YOUR_API_KEY"},
-    json={
-        "workspace_id": "ws_abc123",
-        "name": "user-api",
-        "port": 3000,
-        "subdomain": "user-abc-api",
-    },
-)
-
-app = response.json()
-# App is now live at https://user-abc-api.rigbox.dev
-print(f"App URL: https://{app['subdomain']}.rigbox.dev")
+```bash cURL
+curl -X POST "$BASE/apps" \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "workspace_id": "ws_abc123", "name": "user-api", "port": 3000 }'
 ```
 
 </CodeGroup>
 
-Each app gets a unique subdomain: `{subdomain}.rigbox.dev` with automatic HTTPS.
+Each app gets a unique subdomain, prefixed with the workspace name: `{workspace}-{name}.rigbox.dev`, with automatic HTTPS.
 
 ---
 
 ## Step 4: Control Access
 
-Set the visibility of each app based on your platform's requirements.
+Set the visibility of each app based on your platform's requirements with `PUT /apps/{id}/visibility`.
 
 ### Make an app public
 
 For user-facing apps that should be accessible by anyone:
 
-```bash
-curl -X PUT https://api.rigbox.dev/api/v1/apps/{app_id}/visibility \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "visibility": "public"
-  }'
+<CodeGroup>
+
+```python Python
+requests.put(f"{BASE}/apps/{app_id}/visibility", headers=headers, json={
+    "visibility": "public",
+})
 ```
+
+```javascript JavaScript
+await fetch(`${BASE}/apps/${appId}/visibility`, {
+  method: "PUT",
+  headers,
+  body: JSON.stringify({ visibility: "public" }),
+});
+```
+
+```bash cURL
+curl -X PUT "$BASE/apps/$APP_ID/visibility" \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" -H "Content-Type: application/json" \
+  -d '{ "visibility": "public" }'
+```
+
+</CodeGroup>
 
 ### Restrict to specific users
 
 For team or internal apps, use privileged mode with an allowlist:
 
-```bash
-curl -X PUT https://api.rigbox.dev/api/v1/apps/{app_id}/visibility \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
+<CodeGroup>
+
+```python Python
+requests.put(f"{BASE}/apps/{app_id}/visibility", headers=headers, json={
     "visibility": "privileged",
-    "allowed_emails": [
-      "alice@example.com",
-      "bob@example.com"
-    ]
-  }'
+    "allowed_emails": ["alice@example.com", "bob@example.com"],
+})
 ```
+
+```javascript JavaScript
+await fetch(`${BASE}/apps/${appId}/visibility`, {
+  method: "PUT",
+  headers,
+  body: JSON.stringify({
+    visibility: "privileged",
+    allowed_emails: ["alice@example.com", "bob@example.com"],
+  }),
+});
+```
+
+```bash cURL
+curl -X PUT "$BASE/apps/$APP_ID/visibility" \
+  -H "Authorization: Bearer $RIGBOX_API_KEY" -H "Content-Type: application/json" \
+  -d '{ "visibility": "privileged", "allowed_emails": ["alice@example.com", "bob@example.com"] }'
+```
+
+</CodeGroup>
 
 | Visibility | Access |
 |-----------|--------|
@@ -263,68 +376,113 @@ curl -X PUT https://api.rigbox.dev/api/v1/apps/{app_id}/visibility \
 
 ## Step 5: Monitor Health
 
-Check app health before showing a "live" status indicator in your UI.
+Check app health before showing a "live" status indicator in your UI, and read workspace metrics for resource dashboards.
 
-```bash
+<CodeGroup>
+
+```python Python
 # App-level health check
-curl https://api.rigbox.dev/api/v1/apps/{app_id}/health \
-  -H "Authorization: Bearer YOUR_API_KEY"
+health = requests.get(f"{BASE}/apps/{app_id}/health", headers=headers).json()
 
 # Workspace-level metrics (CPU, memory, disk)
-curl https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/metrics \
-  -H "Authorization: Bearer YOUR_API_KEY"
+metrics = requests.get(f"{BASE}/workspaces/{workspace_id}/metrics", headers=headers).json()
 ```
 
-The health endpoint returns a `status` field (`healthy`, `degraded`, or `down`) that you can map to a status badge in your UI. The metrics endpoint returns CPU, memory, and disk usage for resource dashboards.
+```javascript JavaScript
+// App-level health check
+const health = await fetch(`${BASE}/apps/${appId}/health`, { headers }).then((r) => r.json());
+
+// Workspace-level metrics (CPU, memory, disk)
+const metrics = await fetch(`${BASE}/workspaces/${workspaceId}/metrics`, { headers }).then((r) => r.json());
+```
+
+```bash cURL
+# App-level health check
+curl "$BASE/apps/$APP_ID/health" -H "Authorization: Bearer $RIGBOX_API_KEY"
+
+# Workspace-level metrics (CPU, memory, disk)
+curl "$BASE/workspaces/$WORKSPACE_ID/metrics" -H "Authorization: Bearer $RIGBOX_API_KEY"
+```
+
+</CodeGroup>
+
+The health endpoint returns a status you can map to a badge in your UI; the metrics endpoint returns CPU, memory, and disk usage for resource dashboards.
 
 ---
 
 ## Step 6: Show Credits and Usage
 
-Display credit balance and AI usage in your dashboard.
-
 Three endpoints give you everything you need for a usage dashboard:
 
-```bash
+<CodeGroup>
+
+```python Python
+credits = requests.get(f"{BASE}/users/me/credits", headers=headers).json()
+usage = requests.get(f"{BASE}/users/me/ai-usage", headers=headers).json()
+limits = requests.get(f"{BASE}/users/me/limits", headers=headers).json()
+```
+
+```javascript JavaScript
+const credits = await fetch(`${BASE}/users/me/credits`, { headers }).then((r) => r.json());
+const usage = await fetch(`${BASE}/users/me/ai-usage`, { headers }).then((r) => r.json());
+const limits = await fetch(`${BASE}/users/me/limits`, { headers }).then((r) => r.json());
+```
+
+```bash cURL
 # Credit balance
-curl https://api.rigbox.dev/api/v1/users/me/credits \
-  -H "Authorization: Bearer YOUR_API_KEY"
+curl "$BASE/users/me/credits" -H "Authorization: Bearer $RIGBOX_API_KEY"
 
 # AI usage history
-curl https://api.rigbox.dev/api/v1/users/me/ai-usage \
-  -H "Authorization: Bearer YOUR_API_KEY"
+curl "$BASE/users/me/ai-usage" -H "Authorization: Bearer $RIGBOX_API_KEY"
 
 # Plan limits (max workspaces, memory, monthly credits)
-curl https://api.rigbox.dev/api/v1/users/me/limits \
-  -H "Authorization: Bearer YOUR_API_KEY"
+curl "$BASE/users/me/limits" -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
+
+</CodeGroup>
 
 ---
 
 ## Step 7: Lifecycle Management
 
-Let users control their workspace instances through your UI.
+Let users start, stop, and delete their workspace instances through your UI.
 
-### Start a workspace
+<CodeGroup>
 
-```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/start \
-  -H "Authorization: Bearer YOUR_API_KEY"
+```python Python
+# Start
+requests.post(f"{BASE}/workspaces/{workspace_id}/start", headers=headers)
+
+# Stop
+requests.post(f"{BASE}/workspaces/{workspace_id}/stop", headers=headers)
+
+# Delete (permanent)
+requests.delete(f"{BASE}/workspaces/{workspace_id}", headers=headers)
 ```
 
-### Stop a workspace
+```javascript JavaScript
+// Start
+await fetch(`${BASE}/workspaces/${workspaceId}/start`, { method: "POST", headers });
 
-```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces/{workspace_id}/stop \
-  -H "Authorization: Bearer YOUR_API_KEY"
+// Stop
+await fetch(`${BASE}/workspaces/${workspaceId}/stop`, { method: "POST", headers });
+
+// Delete (permanent)
+await fetch(`${BASE}/workspaces/${workspaceId}`, { method: "DELETE", headers });
 ```
 
-### Delete a workspace
+```bash cURL
+# Start
+curl -X POST "$BASE/workspaces/$WORKSPACE_ID/start" -H "Authorization: Bearer $RIGBOX_API_KEY"
 
-```bash
-curl -X DELETE https://api.rigbox.dev/api/v1/workspaces/{workspace_id} \
-  -H "Authorization: Bearer YOUR_API_KEY"
+# Stop
+curl -X POST "$BASE/workspaces/$WORKSPACE_ID/stop" -H "Authorization: Bearer $RIGBOX_API_KEY"
+
+# Delete (permanent)
+curl -X DELETE "$BASE/workspaces/$WORKSPACE_ID" -H "Authorization: Bearer $RIGBOX_API_KEY"
 ```
+
+</CodeGroup>
 
 <Warning>
   Workspace deletion is permanent and cannot be undone. Show a confirmation dialog in your UI before calling this endpoint.
@@ -338,7 +496,7 @@ curl -X DELETE https://api.rigbox.dev/api/v1/workspaces/{workspace_id} \
 
 [Clawd](https://clawd.rigbox.dev) is an AI bot hosting platform built on Rigbox. Here is what makes it unique:
 
-- **Template**: Uses `openclaw` for Telegram bot deployment
+- **Bot runtime**: Runs the OpenClaw bot gateway (installed as an app recipe) for Telegram bot deployment
 - **Billing**: Integrates Stripe for credit pack sales (billing is handled outside the Rigbox API)
 - **Dashboard**: Shows real-time metrics and AI credit balance
 - **AI config**: Lets users pick their provider and model through a settings UI
@@ -365,7 +523,7 @@ See the full API integration at [Sandbox API Surface](/sandbox-api-surface).
 ## Next Steps
 
 - [SSH Access](/guides/ssh-access) - Connect to workspaces over SSH
-- [The Rigbox CLI](/guides/cli) - Manage workspaces from the terminal
+- [The Rigbox CLI](/cli-reference/cli) - Manage workspaces from the terminal
 - [Workspaces API](/api-reference/workspaces/list) - Full workspace API reference
 - [Apps API](/api-reference/apps/list) - Full apps API reference
 - [AI & Credits API](/api-reference/ai/get-credits) - Credits, usage, and limits

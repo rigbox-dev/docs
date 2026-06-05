@@ -19,19 +19,18 @@ Every Rigbox account has limits on workspaces, resources, and AI credits based o
 | **SSH keys** | 5 | 20 |
 
 <Note>
-These are representative limits. Check your actual limits with the API - they may differ based on promotions or custom arrangements.
+These are representative limits. Check your actual limits with the CLI - they may differ based on promotions or custom arrangements.
 </Note>
 
 ## Check your limits
 
-Query your current plan limits and usage:
+Show your current plan limits and usage:
 
 ```bash
-curl https://api.rigbox.dev/api/v1/users/me/limits \
-  -H "Authorization: Bearer YOUR_API_KEY"
+rig limits
 ```
 
-The response includes both the maximum allowed and current usage for each resource type.
+The output includes both the maximum allowed and current usage for each resource type.
 
 See [Get User Limits](/api-reference/ai/get-limits) for the full response schema.
 
@@ -40,29 +39,22 @@ See [Get User Limits](/api-reference/ai/get-limits) for the full response schema
 When creating a workspace, you specify RAM, vCPU, and disk allocation. These are validated against your plan limits:
 
 ```bash
-curl -X POST https://api.rigbox.dev/api/v1/workspaces \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "<WORKSPACE_NAME>",
-    "image": "dev",
-    "ram_mb": 2048,
-    "vcpu_count": 2,
-    "disk_size_mb": 4096
-  }'
+rig workspace spawn \
+  --name <WORKSPACE_NAME> \
+  --template dev \
+  --ram 2048 \
+  --vcpu 2 \
+  --disk 4096
 ```
 
-If the request exceeds your limits, the API returns `402 Payment Required` with a message indicating which limit was exceeded.
+If the request exceeds your limits, the command fails with a `402 Payment Required` error indicating which limit was exceeded.
 
 ### Resizing
 
 You can resize a workspace after creation. The workspace must be stopped first:
 
 ```bash
-curl -X PUT https://api.rigbox.dev/api/v1/workspaces/{id}/resources \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"ram_mb": 4096, "vcpu_count": 4}'
+rig workspace resize --workspace <WORKSPACE_ID> --ram 4096 --vcpu 4
 ```
 
 See [Update Workspace Resources](/api-reference/workspaces/update-resources) for details.
@@ -74,8 +66,7 @@ AI credits fund requests through the [managed AI proxy](/guides/managed-proxy). 
 ### Check your balance
 
 ```bash
-curl https://api.rigbox.dev/api/v1/users/me/credits \
-  -H "Authorization: Bearer YOUR_API_KEY"
+rig api GET /v1/users/me/credits
 ```
 
 ```json
@@ -89,15 +80,14 @@ curl https://api.rigbox.dev/api/v1/users/me/credits \
 ### View usage breakdown
 
 ```bash
-curl https://api.rigbox.dev/api/v1/users/me/ai-usage \
-  -H "Authorization: Bearer YOUR_API_KEY"
+rig ai usage
 ```
 
-Returns daily usage broken down by workspace, provider, and model.
+Shows daily usage broken down by workspace, provider, and model.
 
 ### When credits run out
 
-- API requests through the proxy return `402`
+- AI requests through the proxy return `402`
 - Non-AI services in your workspace continue running
 - Switch to [BYOK mode](/guides/byok) for unlimited usage with your own keys
 
@@ -133,7 +123,7 @@ def api_call(url, headers, max_retries=3):
 Before creating a workspace, check if the platform has capacity:
 
 ```bash
-curl https://api.rigbox.dev/api/v1/capacity
+rig capacity
 ```
 
 ```json
@@ -143,8 +133,6 @@ curl https://api.rigbox.dev/api/v1/capacity
   "used": 12
 }
 ```
-
-This endpoint is public - no authentication required.
 
 Rigbox also tracks per-node runtime capacity internally, including bridge IP leases for running VMs. Each compute node has 253 active VM bridge IPs available (`172.16.0.2` through `172.16.0.254`), and stopped or deleted workspaces release their active IP lease.
 

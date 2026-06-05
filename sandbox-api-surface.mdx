@@ -33,7 +33,7 @@ Use this guide as an API map when building your own sandbox-like experience.
 | Endpoint | Used for |
 | --- | --- |
 | `GET /apps` | List apps in a workspace (filtered by `workspace_id`) |
-| `PATCH /apps/{id}` | Toggle app visibility (public/private) |
+| `PUT /apps/{id}/visibility` | Toggle app visibility (public/private) |
 | `GET /apps/{id}/health` | Check if an app is reachable |
 | `POST /workspaces/{id}/reconcile-apps` | Ensure template apps exist after deploy |
 
@@ -72,7 +72,7 @@ The Sandbox UI authenticates via session tokens automatically. For programmatic 
 4. Call `POST /workspaces/{id}/reconcile-apps` to ensure apps are created.
 5. List apps with `GET /apps?workspace_id={id}`.
 6. Stream logs with `GET /apps/{id}/logs/stream` for real-time output.
-7. Toggle visibility with `PATCH /apps/{id}` to expose apps publicly.
+7. Toggle visibility with `PUT /apps/{id}/visibility` to expose apps publicly.
 
 ## Key Differences from Clawd
 
@@ -82,6 +82,6 @@ The Sandbox UI authenticates via session tokens automatically. For programmatic 
 | AI config management | Available but optional | Core feature (managed/BYOK) |
 | Terminal access | Built-in xterm.js terminal | Not included |
 | App log streaming | SSE-based live logs | SSE-based live logs |
-| Template focus | General-purpose | OpenClaw-specific |
+| Workload focus | General-purpose | OpenClaw-specific |
 
 For the Clawd-specific API surface, see [/clawd-api-surface](/clawd-api-surface).

@@ -33,140 +33,59 @@ CORS preflight requests (`OPTIONS` method) are always allowed through regardless
 
 ## Setting Visibility
 
-Use the visibility endpoint to change an app's access mode.
+Use `rig app share` to change an app's access mode. Pick exactly one mode per call: `--public`, `--private`, or `--emails`.
 
 ### Make an App Public
 
-<CodeGroup>
-```bash cURL
-curl -X PUT https://api.rigbox.dev/api/v1/apps/$APP_ID/visibility \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "visibility": "public"
-  }'
+```bash
+rig app share --app $APP --public
 ```
 
-```python Python
-import requests
-
-response = requests.put(
-    f"https://api.rigbox.dev/api/v1/apps/{app_id}/visibility",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={"visibility": "public"},
-)
-print(f"Visibility set to: {response.json()['visibility']}")
-```
-</CodeGroup>
+The `--app` value can be an app id, name, or subdomain.
 
 See [Update Visibility](/api-reference/apps/update-visibility) for the full request/response schema.
 
 ### Make an App Private
 
-<CodeGroup>
-```bash cURL
-curl -X PUT https://api.rigbox.dev/api/v1/apps/$APP_ID/visibility \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "visibility": "private"
-  }'
+```bash
+rig app share --app $APP --private
 ```
-
-```python Python
-response = requests.put(
-    f"https://api.rigbox.dev/api/v1/apps/{app_id}/visibility",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={"visibility": "private"},
-)
-```
-</CodeGroup>
 
 ### Share with Specific People (Privileged)
 
-Privileged mode lets you grant access to specific email addresses. This is useful for sharing a staging environment with teammates or showing a client preview.
+Privileged mode lets you grant access to specific email addresses. This is useful for sharing a staging environment with teammates or showing a client preview. Passing `--emails` implies allowlist (privileged) visibility.
 
-<CodeGroup>
-```bash cURL
-curl -X PUT https://api.rigbox.dev/api/v1/apps/$APP_ID/visibility \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "visibility": "privileged",
-    "allowed_emails": [
-      "alice@example.com",
-      "bob@example.com"
-    ]
-  }'
+```bash
+rig app share --app $APP --emails alice@example.com,bob@example.com
 ```
-
-```python Python
-response = requests.put(
-    f"https://api.rigbox.dev/api/v1/apps/{app_id}/visibility",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={
-        "visibility": "privileged",
-        "allowed_emails": [
-            "alice@example.com",
-            "bob@example.com",
-        ],
-    },
-)
-app = response.json()
-print(f"Visibility: {app['visibility']}")
-print(f"Allowed: {app['allowed_emails']}")
-```
-</CodeGroup>
 
 <Warning>
-The `allowed_emails` field is only used when visibility is set to `privileged`. If you set visibility to `public` or `private`, the `allowed_emails` field is ignored.
+The `--emails` allowlist only applies in privileged mode. Switching the app to `--public` or `--private` clears it.
 </Warning>
 
 ## Updating the Allowed Emails List
 
-To add or remove people from the privileged access list, send a new PUT request with the complete list. The list is replaced entirely - it's not additive.
+To add or remove people from the privileged access list, run `rig app share --emails` again with the complete list. The list is replaced entirely - it's not additive.
 
-```python
+```bash
 # Add carol to the existing list
-response = requests.put(
-    f"https://api.rigbox.dev/api/v1/apps/{app_id}/visibility",
-    headers={"Authorization": f"Bearer {api_key}"},
-    json={
-        "visibility": "privileged",
-        "allowed_emails": [
-            "alice@example.com",
-            "bob@example.com",
-            "carol@example.com",  # newly added
-        ],
-    },
-)
+rig app share --app $APP \
+  --emails alice@example.com,bob@example.com,carol@example.com
 ```
 
 <Note>
-To remove someone, send the list without their email. There is no separate "remove" endpoint - you always send the full list.
+To remove someone, run the command again without their email. There is no separate "remove" command - you always send the full list.
 </Note>
 
 ## Checking Current Visibility
 
 Retrieve the app details to see its current visibility mode and allowed emails.
 
-<CodeGroup>
-```bash cURL
-curl -s https://api.rigbox.dev/api/v1/apps/$APP_ID \
-  -H "Authorization: Bearer $RIGBOX_API_KEY" | jq '{visibility, allowed_emails}'
+```bash
+rig app ls --query "[].{name: name, visibility: visibility, allowed_emails: allowed_emails}"
 ```
 
-```python Python
-response = requests.get(
-    f"https://api.rigbox.dev/api/v1/apps/{app_id}",
-    headers={"Authorization": f"Bearer {api_key}"},
-)
-app = response.json()
-print(f"Visibility: {app['visibility']}")
-if app.get("allowed_emails"):
-    print(f"Allowed emails: {', '.join(app['allowed_emails'])}")
-```
-</CodeGroup>
+`rig app ls` lists your apps with their current visibility; use `--query` to narrow the output to the fields you care about.
 
 See [Get App](/api-reference/apps/get) for the full response schema.
 
@@ -178,23 +97,12 @@ This walkthrough shows a typical flow - develop privately, test with teammates, 
 
 Create and expose your app. It starts as private by default.
 
-```python
-import requests
-
-API_URL = "https://api.rigbox.dev/api/v1"
-HEADERS = {"Authorization": f"Bearer {api_key}"}
-
+```bash
 # Expose port 3000 (private by default)
-app = requests.post(
-    f"{API_URL}/workspaces/{workspace_id}/expose-port",
-    headers=HEADERS,
-    json={"port": 3000},
-).json()
-
-app_id = app["id"]
-app_url = f"https://{app['name']}.rigbox.dev"
-print(f"Private app at: {app_url}")
+rig app expose-port --workspace $WORKSPACE --port 3000 --wrap
 ```
+
+The app is now reachable at `https://<APP_NAME>.rigbox.dev`, but only to you.
 
 ### Test and iterate
 
@@ -204,45 +112,25 @@ While the app is private, only you can access it. Make changes, test, and refine
 
 Once you're ready for feedback, switch to privileged mode.
 
-```python
-requests.put(
-    f"{API_URL}/apps/{app_id}/visibility",
-    headers=HEADERS,
-    json={
-        "visibility": "privileged",
-        "allowed_emails": [
-            "teammate@company.com",
-            "reviewer@company.com",
-        ],
-    },
-)
-print(f"Shared with team at: {app_url}")
+```bash
+rig app share --app $APP \
+  --emails teammate@company.com,reviewer@company.com
 ```
 
 ### Go public
 
 After the team approves, make it available to everyone.
 
-```python
-requests.put(
-    f"{API_URL}/apps/{app_id}/visibility",
-    headers=HEADERS,
-    json={"visibility": "public"},
-)
-print(f"Public at: {app_url}")
+```bash
+rig app share --app $APP --public
 ```
 
 ### Lock it back down if needed
 
 You can revert to private at any time.
 
-```python
-requests.put(
-    f"{API_URL}/apps/{app_id}/visibility",
-    headers=HEADERS,
-    json={"visibility": "private"},
-)
-print("App is private again")
+```bash
+rig app share --app $APP --private
 ```
 
 
