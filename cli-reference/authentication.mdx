@@ -64,6 +64,26 @@ rig api POST /v1/snapshots --body snapshot.json
 
 If you authenticate through the dashboard login flow, you receive a short-lived JWT. The dashboard handles refresh automatically — for terminal use, prefer `rig login` (which manages the token for you) or an API key for non-interactive clients.
 
+## CLI session approval (`rig login`)
+
+When you run `rig login` on your local machine, the CLI walks you through a browser-approval device flow rather than asking for credentials at the prompt. The flow uses three endpoints:
+
+| Caller | Endpoint | Purpose |
+| --- | --- | --- |
+| CLI | `POST /api/v1/auth/cli-session` | Open a pending session with a one-time `code` |
+| CLI | `GET /api/v1/auth/cli-session/{code}` | Poll until the browser approves; the approved response carries the API key |
+| Dashboard | `POST /api/v1/auth/cli-session/{code}/approve` | Approve the pending session (requires a fresh dashboard JWT) |
+
+The approval step **rotates a single canonical `"CLI login"` API key**: any prior CLI-login key on your account is revoked before a fresh one is issued. The new key is returned to the polling CLI and written to `~/.rigbox/config.json`. This matches what `gcloud auth login`, `aws sso login`, and `kubectl auth login` do — a fresh login means a fresh credential, and the previous credential is invalidated on every other machine that was using it.
+
+<Note>
+  If you want a long-lived key that survives re-logging in (e.g. for a CI runner or a second laptop), create it explicitly under **Settings → API Keys** instead of relying on the `rig login` slot.
+</Note>
+
+<Warning>
+  Approval requires a valid dashboard session in the browser tab. If the dashboard's Clerk JWT has expired you may see a sign-in prompt or a 401 from `/approve` — refresh the dashboard tab and re-approve.
+</Warning>
+
 ## Dashboard session tokens
 
 The Rigbox frontends (`rigbox.dev`, `clawd.rigbox.dev`, `sandbox.rigbox.dev`) handle authentication automatically. Session tokens are managed by the dashboard - no extra setup needed for first-party UIs.

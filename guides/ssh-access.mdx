@@ -91,19 +91,18 @@ The SSH server identifies you by your registered key and routes the connection d
   The SSH command is shown in the dashboard when you create a workspace. You can also construct it from the workspace name, ID (strip the `ws-` prefix), and region.
 </Tip>
 
-### Region-direct vs gateway routing
+### Connecting to the right region
 
-There are two ways to connect:
+Each workspace runs on a compute node in a specific region (today: `eu-west-1`), and you connect to that region's hostname directly:
 
-| Method | Example | Latency |
-| --- | --- | --- |
-| **Region-direct** | `ssh user@eu-west-1.rigbox.dev` | Lowest - connects directly to the compute node in your workspace's region |
-| **Gateway** | `ssh user@rigbox.dev` | Higher - routes through the central gateway, which forwards to the correct region |
+```bash
+ssh my-project-ctbxi8lb@eu-west-1.rigbox.dev
+```
 
-Use the region-specific hostname (e.g., `eu-west-1.rigbox.dev`) for the best experience. The gateway hostname (`rigbox.dev`) works from anywhere but adds latency proportional to the distance between the gateway and your workspace's region.
+The dashboard always shows the correct region in the SSH command it generates, and `rig ssh-info <workspace>` from the CLI prints the same target. As Rigbox expands to more regions, the hostname will change accordingly — there is no central `rigbox.dev:22` gateway to fall back on.
 
 <Note>
-  The region is part of the SSH command shown in the dashboard. As Rigbox expands to more regions, your workspace will always include the correct region hostname.
+  Older `ssh <name>+rig@rigbox.dev` instructions referred to a gateway router that is no longer deployed. If a third-party guide or older script still uses that format, replace it with the region-direct hostname.
 </Note>
 
 ### Specify an identity file
