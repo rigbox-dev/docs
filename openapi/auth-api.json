@@ -603,6 +603,7 @@
           "App Catalog"
         ],
         "summary": "List all available catalog apps.",
+        "description": "List all available catalog apps that can be installed into a workspace.",
         "operationId": "list_catalog",
         "responses": {
           "200": {
@@ -624,6 +625,7 @@
           "Apps"
         ],
         "summary": "List apps for the authenticated user (or scoped to a workspace via\n`?workspace_id=`). Cursor-paginated under the shared `Page<T>` envelope.",
+        "description": "List the user's apps, cursor-paginated and optionally scoped to one workspace.",
         "operationId": "list_apps",
         "parameters": [
           {
@@ -679,6 +681,7 @@
           "Apps"
         ],
         "summary": "Create a new app.",
+        "description": "Create a new app in a workspace with a unique name and subdomain.",
         "operationId": "create_app",
         "requestBody": {
           "content": {
@@ -745,6 +748,7 @@
           "Apps"
         ],
         "summary": "Get an app by ID.",
+        "description": "Retrieve the full details of a single app by its ID.",
         "operationId": "get_app",
         "parameters": [
           {
@@ -790,6 +794,7 @@
           "Apps"
         ],
         "summary": "Delete an app.",
+        "description": "Delete an app; managed apps require the force query parameter.",
         "operationId": "delete_app",
         "parameters": [
           {
@@ -845,6 +850,7 @@
           "Apps"
         ],
         "summary": "Update an app.",
+        "description": "Update an app's settings, or perform a blue-green subdomain swap.",
         "operationId": "update_app",
         "parameters": [
           {
@@ -912,6 +918,7 @@
           "Apps"
         ],
         "summary": "Replace this app's env vars and propagate them to the running VM's\ncanonical env sink.",
+        "description": "Replace the app's environment variables and propagate them to the running VM.",
         "operationId": "update_app_env",
         "parameters": [
           {
@@ -959,7 +966,7 @@
           "Apps"
         ],
         "summary": "Check if an app's URL is live by verifying actual content is served,\nand probe the underlying service and port status.",
-        "description": "Returns `live` (HTTP reachable), `service_status` (service state),\nand `port_open` (whether the port is bound).",
+        "description": "Probe whether the app's URL is live and its service and port are up.",
         "operationId": "check_app_health",
         "parameters": [
           {
@@ -997,6 +1004,7 @@
           "Logs"
         ],
         "summary": "List log sources for an app.",
+        "description": "List the configured log sources for an app.",
         "operationId": "list_app_log_sources",
         "parameters": [
           {
@@ -1032,6 +1040,7 @@
           "Logs"
         ],
         "summary": "Create a log source for an app.",
+        "description": "Create a new log source for an app.",
         "operationId": "create_app_log_source",
         "parameters": [
           {
@@ -1079,6 +1088,7 @@
           "Logs"
         ],
         "summary": "Delete a log source.",
+        "description": "Delete a configured log source from an app by its ID.",
         "operationId": "delete_app_log_source",
         "parameters": [
           {
@@ -1123,6 +1133,7 @@
           "Logs"
         ],
         "summary": "Update a log source.",
+        "description": "Update an existing log source for an app.",
         "operationId": "update_app_log_source",
         "parameters": [
           {
@@ -1179,6 +1190,7 @@
           "Logs"
         ],
         "summary": "Fetch logs for an app.",
+        "description": "Fetch a paginated batch of recent log lines for an app.",
         "operationId": "get_app_logs",
         "parameters": [
           {
@@ -1216,6 +1228,7 @@
           "Logs"
         ],
         "summary": "Stream app logs via Server-Sent Events.",
+        "description": "Stream an app's logs in real time over Server-Sent Events.",
         "operationId": "stream_app_logs",
         "parameters": [
           {
@@ -1246,6 +1259,7 @@
           "Apps"
         ],
         "summary": "Get app time-series metrics.",
+        "description": "Return time-series traffic, latency, and error metrics for an app.",
         "operationId": "get_app_metrics",
         "parameters": [
           {
@@ -1312,6 +1326,7 @@
           "Apps"
         ],
         "summary": "Get app summary metrics.",
+        "description": "Return aggregated summary metrics for an app over the requested range.",
         "operationId": "get_app_metrics_summary",
         "parameters": [
           {
@@ -1378,6 +1393,7 @@
           "Apps"
         ],
         "summary": "Get configurable parameters for an app.",
+        "description": "Get the configurable parameter specs and current values for an app.",
         "operationId": "get_app_params",
         "parameters": [
           {
@@ -1413,6 +1429,7 @@
           "Apps"
         ],
         "summary": "Update configurable parameters for an app.",
+        "description": "Update an app's configurable parameter values and apply them to the app.",
         "operationId": "update_app_params",
         "parameters": [
           {
@@ -1460,6 +1477,7 @@
           "Apps"
         ],
         "summary": "Restart an app's service.",
+        "description": "Restart the app's background service inside its workspace VM.",
         "operationId": "restart_app_service",
         "parameters": [
           {
@@ -1497,6 +1515,7 @@
           "Apps"
         ],
         "summary": "Start an app's service.",
+        "description": "Start the app's background service inside its workspace VM.",
         "operationId": "start_app_service",
         "parameters": [
           {
@@ -1534,6 +1553,7 @@
           "Apps"
         ],
         "summary": "Stop an app's service.",
+        "description": "Stop the app's background service inside its workspace VM.",
         "operationId": "stop_app_service",
         "parameters": [
           {
@@ -1591,6 +1611,7 @@
           "Apps"
         ],
         "summary": "Update app visibility.",
+        "description": "Set an app's visibility and allowed emails, then resync its routes.",
         "operationId": "update_app_visibility",
         "parameters": [
           {
@@ -1638,6 +1659,7 @@
           "Auth"
         ],
         "summary": "Create a pending CLI session. Called by the CLI before opening the browser.",
+        "description": "Open a CLI login session and return a one-time approval code.",
         "operationId": "create_session",
         "requestBody": {
           "content": {
@@ -1669,6 +1691,7 @@
           "Auth"
         ],
         "summary": "Poll a CLI session. Called by the CLI while waiting for browser approval.",
+        "description": "Poll a CLI login session for browser approval and its issued API key.",
         "operationId": "poll_session",
         "parameters": [
           {
@@ -1701,7 +1724,7 @@
           "Auth"
         ],
         "summary": "Approve a CLI session. Called by the web app after the user logs in.",
-        "description": "Rotates the canonical `\"CLI login\"` API key: any prior row is\ndeleted (logs the user out on any other machine using that key),\nthen a fresh key is minted and handed to the polling CLI. The\nrotation matches what other cloud CLIs (`gcloud auth login`,\n`aws sso login`, `kubectl auth login`) do \u2014 a fresh `login` is a\nfresh credential, and old credentials are invalidated.\n\nUsers who want a separate, named key per machine can still create\nthem manually via `POST /v1/api-keys`; this endpoint only manages\nthe canonical CLI-login slot.",
+        "description": "Approve a CLI login session from the browser and mint its API key.",
         "operationId": "approve_session",
         "parameters": [
           {
@@ -1739,6 +1762,7 @@
           "App Catalog"
         ],
         "summary": "Cursor-paginated list of exact deployable catalog refs for the current\nuser. Same offset-under-opaque-cursor approach as `list_recipes`.",
+        "description": "List paginated deployable catalog refs available to the current user.",
         "operationId": "list_versioned_catalog",
         "parameters": [
           {
@@ -1787,6 +1811,7 @@
           "App Catalog"
         ],
         "summary": "Get one exact deployable catalog ref for the current user.",
+        "description": "Get full details for one exact deployable catalog ref.",
         "operationId": "get_versioned_catalog_detail",
         "parameters": [
           {
@@ -1824,6 +1849,7 @@
           "Community"
         ],
         "summary": "List all published v1 app recipes (latest version of each).",
+        "description": "List all visible community app recipes, latest version of each.",
         "operationId": "list_app_recipes",
         "responses": {
           "200": {
@@ -1856,6 +1882,7 @@
           "Community"
         ],
         "summary": "Publish a v1 App Recipe version.",
+        "description": "Publish a new version of a community app recipe.",
         "operationId": "publish_app_recipe",
         "requestBody": {
           "content": {
@@ -1908,6 +1935,7 @@
           "Community"
         ],
         "summary": "Delete an entire v1 App Recipe (all versions) owned by the caller.",
+        "description": "Delete a community app recipe and all of its published versions.",
         "operationId": "delete_app_recipe_all",
         "parameters": [
           {
@@ -1972,6 +2000,7 @@
           "Community"
         ],
         "summary": "List every published version of a v1 App Recipe (newest first).",
+        "description": "List all published versions of a community app recipe, newest first.",
         "operationId": "list_app_recipe_versions",
         "parameters": [
           {
@@ -2046,6 +2075,7 @@
           "Community"
         ],
         "summary": "Set the visibility of an app recipe the caller owns.",
+        "description": "Set a community app recipe's visibility to private or community.",
         "operationId": "set_app_recipe_visibility",
         "parameters": [
           {
@@ -2122,6 +2152,7 @@
           "Community"
         ],
         "summary": "Fetch a published v1 App Recipe version.",
+        "description": "Fetch the manifest of a specific community app recipe version.",
         "operationId": "get_app_recipe",
         "parameters": [
           {
@@ -2183,6 +2214,7 @@
           "Community"
         ],
         "summary": "Delete a published v1 App Recipe version.",
+        "description": "Delete a specific version of a community app recipe.",
         "operationId": "delete_app_recipe",
         "parameters": [
           {
@@ -2258,6 +2290,7 @@
           "Community"
         ],
         "summary": "Deprecate a published v1 App Recipe version. Only the owning vendor can\nmutate it; the version stays installable but is flagged as deprecated.",
+        "description": "Mark a community app recipe version as deprecated but still installable.",
         "operationId": "deprecate_app_recipe",
         "parameters": [
           {
@@ -2333,6 +2366,7 @@
           "Community"
         ],
         "summary": "Yank a published v1 App Recipe version. Only the owning vendor can mutate\nit; the version is hidden from new installs but existing installs survive.",
+        "description": "Yank a community app recipe version, hiding it from new installs.",
         "operationId": "yank_app_recipe",
         "parameters": [
           {
@@ -2408,6 +2442,7 @@
           "Community"
         ],
         "summary": "Get the current user's community install record for an installed app.",
+        "description": "Get the caller's community install record for an installed app.",
         "operationId": "get_community_install_by_app",
         "parameters": [
           {
@@ -2445,6 +2480,7 @@
           "Community"
         ],
         "summary": "Get the current user's community profile and catalog preference.",
+        "description": "Get the caller's community profile, username, and catalog preference.",
         "operationId": "get_community_profile",
         "responses": {
           "200": {
@@ -2469,6 +2505,7 @@
           "Community"
         ],
         "summary": "Update the current user's community username or catalog preference.",
+        "description": "Update the caller's community username or catalog visibility preference.",
         "operationId": "update_community_profile",
         "requestBody": {
           "content": {
@@ -2505,6 +2542,7 @@
           "Community"
         ],
         "summary": "Get aggregate community registry health and adoption metrics.",
+        "description": "Get aggregate community registry health and adoption metrics.",
         "operationId": "get_registry_health",
         "responses": {
           "200": {
@@ -2531,7 +2569,7 @@
           "Community"
         ],
         "summary": "Promote exact community recipe versions to Verified.",
-        "description": "This endpoint is intended for the future public `rigbox-dev/registry`\nrepository CI/webhook flow. The request body is a normalized allowlist\ndelta, signed with GitHub-style `X-Hub-Signature-256`.",
+        "description": "Promote signed community recipe versions to Verified via registry webhook.",
         "operationId": "promote_verified_versions",
         "parameters": [
           {
@@ -2583,6 +2621,7 @@
           "Community"
         ],
         "summary": "List all published v1 workspace definitions (latest version of each).",
+        "description": "List all visible community workspace definitions, latest version of each.",
         "operationId": "list_workspace_definitions",
         "responses": {
           "200": {
@@ -2615,6 +2654,7 @@
           "Community"
         ],
         "summary": "Publish a v1 Workspace Definition version.",
+        "description": "Publish a new version of a community workspace definition.",
         "operationId": "publish_workspace_definition",
         "requestBody": {
           "content": {
@@ -2667,6 +2707,7 @@
           "Community"
         ],
         "summary": "Delete an entire v1 Workspace Definition (all versions) owned by the caller.",
+        "description": "Delete a community workspace definition and all of its published versions.",
         "operationId": "delete_workspace_definition_all",
         "parameters": [
           {
@@ -2731,6 +2772,7 @@
           "Community"
         ],
         "summary": "List every published version of a v1 Workspace Definition (newest first).",
+        "description": "List all published versions of a community workspace definition, newest first.",
         "operationId": "list_workspace_definition_versions",
         "parameters": [
           {
@@ -2805,6 +2847,7 @@
           "Community"
         ],
         "summary": "Set the visibility of a workspace definition the caller owns.",
+        "description": "Set a community workspace definition's visibility to private or community.",
         "operationId": "set_workspace_definition_visibility",
         "parameters": [
           {
@@ -2881,6 +2924,7 @@
           "Community"
         ],
         "summary": "Fetch a published v1 Workspace Definition version.",
+        "description": "Fetch the manifest of a specific community workspace definition version.",
         "operationId": "get_workspace_definition",
         "parameters": [
           {
@@ -2942,6 +2986,7 @@
           "Community"
         ],
         "summary": "Delete a published v1 Workspace Definition version.",
+        "description": "Delete a specific version of a community workspace definition.",
         "operationId": "delete_workspace_definition",
         "parameters": [
           {
@@ -3044,6 +3089,7 @@
           "Deploy"
         ],
         "summary": "Preview an exact Official, private owner, or allowed community deploy ref.",
+        "description": "Preview what an exact deploy ref will launch before committing to it.",
         "operationId": "preview_deploy",
         "parameters": [
           {
@@ -3080,6 +3126,7 @@
         "tags": [
           "Community"
         ],
+        "description": "Preview the deploy plan for a community workspace definition reference.",
         "operationId": "preview_workspace_definition_v1",
         "parameters": [
           {
@@ -3137,7 +3184,7 @@
           "System"
         ],
         "summary": "Get feature flags resolved for the calling user.",
-        "description": "The response is a flat `{ \"flag_name\": true/false }` map where access is\npre-resolved using the caller's email and plan. The frontend caches this\nat startup and checks keys with `isFeatureOn('flag_name')`.",
+        "description": "Get the set of feature flags enabled for the calling user.",
         "operationId": "get_feature_flags",
         "responses": {
           "200": {
@@ -3230,7 +3277,7 @@
           "Roadmap"
         ],
         "summary": "Get all roadmap vote counts.",
-        "description": "If an Authorization header is present, also returns the user's own votes.\nNo auth required - anyone can see vote counts.",
+        "description": "Get roadmap feature vote counts, plus the caller's own votes if authenticated.",
         "operationId": "get_roadmap_votes",
         "responses": {
           "200": {
@@ -3252,6 +3299,7 @@
           "Roadmap"
         ],
         "summary": "Toggle your vote on a roadmap feature.",
+        "description": "Toggle the caller's vote on a roadmap feature on or off.",
         "operationId": "toggle_roadmap_vote",
         "parameters": [
           {
@@ -3289,6 +3337,7 @@
           "Service Specs"
         ],
         "summary": "List all service specs.",
+        "description": "List all service specs belonging to the authenticated user.",
         "operationId": "list_service_specs",
         "responses": {
           "200": {
@@ -3313,6 +3362,7 @@
           "Service Specs"
         ],
         "summary": "Create a new service spec.",
+        "description": "Create a new reusable service spec on the user's account.",
         "operationId": "create_service_spec",
         "requestBody": {
           "content": {
@@ -3349,6 +3399,7 @@
           "Service Specs"
         ],
         "summary": "Get a service spec by ID.",
+        "description": "Get details for a single service spec by ID.",
         "operationId": "get_service_spec",
         "parameters": [
           {
@@ -3384,6 +3435,7 @@
           "Service Specs"
         ],
         "summary": "Update a service spec.",
+        "description": "Update an existing service spec by ID.",
         "operationId": "update_service_spec",
         "parameters": [
           {
@@ -3429,6 +3481,7 @@
           "Service Specs"
         ],
         "summary": "Delete a service spec.",
+        "description": "Delete a service spec from the user's account by ID.",
         "operationId": "delete_service_spec",
         "parameters": [
           {
@@ -3466,6 +3519,7 @@
           "Setup Scripts"
         ],
         "summary": "List all setup scripts.",
+        "description": "List all setup scripts belonging to the authenticated user.",
         "operationId": "list_setup_scripts",
         "responses": {
           "200": {
@@ -3490,6 +3544,7 @@
           "Setup Scripts"
         ],
         "summary": "Create a new setup script.",
+        "description": "Create a new reusable setup script on the user's account.",
         "operationId": "create_setup_script",
         "requestBody": {
           "content": {
@@ -3526,6 +3581,7 @@
           "Setup Scripts"
         ],
         "summary": "Get a setup script by ID.",
+        "description": "Get details for a single setup script by ID.",
         "operationId": "get_setup_script",
         "parameters": [
           {
@@ -3561,6 +3617,7 @@
           "Setup Scripts"
         ],
         "summary": "Update a setup script.",
+        "description": "Update an existing setup script by ID.",
         "operationId": "update_setup_script",
         "parameters": [
           {
@@ -3606,6 +3663,7 @@
           "Setup Scripts"
         ],
         "summary": "Delete a setup script.",
+        "description": "Delete a setup script from the user's account by ID.",
         "operationId": "delete_setup_script",
         "parameters": [
           {
@@ -3643,6 +3701,7 @@
           "Snapshots"
         ],
         "summary": "Cursor-paginated list of all snapshots owned by the authenticated user\n(independent of workspace existence).",
+        "description": "List all snapshots owned by the authenticated user across workspaces.",
         "operationId": "list_user_snapshots",
         "parameters": [
           {
@@ -3691,6 +3750,7 @@
           "Snapshots"
         ],
         "summary": "Delete a snapshot by ID.",
+        "description": "Delete one of the user's snapshots by ID and its disk file.",
         "operationId": "delete_user_snapshot",
         "parameters": [
           {
@@ -3728,6 +3788,7 @@
           "Snapshots"
         ],
         "summary": "Restore a workspace from a snapshot.",
+        "description": "Restore a workspace's disk from one of the user's snapshots by ID.",
         "operationId": "restore_user_snapshot",
         "parameters": [
           {
@@ -3765,6 +3826,7 @@
           "SSH Keys"
         ],
         "summary": "List SSH keys for the authenticated user.",
+        "description": "List the SSH keys registered on the authenticated user's account.",
         "operationId": "list_ssh_keys",
         "responses": {
           "200": {
@@ -3789,6 +3851,7 @@
           "SSH Keys"
         ],
         "summary": "Add an SSH key to your account.\nThe key is automatically synced to all running workspaces.",
+        "description": "Add an SSH key to your account and sync it to running workspaces.",
         "operationId": "add_ssh_key",
         "requestBody": {
           "content": {
@@ -3825,6 +3888,7 @@
           "SSH Keys"
         ],
         "summary": "Delete an SSH key from your account.\nThe key is automatically removed from all running workspaces.",
+        "description": "Delete an SSH key and remove it from all running workspaces.",
         "operationId": "delete_ssh_key",
         "parameters": [
           {
@@ -3862,6 +3926,7 @@
           "Templates"
         ],
         "summary": "List available workspace templates.",
+        "description": "List all workspace templates available for creating new workspaces.",
         "operationId": "list_templates",
         "responses": {
           "200": {
@@ -3913,6 +3978,7 @@
           "AI"
         ],
         "summary": "Get account-level AI defaults.",
+        "description": "Get the account-level default AI mode, provider, and model.",
         "operationId": "get_user_ai_defaults",
         "responses": {
           "200": {
@@ -3937,6 +4003,7 @@
           "AI"
         ],
         "summary": "Update account-level AI defaults.",
+        "description": "Update the account-level default AI mode, provider, and model.",
         "operationId": "update_user_ai_defaults",
         "requestBody": {
           "content": {
@@ -3973,6 +4040,7 @@
           "AI"
         ],
         "summary": "Update AI mode for the authenticated user.",
+        "description": "Update the account AI mode (deprecated; use ai-defaults instead).",
         "operationId": "update_ai_mode",
         "requestBody": {
           "content": {
@@ -4009,6 +4077,7 @@
           "AI"
         ],
         "summary": "Get AI usage history and workspace breakdown.",
+        "description": "Get AI usage history and per-workspace breakdown for the account.",
         "operationId": "get_ai_usage",
         "responses": {
           "200": {
@@ -4035,6 +4104,7 @@
           "AI"
         ],
         "summary": "Get account AI usage metric series.",
+        "description": "Time series of the account's AI token and credit usage for charts.",
         "operationId": "get_account_ai_usage_metrics",
         "parameters": [
           {
@@ -4072,6 +4142,7 @@
           "AI"
         ],
         "summary": "Get account AI usage metric summary.",
+        "description": "Aggregated AI usage totals for the account over the selected time window.",
         "operationId": "get_account_ai_usage_metrics_summary",
         "parameters": [
           {
@@ -4109,6 +4180,7 @@
           "AI"
         ],
         "summary": "Get AI credit balance for the authenticated user.",
+        "description": "Get the authenticated user's current AI credit balance.",
         "operationId": "get_ai_credits",
         "responses": {
           "200": {
@@ -4135,6 +4207,7 @@
           "AI"
         ],
         "summary": "Get effective account limits and current usage.",
+        "description": "Get the account's effective plan limits alongside current resource usage.",
         "operationId": "get_user_limits",
         "responses": {
           "200": {
@@ -4161,6 +4234,7 @@
           "User Settings"
         ],
         "summary": "List available regions.",
+        "description": "List the regions available for placing new workspaces.",
         "operationId": "list_available_regions",
         "responses": {
           "200": {
@@ -4187,6 +4261,7 @@
           "User Settings"
         ],
         "summary": "Get user settings.",
+        "description": "Get the authenticated user's account preferences and defaults.",
         "operationId": "get_user_settings",
         "responses": {
           "200": {
@@ -4211,6 +4286,7 @@
           "User Settings"
         ],
         "summary": "Update user settings.",
+        "description": "Update the authenticated user's account preferences and defaults.",
         "operationId": "update_user_settings",
         "requestBody": {
           "content": {
@@ -4577,6 +4653,7 @@
           "Deploy"
         ],
         "summary": "Launch an exact Official, private owner, or allowed community deploy ref into a workspace.",
+        "description": "Launch an exact deploy ref into a workspace as a running app.",
         "operationId": "launch_deploy",
         "parameters": [
           {
@@ -4624,7 +4701,7 @@
           "Deploy"
         ],
         "summary": "Install a recipe from an inline manifest, bypassing the registry.",
-        "description": "Used by `rig app deploy --bluegreen <suffix>` for preview deploys:\nthe CLI renders the local rig.yaml to a canonical AppManifest and\nhands it directly to this endpoint, skipping the publish + lookup-\nby-ref round trip that would mint a `@user/<base>-<suffix>@<ver>`\nrow in the registry the user doesn't care about. Stable per-recipe\npublishes still go through `/deploy/launch`.",
+        "description": "Launch a deploy into a workspace from an inline rig.yaml manifest.",
         "operationId": "launch_deploy_from_manifest",
         "parameters": [
           {
@@ -4720,6 +4797,7 @@
           "Apps"
         ],
         "summary": "Detect or expose a port as a routable app.",
+        "description": "Expose a workspace port as a routable app with a public subdomain.",
         "operationId": "expose_port",
         "parameters": [
           {
@@ -4767,6 +4845,7 @@
           "App Catalog"
         ],
         "summary": "Install a catalog app into a workspace.",
+        "description": "Install a catalog app into a workspace and wait for it to come up.",
         "operationId": "install_app",
         "parameters": [
           {
@@ -4814,6 +4893,7 @@
           "App Catalog"
         ],
         "summary": "Poll the status of an async app install job.",
+        "description": "Poll the status of an asynchronous app install job.",
         "operationId": "get_job_status",
         "parameters": [
           {
@@ -4860,7 +4940,7 @@
           "Apps"
         ],
         "summary": "List ports with active listeners in a workspace.",
-        "description": "Detect which ports are listening in the workspace.\nCross-checks against existing apps to flag already-exposed ports.",
+        "description": "List ports with active listeners in the workspace, flagging already-exposed ones.",
         "operationId": "get_listening_ports",
         "parameters": [
           {
@@ -4898,6 +4978,7 @@
           "Logs"
         ],
         "summary": "Fetch structured logs from a workspace.",
+        "description": "Fetch recent structured service logs from the workspace VM.",
         "operationId": "get_workspace_logs",
         "parameters": [
           {
@@ -4935,6 +5016,7 @@
           "Logs"
         ],
         "summary": "Stream workspace logs via Server-Sent Events.",
+        "description": "Stream the workspace's service logs live via Server-Sent Events.",
         "operationId": "stream_workspace_logs",
         "parameters": [
           {
@@ -5147,6 +5229,7 @@
           "AI"
         ],
         "summary": "Get the effective AI mode for a workspace.",
+        "description": "Get the effective AI mode for the workspace and its source.",
         "operationId": "get_workspace_ai_mode",
         "parameters": [
           {
@@ -5182,7 +5265,7 @@
           "AI"
         ],
         "summary": "Set or clear the per-workspace AI mode override.",
-        "description": "When the workspace is `Running` and has an IP, the new `RIGBOX_AI_MODE`\nis hot-reloaded by re-rendering the profile.d script and pushing it via\n`VmWriter` so new shells observe the change immediately. A failed live\npush is logged but does not fail the API call \u2014 the persisted value still\napplies at next boot.",
+        "description": "Set or clear the per-workspace AI mode override, hot-reloading when running.",
         "operationId": "update_workspace_ai_mode",
         "parameters": [
           {
@@ -5230,7 +5313,7 @@
           "Apps"
         ],
         "summary": "Reconcile apps for a workspace against a template.",
-        "description": "Ensure expected template apps exist for a workspace. Template is resolved\nin order: (1) explicit `template_id` query param, (2) `RIGBOX_TEMPLATE_ID`\nfrom workspace env vars, (3) fallback to image-based lookup.",
+        "description": "Reconcile a workspace's apps against its resolved template definition.",
         "operationId": "reconcile_apps",
         "parameters": [
           {
@@ -5343,6 +5426,7 @@
           "Workspace Services"
         ],
         "summary": "List all workspace services with health status.",
+        "description": "List all services running in a workspace with their health status.",
         "operationId": "list_services",
         "parameters": [
           {
@@ -5380,6 +5464,7 @@
           "Workspace Services"
         ],
         "summary": "Get a single workspace service by name.",
+        "description": "Get details for a single workspace service identified by name.",
         "operationId": "get_service",
         "parameters": [
           {
@@ -5426,6 +5511,7 @@
           "Workspace Services"
         ],
         "summary": "Fetch logs for a specific workspace service by name.",
+        "description": "Fetch recent log lines for a named workspace service.",
         "operationId": "get_service_logs",
         "parameters": [
           {
@@ -5478,6 +5564,7 @@
           "Snapshots"
         ],
         "summary": "Cursor-paginated list of snapshots for one workspace.",
+        "description": "List the disk snapshots captured for this workspace, newest first.",
         "operationId": "list_workspace_snapshots",
         "parameters": [
           {
@@ -5533,6 +5620,7 @@
           "Snapshots"
         ],
         "summary": "Create a snapshot of a workspace.",
+        "description": "Create a snapshot of the workspace's disk for later restore.",
         "operationId": "create_workspace_snapshot",
         "parameters": [
           {
@@ -5580,6 +5668,7 @@
           "Snapshots"
         ],
         "summary": "Delete a workspace snapshot.",
+        "description": "Delete one snapshot belonging to this workspace and its disk file.",
         "operationId": "delete_workspace_snapshot",
         "parameters": [
           {
@@ -5626,6 +5715,7 @@
           "Snapshots"
         ],
         "summary": "Restore a workspace from a snapshot.",
+        "description": "Restore the workspace's disk from a snapshot; it must be stopped.",
         "operationId": "restore_workspace_snapshot",
         "parameters": [
           {
@@ -5672,7 +5762,7 @@
           "SSH Keys"
         ],
         "summary": "Cursor-paginated list of SSH keys currently in the workspace.",
-        "description": "Note: this endpoint reads `authorized_keys` from the running VM rather\nthan the database. The host always loads the full file in one round-trip,\nso pagination is purely client-side slicing on the parsed list. Wire\nshape stays uniform with the rest of the contract.",
+        "description": "List the SSH public keys currently authorized on the running workspace.",
         "operationId": "list_workspace_ssh_keys",
         "parameters": [
           {
@@ -5730,6 +5820,7 @@
           "SSH Keys"
         ],
         "summary": "Sync all account SSH keys to the workspace.",
+        "description": "Sync all of the account's SSH keys onto the running workspace.",
         "operationId": "sync_workspace_ssh_keys",
         "parameters": [
           {
@@ -5841,6 +5932,7 @@
           "Tools"
         ],
         "summary": "List available tools and their status for a workspace.",
+        "description": "List the tools available in a workspace along with their status.",
         "operationId": "list_tools",
         "parameters": [
           {
@@ -5878,7 +5970,7 @@
           "Tools"
         ],
         "summary": "Install a tool asynchronously.",
-        "description": "Returns a `job_id` for polling install progress.",
+        "description": "Dispatch installation of a tool into a workspace.",
         "operationId": "install_tool",
         "parameters": [
           {
@@ -5925,6 +6017,7 @@
           "Tools"
         ],
         "summary": "Poll the status of an async tool install job.",
+        "description": "Poll the install status of a tool in a workspace.",
         "operationId": "get_tool_install_status",
         "parameters": [
           {
@@ -5971,6 +6064,7 @@
           "Tools"
         ],
         "summary": "Launch a tool in the workspace.",
+        "description": "Launch a tool inside a workspace and return its launch result.",
         "operationId": "launch_tool",
         "parameters": [
           {
@@ -6026,6 +6120,7 @@
           "Tools"
         ],
         "summary": "Get the status of a specific tool.",
+        "description": "Get the current status of a specific tool in a workspace.",
         "operationId": "get_tool_status",
         "parameters": [
           {
@@ -6072,6 +6167,7 @@
           "Tools"
         ],
         "summary": "Stop a running tool.",
+        "description": "Stop a running tool in a workspace.",
         "operationId": "stop_tool",
         "parameters": [
           {
@@ -6118,6 +6214,7 @@
           "Volumes"
         ],
         "summary": "List a workspace's persistent volumes.",
+        "description": "List the persistent volumes attached to this workspace.",
         "operationId": "list_workspace_volumes",
         "parameters": [
           {
@@ -6153,6 +6250,7 @@
           "Volumes"
         ],
         "summary": "Create a persistent volume on a workspace.",
+        "description": "Create a persistent volume mounted into this workspace at a path.",
         "operationId": "create_workspace_volume",
         "parameters": [
           {
@@ -6200,6 +6298,7 @@
           "Volumes"
         ],
         "summary": "Delete a persistent volume from a workspace.",
+        "description": "Delete a persistent volume from this workspace; it must be stopped.",
         "operationId": "delete_workspace_volume",
         "parameters": [
           {
@@ -6239,6 +6338,7 @@
           "Volumes"
         ],
         "summary": "Resize a persistent volume on a workspace.",
+        "description": "Grow a persistent volume on this workspace; it must be stopped.",
         "operationId": "resize_workspace_volume",
         "parameters": [
           {
