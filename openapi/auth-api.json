@@ -1564,7 +1564,11 @@
     },
     "/api/v1/apps/{id}/verify-domain": {
       "post": {
-        "summary": "POST /api/v1/apps/:id/verify-domain - re-check DNS for the app's custom domain.",
+        "tags": [
+          "Apps"
+        ],
+        "summary": "Re-check DNS for an app's custom domain.",
+        "description": "Re-verify the DNS records for an app's custom domain and report status.",
         "operationId": "verify_domain",
         "responses": {
           "200": {
@@ -1613,41 +1617,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetAppResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/auth/change-password": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "operationId": "change_password",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangePasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Password changed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMessageResponse"
                 }
               }
             }
@@ -1761,319 +1730,6 @@
         ]
       }
     },
-    "/api/v1/auth/create-checkout-session": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "POST /auth/create-checkout-session - Create a Stripe Checkout session and return the URL",
-        "operationId": "create_checkout_session",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CheckoutRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Checkout URL",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UrlResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/auth/create-portal-session": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "POST /auth/create-portal-session - Create Stripe Customer Portal session",
-        "operationId": "create_portal_session",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PortalRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Portal URL",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UrlResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/auth/force-change-password": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "POST /auth/force-change-password - Used after admin resets a user's password.\nVerifies the temporary password, sets the new one, and clears the must_change_password flag.",
-        "operationId": "force_change_password",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ForceChangePasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Password changed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthResponseWithUser"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/auth/login": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "operationId": "login",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Logged in",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthResponseWithUser"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/auth/me": {
-      "get": {
-        "tags": [
-          "Auth"
-        ],
-        "operationId": "get_me",
-        "responses": {
-          "200": {
-            "description": "Current user",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetMeResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/auth/signup": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "operationId": "signup",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SignupRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Signed up",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthResponseWithUser"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/auth/stripe-webhook": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "POST /auth/stripe-webhook - Handle Stripe webhook events",
-        "operationId": "stripe_webhook",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "string"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Webhook accepted"
-          }
-        }
-      }
-    },
-    "/api/v1/auth/subscription-status": {
-      "get": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "GET /auth/subscription-status - Check current subscription status",
-        "operationId": "get_subscription_status",
-        "responses": {
-          "200": {
-            "description": "Subscription status",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionStatusResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/auth/switch-plan": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "POST /auth/switch-plan - Switch between pro_byok and pro_managed (proration)",
-        "operationId": "switch_plan",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CheckoutRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Plan switched",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SwitchPlanResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/auth/validate": {
-      "get": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "GET /auth/validate - Validate token for forward_auth",
-        "operationId": "validate_token",
-        "responses": {
-          "200": {
-            "description": "Token valid"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/api/v1/catalog": {
       "get": {
         "tags": [
@@ -2162,7 +1818,7 @@
     "/api/v1/community/app-recipes": {
       "get": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "List all published v1 app recipes (latest version of each).",
         "operationId": "list_app_recipes",
@@ -2194,7 +1850,7 @@
       },
       "post": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "Publish a v1 App Recipe version.",
         "operationId": "publish_app_recipe",
@@ -2246,7 +1902,7 @@
     "/api/v1/community/app-recipes/{vendor}/{slug}": {
       "delete": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "Delete an entire v1 App Recipe (all versions) owned by the caller.",
         "operationId": "delete_app_recipe_all",
@@ -2310,7 +1966,7 @@
     "/api/v1/community/app-recipes/{vendor}/{slug}/versions": {
       "get": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "List every published version of a v1 App Recipe (newest first).",
         "operationId": "list_app_recipe_versions",
@@ -2384,7 +2040,7 @@
     "/api/v1/community/app-recipes/{vendor}/{slug}/visibility": {
       "patch": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "Set the visibility of an app recipe the caller owns.",
         "operationId": "set_app_recipe_visibility",
@@ -2460,7 +2116,7 @@
     "/api/v1/community/app-recipes/{vendor}/{slug}/{version}": {
       "get": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "Fetch a published v1 App Recipe version.",
         "operationId": "get_app_recipe",
@@ -2521,7 +2177,7 @@
       },
       "delete": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "Delete a published v1 App Recipe version.",
         "operationId": "delete_app_recipe",
@@ -2557,6 +2213,156 @@
         "responses": {
           "200": {
             "description": "Recipe version deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the vendor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/app-recipes/{vendor}/{slug}/{version}/deprecate": {
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Deprecate a published v1 App Recipe version. Only the owning vendor can\nmutate it; the version stays installable but is flagged as deprecated.",
+        "operationId": "deprecate_app_recipe",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor (lowercase)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Recipe slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "Exact semver",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recipe version deprecated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the vendor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/community/app-recipes/{vendor}/{slug}/{version}/yank": {
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Yank a published v1 App Recipe version. Only the owning vendor can mutate\nit; the version is hidden from new installs but existing installs survive.",
+        "operationId": "yank_app_recipe",
+        "parameters": [
+          {
+            "name": "vendor",
+            "in": "path",
+            "description": "Vendor (lowercase)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Recipe slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "Exact semver",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recipe version yanked",
             "content": {
               "application/json": {
                 "schema": {
@@ -2690,191 +2496,6 @@
         ]
       }
     },
-    "/api/v1/community/recipes/{vendor}/{slug}/{version}": {
-      "delete": {
-        "tags": [
-          "Community"
-        ],
-        "summary": "Unpublish a community recipe version. Only the owning vendor can delete.\nBuilt-in recipes (`vendor=rigbox`) cannot be deleted.",
-        "operationId": "delete_recipe",
-        "parameters": [
-          {
-            "name": "vendor",
-            "in": "path",
-            "description": "Vendor username",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "in": "path",
-            "description": "Recipe slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "description": "Exact version (semver)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Recipe version deleted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Not the vendor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiErrorBody"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/community/recipes/{vendor}/{slug}/{version}/deprecate": {
-      "post": {
-        "tags": [
-          "Community"
-        ],
-        "summary": "Deprecate a community recipe version. Only the owning vendor can mutate it.",
-        "operationId": "deprecate_recipe",
-        "parameters": [
-          {
-            "name": "vendor",
-            "in": "path",
-            "description": "Vendor username",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "in": "path",
-            "description": "Recipe slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "description": "Exact version (semver)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Recipe version deprecated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommunityRecipeLifecycleResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/community/recipes/{vendor}/{slug}/{version}/yank": {
-      "post": {
-        "tags": [
-          "Community"
-        ],
-        "summary": "Yank a community recipe version. Only the owning vendor can mutate it.",
-        "operationId": "yank_recipe",
-        "parameters": [
-          {
-            "name": "vendor",
-            "in": "path",
-            "description": "Vendor username",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "in": "path",
-            "description": "Recipe slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "description": "Exact version (semver)",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Recipe version yanked",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommunityRecipeLifecycleResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/api/v1/community/registry/health": {
       "get": {
         "tags": [
@@ -2956,7 +2577,7 @@
     "/api/v1/community/workspace-definitions": {
       "get": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "List all published v1 workspace definitions (latest version of each).",
         "operationId": "list_workspace_definitions",
@@ -2988,7 +2609,7 @@
       },
       "post": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "Publish a v1 Workspace Definition version.",
         "operationId": "publish_workspace_definition",
@@ -3040,7 +2661,7 @@
     "/api/v1/community/workspace-definitions/{vendor}/{slug}": {
       "delete": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "Delete an entire v1 Workspace Definition (all versions) owned by the caller.",
         "operationId": "delete_workspace_definition_all",
@@ -3104,7 +2725,7 @@
     "/api/v1/community/workspace-definitions/{vendor}/{slug}/versions": {
       "get": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "List every published version of a v1 Workspace Definition (newest first).",
         "operationId": "list_workspace_definition_versions",
@@ -3178,7 +2799,7 @@
     "/api/v1/community/workspace-definitions/{vendor}/{slug}/visibility": {
       "patch": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "Set the visibility of a workspace definition the caller owns.",
         "operationId": "set_workspace_definition_visibility",
@@ -3254,7 +2875,7 @@
     "/api/v1/community/workspace-definitions/{vendor}/{slug}/{version}": {
       "get": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "Fetch a published v1 Workspace Definition version.",
         "operationId": "get_workspace_definition",
@@ -3315,7 +2936,7 @@
       },
       "delete": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "summary": "Delete a published v1 Workspace Definition version.",
         "operationId": "delete_workspace_definition",
@@ -3393,7 +3014,7 @@
           "Workspaces"
         ],
         "summary": "Get composite dashboard data.",
-        "description": "Fetches workspaces, apps, limits, and AI credits in parallel and returns\nthem in a single JSON response.",
+        "description": "Account dashboard summary: workspace counts, statuses, and resource totals at a glance.",
         "operationId": "get_dashboard",
         "responses": {
           "200": {
@@ -3454,7 +3075,7 @@
     "/api/v1/deploy/workspace-definitions/preview": {
       "get": {
         "tags": [
-          "Community v1"
+          "Community"
         ],
         "operationId": "preview_workspace_definition_v1",
         "parameters": [
@@ -3537,7 +3158,7 @@
     "/api/v1/metrics": {
       "post": {
         "tags": [
-          "Telemetry"
+          "CLI"
         ],
         "operationId": "ingest_metrics",
         "requestBody": {
@@ -3568,6 +3189,7 @@
         "tags": [
           "Workspaces"
         ],
+        "description": "Create and boot a workspace from a template in a single call.",
         "operationId": "quick_deploy",
         "requestBody": {
           "content": {
@@ -4254,7 +3876,7 @@
     "/api/v1/traces": {
       "post": {
         "tags": [
-          "Telemetry"
+          "CLI"
         ],
         "operationId": "ingest_traces",
         "requestBody": {
@@ -4619,6 +4241,7 @@
         "tags": [
           "Workspaces"
         ],
+        "description": "List all workspaces on your account with their status and resources.",
         "operationId": "list_vms",
         "parameters": [
           {
@@ -4664,6 +4287,7 @@
         "tags": [
           "Workspaces"
         ],
+        "description": "Provision a new workspace; it starts stopped, then boot it separately.",
         "operationId": "create_vm",
         "requestBody": {
           "content": {
@@ -4699,6 +4323,7 @@
         "tags": [
           "Workspaces"
         ],
+        "description": "Deploy a workspace from a v1 definition, provisioning its image and app recipes.",
         "operationId": "deploy_from_definition",
         "requestBody": {
           "content": {
@@ -4734,6 +4359,7 @@
         "tags": [
           "Workspaces"
         ],
+        "description": "Fetch one workspace's full state, resources, and installed apps by ID.",
         "operationId": "get_vm",
         "parameters": [
           {
@@ -4768,6 +4394,7 @@
         "tags": [
           "Workspaces"
         ],
+        "description": "Permanently delete a workspace and its VM; this cannot be undone.",
         "operationId": "delete_vm",
         "parameters": [
           {
@@ -4814,6 +4441,7 @@
           "Workspaces"
         ],
         "summary": "Get workspace AI usage metric series.",
+        "description": "Time series of the workspace's AI token and credit usage for charts.",
         "operationId": "get_workspace_ai_usage_metrics",
         "parameters": [
           {
@@ -4860,6 +4488,7 @@
           "Workspaces"
         ],
         "summary": "Get workspace AI usage metric summary.",
+        "description": "Aggregated AI usage totals for the workspace over the selected time window.",
         "operationId": "get_workspace_ai_usage_metrics_summary",
         "parameters": [
           {
@@ -4905,6 +4534,7 @@
         "tags": [
           "Workspaces"
         ],
+        "description": "Cancel a workspace that is still provisioning or starting up.",
         "operationId": "cancel_vm",
         "parameters": [
           {
@@ -5037,6 +4667,7 @@
           "Workspaces"
         ],
         "summary": "Update environment variables for a workspace.\nChanges take effect immediately if the workspace is running.",
+        "description": "Replace workspace environment variables; a running workspace picks up changes immediately.",
         "operationId": "update_workspace_env",
         "parameters": [
           {
@@ -5329,6 +4960,7 @@
           "Workspaces"
         ],
         "summary": "Get live resource metrics for a workspace.",
+        "description": "Live CPU, memory, and disk usage for the running workspace VM.",
         "operationId": "get_workspace_metrics",
         "parameters": [
           {
@@ -5376,6 +5008,7 @@
           "Workspaces"
         ],
         "summary": "Get workspace resource metric series.",
+        "description": "Time series of the workspace's CPU, memory, and disk usage.",
         "operationId": "get_workspace_metrics_series",
         "parameters": [
           {
@@ -5442,6 +5075,7 @@
           "Workspaces"
         ],
         "summary": "Get workspace resource metric summary.",
+        "description": "Aggregated resource-usage summary for the workspace over the selected time window.",
         "operationId": "get_workspace_metrics_summary",
         "parameters": [
           {
@@ -5629,6 +5263,7 @@
           "Workspaces"
         ],
         "summary": "Update workspace resources.",
+        "description": "Resize the workspace's RAM, vCPU, and disk; it must be stopped first.",
         "operationId": "update_workspace_resources",
         "parameters": [
           {
@@ -5665,6 +5300,7 @@
         "tags": [
           "Workspaces"
         ],
+        "description": "Retry provisioning for a workspace that previously failed to come up.",
         "operationId": "retry_vm",
         "parameters": [
           {
@@ -6125,6 +5761,7 @@
         "tags": [
           "Workspaces"
         ],
+        "description": "Boot the workspace VM and wait until it reports running.",
         "operationId": "start_vm",
         "parameters": [
           {
@@ -6161,6 +5798,7 @@
         "tags": [
           "Workspaces"
         ],
+        "description": "Stop the workspace VM while preserving its disk and configuration.",
         "operationId": "stop_vm",
         "parameters": [
           {
@@ -7903,116 +7541,6 @@
           }
         }
       },
-      "CommunityCatalogItem": {
-        "type": "object",
-        "required": [
-          "id",
-          "vendor_user_id",
-          "slug",
-          "created_at",
-          "updated_at"
-        ],
-        "properties": {
-          "category": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "type": "string"
-          },
-          "latest_version": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "slug": {
-            "type": "string"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "vendor_user_id": {
-            "type": "string"
-          }
-        }
-      },
-      "CommunityCatalogVersion": {
-        "type": "object",
-        "required": [
-          "id",
-          "item_id",
-          "version",
-          "manifest_yaml",
-          "manifest_json",
-          "manifest_digest",
-          "visibility",
-          "trust_tier",
-          "status",
-          "lint_results",
-          "created_at"
-        ],
-        "properties": {
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "deprecated_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "id": {
-            "type": "string"
-          },
-          "item_id": {
-            "type": "string"
-          },
-          "lint_results": {},
-          "manifest_digest": {
-            "type": "string"
-          },
-          "manifest_json": {},
-          "manifest_yaml": {
-            "type": "string"
-          },
-          "published_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "status": {
-            "type": "string"
-          },
-          "trust_tier": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          },
-          "visibility": {
-            "type": "string"
-          },
-          "yanked_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          }
-        }
-      },
       "CommunityCatalogVersionInstallStats": {
         "type": "object",
         "required": [
@@ -8116,29 +7644,6 @@
         "properties": {
           "profile": {
             "$ref": "#/components/schemas/CommunityProfile"
-          }
-        }
-      },
-      "CommunityRecipeLifecycleResponse": {
-        "type": "object",
-        "required": [
-          "deploy_ref",
-          "item",
-          "version",
-          "message"
-        ],
-        "properties": {
-          "deploy_ref": {
-            "type": "string"
-          },
-          "item": {
-            "$ref": "#/components/schemas/CommunityCatalogItem"
-          },
-          "message": {
-            "type": "string"
-          },
-          "version": {
-            "$ref": "#/components/schemas/CommunityCatalogVersion"
           }
         }
       },
@@ -13829,7 +13334,7 @@
       "name": "Workspaces"
     },
     {
-      "name": "Telemetry"
+      "name": "CLI"
     },
     {
       "name": "Auth"
@@ -13841,34 +13346,19 @@
       "name": "Access Control"
     },
     {
-      "name": "AI"
+      "name": "Apps"
     },
     {
       "name": "App Catalog"
     },
     {
-      "name": "Apps"
-    },
-    {
-      "name": "Community"
-    },
-    {
-      "name": "Community v1"
-    },
-    {
-      "name": "Deploy"
-    },
-    {
       "name": "Logs"
     },
     {
-      "name": "Roadmap"
+      "name": "AI"
     },
     {
-      "name": "Service Specs"
-    },
-    {
-      "name": "Setup Scripts"
+      "name": "Tools"
     },
     {
       "name": "Snapshots"
@@ -13877,16 +13367,28 @@
       "name": "SSH Keys"
     },
     {
-      "name": "System"
-    },
-    {
       "name": "Templates"
     },
     {
-      "name": "Tools"
+      "name": "Setup Scripts"
+    },
+    {
+      "name": "Service Specs"
+    },
+    {
+      "name": "Deploy"
+    },
+    {
+      "name": "Community"
     },
     {
       "name": "User Settings"
+    },
+    {
+      "name": "Roadmap"
+    },
+    {
+      "name": "System"
     }
   ]
 }
