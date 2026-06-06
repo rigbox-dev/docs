@@ -110,6 +110,13 @@
             ]
           },
           {
+            "group": "Workspace Services",
+            "pages": [
+              "api-reference/workspace-services/list",
+              "api-reference/workspace-services/get"
+            ]
+          },
+          {
             "group": "Apps",
             "pages": [
               "api-reference/apps/list",
@@ -132,13 +139,6 @@
             ]
           },
           {
-            "group": "Workspace Services",
-            "pages": [
-              "api-reference/workspace-services/list",
-              "api-reference/workspace-services/get"
-            ]
-          },
-          {
             "group": "App Logs",
             "pages": [
               "api-reference/app-logs/get-logs",
@@ -147,6 +147,14 @@
               "api-reference/app-logs/create-source",
               "api-reference/app-logs/update-source",
               "api-reference/app-logs/delete-source"
+            ]
+          },
+          {
+            "group": "App Catalog",
+            "pages": [
+              "api-reference/app-catalog/list",
+              "api-reference/app-catalog/install",
+              "api-reference/app-catalog/job-status"
             ]
           },
           {
@@ -223,32 +231,19 @@
             ]
           },
           {
-            "group": "App Catalog",
-            "pages": [
-              "api-reference/app-catalog/list",
-              "api-reference/app-catalog/install",
-              "api-reference/app-catalog/job-status"
-            ]
-          },
-          {
-            "group": "Roadmap",
-            "pages": [
-              "api-reference/roadmap/get-votes",
-              "api-reference/roadmap/toggle-vote"
-            ]
-          },
-          {
-            "group": "System",
-            "pages": [
-              "api-reference/system/feature-flags"
-            ]
-          },
-          {
             "group": "User Settings",
             "pages": [
               "api-reference/users/get-settings",
               "api-reference/users/update-settings",
               "api-reference/users/list-regions"
+            ]
+          },
+          {
+            "group": "API Keys",
+            "pages": [
+              "api-reference/api-keys/list",
+              "api-reference/api-keys/create",
+              "api-reference/api-keys/delete"
             ]
           },
           {
@@ -269,16 +264,16 @@
             ]
           },
           {
-            "group": "API Keys",
+            "group": "Roadmap",
             "pages": [
-              "api-reference/api-keys/list",
-              "api-reference/api-keys/create",
-              "api-reference/api-keys/delete"
+              "api-reference/roadmap/get-votes",
+              "api-reference/roadmap/toggle-vote"
             ]
           },
           {
-            "group": "Other",
+            "group": "System",
             "pages": [
+              "api-reference/system/feature-flags",
               "api-reference/other/capacity"
             ]
           }
