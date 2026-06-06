@@ -24,6 +24,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "List the role bindings (principal, role, resource) configured on your account.",
         "operationId": "list_bindings",
         "parameters": [
           {
@@ -58,6 +59,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "Create a role binding granting a principal a role on a resource.",
         "operationId": "create_binding",
         "requestBody": {
           "content": {
@@ -91,6 +93,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "Delete a role binding, revoking that principal's access to the resource.",
         "operationId": "delete_binding",
         "requestBody": {
           "content": {
@@ -124,6 +127,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "Update an existing role binding, changing its role or resource scope.",
         "operationId": "update_binding",
         "requestBody": {
           "content": {
@@ -159,6 +163,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "List the principals on your account that can be granted access-control roles.",
         "operationId": "search_principals",
         "parameters": [
           {
@@ -214,6 +219,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "List the built-in role presets and the actions each one grants.",
         "operationId": "list_role_presets",
         "parameters": [
           {
@@ -250,6 +256,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "Simulate whether a principal would be allowed an action on a resource.",
         "operationId": "simulate_access",
         "requestBody": {
           "content": {
@@ -285,6 +292,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "Get the access-control tags attached to a principal or resource.",
         "operationId": "get_tags",
         "parameters": [
           {
@@ -319,6 +327,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "Set the access-control tags on a principal or resource.",
         "operationId": "put_tags",
         "requestBody": {
           "content": {
@@ -354,6 +363,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "Get the throttle (rate-limit) preset bound to a resource.",
         "operationId": "get_throttle_binding",
         "parameters": [
           {
@@ -388,6 +398,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "Bind a throttle (rate-limit) preset to a resource.",
         "operationId": "put_throttle_binding",
         "requestBody": {
           "content": {
@@ -423,6 +434,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "List the available throttle presets and their rate-limit settings.",
         "operationId": "list_throttle_presets",
         "parameters": [
           {
@@ -459,6 +471,7 @@
         "tags": [
           "API Keys"
         ],
+        "description": "List your account's API keys (metadata only; secrets are never returned).",
         "operationId": "list_api_keys",
         "parameters": [
           {
@@ -504,6 +517,7 @@
         "tags": [
           "API Keys"
         ],
+        "description": "Create a full-account API key; the plaintext secret is returned only once.",
         "operationId": "create_api_key",
         "requestBody": {
           "content": {
@@ -539,6 +553,7 @@
         "tags": [
           "API Keys"
         ],
+        "description": "Revoke an API key by ID; requests using it stop working immediately.",
         "operationId": "delete_api_key",
         "parameters": [
           {
@@ -3136,6 +3151,7 @@
         "tags": [
           "CLI"
         ],
+        "description": "Ingest an OTLP/HTTP protobuf metric export from the rig CLI and forward it to the collector.",
         "operationId": "ingest_metrics",
         "requestBody": {
           "description": "OTLP/HTTP protobuf metric export",
@@ -3855,6 +3871,7 @@
         "tags": [
           "CLI"
         ],
+        "description": "Ingest an OTLP/HTTP protobuf trace export from the rig CLI and forward it to the collector.",
         "operationId": "ingest_traces",
         "requestBody": {
           "description": "OTLP/HTTP protobuf trace export",

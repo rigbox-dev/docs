@@ -24,6 +24,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "List the role bindings (principal, role, resource) configured on your account.",
         "operationId": "list_bindings",
         "parameters": [
           {
@@ -53,13 +54,13 @@
             "bearer": []
           }
         ],
-        "description": "Returns all role bindings, showing who has what access to which resources. Filter by resource ref or principal to narrow results.",
         "summary": "List bindings"
       },
       "post": {
         "tags": [
           "Access Control"
         ],
+        "description": "Create a role binding granting a principal a role on a resource.",
         "operationId": "create_binding",
         "requestBody": {
           "content": {
@@ -88,13 +89,13 @@
             "bearer": []
           }
         ],
-        "description": "Grants a role to a principal on a specific resource. Resource refs use the format `rig:account:{id}`, `rig:workspace:{id}`, or `rig:app:{id}`.",
         "summary": "Create binding"
       },
       "delete": {
         "tags": [
           "Access Control"
         ],
+        "description": "Delete a role binding, revoking that principal's access to the resource.",
         "operationId": "delete_binding",
         "requestBody": {
           "content": {
@@ -123,13 +124,13 @@
             "bearer": []
           }
         ],
-        "description": "Revokes a role binding, removing the principal's access to the specified resource.",
         "summary": "Delete binding"
       },
       "patch": {
         "tags": [
           "Access Control"
         ],
+        "description": "Update an existing role binding, changing its role or resource scope.",
         "operationId": "update_binding",
         "requestBody": {
           "content": {
@@ -158,7 +159,6 @@
             "bearer": []
           }
         ],
-        "description": "Updates an existing role binding, such as changing the assigned role or modifying conditions.",
         "summary": "Update binding"
       }
     },
@@ -167,6 +167,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "List the principals on your account that can be granted access-control roles.",
         "operationId": "search_principals",
         "parameters": [
           {
@@ -215,7 +216,6 @@
             "bearer": []
           }
         ],
-        "description": "Search for users and service accounts that can be assigned roles. Use this to look up principals by email or name before creating role bindings.",
         "summary": "Search principals"
       }
     },
@@ -224,6 +224,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "List the built-in role presets and the actions each one grants.",
         "operationId": "list_role_presets",
         "parameters": [
           {
@@ -253,7 +254,6 @@
             "bearer": []
           }
         ],
-        "description": "Returns available role presets and their permissions. Use these when creating role bindings.",
         "summary": "List role presets"
       }
     },
@@ -262,6 +262,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "Simulate whether a principal would be allowed an action on a resource.",
         "operationId": "simulate_access",
         "requestBody": {
           "content": {
@@ -290,7 +291,6 @@
             "bearer": []
           }
         ],
-        "description": "Tests whether a specific action would be allowed for a given principal and resource, without making any changes. Useful for debugging access control policies.",
         "summary": "Simulate access"
       }
     },
@@ -299,6 +299,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "Get the access-control tags attached to a principal or resource.",
         "operationId": "get_tags",
         "parameters": [
           {
@@ -328,13 +329,13 @@
             "bearer": []
           }
         ],
-        "description": "Returns tags assigned to a resource. Tags are used in policy evaluation to match access control rules.",
         "summary": "Get tags"
       },
       "put": {
         "tags": [
           "Access Control"
         ],
+        "description": "Set the access-control tags on a principal or resource.",
         "operationId": "put_tags",
         "requestBody": {
           "content": {
@@ -363,7 +364,6 @@
             "bearer": []
           }
         ],
-        "description": "Updates the tags on a resource. Tags can trigger or restrict access control rules during policy evaluation.",
         "summary": "Update tags"
       }
     },
@@ -372,6 +372,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "Get the throttle (rate-limit) preset bound to a resource.",
         "operationId": "get_throttle_binding",
         "parameters": [
           {
@@ -401,13 +402,13 @@
             "bearer": []
           }
         ],
-        "description": "Returns the throttle profile currently bound to a resource. Throttle profiles control rate limits for API requests.",
         "summary": "Get throttle binding"
       },
       "put": {
         "tags": [
           "Access Control"
         ],
+        "description": "Bind a throttle (rate-limit) preset to a resource.",
         "operationId": "put_throttle_binding",
         "requestBody": {
           "content": {
@@ -436,7 +437,6 @@
             "bearer": []
           }
         ],
-        "description": "Assigns a throttle profile to a resource, controlling the rate limits applied to API requests targeting that resource.",
         "summary": "Update throttle binding"
       }
     },
@@ -445,6 +445,7 @@
         "tags": [
           "Access Control"
         ],
+        "description": "List the available throttle presets and their rate-limit settings.",
         "operationId": "list_throttle_presets",
         "parameters": [
           {
@@ -474,7 +475,6 @@
             "bearer": []
           }
         ],
-        "description": "Returns available throttle presets (rate limit profiles). Each preset defines requests-per-minute and burst limits.",
         "summary": "List throttle presets"
       }
     },
@@ -483,6 +483,7 @@
         "tags": [
           "API Keys"
         ],
+        "description": "List your account's API keys (metadata only; secrets are never returned).",
         "operationId": "list_api_keys",
         "parameters": [
           {
@@ -528,6 +529,7 @@
         "tags": [
           "API Keys"
         ],
+        "description": "Create a full-account API key; the plaintext secret is returned only once.",
         "operationId": "create_api_key",
         "requestBody": {
           "content": {
@@ -563,6 +565,7 @@
         "tags": [
           "API Keys"
         ],
+        "description": "Revoke an API key by ID; requests using it stop working immediately.",
         "operationId": "delete_api_key",
         "parameters": [
           {
@@ -3160,6 +3163,7 @@
         "tags": [
           "CLI"
         ],
+        "description": "Ingest an OTLP/HTTP protobuf metric export from the rig CLI and forward it to the collector.",
         "operationId": "ingest_metrics",
         "requestBody": {
           "description": "OTLP/HTTP protobuf metric export",
@@ -3878,6 +3882,7 @@
         "tags": [
           "CLI"
         ],
+        "description": "Ingest an OTLP/HTTP protobuf trace export from the rig CLI and forward it to the collector.",
         "operationId": "ingest_traces",
         "requestBody": {
           "description": "OTLP/HTTP protobuf trace export",
