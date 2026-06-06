@@ -24,6 +24,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "List role bindings.",
         "description": "List the role bindings (principal, role, resource) configured on your account.",
         "operationId": "list_bindings",
         "parameters": [
@@ -59,6 +60,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "Create a role binding.",
         "description": "Create a role binding granting a principal a role on a resource.",
         "operationId": "create_binding",
         "requestBody": {
@@ -93,6 +95,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "Delete a role binding.",
         "description": "Delete a role binding, revoking that principal's access to the resource.",
         "operationId": "delete_binding",
         "requestBody": {
@@ -127,6 +130,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "Update a role binding.",
         "description": "Update an existing role binding, changing its role or resource scope.",
         "operationId": "update_binding",
         "requestBody": {
@@ -163,6 +167,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "List principals.",
         "description": "List the principals on your account that can be granted access-control roles.",
         "operationId": "search_principals",
         "parameters": [
@@ -219,6 +224,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "List role presets.",
         "description": "List the built-in role presets and the actions each one grants.",
         "operationId": "list_role_presets",
         "parameters": [
@@ -256,6 +262,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "Simulate an access decision.",
         "description": "Simulate whether a principal would be allowed an action on a resource.",
         "operationId": "simulate_access",
         "requestBody": {
@@ -292,6 +299,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "Get access-control tags.",
         "description": "Get the access-control tags attached to a principal or resource.",
         "operationId": "get_tags",
         "parameters": [
@@ -327,6 +335,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "Set access-control tags.",
         "description": "Set the access-control tags on a principal or resource.",
         "operationId": "put_tags",
         "requestBody": {
@@ -363,6 +372,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "Get a resource's throttle binding.",
         "description": "Get the throttle (rate-limit) preset bound to a resource.",
         "operationId": "get_throttle_binding",
         "parameters": [
@@ -398,6 +408,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "Set a resource's throttle binding.",
         "description": "Bind a throttle (rate-limit) preset to a resource.",
         "operationId": "put_throttle_binding",
         "requestBody": {
@@ -434,6 +445,7 @@
         "tags": [
           "Access Control"
         ],
+        "summary": "List throttle presets.",
         "description": "List the available throttle presets and their rate-limit settings.",
         "operationId": "list_throttle_presets",
         "parameters": [
@@ -471,6 +483,7 @@
         "tags": [
           "API Keys"
         ],
+        "summary": "List your API keys.",
         "description": "List your account's API keys (metadata only; secrets are never returned).",
         "operationId": "list_api_keys",
         "parameters": [
@@ -517,6 +530,7 @@
         "tags": [
           "API Keys"
         ],
+        "summary": "Create an API key.",
         "description": "Create a full-account API key; the plaintext secret is returned only once.",
         "operationId": "create_api_key",
         "requestBody": {
@@ -553,6 +567,7 @@
         "tags": [
           "API Keys"
         ],
+        "summary": "Revoke an API key.",
         "description": "Revoke an API key by ID; requests using it stop working immediately.",
         "operationId": "delete_api_key",
         "parameters": [
@@ -3114,6 +3129,7 @@
         "tags": [
           "Community"
         ],
+        "summary": "Preview a workspace-definition deploy.",
         "description": "Preview the deploy plan for a community workspace definition reference.",
         "operationId": "preview_workspace_definition_v1",
         "parameters": [
@@ -3198,6 +3214,7 @@
         "tags": [
           "CLI"
         ],
+        "summary": "Ingest CLI OTLP metric exports.",
         "description": "Ingest an OTLP/HTTP protobuf metric export from the rig CLI and forward it to the collector.",
         "operationId": "ingest_metrics",
         "requestBody": {
@@ -3228,6 +3245,7 @@
         "tags": [
           "Workspaces"
         ],
+        "summary": "Create a workspace from a template.",
         "description": "Create and boot a workspace from a template in a single call.",
         "operationId": "quick_deploy",
         "requestBody": {
@@ -3256,8 +3274,7 @@
           {
             "bearer": []
           }
-        ],
-        "summary": "Create a workspace from a template."
+        ]
       }
     },
     "/api/v1/roadmap/votes": {
@@ -3936,6 +3953,7 @@
         "tags": [
           "CLI"
         ],
+        "summary": "Ingest CLI OTLP trace exports.",
         "description": "Ingest an OTLP/HTTP protobuf trace export from the rig CLI and forward it to the collector.",
         "operationId": "ingest_traces",
         "requestBody": {
@@ -4311,6 +4329,7 @@
         "tags": [
           "Workspaces"
         ],
+        "summary": "List all workspaces.",
         "description": "List all workspaces on your account with their status and resources.",
         "operationId": "list_vms",
         "parameters": [
@@ -4351,13 +4370,13 @@
           {
             "bearer": []
           }
-        ],
-        "summary": "List all workspaces for the authenticated user."
+        ]
       },
       "post": {
         "tags": [
           "Workspaces"
         ],
+        "summary": "Create a new workspace.",
         "description": "Provision a new workspace; it starts stopped, then boot it separately.",
         "operationId": "create_vm",
         "requestBody": {
@@ -4386,8 +4405,7 @@
           {
             "bearer": []
           }
-        ],
-        "summary": "Create a new workspace."
+        ]
       }
     },
     "/api/v1/workspaces/from-definition": {
@@ -4395,6 +4413,7 @@
         "tags": [
           "Workspaces"
         ],
+        "summary": "Deploy a workspace from a v1 definition.",
         "description": "Deploy a workspace from a v1 definition, provisioning its image and app recipes.",
         "operationId": "deploy_from_definition",
         "requestBody": {
@@ -4423,8 +4442,7 @@
           {
             "bearer": []
           }
-        ],
-        "summary": "Deploy a v1 workspace definition: provisions a real VM via `quick_deploy_with_template`\nfor `@rigbox/...` catalog apps, then dispatches community app installs via\n`launch_deploy_ref_for_workspace` for each non-rigbox ref."
+        ]
       }
     },
     "/api/v1/workspaces/{id}": {
@@ -4432,6 +4450,7 @@
         "tags": [
           "Workspaces"
         ],
+        "summary": "Get a workspace by ID.",
         "description": "Fetch one workspace's full state, resources, and installed apps by ID.",
         "operationId": "get_vm",
         "parameters": [
@@ -4461,13 +4480,13 @@
           {
             "bearer": []
           }
-        ],
-        "summary": "Get a workspace by ID."
+        ]
       },
       "delete": {
         "tags": [
           "Workspaces"
         ],
+        "summary": "Delete a workspace.",
         "description": "Permanently delete a workspace and its VM; this cannot be undone.",
         "operationId": "delete_vm",
         "parameters": [
@@ -4506,8 +4525,7 @@
           {
             "bearer": []
           }
-        ],
-        "summary": "Delete a workspace."
+        ]
       }
     },
     "/api/v1/workspaces/{id}/ai-usage/metrics": {
@@ -4609,6 +4627,7 @@
         "tags": [
           "Workspaces"
         ],
+        "summary": "Cancel a provisioning workspace.",
         "description": "Cancel a workspace that is still provisioning or starting up.",
         "operationId": "cancel_vm",
         "parameters": [
@@ -4638,8 +4657,7 @@
           {
             "bearer": []
           }
-        ],
-        "summary": "Cancel a workspace that is currently provisioning or starting."
+        ]
       }
     },
     "/api/v1/workspaces/{id}/deploy/launch": {
@@ -5383,6 +5401,7 @@
         "tags": [
           "Workspaces"
         ],
+        "summary": "Retry a failed workspace.",
         "description": "Retry provisioning for a workspace that previously failed to come up.",
         "operationId": "retry_vm",
         "parameters": [
@@ -5412,8 +5431,7 @@
           {
             "bearer": []
           }
-        ],
-        "summary": "Retry a workspace that failed during provisioning."
+        ]
       }
     },
     "/api/v1/workspaces/{id}/services": {
@@ -5853,6 +5871,7 @@
         "tags": [
           "Workspaces"
         ],
+        "summary": "Start a workspace.",
         "description": "Boot the workspace VM and wait until it reports running.",
         "operationId": "start_vm",
         "parameters": [
@@ -5882,8 +5901,7 @@
           {
             "bearer": []
           }
-        ],
-        "summary": "Start a workspace."
+        ]
       }
     },
     "/api/v1/workspaces/{id}/stop": {
@@ -5891,6 +5909,7 @@
         "tags": [
           "Workspaces"
         ],
+        "summary": "Stop a workspace.",
         "description": "Stop the workspace VM while preserving its disk and configuration.",
         "operationId": "stop_vm",
         "parameters": [
@@ -5920,8 +5939,7 @@
           {
             "bearer": []
           }
-        ],
-        "summary": "Stop a workspace."
+        ]
       }
     },
     "/api/v1/workspaces/{id}/tools": {
