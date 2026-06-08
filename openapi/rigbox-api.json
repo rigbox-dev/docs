@@ -3240,6 +3240,228 @@
         ]
       }
     },
+    "/api/v1/observability/traces": {
+      "get": {
+        "tags": [
+          "Observability"
+        ],
+        "summary": "Search the caller's CLI traces.",
+        "operationId": "search_traces",
+        "parameters": [
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Lookback window: `1h` | `6h` | `24h` | `7d` (default `24h`). Ignored when\na custom `start`+`end` is given.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "`success` | `error` (default: any).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "command",
+            "in": "query",
+            "description": "Case-sensitive substring matched against the root command name.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max traces to return (1..=200, default 50).",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Custom window start (unix seconds). Requires `end`; overrides `range`.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "Custom window end (unix seconds). Requires `start`.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching traces (newest first).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TraceSearchResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/observability/traces/stats": {
+      "get": {
+        "tags": [
+          "Observability"
+        ],
+        "summary": "RED metrics for the caller's traces (count, error rate, p50/p95/p99 + sparklines).",
+        "operationId": "trace_stats",
+        "parameters": [
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Lookback window: `1h` | `6h` | `24h` | `7d` (default `24h`). Ignored when\na custom `start`+`end` is given.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "command",
+            "in": "query",
+            "description": "Case-sensitive substring matched against the root command name, so the\nstrip can track the active command filter.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Custom window start (unix seconds). Requires `end`; overrides `range`.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "Custom window end (unix seconds). Requires `start`.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregated trace stats for the window.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TraceStatsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/observability/traces/{trace_id}": {
+      "get": {
+        "tags": [
+          "Observability"
+        ],
+        "summary": "Fetch one of the caller's traces with its full span tree.",
+        "operationId": "get_trace",
+        "parameters": [
+          {
+            "name": "trace_id",
+            "in": "path",
+            "description": "Hex trace id from the search list",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Normalized span list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TraceDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Trace not found, expired, or not owned by the caller."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/quick-deploy": {
       "post": {
         "tags": [
@@ -11078,6 +11300,51 @@
           }
         }
       },
+      "SpanNode": {
+        "type": "object",
+        "required": [
+          "span_id",
+          "name",
+          "start_ns",
+          "duration_ms",
+          "status",
+          "attributes"
+        ],
+        "properties": {
+          "attributes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "duration_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_span_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`None` for the root span."
+          },
+          "span_id": {
+            "type": "string"
+          },
+          "start_ns": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TraceStatus"
+          }
+        }
+      },
       "SshKey": {
         "type": "object",
         "required": [
@@ -11593,6 +11860,204 @@
             "items": {
               "$ref": "#/components/schemas/ToolStatus"
             }
+          }
+        }
+      },
+      "TraceDetailResponse": {
+        "type": "object",
+        "required": [
+          "trace_id",
+          "command",
+          "start_ns",
+          "duration_ms",
+          "status",
+          "spans"
+        ],
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "duration_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "spans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpanNode"
+            },
+            "description": "Flat span list; the client builds the tree via `parent_span_id`."
+          },
+          "start_ns": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TraceStatus"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "TraceSearchResponse": {
+        "type": "object",
+        "required": [
+          "traces",
+          "range"
+        ],
+        "properties": {
+          "range": {
+            "type": "string",
+            "description": "Echo of the resolved range label (e.g. \"24h\")."
+          },
+          "traces": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TraceSummary"
+            }
+          }
+        }
+      },
+      "TraceStatsBucket": {
+        "type": "object",
+        "required": [
+          "t",
+          "count",
+          "error_count",
+          "p50_ms",
+          "p95_ms",
+          "p99_ms"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "error_count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "p50_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "p95_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "p99_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "t": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Bucket start (unix seconds)."
+          }
+        }
+      },
+      "TraceStatsResponse": {
+        "type": "object",
+        "description": "RED metrics for the trace list hero strip, aggregated server-side from the\ncaller's traces in the window. Every value is real (never an estimate);\n`total`/`error_count` are exact unless `capped` is set.",
+        "required": [
+          "range",
+          "total",
+          "capped",
+          "error_count",
+          "error_rate",
+          "p50_ms",
+          "p95_ms",
+          "p99_ms",
+          "buckets"
+        ],
+        "properties": {
+          "buckets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TraceStatsBucket"
+            },
+            "description": "Equal-width time buckets across the window (chronological), one point\nper sparkline sample."
+          },
+          "capped": {
+            "type": "boolean",
+            "description": "True when the window held more than `MAX_STATS` traces, so `total` and\nthe aggregates are computed over the first `MAX_STATS` (a lower bound)."
+          },
+          "error_count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "error_rate": {
+            "type": "number",
+            "format": "double",
+            "description": "Errored fraction in `0.0..=1.0`."
+          },
+          "p50_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "p95_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "p99_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "range": {
+            "type": "string",
+            "description": "Echo of the resolved range label (e.g. \"24h\" / \"custom\")."
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Trace count in the window.",
+            "minimum": 0
+          }
+        }
+      },
+      "TraceStatus": {
+        "type": "string",
+        "enum": [
+          "success",
+          "error"
+        ]
+      },
+      "TraceSummary": {
+        "type": "object",
+        "required": [
+          "trace_id",
+          "command",
+          "start_ns",
+          "duration_ms",
+          "span_count",
+          "status"
+        ],
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "Root span name, e.g. `rig deploy` / `rig workspace ls`."
+          },
+          "duration_ms": {
+            "type": "number",
+            "format": "double"
+          },
+          "span_count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "start_ns": {
+            "type": "string",
+            "description": "Trace start as unix nanoseconds (string to avoid JS i64 precision loss)."
+          },
+          "status": {
+            "$ref": "#/components/schemas/TraceStatus"
+          },
+          "trace_id": {
+            "type": "string"
           }
         }
       },
@@ -13456,6 +13921,9 @@
     },
     {
       "name": "CLI"
+    },
+    {
+      "name": "Observability"
     },
     {
       "name": "Auth"
