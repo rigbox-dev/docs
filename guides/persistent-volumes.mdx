@@ -9,7 +9,7 @@ A persistent volume is an ext4 drive attached to a workspace as a **second disk*
 
 `rig deploy` **wipes and re-rsyncs the synced app directory on every deploy**. That makes deploys clean and reproducible, but it means you must never store durable data inside the app dir — a redeploy would erase it.
 
-Durable state belongs on a persistent volume. The default `data` volume mounts at `/home/developer/data`, and the convention is to expose that path as `DATA_DIR`:
+Durable state belongs on a persistent volume. The usual convention is a volume named `data` mounted at `/home/developer/data`, exposed to the app as `DATA_DIR`:
 
 ```yaml
 env:
@@ -24,23 +24,61 @@ A persistent volume survives **redeploys** (the rsync wipe), **app restarts**, a
 
 ## Declare a volume in rig.yaml
 
-The simplest path is to declare volumes under an app's `volumes:` block in `rig.yaml`. The volume is created (or reattached) on deploy, and the mount is available to your process.
+The canonical path is to declare durable disks once under `workspace.volumes`, then opt each app into the mount with `volumes: [data]`. The volume is created or reattached on deploy, and only apps that reference it receive the mount.
 
 ```yaml
 name: markdown-notes
 port: 8080
-build:
-  dockerfile: Dockerfile
+workspace:
+  volumes:
+    - name: data
+      mountPath: /home/developer/data
+      sizeMb: 1024
+install: pip install --break-system-packages flask gunicorn
 start: gunicorn --bind 0.0.0.0:8080 app:app
 health: { path: /healthz, timeoutSeconds: 30 }
+volumes: [data]
 env:
   DATA_DIR: /home/developer/data
+```
+
+Point `DATA_DIR` at the same path and your app reads and writes durable state there.
+
+For multi-app projects, keep the declaration at the workspace level and attach it only to the apps that need it:
+
+```yaml
+workspace:
+  image: base
+  volumes:
+    - name: data
+      mountPath: /home/developer/data
+      sizeMb: 1024
+
+apps:
+  api:
+    path: ./api
+    port: 5100
+    start: npm start
+    volumes: [data]
+    env:
+      DATA_DIR: /home/developer/data
+
+  web:
+    path: ./web
+    port: 5101
+    start: npm start
+    dependsOn: [api]
+    visibility: public
+```
+
+App references can be written as `volumes: [data]` or `volumes: [{ name: data }]`. App-local full specs are still supported for single-app or one-off cases:
+
+```yaml
 volumes:
   - name: data
     mountPath: /home/developer/data
+    sizeMb: 1024
 ```
-
-The default `data` volume mounts at `/home/developer/data` — point `DATA_DIR` at the same path and your app reads and writes durable state there.
 
 ## Manage volumes with the CLI
 

@@ -58,6 +58,7 @@ health:
   timeoutSeconds: 30
 env:
   DATA_DIR: /home/developer/data
+volumes: [data]
 secrets:
   - name: STRIPE_KEY
   - name: SENTRY_DSN
@@ -77,6 +78,10 @@ visibility: public
 workspace:
   image: base
   resources: { ramMb: 1024, vcpuCount: 1, diskSizeMb: 3072 }
+  volumes:
+    - name: data
+      mountPath: /home/developer/data
+      sizeMb: 1024
 ```
 
 | Field | Purpose |
@@ -93,8 +98,8 @@ workspace:
 | `visibility` | `private` (default), `public`, or `{ emails: [...] }`. |
 | `build` | Opt into a reproducible image build. See [Deploy modes](#deploy-modes). |
 | `source` | A git source for the build context (optional — the CLI uploads the local dir by default). |
-| `volumes` | Persistent ext4 drives that survive redeploys. See [Persistent Volumes](/guides/persistent-volumes). |
-| `workspace` | `{ image, resources: { ramMb, vcpuCount, diskSizeMb } }` — sizing for the VM. |
+| `volumes` | App opt-in mounts. Use workspace volume refs (`[data]`) or full app-local specs. See [Persistent Volumes](/guides/persistent-volumes). |
+| `workspace` | `{ image, resources, volumes }` — VM image/sizing plus reusable workspace volume declarations. |
 
 ### Multi-app shape
 
@@ -104,6 +109,10 @@ For a project that runs several services together, use a top-level `workspace:` 
 workspace:
   image: base
   resources: { ramMb: 2048, vcpuCount: 2, diskSizeMb: 10240 }
+  volumes:
+    - name: data
+      mountPath: /home/developer/data
+      sizeMb: 1024
 apps:
   api:
     path: ./api
@@ -111,6 +120,9 @@ apps:
     start: uvicorn main:app --host 0.0.0.0 --port 5100
     install: pip install --break-system-packages -r requirements.txt
     health: { path: /healthz, timeoutSeconds: 30 }
+    volumes: [data]
+    env:
+      DATA_DIR: /home/developer/data
   web:
     path: ./web
     port: 5101

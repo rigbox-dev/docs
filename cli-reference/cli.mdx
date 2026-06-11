@@ -270,6 +270,14 @@ ai:                           # opt this app into the managed AI proxy
   managed: true
   providers: [openai]         # defaults to [openai]; injects OPENAI_BASE_URL/_API_KEY
 
+workspace:
+  image: base
+  resources: { ramMb: 1024, vcpuCount: 1, diskSizeMb: 3072 }
+  volumes:                    # reusable workspace volume declarations
+    - name: data
+      mountPath: /home/developer/data
+      sizeMb: 1024
+
 params:                       # user-configurable knobs surfaced in the workspace UI
   - key: max_items
     label: Max items
@@ -293,10 +301,7 @@ limits:                       # per-app runtime caps applied to the systemd unit
   cpuPercent: 150             # CPUQuota as percent of one core (150 = 1.5 cores)
   tasksMax: 100               # systemd TasksMax
 
-volumes:                      # persistent volumes mounted into the app
-  - name: data
-    mountPath: /var/lib/data
-    sizeMb: 4096
+volumes: [data]               # opt the app into a workspace volume mount
 ```
 
 <Note>
@@ -325,7 +330,8 @@ volumes:                      # persistent volumes mounted into the app
 | `source` | object | `kind: local` (default) or `kind: git` with `repo`/`branch`. |
 | `ai` | object | `managed: true` + optional `providers` to route through the AI proxy. |
 | `limits` | object | `memoryMaxMb`, `cpuPercent`, `tasksMax` (all optional). |
-| `volumes` | list | `name`, `mountPath`, `sizeMb` per entry. |
+| `volumes` | list | App opt-in mounts. Use workspace volume refs (`data` or `{ name: data }`) or full app-local specs with `name`, `mountPath`, and `sizeMb`. |
+| `workspace` | object | App/workspace image, resources, env, and reusable `volumes` declarations. |
 | `publish` | object | Metadata for `rig publish` (`vendor`, `slug`, `version`, `summary`, `tags`, …). |
 
 Each `params:` entry accepts: `key` (required), `label`, `description`, `type` (`string` default, `number`, `boolean`, `secret`, `select`, `email`, `url`, `textarea`), `default`, `required`, `sensitive`, `options` (for `select`: `{value, label}`), `group`, `order`, `helpUrl`, `validationPattern`, and `envVar` (surface the value as this env var on the unit — without it the value lands in metadata but the process can't see it).
@@ -341,6 +347,10 @@ workspace:
     ramMb: 4096               # workspace VM resources (all optional)
     vcpuCount: 2
     diskSizeMb: 20480
+  volumes:                    # declare once, then reference from apps
+    - name: data
+      mountPath: /home/developer/data
+      sizeMb: 1024
   env:                        # merged UNDER each app's own env (app wins per key)
     SHARED_FLAG: "1"
 
@@ -351,6 +361,7 @@ apps:
     start: node server.js
     install: npm ci
     dependsOn: [postgresql]
+    volumes: [data]           # or volumes: [{ name: data }]
   worker:
     path: ./worker
     start: python3 worker.py
@@ -359,6 +370,8 @@ apps:
   cache:
     ref: "@vendor/redis@1.2.0"  # launch a published recipe by ref instead of building
 ```
+
+`workspace.volumes` is an authoring convenience: deploy expands each app reference into the existing per-app run volume payload. Apps must still opt in explicitly; declaring a workspace volume alone does not mount it everywhere.
 
 Every entry under `apps:` accepts the same inline fields as the single-app form (minus `name`, which is the map key). `dependsOn` is topo-sorted across siblings. Mixing single-app keys (`start`/`port` at the top level) with `apps:` is rejected.
 
@@ -474,7 +487,7 @@ rig volume resize --workspace my-project --volume <VOL_ID> --size-mb 8192
 rig volume rm     --workspace my-project --volume <VOL_ID>
 ```
 
-You can also declare volumes inline in `rig.yaml` under [`volumes:`](#single-app-form) so a deploy provisions and mounts them automatically.
+You can also declare volumes in `rig.yaml` under `workspace.volumes` and opt apps in with `volumes: [data]` so a deploy provisions and mounts them automatically. Full app-local `volumes:` specs remain supported for one-off cases.
 
 <Note>
 `volume` commands back the **PersistentVolumes** server feature. They may be unavailable until that feature flag is enabled for your account.
