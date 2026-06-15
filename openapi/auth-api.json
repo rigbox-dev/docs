@@ -1480,7 +1480,7 @@
           "Apps"
         ],
         "summary": "Restart an app's service.",
-        "description": "Restart the app's background service inside its workspace VM.",
+        "description": "Enqueue a restart of the app's background service inside its workspace VM. Returns immediately; poll GET /v1/apps/{id}/health for readiness.",
         "operationId": "restart_app_service",
         "parameters": [
           {
@@ -1494,8 +1494,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Service restarted",
+          "202": {
+            "description": "Service restart enqueued",
             "content": {
               "application/json": {
                 "schema": {
@@ -3231,228 +3231,6 @@
         "responses": {
           "202": {
             "description": "Metrics accepted and forwarded to the collector"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/observability/traces": {
-      "get": {
-        "tags": [
-          "Observability"
-        ],
-        "summary": "Search the caller's CLI traces.",
-        "operationId": "search_traces",
-        "parameters": [
-          {
-            "name": "range",
-            "in": "query",
-            "description": "Lookback window: `1h` | `6h` | `24h` | `7d` (default `24h`). Ignored when\na custom `start`+`end` is given.",
-            "required": false,
-            "schema": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "description": "`success` | `error` (default: any).",
-            "required": false,
-            "schema": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          {
-            "name": "command",
-            "in": "query",
-            "description": "Case-sensitive substring matched against the root command name.",
-            "required": false,
-            "schema": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Max traces to return (1..=200, default 50).",
-            "required": false,
-            "schema": {
-              "type": [
-                "integer",
-                "null"
-              ],
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "start",
-            "in": "query",
-            "description": "Custom window start (unix seconds). Requires `end`; overrides `range`.",
-            "required": false,
-            "schema": {
-              "type": [
-                "integer",
-                "null"
-              ],
-              "format": "int64"
-            }
-          },
-          {
-            "name": "end",
-            "in": "query",
-            "description": "Custom window end (unix seconds). Requires `start`.",
-            "required": false,
-            "schema": {
-              "type": [
-                "integer",
-                "null"
-              ],
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Matching traces (newest first).",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TraceSearchResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/observability/traces/stats": {
-      "get": {
-        "tags": [
-          "Observability"
-        ],
-        "summary": "RED metrics for the caller's traces (count, error rate, p50/p95/p99 + sparklines).",
-        "operationId": "trace_stats",
-        "parameters": [
-          {
-            "name": "range",
-            "in": "query",
-            "description": "Lookback window: `1h` | `6h` | `24h` | `7d` (default `24h`). Ignored when\na custom `start`+`end` is given.",
-            "required": false,
-            "schema": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          {
-            "name": "command",
-            "in": "query",
-            "description": "Case-sensitive substring matched against the root command name, so the\nstrip can track the active command filter.",
-            "required": false,
-            "schema": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          {
-            "name": "start",
-            "in": "query",
-            "description": "Custom window start (unix seconds). Requires `end`; overrides `range`.",
-            "required": false,
-            "schema": {
-              "type": [
-                "integer",
-                "null"
-              ],
-              "format": "int64"
-            }
-          },
-          {
-            "name": "end",
-            "in": "query",
-            "description": "Custom window end (unix seconds). Requires `start`.",
-            "required": false,
-            "schema": {
-              "type": [
-                "integer",
-                "null"
-              ],
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Aggregated trace stats for the window.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TraceStatsResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/observability/traces/{trace_id}": {
-      "get": {
-        "tags": [
-          "Observability"
-        ],
-        "summary": "Fetch one of the caller's traces with its full span tree.",
-        "operationId": "get_trace",
-        "parameters": [
-          {
-            "name": "trace_id",
-            "in": "path",
-            "description": "Hex trace id from the search list",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Normalized span list.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TraceDetailResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Trace not found, expired, or not owned by the caller."
           }
         },
         "security": [
@@ -6798,15 +6576,38 @@
           "total",
           "remaining_micro",
           "total_micro",
+          "free",
+          "pro",
+          "free_micro",
+          "pro_micro",
           "mode"
         ],
         "properties": {
+          "free": {
+            "type": "number",
+            "format": "double",
+            "description": "Free bucket balance (resets to 250 each month, unused expires)."
+          },
+          "free_micro": {
+            "type": "integer",
+            "format": "int64"
+          },
           "mode": {
             "type": "string"
           },
+          "pro": {
+            "type": "number",
+            "format": "double",
+            "description": "Pro bucket balance (active pro_managed gets +2000/month, rolls over)."
+          },
+          "pro_micro": {
+            "type": "integer",
+            "format": "int64"
+          },
           "remaining": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "description": "Total spendable credits = free + pro."
           },
           "remaining_micro": {
             "type": "integer",
@@ -6814,7 +6615,8 @@
           },
           "total": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "description": "Credits granted this cycle (the monthly entitlement: 250 free, plus 2000\nfor an active pro_managed subscriber). May be below `remaining` when pro\ncredits have rolled over from prior months."
           },
           "total_micro": {
             "type": "integer",
