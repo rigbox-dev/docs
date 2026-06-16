@@ -1,0 +1,342 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Rigbox Managed AI Proxy",
+    "version": "1.0.0",
+    "description": "The managed AI proxy reachable at `http://172.16.0.1:9090` from inside a workspace VM. It is **IP-attested** (no API key — send a placeholder `Authorization: Bearer managed-by-rigbox`) and exposes an OpenAI-compatible `/v1` surface over OpenRouter.\n\nThis reference documents the multi-tenant metering surface: the settled cost returned on each response, per-subject cost attribution and the rolling-window read, and per-subject budget + rate-limit enforcement. The proxy is the *mechanism*; your app owns *policy* (which tiers exist, the amounts, the windows) and asserts the end-user (\"subject\") id over the IP-attested channel."
+  },
+  "servers": [
+    {
+      "url": "http://172.16.0.1:9090",
+      "description": "In-VM managed proxy (bridge-local, IP-attested)"
+    }
+  ],
+  "security": [],
+  "tags": [
+    {
+      "name": "Managed Proxy",
+      "description": "Per-subject cost metering, attribution, and budget/rate-limit enforcement for multi-tenant apps."
+    }
+  ],
+  "paths": {
+    "/v1/chat/completions": {
+      "post": {
+        "tags": ["Managed Proxy"],
+        "summary": "Chat completion (metered, per-subject)",
+        "operationId": "managed_chat_completions",
+        "description": "OpenAI-compatible chat completion through the managed proxy.\n\n**Cost in the response:** the settled rigbox-credit cost rides on the response — the `X-Rigbox-Cost-Micro` / `X-Rigbox-Cost-Credits` headers and the `usage.cost_micro` / `usage.cost_credits` body fields (and, for streaming, the final `stream_options.include_usage` chunk). No second `/v1/generation` round-trip. Cost fields are best-effort: present only when upstream reports a cost — absence is not zero.\n\n**Attribution:** set `X-Rigbox-Subject` (wins) or the OpenAI `user` body field to attribute the call to one of your end-users.\n\n**Enforcement:** attach `X-Rigbox-Subject-Budget` and/or `X-Rigbox-Subject-Rate` to have the proxy reject the call (before any spend) once the subject is over its declared cap.\n\nScope: the same applies to `/v1/completions`, `/v1/responses`, and `/v1/embeddings`. `/v1/messages` (Anthropic) and the audio endpoints are not yet metered per-subject.",
+        "parameters": [
+          {
+            "name": "X-Rigbox-Subject",
+            "in": "header",
+            "required": false,
+            "description": "End-user id this call's cost is attributed to. Wins over the OpenAI `user` body field. Trimmed; empty is treated as absent; capped at 256 characters.",
+            "schema": { "type": "string", "example": "tenant-42" }
+          },
+          {
+            "name": "X-Rigbox-Subject-Budget",
+            "in": "header",
+            "required": false,
+            "description": "At most one. Total spend cap for the subject over a rolling window: `<amount>;period=<window>`. `<amount>` is credits (a float) or a request count with a `req` suffix (e.g. `100req`). `<window>` is `5h`/`30m`/`7d` or a bare number of seconds. Requires `X-Rigbox-Subject`. A breach returns `402 subject_over_budget`. Malformed → `400 subject_limit_malformed`.",
+            "schema": { "type": "string", "example": "50;period=30d" }
+          },
+          {
+            "name": "X-Rigbox-Subject-Rate",
+            "in": "header",
+            "required": false,
+            "description": "May be sent multiple times. A sliding rolling-window rate limit for the subject: `<amount>;window=<window>` (same amount/window grammar as the budget header). Requires `X-Rigbox-Subject`. A breach returns `429 subject_rate_limited` with a `Retry-After` header. Malformed → `400 subject_limit_malformed`.",
+            "schema": { "type": "string", "example": "5;window=1h" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ChatCompletionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chat completion. Carries the settled cost in both headers and the body `usage`.",
+            "headers": {
+              "X-Rigbox-Cost-Micro": {
+                "description": "Settled cost in microcredits (1,000,000 micro = 1 credit). Present only when upstream reported a cost.",
+                "schema": { "type": "integer", "format": "int64", "example": 360 }
+              },
+              "X-Rigbox-Cost-Credits": {
+                "description": "Settled cost in credits (1 credit ≈ $0.01). Present only when upstream reported a cost.",
+                "schema": { "type": "string", "example": "0.000360" }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChatCompletionResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed subject limit header.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GatewayError" },
+                "example": {
+                  "error": {
+                    "code": "subject_limit_malformed",
+                    "message": "Malformed X-Rigbox-Subject-Budget/-Rate header: expected '<amount>;period=<window>' (amount is credits, or a request count with a 'req' suffix).",
+                    "type": "rigbox_gateway_error",
+                    "param": null
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "The subject is over its declared budget. No spend occurs.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SubjectLimitError" },
+                "example": {
+                  "error": {
+                    "code": "subject_over_budget",
+                    "message": "Subject 'tenant-42' is over its budget: 50 credits per 2592000s.",
+                    "type": "rigbox_gateway_error",
+                    "param": null,
+                    "details": {
+                      "reason": "subject_over_budget",
+                      "subject": "tenant-42",
+                      "limit": { "kind": "credits", "amount": 50.0, "window_seconds": 2592000 },
+                      "used": { "credits": 50.3, "credits_micro": 50300000 },
+                      "resets_at": "2026-07-15T06:04:15Z",
+                      "retry_after": 2592000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The subject hit a declared rate limit. No spend occurs.",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before retrying (conservative upper bound — the window length).",
+                "schema": { "type": "integer", "example": 3600 }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SubjectLimitError" },
+                "example": {
+                  "error": {
+                    "code": "subject_rate_limited",
+                    "message": "Subject 'tenant-42' hit a rate limit: 5 credits per 3600s.",
+                    "type": "rigbox_gateway_error",
+                    "param": null,
+                    "details": {
+                      "reason": "subject_rate_limited",
+                      "subject": "tenant-42",
+                      "limit": { "kind": "credits", "amount": 5.0, "window_seconds": 3600 },
+                      "used": { "credits": 5.0, "credits_micro": 5000000 },
+                      "resets_at": "2026-06-15T13:00:00Z",
+                      "retry_after": 3600
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rig/v1/usage": {
+      "get": {
+        "tags": ["Managed Proxy"],
+        "summary": "Read a subject's rolling AI spend",
+        "operationId": "get_subject_usage",
+        "description": "Per-subject AI spend over a rolling window, served directly by the proxy from inside the VM. Scoped to the calling workspace's owner — you can only read your own subjects, and subjects are isolated from each other. Attribution is forward-only: only calls made after this feature shipped carry a subject.",
+        "parameters": [
+          {
+            "name": "subject",
+            "in": "query",
+            "required": true,
+            "description": "The end-user id (the value sent as `X-Rigbox-Subject` / OpenAI `user`).",
+            "schema": { "type": "string", "example": "tenant-42" }
+          },
+          {
+            "name": "window",
+            "in": "query",
+            "required": false,
+            "description": "Rolling window: `30s`/`15m`/`5h`/`7d` or a bare number of seconds. Defaults to `86400` (24h).",
+            "schema": { "type": "string", "default": "86400", "example": "24h" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The subject's usage over the window.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SubjectUsage" },
+                "example": {
+                  "subject": "tenant-42",
+                  "window_seconds": 86400,
+                  "credits": 0.00072,
+                  "credits_micro": 720,
+                  "input_tokens": 8,
+                  "output_tokens": 10,
+                  "requests": 1
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing `subject` or an invalid `window`.",
+            "content": { "application/json": { "schema": { "type": "string" } } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChatCompletionRequest": {
+        "type": "object",
+        "description": "A standard OpenAI chat-completion request. Any OpenAI/OpenRouter field is forwarded verbatim; only the fields below are highlighted.",
+        "required": ["model", "messages"],
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "OpenRouter model slug — choose the upstream provider here.",
+            "example": "openai/gpt-4o-mini"
+          },
+          "messages": {
+            "type": "array",
+            "items": { "type": "object" },
+            "example": [{ "role": "user", "content": "Explain microVMs in one paragraph." }]
+          },
+          "max_tokens": { "type": "integer", "example": 256 },
+          "stream": {
+            "type": "boolean",
+            "description": "When true, the settled cost is appended to the final `usage` chunk (`stream_options.include_usage` is forced on).",
+            "example": false
+          },
+          "user": {
+            "type": "string",
+            "description": "OpenAI end-user field. Used as the subject when `X-Rigbox-Subject` is absent.",
+            "example": "tenant-42"
+          }
+        }
+      },
+      "Usage": {
+        "type": "object",
+        "description": "Token usage plus the rigbox-credit settled cost.",
+        "properties": {
+          "prompt_tokens": { "type": "integer", "example": 12 },
+          "completion_tokens": { "type": "integer", "example": 3 },
+          "total_tokens": { "type": "integer", "example": 15 },
+          "cost": {
+            "type": "number",
+            "description": "Upstream cost in USD (OpenRouter).",
+            "example": 0.0000036
+          },
+          "cost_micro": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Settled rigbox cost in microcredits (1,000,000 micro = 1 credit). Present only when upstream reported a cost.",
+            "example": 360
+          },
+          "cost_credits": {
+            "type": "number",
+            "description": "Settled rigbox cost in credits (1 credit ≈ $0.01). Present only when upstream reported a cost.",
+            "example": 0.00036
+          }
+        }
+      },
+      "ChatCompletionResponse": {
+        "type": "object",
+        "description": "A standard OpenAI chat-completion response; `usage` is augmented with the settled cost.",
+        "properties": {
+          "id": { "type": "string", "example": "gen-abc123" },
+          "model": { "type": "string", "example": "openai/gpt-4o-mini" },
+          "choices": { "type": "array", "items": { "type": "object" } },
+          "usage": { "$ref": "#/components/schemas/Usage" }
+        }
+      },
+      "SubjectUsage": {
+        "type": "object",
+        "description": "A subject's aggregated AI usage over a rolling window.",
+        "properties": {
+          "subject": { "type": "string", "example": "tenant-42" },
+          "window_seconds": { "type": "integer", "example": 86400 },
+          "credits": { "type": "number", "example": 0.00072 },
+          "credits_micro": { "type": "integer", "format": "int64", "example": 720 },
+          "input_tokens": { "type": "integer", "example": 8 },
+          "output_tokens": { "type": "integer", "example": 10 },
+          "requests": { "type": "integer", "example": 1 }
+        }
+      },
+      "GatewayError": {
+        "type": "object",
+        "description": "OpenAI-shape error envelope.",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string", "example": "subject_limit_malformed" },
+              "message": { "type": "string" },
+              "type": { "type": "string", "example": "rigbox_gateway_error" },
+              "param": { "type": ["string", "null"], "example": null }
+            }
+          }
+        }
+      },
+      "SubjectLimitError": {
+        "type": "object",
+        "description": "Enforcement reject. OpenAI SDKs read `error.message`/`error.code`; `error.details` is the structured payload for your own UX.",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": ["subject_over_budget", "subject_rate_limited"],
+                "example": "subject_rate_limited"
+              },
+              "message": { "type": "string" },
+              "type": { "type": "string", "example": "rigbox_gateway_error" },
+              "param": { "type": ["string", "null"], "example": null },
+              "details": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "enum": ["subject_over_budget", "subject_rate_limited"]
+                  },
+                  "subject": { "type": "string", "example": "tenant-42" },
+                  "limit": {
+                    "type": "object",
+                    "properties": {
+                      "kind": { "type": "string", "enum": ["credits", "requests"] },
+                      "amount": { "type": "number", "example": 5.0 },
+                      "window_seconds": { "type": "integer", "example": 3600 }
+                    }
+                  },
+                  "used": {
+                    "type": "object",
+                    "description": "Spend so far in the window — `{credits, credits_micro}` for a credit limit, `{requests}` for a request-count limit.",
+                    "example": { "credits": 5.0, "credits_micro": 5000000 }
+                  },
+                  "resets_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Conservative upper bound on when the window clears (now + window length)."
+                  },
+                  "retry_after": { "type": "integer", "example": 3600 }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

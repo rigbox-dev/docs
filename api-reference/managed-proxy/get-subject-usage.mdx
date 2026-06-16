@@ -1,0 +1,11 @@
+---
+title: Get Subject Usage
+openapi: GET /rig/v1/usage
+description: Read one end-user (subject)'s AI spend over a rolling window, from inside the workspace VM.
+---
+
+<Note>
+This endpoint is served by the in-VM managed proxy at `http://172.16.0.1:9090`, not the public `api.rigbox.dev` gateway. It is **IP-attested** and scoped to the calling workspace's owner — you can only read your own subjects.
+</Note>
+
+See the [Managed AI Proxy guide](/guides/managed-proxy#per-subject-cost-and-budgets) for how subjects are attributed and enforced.
