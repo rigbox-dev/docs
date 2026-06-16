@@ -32,7 +32,12 @@ The proxy speaks two HTTP shapes — OpenAI-compatible (used by most SDKs and to
 | `http://172.16.0.1:9090/v1/embeddings` | OpenAI | Embedding models. |
 | `http://172.16.0.1:9090/v1/models` | OpenAI | List models available to your account. |
 | `http://172.16.0.1:9090/v1/messages` | Anthropic | Native Anthropic Messages-API passthrough used by Claude Code. Streams via byte forwarding; credit metering for streaming responses on this endpoint is currently deferred. |
+| `http://172.16.0.1:9090/rig/v1/usage` | Rigbox | Per-subject AI spend over a rolling window. See [Per-subject cost and budgets](#per-subject-cost-and-budgets). |
 | `http://172.16.0.1:9090/brave` | Brave Search | Web Search API when configured for your environment. |
+
+<Tip>
+OpenAI-shape responses now carry the settled rigbox-credit cost of each call (`X-Rigbox-Cost-*` headers + `usage.cost_micro`/`cost_credits`), and multi-tenant apps can attribute, read, and cap cost per end-user. See [Per-subject cost and budgets](#per-subject-cost-and-budgets).
+</Tip>
 
 <Note>
 A small set of free-tier models is also exposed through a `free` alias when Rigbox has the matching managed key. They consume credits at zero rate but otherwise behave identically.
@@ -134,6 +139,125 @@ rig ai usage
 </CodeGroup>
 
 See the [AI Usage API reference](/api-reference/ai/get-usage) for full response schema and query parameters.
+
+## Per-subject cost and budgets
+
+If your app fronts many end-users through a single workspace — a multi-tenant SaaS, an agent platform, a shared chatbot — you can attribute managed-AI cost to each end-user ("subject"), read their spend, and cap it. The proxy is the **mechanism** (accurate cost, attribution, enforcement); your app owns the **policy** (which tiers exist, the amounts, the windows) and asserts the subject id over the already-IP-attested channel.
+
+This covers the OpenAI-shape endpoints (`/v1/chat/completions`, `/v1/completions`, `/v1/responses`, `/v1/embeddings`).
+
+### Read the settled cost of a call
+
+The settled rigbox-credit cost rides on the response — no second lookup. **1 credit ≈ $0.01; 1,000,000 microcredits = 1 credit.** `cost_micro` is the exact integer; `cost_credits` is the convenience float. The fields are best-effort: present only when the upstream model reports a cost, so **don't treat their absence as zero.**
+
+<CodeGroup>
+```bash Buffered
+curl -i "$OPENROUTER_BASE_URL/chat/completions" \
+  -H "Authorization: Bearer $OPENROUTER_API_KEY" -H "Content-Type: application/json" \
+  -d '{"model":"openai/gpt-4o-mini","max_tokens":16,
+       "messages":[{"role":"user","content":"hi"}]}'
+```
+
+```http Response headers + body
+X-Rigbox-Cost-Micro: 360
+X-Rigbox-Cost-Credits: 0.000360
+
+{"usage":{"prompt_tokens":12,"completion_tokens":3,"cost":3.6e-06,
+          "cost_micro":360,"cost_credits":0.00036}}
+```
+</CodeGroup>
+
+For streaming (`"stream": true`), the same `cost_micro` / `cost_credits` are spliced into the final `usage` chunk:
+
+```
+data: {"usage":{"completion_tokens":2,"cost_micro":300,"cost_credits":0.0003}}
+data: [DONE]
+```
+
+### Attribute a call to a subject
+
+Tag any call with `X-Rigbox-Subject` (it wins) or the OpenAI `user` body field. Trimmed; empty = unattributed; capped at 256 characters.
+
+```bash
+curl "$OPENROUTER_BASE_URL/chat/completions" \
+  -H "Authorization: Bearer $OPENROUTER_API_KEY" \
+  -H "X-Rigbox-Subject: tenant-42" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"openai/gpt-4o-mini","messages":[{"role":"user","content":"hi"}]}'
+```
+
+### Read a subject's rolling spend
+
+```bash
+curl "http://172.16.0.1:9090/rig/v1/usage?subject=tenant-42&window=24h"
+```
+```json
+{"subject":"tenant-42","window_seconds":86400,
+ "credits":0.00072,"credits_micro":720,
+ "input_tokens":8,"output_tokens":10,"requests":1}
+```
+
+`window` accepts `30s` / `15m` / `5h` / `7d` or a bare number of seconds (default `86400`). It's a rolling window scoped to your workspace — you can only read your own subjects, and they're isolated from each other. Attribution is forward-only. This read alone is enough to enforce policy yourself (read spend → decide whether to call); the next section is for letting the proxy do it. See the [Get Subject Usage API reference](/api-reference/managed-proxy/get-subject-usage).
+
+### Enforce budgets and rate limits
+
+Declare the policy inline on each request and the proxy checks it against the subject's recorded spend **before** the call runs:
+
+```bash
+curl "$OPENROUTER_BASE_URL/chat/completions" \
+  -H "Authorization: Bearer $OPENROUTER_API_KEY" \
+  -H "X-Rigbox-Subject: tenant-42" \
+  -H "X-Rigbox-Subject-Budget: 50;period=30d" \
+  -H "X-Rigbox-Subject-Rate: 5;window=1h" \
+  -H "X-Rigbox-Subject-Rate: 100req;window=1m" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"openai/gpt-4o-mini","messages":[{"role":"user","content":"hi"}]}'
+```
+
+| Header | Cardinality | Meaning |
+|--------|-------------|---------|
+| `X-Rigbox-Subject-Budget` | at most one | Total spend cap: `<amount>;period=<window>` |
+| `X-Rigbox-Subject-Rate` | repeatable | Sliding limit: `<amount>;window=<window>` |
+
+- **Amount** — a bare number is credits (`5` = 5 credits); a `req` suffix is a request count (`100req`).
+- **Window** — `5h` / `30m` / `3600` / `7d`.
+- Enforcement requires `X-Rigbox-Subject`; with no subject, the limit headers are ignored.
+
+On breach the call is rejected before any spend, with a `Retry-After` header and a structured body. OpenAI SDKs still read `error.message` / `error.code`; `error.details` is the rich payload for your UX:
+
+<CodeGroup>
+```json 429 subject_rate_limited
+{"error":{
+  "code":"subject_rate_limited",
+  "message":"Subject 'tenant-42' hit a rate limit: 5 credits per 3600s.",
+  "details":{
+    "reason":"subject_rate_limited","subject":"tenant-42",
+    "limit":{"kind":"credits","amount":5.0,"window_seconds":3600},
+    "used":{"credits":5.0,"credits_micro":5000000},
+    "resets_at":"2026-06-15T13:00:00Z","retry_after":3600}}}
+```
+
+```json 402 subject_over_budget
+{"error":{
+  "code":"subject_over_budget",
+  "message":"Subject 'tenant-42' is over its budget: 50 credits per 2592000s.",
+  "details":{
+    "reason":"subject_over_budget","subject":"tenant-42",
+    "limit":{"kind":"credits","amount":50.0,"window_seconds":2592000},
+    "used":{"credits":50.3,"credits_micro":50300000},
+    "resets_at":"2026-07-15T06:04:15Z","retry_after":2592000}}}
+```
+</CodeGroup>
+
+A budget breach returns **402 `subject_over_budget`**, a rate breach **429 `subject_rate_limited`** (budget is evaluated first if several trip), and a malformed limit header **400 `subject_limit_malformed`**. The full schema is in the [Chat Completion API reference](/api-reference/managed-proxy/chat-completions).
+
+<Warning>
+Per-subject budgets are **advisory app policy**, not a hard wall. The hard cap is your workspace's own credit balance (enforced atomically). Under concurrency a subject can overshoot a budget by roughly `(in-flight − 1) × per-request cost`, never beyond the workspace balance. `resets_at` / `retry_after` are a conservative upper bound (the window length). Because your app asserts the subject id and its limits, this guards against honest tenant over-spend, not a compromised app process.
+</Warning>
+
+<Note>
+`/v1/messages` (Anthropic) and the audio endpoints are not yet covered by per-subject attribution or enforcement.
+</Note>
 
 ## What Happens When Credits Run Out
 

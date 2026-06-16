@@ -1,0 +1,11 @@
+---
+title: Chat Completion (metered, per-subject)
+openapi: POST /v1/chat/completions
+description: OpenAI-compatible chat completion through the managed proxy, with the settled cost on the response and optional per-subject budget/rate enforcement.
+---
+
+<Note>
+This endpoint is served by the in-VM managed proxy at `http://172.16.0.1:9090`, not the public `api.rigbox.dev` gateway. It is **IP-attested** — no API key; SDKs that require one can send a placeholder `Authorization: Bearer managed-by-rigbox`.
+</Note>
+
+See the [Managed AI Proxy guide](/guides/managed-proxy#per-subject-cost-and-budgets) for the full integration walkthrough, including streaming and the subject usage read.

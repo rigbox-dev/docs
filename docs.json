@@ -14,7 +14,8 @@
   },
   "openapi": [
     "openapi/rigbox-api.json",
-    "openapi/auth-api.json"
+    "openapi/auth-api.json",
+    "openapi/managed-proxy-api.json"
   ],
   "navigation": {
     "tabs": [
@@ -197,6 +198,13 @@
               "api-reference/ai/update-mode",
               "api-reference/ai/get-workspace-ai-config",
               "api-reference/ai/update-workspace-ai-config"
+            ]
+          },
+          {
+            "group": "Managed Proxy",
+            "pages": [
+              "api-reference/managed-proxy/chat-completions",
+              "api-reference/managed-proxy/get-subject-usage"
             ]
           },
           {
