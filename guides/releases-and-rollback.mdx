@@ -3,13 +3,13 @@ title: Releases & Rollback
 description: Every reproducible deploy records an immutable release. List history, roll back to a known-good image, or pin a release manually.
 ---
 
-A **release** is an immutable record of what ran: an image digest plus its run-config. Every reproducible `rig deploy` (one with a Dockerfile or prebuilt image in `rig.yaml`) auto-records a release, giving you a linear history you can roll back to at any time.
+A **release** is an immutable record of what ran: an image digest plus its run-config. Every reproducible `rig deploy` (one whose `rig.yaml` sets `reproducible: true`) auto-records a release, giving you a linear history you can roll back to at any time.
 
 Because the image is content-addressed and frozen, activating an old release boots the workspace from the exact environment that release captured — not an approximate rebuild.
 
 ## How releases are recorded
 
-When `rig deploy` takes the [reproducible path](/guides/deploying#reproducible-deploy), it freezes the environment into a content-addressed image and records a release pointing at that digest. Standard (rsync-only) deploys do not produce releases — there is no frozen image to pin.
+When `rig deploy` takes the [reproducible path](/guides/deploying#reproducible-deploy), it freezes the `install:` result into a content-addressed image and records a release pointing at that digest. Standard (rsync-only) deploys do not produce releases — there is no frozen image to pin.
 
 ```text
 $ rig deploy
@@ -65,27 +65,23 @@ This is useful for promoting an image you built and tested separately, or for co
 
 ## rig build: the explicit image build
 
-`rig build` is the explicit, standalone image build. It builds an image from your Dockerfile (the same content-addressed mechanism `rig deploy` uses) and returns a digest and cache key:
+`rig build image` is the explicit, standalone image build. It runs an install script once in an ephemeral builder VM on top of a base image (the same content-addressed mechanism `rig deploy` uses for `reproducible: true`) and returns a digest and cache key:
 
 ```bash
-rig build
+rig build image --workspace my-project --base-image base \
+  --install "pip install --break-system-packages flask"
 ```
 
 ```text
-→ building image from Dockerfile (FROM rigbox-base)
-✓ image built
+→ running install in builder VM (from base)
+✓ image frozen
   digest: sha256:7b1e…
   key:    a1b2c3…
 ```
 
-To build against a specific workspace and base image explicitly, pass the flags:
+`rig build ls` lists your recent builds (including failed ones) and `rig build logs <build-id>` streams the builder VM's install output — the first place to look when a freeze fails.
 
-```bash
-rig build --workspace my-project --base-image rigbox-base \
-  --install "pip install --break-system-packages flask"
-```
-
-`rig build` is complementary to the auto-build inside `rig deploy`: deploy builds and mounts in one step, while `rig build` lets you produce a digest first and then pin it as a release with `rig release create --image-digest`.
+`rig build image` is complementary to the auto-build inside `rig deploy`: deploy freezes and mounts in one step, while `rig build image` lets you produce a digest first and then pin it as a release with `rig release create --image-digest`. To pre-warm the cache for a project's own `rig.yaml` instead, use `rig deploy --build-only`.
 
 ## Putting it together
 
@@ -93,7 +89,7 @@ A typical reproducible workflow:
 
 <Steps>
 <Step title="Deploy">
-`rig deploy` builds (or reuses) the image and records a release automatically.
+`rig deploy` freezes (or reuses) the image and records a release automatically.
 </Step>
 <Step title="Inspect history">
 `rig release ls` shows the linear history and which release is active.
@@ -102,7 +98,7 @@ A typical reproducible workflow:
 `rig rollback --release <id>` boots the previous release's frozen image — instant, no rebuild.
 </Step>
 <Step title="Pin a tested image">
-Build separately with `rig build`, then `rig release create --image-digest <d>` to capture it as a release before activating.
+Build separately with `rig build image`, then `rig release create --image-digest <d>` to capture it as a release before activating.
 </Step>
 </Steps>
 

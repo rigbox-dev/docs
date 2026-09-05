@@ -1,6 +1,6 @@
 ---
 title: Deploying with rig deploy
-description: Ship a project to a workspace from a single rig.yaml — the standard rsync deploy, the reproducible Dockerfile build, multi-app graphs, and blue-green promotion.
+description: Ship a project to a workspace from a single rig.yaml — the standard rsync deploy, reproducible frozen-image builds, multi-app graphs, and blue-green promotion.
 ---
 
 `rig deploy` is the one command that takes a project on your machine and runs it as a live app in a Rigbox workspace. It reads a `rig.yaml` in the project directory, resolves a target workspace, syncs your code, and brings the service up behind a public subdomain.
@@ -96,8 +96,9 @@ workspace:
 | `credentials` | `[{ generate: true }]` — the server mints a stable random value, injected as `CRED_<UPPER_KEY>`. |
 | `params` | Server-validated config (types: `string`, `number`, `boolean`, `secret`, `select`, `email`, `url`, `textarea`). |
 | `visibility` | `private` (default), `public`, or `{ emails: [...] }`. |
-| `build` | Opt into a reproducible image build. See [Deploy modes](#deploy-modes). |
-| `source` | A git source for the build context (optional — the CLI uploads the local dir by default). |
+| `build` | A build command run on the VM after `install:`, before `start:`. |
+| `reproducible` | `true` to freeze `install:` into a content-addressed image and boot from it. See [Deploy modes](#deploy-modes). |
+| `source` | `kind: local` (default; rsync the dir) or `kind: git` with `repo`/`branch`. |
 | `volumes` | App opt-in mounts. Use workspace volume refs (`[data]`) or full app-local specs. See [Persistent Volumes](/guides/persistent-volumes). |
 | `workspace` | `{ image, resources, volumes }` — VM image/sizing plus reusable workspace volume declarations. |
 
@@ -160,11 +161,11 @@ health:
 
 ## Deploy modes
 
-`rig deploy` picks its mode from `rig.yaml`. There is **no `--reproducible` flag** — the presence of a Dockerfile (or prebuilt image) in `build:` is the only signal.
+`rig deploy` picks its mode from `rig.yaml`. There is **no `--reproducible` flag** — the app-level `reproducible: true` key is the only signal.
 
 ### Standard deploy
 
-With no `build:` block (or a `build:` that is just a shell command), `rig deploy`:
+With `reproducible` unset (or `false`), `rig deploy`:
 
 1. Rsyncs the app directory into the workspace.
 2. Runs `install:` on the VM.
@@ -182,52 +183,43 @@ health: { path: /healthz, timeoutSeconds: 30 }
 
 ### Reproducible deploy
 
-> **A Dockerfile in `rig.yaml` makes the deploy reproducible automatically — no flag.**
+> **`reproducible: true` in `rig.yaml` makes the deploy reproducible — the same `install:` script, frozen once.**
 
-When `build:` declares a `dockerfile` (or a prebuilt `image`), `rig deploy` builds a **content-addressed image** that freezes the environment, boots the workspace from that exact image digest, and then rsyncs your app **code** on top.
+When an app sets `reproducible: true`, `rig deploy` runs your `install:` script **once** in an ephemeral builder VM booted from the base image, freezes the result into a **content-addressed image**, boots the workspace from that exact image digest, and then rsyncs your app **code** on top. `build:` and `start:` run as usual after the sync.
 
 ```yaml
 name: ai-chat
 port: 8080
-build:
-  dockerfile: Dockerfile
+reproducible: true
+install: |
+  pip install --break-system-packages --no-cache-dir \
+    fastapi uvicorn pydantic httpx
 start: uvicorn chat:app --host 0.0.0.0 --port 8080
 health: { path: /healthz, timeoutSeconds: 30 }
 ```
 
-The Dockerfile **must be `FROM rigbox-base`**. The platform asserts that its agent and systemd are present and rejects any other base at build time, so you keep the platform's opinions while layering your own dependencies on top.
-
-```dockerfile
-# Dockerfile — must be FROM rigbox-base.
-FROM rigbox-base
-RUN pip install --break-system-packages --no-cache-dir \
-      fastapi uvicorn pydantic httpx
-```
+Nothing about the manifest changes except the flag: the same `install:` you would run on every standard deploy is what gets frozen. The image is always built on top of the platform base image (`workspace.image`, default `base`), so the agent and systemd are present and you keep the platform's opinions while layering your own dependencies on top.
 
 <Note>
-The CLI uploads the **local project directory** as the build context, so **no git repo is required**. Install dependencies to **system paths** (e.g. pip `--break-system-packages`) so the rsynced code finds them. Keep your app's own source **out** of the image — it arrives by rsync.
+The builder is a throwaway VM, not the host — **no user code ever runs on the host**. Install dependencies to **system paths** (e.g. pip `--break-system-packages`) so the rsynced code finds them. Keep your app's own source **out** of the image — it arrives by rsync.
 </Note>
 
-#### `build:` has three shapes
+#### `build:` is always a command
 
-| Shape | Mode | Meaning |
-| --- | --- | --- |
-| `build: <command>` | Standard | A build command run on the VM after `install:`. |
-| `build: { dockerfile, context?, sizeMb? }` | Reproducible | Build a content-addressed image from a local Dockerfile. |
-| `build: { image, sizeMb? }` | Reproducible | Pull a prebuilt OCI image by reference. |
+`build:` is a shell command run on the VM after the code syncs (after the frozen `install:` layer in reproducible mode, after `install:` runs in standard mode) and before `start:`. It has no other shape.
 
-### The hybrid model: build once, rsync the rest
+### The hybrid model: freeze once, rsync the rest
 
 The reproducible path is **hybrid** — the slow, stable environment is built once and frozen into an image; fast-changing app code rides over it via rsync.
 
-The image is cached keyed by the **build inputs** — the install/build command, the Dockerfile **contents**, the base image, the git source, and dependency lockfiles — **not** your app code. So:
+The image is cached keyed by the **build inputs** — the `install:` script, the `build:` command, the base image, the git source (when `source.kind: git`), and dependency lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `poetry.lock`, `requirements.txt`, `Cargo.lock`, `Gemfile.lock`, `go.sum`) — **not** your app code. So:
 
 <CodeGroup>
-```text First deploy (builds the image)
+```text First deploy (freezes the image)
 $ rig deploy
-→ building image from Dockerfile (FROM rigbox-base)
+→ running install in builder VM (from base)
   + pip install fastapi uvicorn pydantic httpx
-→ image built: sha256:9f3c… (frozen)
+→ image frozen: sha256:9f3c… (build bld_01…)
 → booting workspace from image digest
 → rsyncing app code (chat.py, static/)
 → starting service · health GET /healthz → 200 OK
@@ -243,7 +235,16 @@ $ rig deploy
 ```
 </CodeGroup>
 
-Editing the Dockerfile or a lockfile changes a build input, so the next deploy rebuilds the image. Editing only app code reuses the cached image and just rsyncs the change — no rebuild, no re-install.
+Editing `install:`, `build:`, or a lockfile changes a build input, so the next deploy rebuilds the image. Editing only app code reuses the cached image and just rsyncs the change — no rebuild, no re-install.
+
+#### Pre-warm the image with `--build-only`
+
+`rig deploy --build-only` runs the freeze step and stops — no workspace is created, re-imaged, or synced. It uses the same build-inputs digest a full deploy computes, so a later `rig deploy` finds the cached image and skips straight to rsync. Useful in CI, or to pay the install cost before a launch window.
+
+```bash
+rig deploy --build-only     # freeze (or reuse) the image, print its digest, exit
+rig deploy                  # later: reuses the image, rsyncs, starts
+```
 
 <Note>
 Every reproducible deploy also auto-records a **release** (an image digest + run-config), so you can roll back later. See [Releases & Rollback](/guides/releases-and-rollback).
@@ -251,8 +252,36 @@ Every reproducible deploy also auto-records a **release** (an image digest + run
 
 #### When to use which
 
-- **`install:` (no Dockerfile)** — simple apps with fast installs. The default.
-- **`build: { dockerfile }`** — heavier or slower environments you want frozen and byte-identical across deploys. `rig deploy` builds and mounts the image for you, and only rebuilds when the build inputs change.
+- **`install:` alone** — simple apps with fast installs. The default.
+- **`reproducible: true`** — heavier or slower installs you want frozen and byte-identical across deploys and rollbacks. `rig deploy` freezes and mounts the image for you, and only rebuilds when the build inputs change.
+
+### Migrating from Dockerfile builds
+
+Earlier releases accepted a Dockerfile or prebuilt OCI image under `build:`. **As of rig 0.12.63, `build: { dockerfile }` and `build: { image }` are rejected** with a hard error — the platform no longer builds from Docker sources. To migrate, move each `RUN` step into `install:` and set `reproducible: true`; the base image is implied, so the `FROM rigbox-base` line goes away.
+
+<CodeGroup>
+```yaml Before (rig ≤ 0.12.62)
+name: ai-chat
+port: 8080
+build:
+  dockerfile: Dockerfile     # FROM rigbox-base + RUN pip install …
+start: uvicorn chat:app --host 0.0.0.0 --port 8080
+health: { path: /healthz, timeoutSeconds: 30 }
+```
+
+```yaml After (rig ≥ 0.12.63)
+name: ai-chat
+port: 8080
+reproducible: true
+install: |
+  pip install --break-system-packages --no-cache-dir \
+    fastapi uvicorn pydantic httpx
+start: uvicorn chat:app --host 0.0.0.0 --port 8080
+health: { path: /healthz, timeoutSeconds: 30 }
+```
+</CodeGroup>
+
+The Dockerfile itself can be deleted. Non-`RUN` instructions map as you'd expect: `ENV` → `env:`, `EXPOSE` → `port:`, `CMD` → `start:`, `WORKDIR` → `workingDirectory:`. The first deploy after migrating rebuilds the image (the build inputs changed); subsequent deploys reuse it.
 
 ---
 
@@ -281,16 +310,20 @@ For zero-downtime rollouts, stage a change, verify it, then swap production over
 
 ## Deploy via the API
 
-`rig deploy` orchestrates several REST calls. The image build step maps to the builds endpoint, and the resulting digest is recorded as a release. For endpoints without a dedicated command, `rig api` sends a raw authenticated request:
+`rig deploy` orchestrates several REST calls. The freeze step maps to the builds endpoint (a recipe: base image plus install script), and the resulting digest is recorded as a release. For endpoints without a dedicated command, `rig api` sends a raw authenticated request:
 
 ```bash
 # Kick off an explicit image build (the deploy auto-build uses the same endpoint)
 rig api POST /v1/builds --body - <<'JSON'
-{ "dockerfile": "FROM rigbox-base\nRUN pip install --break-system-packages flask" }
+{
+  "base_image": "base",
+  "recipe": { "install_script": "pip install --break-system-packages flask" },
+  "label": "ai-chat"
+}
 JSON
 ```
 
-See [Releases & Rollback](/guides/releases-and-rollback) for the release lifecycle and the `rig build` command.
+See [Releases & Rollback](/guides/releases-and-rollback) for the release lifecycle and the `rig build` commands.
 
 ---
 

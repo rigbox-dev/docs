@@ -171,6 +171,7 @@ rig deploy --workspace my-project       # target a named/id'd workspace
 rig deploy --name my-project            # name to use when spawning a fresh workspace
 rig deploy --app api                    # multi-app project: deploy only one app
 rig deploy --watch                      # re-deploy on source changes (single-app)
+rig deploy --build-only                 # freeze the image for reproducible apps and stop
 ```
 
 When `--workspace` is unset, deploy reuses the workspace bound in `.rig.lock`, or spawns a fresh one. `rig deploy --prune-stale` drops `.rig.lock` bindings to workspaces that no longer exist, then exits without deploying.
@@ -234,6 +235,7 @@ port: 5000                    # required — port the app listens on
 start: gunicorn app:app       # required — the systemd ExecStart command
 install: pip install -r requirements.txt   # dependency install (runs server-side)
 build: python manage.py collectstatic       # optional — runs after install, before start
+reproducible: false           # true freezes install: into a content-addressed image
 
 env:                          # static env vars baked into the unit
   LOG_LEVEL: info
@@ -316,7 +318,8 @@ volumes: [data]               # opt the app into a workspace volume mount
 | `port` | number | **Required.** Port the app listens on. |
 | `start` | string | **Required.** systemd `ExecStart`. |
 | `install` | string | Dependency-install command, compiled into the server-side install script. |
-| `build` | string | Build command run after `install`, before start. |
+| `build` | string | Build command run after `install`, before start. Always a command — Dockerfile/image forms are rejected as of rig 0.12.63. |
+| `reproducible` | bool | `true` runs `install` once in a builder VM, freezes the result to an image, and boots from that digest. See [Deploying](/guides/deploying#reproducible-deploy). |
 | `env` | map | Static env vars baked into the unit. |
 | `secrets` | list | Local env vars forwarded at deploy time (`NAME`, `{name, from}`, or `{name, optional}`). |
 | `credentials` | map | Platform-minted values (`generate`, `envVar`). |
@@ -495,13 +498,16 @@ You can also declare volumes in `rig.yaml` under `workspace.volumes` and opt app
 
 ### build, release, rollback
 
-Reproducible deploys separate **build** (produce an immutable image artifact) from **run** (activate a release that pins an image digest).
+Reproducible deploys separate **build** (freeze an `install:` script into an immutable image artifact) from **run** (activate a release that pins an image digest). Setting `reproducible: true` in `rig.yaml` makes `rig deploy` do both; the commands below expose each half on its own.
 
 ```bash
-# Build an immutable image for a workspace
-rig build --workspace my-project --base-image dev \
+# Freeze an install script into an immutable image for a workspace
+rig build image --workspace my-project --base-image base \
   --install "npm ci && npm run build" \
   --source-repo https://github.com/you/repo.git --source-commit "$(git rev-parse HEAD)"
+
+rig build ls                            # recent builds, including failed ones
+rig build logs bld-…                    # the builder VM's install output
 
 # Pin that image digest into a release
 rig release create --workspace my-project --image-digest sha256:… \
@@ -516,7 +522,9 @@ rig rollback --workspace my-project --release <RELEASE_ID>
 
 | Command | Key flags | Description |
 | --- | --- | --- |
-| `build` | `--workspace`, `--base-image`, `--install`, `--source-repo`, `--source-commit` | Build a reproducible image and print its digest. |
+| `build image` | `--workspace`, `--base-image`, `--install`, `--source-repo`, `--source-commit` | Freeze an install script into a reproducible image and print its digest. |
+| `build ls` | `--limit` | List your recent image builds, including failed ones. |
+| `build logs` | `<build-id>` | Stream the builder VM's install log for a build. |
 | `release create` | `--workspace`, `--image-digest`, `--run-config` | Create a release pinning an image digest. |
 | `release ls` | `--workspace` | List releases for a workspace. |
 | `release activate` | `--workspace`, `--release` | Activate a release. |
