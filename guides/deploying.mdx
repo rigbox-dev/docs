@@ -255,34 +255,6 @@ Every reproducible deploy also auto-records a **release** (an image digest + run
 - **`install:` alone** — simple apps with fast installs. The default.
 - **`reproducible: true`** — heavier or slower installs you want frozen and byte-identical across deploys and rollbacks. `rig deploy` freezes and mounts the image for you, and only rebuilds when the build inputs change.
 
-### Migrating from Dockerfile builds
-
-Earlier releases accepted a Dockerfile or prebuilt OCI image under `build:`. **As of rig 0.12.63, `build: { dockerfile }` and `build: { image }` are rejected** with a hard error — the platform no longer builds from Docker sources. To migrate, move each `RUN` step into `install:` and set `reproducible: true`; the base image is implied, so the `FROM rigbox-base` line goes away.
-
-<CodeGroup>
-```yaml Before (rig ≤ 0.12.62)
-name: ai-chat
-port: 8080
-build:
-  dockerfile: Dockerfile     # FROM rigbox-base + RUN pip install …
-start: uvicorn chat:app --host 0.0.0.0 --port 8080
-health: { path: /healthz, timeoutSeconds: 30 }
-```
-
-```yaml After (rig ≥ 0.12.63)
-name: ai-chat
-port: 8080
-reproducible: true
-install: |
-  pip install --break-system-packages --no-cache-dir \
-    fastapi uvicorn pydantic httpx
-start: uvicorn chat:app --host 0.0.0.0 --port 8080
-health: { path: /healthz, timeoutSeconds: 30 }
-```
-</CodeGroup>
-
-The Dockerfile itself can be deleted. Non-`RUN` instructions map as you'd expect: `ENV` → `env:`, `EXPOSE` → `port:`, `CMD` → `start:`, `WORKDIR` → `workingDirectory:`. The first deploy after migrating rebuilds the image (the build inputs changed); subsequent deploys reuse it.
-
 ---
 
 ## Env, secrets, credentials, params, and visibility
