@@ -318,7 +318,7 @@ volumes: [data]               # opt the app into a workspace volume mount
 | `port` | number | **Required.** Port the app listens on. |
 | `start` | string | **Required.** systemd `ExecStart`. |
 | `install` | string | Dependency-install command, compiled into the server-side install script. |
-| `build` | string | Build command run after `install`, before start. Always a command — Dockerfile/image forms are rejected as of rig 0.12.63. |
+| `build` | string | Build command run after `install`, before start. |
 | `reproducible` | bool | `true` runs `install` once in a builder VM, freezes the result to an image, and boots from that digest. See [Deploying](/guides/deploying#reproducible-deploy). |
 | `env` | map | Static env vars baked into the unit. |
 | `secrets` | list | Local env vars forwarded at deploy time (`NAME`, `{name, from}`, or `{name, optional}`). |
