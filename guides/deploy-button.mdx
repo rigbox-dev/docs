@@ -32,7 +32,7 @@ If the workspace already has a different automatic deployment connection, review
 
 ## Secrets and retries
 
-Runtime-secret inputs and sensitive app parameters are encrypted in Rigbox. Their entered values are not committed to Git, included in deployment links, or persisted in browser onboarding storage. Re-enter them after reloading an unfinished attempt. Do not put credentials in the YAML editor or badge URL.
+Runtime-secret inputs and sensitive app parameters are encrypted in the GitHub deployment connection. Once delivered to the workspace, they use Rigbox’s existing runtime environment configuration; account owners can inspect that configuration through the authenticated API. Their entered values are not committed to Git, included in deployment links, or persisted in browser onboarding storage. Re-enter them after reloading an unfinished attempt. Do not put credentials in the YAML editor or badge URL.
 
 Deployment attempts are saved on the server for 24 hours. Reloading or retrying a failed GitHub save resumes the same attempt and workspace. Duplicate submissions do not provision another workspace. If a branch changes during review, review it again before deploying.
 
