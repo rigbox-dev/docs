@@ -5,7 +5,7 @@ description: Push a GitHub repository to its bound Rigbox workspace using short-
 
 Use [rigbox-dev/deploy-action](https://github.com/rigbox-dev/deploy-action) to deploy on a push. The Action exchanges GitHub's OpenID Connect identity for a short-lived Rigbox credential scoped to one existing workspace. You do not store a Rigbox API key or register an SSH key on the runner.
 
-This guide uses Action `v1` and Rigbox CLI **v0.12.64 or newer**. GitHub OIDC deployments must be enabled for your Rigbox account. GitHub App webhooks and automatic pull-request preview environments are separate, planned features.
+This guide uses Action `v1` and Rigbox CLI **v0.12.64 or newer**. GitHub OIDC deployments must be enabled for your Rigbox account. For automatic deployments without a workflow, connect a repository through the workspace creation page or the workspace’s GitHub deployment settings. Automatic pull-request preview environments are not yet supported.
 
 ## Prepare the manifest
 
