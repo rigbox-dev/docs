@@ -44,6 +44,7 @@
           {
             "group": "Deploying & hosting",
             "pages": [
+              "guides/deploy-button",
               "guides/github-actions",
               "guides/bluegreen",
               "guides/releases-and-rollback",

@@ -155,3 +155,7 @@ A failed app fails the job even when other apps succeeded. The CLI's nonzero exi
 | CLI too old or ARM asset missing | Use a supported release and runner architecture. |
 
 Deployment credentials expire after 60 minutes and cannot be reused to manage the account or another workspace. Each GitHub identity token can be exchanged once; rerun the workflow to request a new identity instead of replaying a captured token.
+
+## Deploy from an example README
+
+For a browser-based flow without a local CLI or workflow file, use [Deploy to Rigbox buttons](/guides/deploy-button). Each workspace gets a deployment branch, so one fork can serve several independent targets.

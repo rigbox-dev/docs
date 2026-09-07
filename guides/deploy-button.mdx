@@ -1,0 +1,57 @@
+---
+title: "Deploy buttons"
+description: "Fork an example and deploy its apps to a new or existing Rigbox workspace."
+---
+
+A **Deploy to Rigbox** button opens workspace creation with a repository, branch, and manifest selected. You can sign up or log in, connect GitHub, and deploy without running a local CLI or adding a GitHub Actions workflow.
+
+## Deploy an example
+
+1. Click the button in an example README. Rigbox keeps the selected example through signup and login.
+2. Connect GitHub. Select an existing fork, including a renamed fork, or choose **Fork on GitHub**. Forking opens a separate tab. Return to Rigbox and select **Refresh after forking**, then **Continue with my fork**.
+3. If the fork is missing, grant the Rigbox GitHub App access to it and refresh the connection. Choose the correct GitHub account when you have several connected accounts.
+4. Choose **New workspace**, or select a workspace you already own. Previous deployments of the same example are marked in the destination list.
+5. Review the apps and resource allocation. Choose **Deploy with defaults**, or **Customize** to edit resources, app settings, and YAML. Required settings and secrets must be supplied; invalid manifests and insufficient capacity block deployment.
+6. Rigbox starts the workspace, queues deployment, and opens its detail page. Follow the build and deployment progress there. HTTP services get app links; CLI tools are available from the workspace terminal or SSH.
+
+The badge source must be a public GitHub repository. Your fork is checked using GitHub repository identity and ancestry, so renaming a fork is supported. The GitHub App needs access to the selected fork; the flow does not expand its permissions or retain a GitHub user token.
+
+## Deployment branches
+
+Each new target gets a branch named `rigbox/deploy/<workspace-id>`, based on the source commit you reviewed. Rigbox saves configuration and resource changes there and rewrites app Git sources to the selected fork and deployment branch. Unrelated YAML and comments are preserved.
+
+Pushes to that deployment branch redeploy only its workspace. Multiple workspaces can use one fork with independent branches. Updating the fork's default branch does not update deployed workspaces: explicitly merge those changes into the relevant deployment branch when ready.
+
+Redeploying the same target reuses its branch. Existing connections keep their current branches. Replacing a different connection may use a suffixed deployment branch to preserve the previous branch.
+
+## Existing workspaces
+
+Rigbox imports the workspace's actual vCPU, RAM, disk, and base image into the configuration preview. Confirm **root-filesystem and app replacement** before deploying. Persistent volumes are retained; changes stored only on the root filesystem are replaced.
+
+If the workspace already has a different automatic deployment connection, review and explicitly confirm replacing it. Rigbox keeps one active automatic deployment connection per workspace. Adding apps without replacing the root filesystem is a separate planned capability.
+
+## Secrets and retries
+
+Runtime-secret inputs and sensitive app parameters are encrypted in Rigbox. Their entered values are not committed to Git, included in deployment links, or persisted in browser onboarding storage. Re-enter them after reloading an unfinished attempt. Do not put credentials in the YAML editor or badge URL.
+
+Deployment attempts are saved on the server for 24 hours. Reloading or retrying a failed GitHub save resumes the same attempt and workspace. Duplicate submissions do not provision another workspace. If a branch changes during review, review it again before deploying.
+
+A workspace created before a later failure is kept. Open it to inspect startup or build failures. An expired attempt requires a new review; select the already-created workspace to reuse it instead of creating another.
+
+## Add a badge
+
+Place this Markdown in the example README:
+
+```markdown
+[![Deploy to Rigbox](https://rigbox.dev/deploy.svg)](https://rigbox.dev/deploy?repo=rigbox-dev/rigbox-examples&ref=main&path=quickstart%2Frig.yaml)
+```
+
+| Parameter | Meaning | Default |
+| --- | --- | --- |
+| `repo` | Public GitHub `owner/repository` | Required |
+| `ref` | Source branch to review | `main` |
+| `path` | Repository-relative manifest file ending in `rig.yaml` | `rig.yaml` |
+
+URL-encode parameter values. Absolute URLs and paths outside the repository are rejected. A badge can point to service, multi-app, CLI-only, or mixed manifests. Validate and test the example before publishing its badge.
+
+For GitHub Actions connections, use `rig ci status --repo owner/repository` to list targets. When more than one binding exists, disconnect a specific target with `rig ci unlink --repo owner/repository --workspace <workspace-id>`.
