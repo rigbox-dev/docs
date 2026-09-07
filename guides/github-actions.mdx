@@ -1,0 +1,157 @@
+---
+title: Deploy from GitHub Actions
+description: Push a GitHub repository to its bound Rigbox workspace using short-lived OIDC credentials.
+---
+
+Use [rigbox-dev/deploy-action](https://github.com/rigbox-dev/deploy-action) to deploy on a push. The Action exchanges GitHub's OpenID Connect identity for a short-lived Rigbox credential scoped to one existing workspace. You do not store a Rigbox API key or register an SSH key on the runner.
+
+This guide uses Action `v1` and Rigbox CLI **v0.12.64 or newer**. GitHub OIDC deployments must be enabled for your Rigbox account. GitHub App webhooks and automatic pull-request preview environments are separate, planned features.
+
+## Prepare the manifest
+
+Every app deployed from CI must declare `source.kind: git` and the HTTPS URL of the workflow's repository. Local source deployments are rejected before deployment starts. For a private repository, also set `reproducible: true` on every app.
+
+Add the source settings to your existing `rig.yaml`:
+
+```yaml
+name: web
+port: 3000
+source:
+  kind: git
+  repo: https://github.com/YOUR_ORG/YOUR_REPO
+  branch: main
+reproducible: true
+install: npm ci
+start: npm start
+health:
+  path: /healthz
+  timeoutSeconds: 60
+visibility: public
+```
+
+Replace the repository URL, commands, port, and health path with your app's values. In a multi-app manifest, put `source` and `reproducible` in each app definition. See [Deploying with rig deploy](/guides/deploying) for manifest shapes.
+
+The deployed source is the exact `GITHUB_SHA` from the workflow. The CLI records that SHA in the build inputs and release provenance. A new commit changes the reproducible image cache key, even when the branch name stays the same. The git path does not rsync the runner's checkout over the server-side clone.
+
+## Link the repository once
+
+From your project directory on your machine, authenticate with your full Rigbox account credential and link an existing workspace:
+
+```bash
+rig login
+rig ci link --repo YOUR_ORG/YOUR_REPO --workspace production
+rig ci status --repo YOUR_ORG/YOUR_REPO
+```
+
+For a private repository, add `--private` to make the link preflight check the required reproducible settings:
+
+```bash
+rig ci link --repo YOUR_ORG/YOUR_REPO --workspace production --private
+```
+
+`--workspace` accepts a name or ID. `--from <directory>` selects another project directory for manifest validation. The Action takes its target from this binding, so a fresh checkout without `.rig.lock` deploys to the same workspace.
+
+The new binding is **pending for 24 hours**. The first claim relies on control of the configured repository name during this window; verify the name before linking. Its first successful OIDC exchange claims it and makes it active. If the window expires, rerun the same link command and then run the workflow. Repeating the command for an active binding preserves its identity.
+
+Once claimed, the binding stores GitHub's immutable repository and owner IDs. A deleted-and-recreated repository cannot inherit access by taking the same name. Repository ownership transfers require the Rigbox account owner to unlink and link again; the old owner ID is rejected.
+
+```bash
+rig ci unlink --repo YOUR_ORG/YOUR_REPO
+```
+
+Unlinking removes the binding and revokes credentials issued through it. Run `rig ci status` without `--repo` to list your bindings. These setup commands require an account credential; a deployment credential cannot manage bindings.
+
+## Add the workflow
+
+Create `.github/workflows/deploy.yml` in the linked repository:
+
+```yaml
+name: Deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: rigbox-production
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: rigbox-dev/deploy-action@v1
+        id: deploy
+        with:
+          cli-version: v0.12.64
+```
+
+Use your deployment branch instead of `main` if needed. Keep changes to the deployment workflow under the repository's normal review controls. You can pin the Action to a reviewed commit rather than a moving major-version tag.
+
+The Action requests the audience `https://api.rigbox.dev`, validates the exchanged repository and commit, then runs `rig deploy --workspace <bound-id> --output json`. Both identity and deploy credentials are masked immediately. For private source, it forwards the job's ephemeral `github.token` to the builder; no token is stored in the manifest or build record. Public source is fetched anonymously. CI does not create or register an account SSH key.
+
+### First image deployment to an existing workspace
+
+A workspace that is not already image-pinned may require explicit consent before its first reproducible deployment. Re-imaging replaces the workspace filesystem and discards files stored there. Back up data you need to keep, then set this input for that setup deployment:
+
+```yaml
+      - uses: rigbox-dev/deploy-action@v1
+        with:
+          cli-version: v0.12.64
+          reimage: "true"
+```
+
+Remove `reimage` after setup. It defaults to `false`; the Action never enables disk replacement automatically. Keep durable data in [persistent volumes](/guides/persistent-volumes).
+
+## Inputs and runner support
+
+| Input | Default | Purpose |
+| --- | --- | --- |
+| `cli-version` | `latest` | Stable CLI version, at least v0.12.64. Pin a release for repeatability. |
+| `working-directory` | `.` | Directory containing `rig.yaml`. |
+| `api-url` | `https://api.rigbox.dev` | HTTPS API base URL. |
+| `audience` | `https://api.rigbox.dev` | OIDC audience accepted by that server. |
+| `reimage` | `false` | `true` explicitly allows workspace filesystem replacement. |
+
+Linux x64 and macOS Intel/Apple Silicon are supported. The installer verifies the release asset's SHA256 digest before executing it. Linux ARM fails explicitly while no `rigbox-linux-arm64` asset is published. Runners need Bash and Python 3.9 or newer.
+
+## Application environment values
+
+Workflow `env:` supplies values for the manifest's existing `secrets` declarations:
+
+```yaml
+      - uses: rigbox-dev/deploy-action@v1
+        env:
+          APP_TOKEN: ${{ secrets.APP_TOKEN }}
+        with:
+          cli-version: v0.12.64
+```
+
+```yaml
+secrets:
+  - name: APP_TOKEN
+```
+
+Application values are separate from the Action's short-lived deployment credential. Rigbox currently stores app environment values as plaintext metadata. Authorized callers can read them through `GET /apps`, `rig app env ls --reveal`, or JSON environment output. The manifest's `secrets` field reads values without committing them to `rig.yaml`; it is **not an encrypted Rigbox secrets store**. Encryption at rest and restricted readback remain separate work.
+
+## Results and failures
+
+The Action reads the CLI's terminal `deploy_finished` event, including partial failures. It exposes `workspace-id`, `url` (the first app URL), `apps` (JSON app outcomes), `success`, `failures`, `duration-ms`, `result` (the full event), and `exit-code`.
+
+A failed app fails the job even when other apps succeeded. The CLI's nonzero exit code is preserved. If deployment fails before its terminal event, only the workspace ID, failure status, and exit code are available. Use `if: always()` on a follow-up step when reading failure outputs.
+
+| Problem | Next step |
+| --- | --- |
+| OIDC request variables missing | Add `permissions: id-token: write` to the workflow or job. |
+| No permitted binding | Check `rig ci status`, the repository URL, and the workspace owner. Renew an expired pending binding. |
+| GitHub OIDC deployments disabled | Enable the capability for your Rigbox account before retrying. |
+| Repository transferred or recreated | Review the new ownership, then unlink and link again. |
+| Private source refused | Set `reproducible: true`, keep `source.kind: git`, and grant `contents: read`. |
+| Re-image consent required | Review the filesystem replacement above before explicitly setting `reimage: "true"`. |
+| CLI too old or ARM asset missing | Use a supported release and runner architecture. |
+
+Deployment credentials expire after 60 minutes and cannot be reused to manage the account or another workspace. Each GitHub identity token can be exchanged once; rerun the workflow to request a new identity instead of replaying a captured token.

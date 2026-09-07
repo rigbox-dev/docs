@@ -5,7 +5,7 @@ description: Ship a project to a workspace from a single rig.yaml — the standa
 
 `rig deploy` is the one command that takes a project on your machine and runs it as a live app in a Rigbox workspace. It reads a `rig.yaml` in the project directory, resolves a target workspace, syncs your code, and brings the service up behind a public subdomain.
 
-It is the single, consolidated deploy verb — it replaced the older `rig app deploy` and `rig workspace deploy` commands.
+For push-to-deploy workflows, use the [GitHub Actions guide](/guides/github-actions). It deploys to a bound workspace with a short-lived credential.
 
 ```bash
 cd my-app
@@ -165,7 +165,7 @@ health:
 
 ### Standard deploy
 
-With `reproducible` unset (or `false`), `rig deploy`:
+With `reproducible` unset (or `false`) and local source, `rig deploy`:
 
 1. Rsyncs the app directory into the workspace.
 2. Runs `install:` on the VM.
@@ -185,7 +185,7 @@ health: { path: /healthz, timeoutSeconds: 30 }
 
 > **`reproducible: true` in `rig.yaml` makes the deploy reproducible — the same `install:` script, frozen once.**
 
-When an app sets `reproducible: true`, `rig deploy` runs your `install:` script **once** in an ephemeral builder VM booted from the base image, freezes the result into a **content-addressed image**, boots the workspace from that exact image digest, and then rsyncs your app **code** on top. `build:` and `start:` run as usual after the sync.
+When an app sets `reproducible: true`, `rig deploy` runs its `install:` script in an isolated builder workspace and freezes the result into a content-addressed image. It boots the target from that image digest. With `source.kind: local`, app code is then synced from your machine. With `source.kind: git`, the builder fetches the resolved commit and the CLI does not overlay the local checkout.
 
 ```yaml
 name: ai-chat
@@ -201,29 +201,29 @@ health: { path: /healthz, timeoutSeconds: 30 }
 Nothing about the manifest changes except the flag: the same `install:` you would run on every standard deploy is what gets frozen. The image is always built on top of the platform base image (`workspace.image`, default `base`), so the agent and systemd are present and you keep the platform's opinions while layering your own dependencies on top.
 
 <Note>
-The builder is a throwaway VM, not the host — **no user code ever runs on the host**. Install dependencies to **system paths** (e.g. pip `--break-system-packages`) so the rsynced code finds them. Keep your app's own source **out** of the image — it arrives by rsync.
+Install dependencies to system paths, such as pip `--break-system-packages`, so deployed code can find them. Git source is fetched into the build at its resolved commit; local source is synced after the image is ready.
 </Note>
 
 #### `build:` is always a command
 
-`build:` is a shell command run on the VM after the code syncs (after the frozen `install:` layer in reproducible mode, after `install:` runs in standard mode) and before `start:`. It has no other shape.
+`build:` is a shell command run after `install:` and before the service starts. For reproducible Git source it runs against the exact checkout in the builder, so the image includes its output. It has no other shape.
 
-### The hybrid model: freeze once, rsync the rest
+### Local source: freeze dependencies and sync code
 
 The reproducible path is **hybrid** — the slow, stable environment is built once and frozen into an image; fast-changing app code rides over it via rsync.
 
-The image is cached keyed by the **build inputs** — the `install:` script, the `build:` command, the base image, the git source (when `source.kind: git`), and dependency lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `poetry.lock`, `requirements.txt`, `Cargo.lock`, `Gemfile.lock`, `go.sum`) — **not** your app code. So:
+For local source, the image is cached by the **build inputs** — the `install:` script, the `build:` command, the base image, and dependency lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `poetry.lock`, `requirements.txt`, `Cargo.lock`, `Gemfile.lock`, `go.sum`) — **not** your app code. So:
 
 <CodeGroup>
 ```text First deploy (freezes the image)
 $ rig deploy
-→ running install in builder VM (from base)
+→ running install in builder workspace (from base)
   + pip install fastapi uvicorn pydantic httpx
 → image frozen: sha256:9f3c… (build bld_01…)
 → booting workspace from image digest
 → rsyncing app code (chat.py, static/)
 → starting service · health GET /healthz → 200 OK
-✓ deployed to https://ai-chat.rigbox.dev   (release rel_01…)
+deployed to https://ai-chat.rigbox.dev   (release rel_01…)
 ```
 
 ```text Later deploy (build inputs unchanged)
@@ -231,15 +231,31 @@ $ rig deploy
 → build inputs unchanged — reusing cached image sha256:9f3c…
 → rsyncing changed app code (chat.py)
 → restarting service · health GET /healthz → 200 OK
-✓ deployed to https://ai-chat.rigbox.dev   (release rel_02…)
+deployed to https://ai-chat.rigbox.dev   (release rel_02…)
 ```
 </CodeGroup>
 
 Editing `install:`, `build:`, or a lockfile changes a build input, so the next deploy rebuilds the image. Editing only app code reuses the cached image and just rsyncs the change — no rebuild, no re-install.
 
+### Git source: deploy the resolved commit
+
+```yaml
+source:
+  kind: git
+  repo: https://github.com/YOUR_ORG/YOUR_REPO
+  branch: main
+reproducible: true
+```
+
+For git source, the resolved commit SHA is part of the image cache key. A new commit therefore produces different build inputs even on the same branch. The server checks out that commit; the CLI does not rsync local files over it. Standard public-git deployments can refresh the source without reinstalling when their install configuration and lockfiles are unchanged and no `build:` command needs to regenerate artifacts.
+
+All CI apps must use git source. Private CI repositories also require `reproducible: true`; the [GitHub Action](/guides/github-actions) forwards the job's ephemeral repository token for the build. No runner SSH key is needed.
+
+Deploying a frozen image into an existing workspace that is not image-pinned requires `rig deploy --reimage`. This explicitly permits replacement of the workspace filesystem. Back up needed files before opting in; keep durable data in separate volumes.
+
 #### Pre-warm the image with `--build-only`
 
-`rig deploy --build-only` runs the freeze step and stops — no workspace is created, re-imaged, or synced. It uses the same build-inputs digest a full deploy computes, so a later `rig deploy` finds the cached image and skips straight to rsync. Useful in CI, or to pay the install cost before a launch window.
+`rig deploy --build-only` runs the freeze step and stops — no workspace is created, re-imaged, or synced. It uses the same build-inputs digest a full deploy computes, so a later `rig deploy` can reuse the cached image. Use it to pay the install cost before a launch window.
 
 ```bash
 rig deploy --build-only     # freeze (or reuse) the image, print its digest, exit
@@ -273,6 +289,10 @@ rig deploy
 ```
 
 ---
+
+<Note>
+Application environment values are stored in plaintext metadata and are readable through the API, `rig app env ls --reveal`, and JSON output. The manifest `secrets` field reads values from your environment; it does not create an encrypted Rigbox secrets store.
+</Note>
 
 ## Blue-green deploys and promotion
 
