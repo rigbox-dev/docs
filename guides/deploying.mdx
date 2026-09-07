@@ -16,6 +16,24 @@ That's the whole workflow for most projects. The rest of this guide explains wha
 
 ---
 
+## Configure a GitHub repository in the console
+
+GitHub repository imports must be enabled for your account. Connect GitHub under **Settings → GitHub**, then choose a repository when creating
+a workspace or under an existing workspace’s **GitHub deployments** settings.
+Choose an account before loading its repositories when several accounts are connected.
+You can switch accounts while a repository page loads.
+
+If the repository already contains `rig.yaml`, Rigbox loads that document and
+shows its app name, listening port, install/build/start commands, and memory limit
+as editable fields. Changes update the manifest preview immediately while keeping
+other fields and comments. Use **Edit YAML** for configuration outside the form.
+
+If no `rig.yaml` exists, configure the app using the same fields and watch the
+manifest compose in the preview. Invalid values must be corrected before saving.
+Choose automatic GitHub App deployments or a custom GitHub Actions workflow, then
+save the reviewed configuration directly or through a pull request. Protected
+branches require a pull request. The repository manifest remains the source of truth.
+
 ## How rig deploy resolves a workspace
 
 `rig deploy` never makes you name a workspace by hand on every run. It resolves the target in this order:

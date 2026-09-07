@@ -139,7 +139,36 @@ rig workspace spawn --generate-cli-skeleton > spawn.json
 rig workspace spawn --cli-input-json spawn.json
 ```
 
-### Persisted defaults
+## HTTP traces and body capture
+
+From CLI v0.12.66, command traces include redacted JSON request and response bodies
+by default. Run `rig update` to update, then open **Traces** in the Rigbox console.
+Open a trace and expand an HTTP span to inspect its request, response, timing, and
+status. Older traces cannot recover bodies that were never captured.
+
+```bash
+rig config set trace-bodies false  # keep timing and metadata, omit bodies
+rig config set trace-bodies true   # restore body capture
+RIGBOX_TRACE_BODIES=false rig workspace ls  # omit bodies for one command
+```
+
+The environment variable overrides the saved setting. An explicitly saved `false`
+remains disabled after updating. `rig config unset trace-bodies` restores the
+current default. Disable all telemetry with `rig config set telemetry false` or
+by setting `RIGBOX_NO_TELEMETRY`.
+
+Capture applies to supported workspace, app, build, snapshot, image, template,
+and catalog JSON requests. Authentication, secrets, environment, execution, logs,
+files, source, and configuration routes are excluded. Credential fields and known
+credential patterns are filtered recursively before export; original API messages
+and CLI output are unchanged. Uploads and streaming responses are not buffered.
+
+Bodies larger than 64 KiB are omitted. Redacted body text is limited to 8 KiB per
+body and 64 KiB total per command. The viewer explains omissions and marks partial
+bodies as truncated. Other application data may remain in captured JSON; disable
+body capture when that data should not be stored in your account’s traces.
+
+## Persisted defaults
 
 ```bash
 rig config set output yaml     # default output format for every command
