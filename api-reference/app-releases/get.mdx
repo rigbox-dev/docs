@@ -1,0 +1,9 @@
+---
+title: Get an App Release
+openapi: GET /api/v1/workspaces/{id}/app-releases/{release_id}
+description: Retrieve the status and retained metadata of one workspace app release.
+---
+
+Statuses include `staging`, `ready`, `activating`, `succeeded`, `failed`, and `expired`. A ready candidate has finished staging but is not serving traffic until activated.
+
+Release metadata excludes the encrypted deployment payload. Use the logs endpoint for progress and errors.

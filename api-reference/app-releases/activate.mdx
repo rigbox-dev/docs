@@ -1,0 +1,11 @@
+---
+title: Activate or Roll Back an App Release
+openapi: POST /api/v1/workspaces/{id}/app-releases/{release_id}/activate
+description: Activate a ready candidate or restore a retained successful app release.
+---
+
+This endpoint does not require a request body. New activation work returns **202 Accepted**; selecting the already-current artifact can return **200 OK**. Poll the returned release ID, which may identify a new activation of a retained artifact.
+
+Activation briefly restarts affected services on their original ports and verifies readiness. The workspace, SSH sessions, unrelated apps, and persistent data remain in place. Code rollback does not undo database migrations or restore runtime data.
+
+An expired artifact, conflicting operation, or incompatible ownership cannot be activated. See [release and rollback guidance](/guides/releases-and-rollback).
