@@ -33,7 +33,7 @@ rig app-release activate --workspace my-project --release <app-release-id>
 
 Rigbox retains three distinct successful app artifacts for each deployment owner, preserving artifacts still referenced by active apps. Repeated activation of the same artifact does not consume another artifact slot. Plan disk space for retained dependencies, a staged candidate, caches, and persistent app data.
 
-Rollback restores retained code and configuration; it leaves runtime data untouched. Failed attempts keep their deployment IDs so a retry or reload can resume the same attempt without creating another workspace. An expired artifact cannot be activated: deploy a reviewed new attempt with a new deployment ID instead.
+Rollback restores retained code and configuration; it leaves runtime data untouched. Failed attempts keep their deployment IDs. Retrying the same ID returns the existing attempt and status instead of creating duplicate resources; it does not silently repeat an interrupted installation. To run a reviewed new attempt, provide a new deployment ID. An expired artifact cannot be activated.
 
 ## Image releases: replace the root filesystem
 
