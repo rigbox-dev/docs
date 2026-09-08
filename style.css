@@ -19,7 +19,7 @@
   --rigbox-accent: #4adea1;
 }
 #content-area { font-size: 16px; line-height: 1.7; }
-#page-title { font-size: 36px; font-weight: 600; letter-spacing: -.04em; line-height: 1.2; }
+#page-title { font-size: 40px; font-weight: 600; letter-spacing: -.04em; line-height: 1.2; }
 #content-container pre, #content-container code { font-family: 'Geist Mono', monospace; }
 #content-container pre { font-size: 13px; }
 #content .card, #content-area .code-block, #content-area pre { border-radius: 6px; }
@@ -53,7 +53,7 @@
   #sidebar #sidebar-group { margin: 0; }
   #sidebar a { padding: 8px 10px !important; min-height: 36px; font-size: 14px; line-height: 20px; font-weight: 400; border: 0; border-radius: 6px; }
   #sidebar a[class*="text-primary"] { color: var(--rigbox-text); background: var(--rigbox-active); text-shadow: none; }
-  #content-container { width: 100%; margin-inline: auto; padding: 72px 64px 0; max-width: 1188px !important; }
+  #content-container { width: 100%; margin-inline: auto; padding: 40px 64px 0; max-width: 1188px !important; }
   #content-container:has(.rigbox-home) { max-width: 1152px !important; }
   #content-container > div { padding-top: 0; }
   #content-area { margin: 0; padding: 0; width: auto; min-width: 0; }
@@ -64,7 +64,7 @@
 .rigbox-home { color: var(--rigbox-text); }
 .rigbox-hero { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 48px; align-items: center; margin-bottom: 48px; }
 #content .rigbox-home h1 { font-size: 56px; font-weight: 600; line-height: 1; letter-spacing: -.055em; margin: 0 0 28px; }
-#content .rigbox-lead { font-size: 18px; line-height: 28px; color: var(--rigbox-muted); margin: 0; }
+#content .rigbox-lead { font-size: 20px; line-height: 30px; color: var(--rigbox-muted); margin: 0; }
 .rigbox-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
 #content .rigbox-button { display: inline-flex; justify-content: center; align-items: center; padding: 8px 14px; min-height: 38px; border: 1px solid var(--rigbox-border); border-radius: 6px; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--rigbox-text); text-decoration: none; background: var(--rigbox-surface); }
 #content .rigbox-button-primary { background: var(--rigbox-text); color: var(--rigbox-background); border-color: var(--rigbox-text); }
@@ -73,8 +73,8 @@
 #content .rigbox-terminal > div { margin: 0; }
 #content .rigbox-terminal pre { border-radius: 0 0 6px 6px; }
 .rigbox-section { margin-bottom: 48px; }
-#content .rigbox-section h2 { font-size: 24px; line-height: 32px; font-weight: 600; letter-spacing: -.035em; margin: 0 0 12px; }
-#content .rigbox-section > p { font-size: 16px; line-height: 27px; margin: 0 0 20px; color: var(--rigbox-text); }
+#content .rigbox-section h2 { font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -.035em; margin: 0 0 12px; }
+#content .rigbox-section > p { font-size: 17px; line-height: 28px; margin: 0 0 20px; color: var(--rigbox-text); }
 .rigbox-card-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
 #content a.rigbox-feature-card { display: block; min-width: 0; padding: 24px; border: 1px solid var(--rigbox-border); border-radius: 8px; background: var(--rigbox-surface); color: var(--rigbox-text); text-decoration: none; font-weight: 400; }
 #content a.rigbox-feature-card:hover { border-color: var(--rigbox-muted); }
@@ -113,7 +113,8 @@
 }
 #header .eyebrow { color: var(--rigbox-muted); font-size: 13px; margin-bottom: 16px; }
 #header > div > div:has(#page-title) { margin-top: 0; }
-#header > div > p { font-size: 16px; line-height: 27px; }
+#header > div:has(> p) { margin-top: 16px; }
+#header > div > p { font-size: 18px; line-height: 28px; margin: 0; }
 @media (min-width: 1024px) {
   #sidebar button[aria-expanded] { padding: 8px 10px !important; min-height: 36px; font-size: 14px; line-height: 20px; border-radius: 6px; justify-content: space-between; }
   #sidebar button[aria-expanded] > svg { margin-left: auto; }
@@ -131,7 +132,6 @@
   #content-container:has(#table-of-contents) #content-area { max-width: 720px; }
 }
 
-#content .rigbox-kicker { font-size: 12px; font-weight: 500; letter-spacing: .08em; color: var(--rigbox-muted); margin: 0 0 20px; }
 #content .rigbox-terminal-note { font-size: 13px; line-height: 21px; color: var(--rigbox-muted); margin-top: 16px; }
 .rigbox-card-arrow { display: block; margin-top: 16px; color: var(--rigbox-accent); }
 
