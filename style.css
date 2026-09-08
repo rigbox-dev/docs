@@ -128,8 +128,8 @@
 }
 
 @media (min-width: 1280px) {
-  #content-container:has(#table-of-contents) { max-width: 1104px !important; }
-  #content-container:has(#table-of-contents) #content-area { max-width: 720px; }
+  #content-container:has(#table-of-contents, #table-of-contents-layout) { max-width: 1056px !important; }
+  #content-container:has(#table-of-contents, #table-of-contents-layout) #content-area { max-width: 720px; }
 }
 
 #content .rigbox-terminal-note { font-size: 13px; line-height: 21px; color: var(--rigbox-muted); margin-top: 16px; }
