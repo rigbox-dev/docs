@@ -11,8 +11,8 @@ A **Deploy to Rigbox** button opens workspace creation with a repository, branch
 2. Connect GitHub. Select an existing fork, including a renamed fork, or choose **Fork on GitHub**. Forking opens a separate tab. Return to Rigbox and select **Refresh after forking**, then **Continue with my fork**.
 3. If the fork is missing, grant the Rigbox GitHub App access to it and refresh the connection. Choose the correct GitHub account when you have several connected accounts.
 4. Choose **New workspace**, or select a workspace you already own. Previous deployments of the same example are marked in the destination list.
-5. Review the apps and resource allocation. Choose **Deploy with defaults**, or **Customize** to edit resources, app settings, and YAML. Required settings and secrets must be supplied; invalid manifests and insufficient capacity block deployment.
-6. Rigbox starts the workspace, queues deployment, and opens its detail page. Follow the build and deployment progress there. HTTP services get app links; CLI tools are available from the workspace terminal or SSH.
+5. Review the apps, deployment strategy, and resource allocation. Choose **Deploy with defaults**, or **Customize** to edit resources, app settings, and YAML. Required settings and secrets must be supplied; invalid manifests and insufficient capacity block deployment.
+6. Rigbox starts the workspace, queues deployment, and opens its detail page. Follow app-release progress and logs there (or image-build logs for an image deployment). HTTP services get app links; CLI tools are available from the workspace terminal or SSH.
 
 The badge source must be a public GitHub repository. Your fork is checked using GitHub repository identity and ancestry, so renaming a fork is supported. The GitHub App needs access to the selected fork; the flow does not expand its permissions or retain a GitHub user token.
 
@@ -26,9 +26,19 @@ Redeploying the same target reuses its branch. Existing connections keep their c
 
 ## Existing workspaces
 
-Rigbox imports the workspace's actual vCPU, RAM, disk, and base image into the configuration preview. Confirm **root-filesystem and app replacement** before deploying. Persistent volumes are retained; changes stored only on the root filesystem are replaced.
+Rigbox imports the workspace's actual vCPU, RAM, disk, and base image into the configuration preview. New connections default to **app releases** unless the manifest explicitly selects image mode. App deployment preserves workspace identity, root files, development tools, and SSH sessions. It stages code separately from your development checkout, then briefly restarts affected services on their existing ports.
 
-If the workspace already has a different automatic deployment connection, review and explicitly confirm replacing it. Rigbox keeps one active automatic deployment connection per workspace. Adding apps without replacing the root filesystem is a separate planned capability.
+**Image replacement** is an explicit advanced strategy. Confirm root-filesystem replacement before using it on an existing workspace. Persistent volumes are retained; arbitrary root-filesystem changes are replaced. Some catalog examples retain image mode because their installers change system packages or global tool configuration.
+
+Existing image-based connections keep their strategy until you explicitly review a change. Changing strategy does not automatically adopt existing apps: conflicting app ownership requires a separate import and cannot be bypassed by matching an app name. Never delete an app or enable reimaging merely to work around that conflict.
+
+If the workspace already has another automatic deployment connection, explicitly review replacement. Rigbox keeps one active automatic deployment connection per workspace. Resource changes and volume provisioning are separate workspace operations; incremental deployment requires declared volumes to exist already.
+
+## App releases and rollback
+
+The workspace detail page shows app-release history and deployment logs. Restore a retained release to return affected apps to its code and configuration. Services briefly restart; the workspace and SSH sessions stay in place. Database migrations, uploads, and other persistent data are not rolled back. Your Git branch stays unchanged, so its next push can deploy newer code again.
+
+No preview workspace, alternate port, promotion, or blue-green stage is part of this flow. See [Releases and rollback](/guides/releases-and-rollback) for the separate app and image operations.
 
 ## Secrets and retries
 

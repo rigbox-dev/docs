@@ -1474,6 +1474,99 @@
         ]
       }
     },
+    "/api/v1/apps/{id}/refresh-source": {
+      "post": {
+        "tags": [
+          "Apps"
+        ],
+        "description": "Fetch and check out an exact Git commit in the app's existing working directory. Does not install dependencies or restart the service. Poll the returned job for completion.",
+        "operationId": "refresh_app_source",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "App ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshSourceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Source refresh queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshSourceResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/apps/{id}/refresh-source/{job_id}": {
+      "get": {
+        "tags": [
+          "Apps"
+        ],
+        "description": "Poll this app's latest source refresh. Success requires status done and exit_code 0. Jobs are ephemeral and disappear when the workspace restarts.",
+        "operationId": "get_source_refresh_status",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "App ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "Source refresh job ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Source refresh status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshSourceStatusResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/apps/{id}/restart": {
       "post": {
         "tags": [
@@ -1757,6 +1850,805 @@
             "bearer": []
           }
         ]
+      }
+    },
+    "/api/v1/auth/github/app": {
+      "get": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "status",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionStatus"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "disconnect",
+        "responses": {
+          "204": {
+            "description": "GitHub disconnected from this account"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/attempts": {
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttemptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/attempts/{id}": {
+      "get": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/attempts/{id}/deploy": {
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "deploy",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeployRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/badge-fork": {
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "fork",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inspection"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/badge-source": {
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "source",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SourceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadgeSource"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/branches": {
+      "get": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "branches",
+        "parameters": [
+          {
+            "name": "installation_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "repository_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/callback": {
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "callback",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Callback"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionStatus"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/connect": {
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "connect",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectUrl"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/generate": {
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "generate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/inspect": {
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "inspect",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inspection"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/manifest-paths": {
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "manifest_paths",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PathsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManifestPaths"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/projects": {
+      "get": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "save",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/projects/{id}": {
+      "delete": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "disconnect",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Disconnected"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/projects/{id}/retry": {
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "retry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/repositories": {
+      "get": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "repos",
+        "parameters": [
+          {
+            "name": "installation_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepoList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/app/webhook": {
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "webhook",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Event accepted"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/github/bindings": {
+      "get": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "list_bindings",
+        "responses": {
+          "200": {
+            "description": "Account repository bindings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GithubBindingsResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Full-account credential required"
+          },
+          "404": {
+            "description": "Feature disabled"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "create_binding",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGithubBindingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Repository binding",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GithubBindingResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid repository name"
+          },
+          "403": {
+            "description": "Full-account credential required"
+          },
+          "404": {
+            "description": "Workspace unavailable or feature disabled"
+          },
+          "409": {
+            "description": "Repository already bound"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/bindings/{binding_id}": {
+      "delete": {
+        "tags": [
+          "GitHub Deployments"
+        ],
+        "operationId": "delete_binding",
+        "parameters": [
+          {
+            "name": "binding_id",
+            "in": "path",
+            "description": "Binding ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "workspace_id",
+            "in": "query",
+            "description": "Required target when a repository has several workspace bindings",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Binding deleted and deploy tokens revoked"
+          },
+          "403": {
+            "description": "Full-account credential required"
+          },
+          "404": {
+            "description": "Binding unavailable or feature disabled"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/github/token": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "exchange_token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExchangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or replayed GitHub token"
+          },
+          "403": {
+            "description": "No permitted repository binding"
+          }
+        }
       }
     },
     "/api/v1/catalog": {
@@ -4622,6 +5514,231 @@
         ]
       }
     },
+    "/api/v1/workspaces/{id}/app-releases": {
+      "get": {
+        "tags": [
+          "App releases"
+        ],
+        "operationId": "list",
+        "responses": {
+          "200": {
+            "description": "App release result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Workspace ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "App releases"
+        ],
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAppRelease"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "App release accepted for asynchronous processing.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Workspace ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/app-releases/{release_id}": {
+      "get": {
+        "tags": [
+          "App releases"
+        ],
+        "operationId": "read",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Workspace ID.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "release_id",
+            "in": "path",
+            "required": true,
+            "description": "App release ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "App release result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/app-releases/{release_id}/activate": {
+      "post": {
+        "tags": [
+          "App releases"
+        ],
+        "operationId": "activate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Workspace ID.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "release_id",
+            "in": "path",
+            "required": true,
+            "description": "App release ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "App release result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseResponse"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "App release accepted for asynchronous processing.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/app-releases/{release_id}/logs": {
+      "get": {
+        "tags": [
+          "App releases"
+        ],
+        "operationId": "logs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Workspace ID.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "release_id",
+            "in": "path",
+            "required": true,
+            "description": "App release ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "App release result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/workspaces/{id}/cancel": {
       "post": {
         "tags": [
@@ -7444,6 +8561,79 @@
           }
         }
       },
+      "AppRelease": {
+        "type": "object",
+        "required": [
+          "id",
+          "is_current",
+          "can_rollback",
+          "workspace_id",
+          "user_id",
+          "owner_key",
+          "idempotency_key",
+          "status",
+          "artifact_release_id",
+          "apps",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "apps": {},
+          "artifact_release_id": {
+            "type": "string"
+          },
+          "can_rollback": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "is_current": {
+            "type": "boolean"
+          },
+          "owner_key": {
+            "type": "string"
+          },
+          "previous_release_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_commit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
       "AppStatus": {
         "type": "string",
         "enum": [
@@ -7492,6 +8682,100 @@
           }
         }
       },
+      "AttemptRequest": {
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "installation_id",
+          "repository_id",
+          "repository_name",
+          "commit",
+          "branch",
+          "name",
+          "content"
+        ],
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "commit": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "deployment_strategy": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "installation_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "replace_binding_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "repository_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "repository_name": {
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SourceRequest"
+          },
+          "workspace_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "AttemptResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "workspace_id",
+          "existing_workspace",
+          "branch",
+          "draft"
+        ],
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "draft": {
+            "$ref": "#/components/schemas/AttemptRequest"
+          },
+          "existing_workspace": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "result": {},
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
       "AuthMessageResponse": {
         "type": "object",
         "required": [
@@ -7521,6 +8805,25 @@
           }
         }
       },
+      "BadgeSource": {
+        "type": "object",
+        "required": [
+          "repository",
+          "commit",
+          "fork_url"
+        ],
+        "properties": {
+          "commit": {
+            "type": "string"
+          },
+          "fork_url": {
+            "type": "string"
+          },
+          "repository": {
+            "$ref": "#/components/schemas/Repository"
+          }
+        }
+      },
       "BindingsResponse": {
         "type": "object",
         "required": [
@@ -7532,6 +8835,120 @@
             "items": {
               "$ref": "#/components/schemas/AccessBinding"
             }
+          }
+        }
+      },
+      "Branch": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "BranchList": {
+        "type": "object",
+        "required": [
+          "branches"
+        ],
+        "properties": {
+          "branches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Branch"
+            }
+          },
+          "next_page": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "Build": {
+        "type": "object",
+        "description": "Index row for one image build. NOT the build log \u2014\nthe log text stays in host journald under `rigbox-build-<build_id>`; this row\njust lets a user enumerate their recent builds (incl. failures) and resolve\neach `build_id` to open its journald log. Owner-scoped.",
+        "required": [
+          "build_id",
+          "owner_user_id",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "build_id": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Short failure summary \u2014 set on failure."
+          },
+          "image_digest": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Content digest of the produced image \u2014 set on success."
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Best-effort app/project label from the deploy (the CLI's `rig.yaml` name)."
+          },
+          "owner_user_id": {
+            "type": "string"
+          },
+          "source_commit": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Full git object ID requested for this build; retained on failure."
+          },
+          "source_kind": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`recipe` for every build since Dockerfile/image sources were removed;\nhistorical rows may still read `dockerfile` or `image`."
+          },
+          "status": {
+            "type": "string",
+            "description": "`building` while in flight, then `succeeded` | `failed`."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Callback": {
+        "type": "object",
+        "required": [
+          "code",
+          "state"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
           }
         }
       },
@@ -7891,6 +9308,41 @@
           }
         }
       },
+      "ConnectUrl": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ConnectionStatus": {
+        "type": "object",
+        "required": [
+          "configured",
+          "connections"
+        ],
+        "properties": {
+          "configured": {
+            "type": "boolean"
+          },
+          "connections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GithubConnection"
+            }
+          },
+          "install_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "CreateApiKeyRequest": {
         "type": "object",
         "properties": {
@@ -7950,6 +9402,40 @@
             "type": "string"
           }
         }
+      },
+      "CreateAppRelease": {
+        "type": "object",
+        "required": [
+          "idempotency_key",
+          "apps"
+        ],
+        "properties": {
+          "apps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReleaseApp"
+            }
+          },
+          "deployment_scope": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "replace_app_set": {
+            "type": "boolean"
+          },
+          "source_commit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
       },
       "CreateAppRequest": {
         "type": "object",
@@ -8027,6 +9513,21 @@
         ],
         "properties": {
           "status": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateGithubBindingRequest": {
+        "type": "object",
+        "required": [
+          "repository_name",
+          "workspace_id"
+        ],
+        "properties": {
+          "repository_name": {
+            "type": "string"
+          },
+          "workspace_id": {
             "type": "string"
           }
         }
@@ -8554,6 +10055,42 @@
           }
         }
       },
+      "DeployRequest": {
+        "type": "object",
+        "required": [
+          "content",
+          "allow_reimage"
+        ],
+        "properties": {
+          "allow_reimage": {
+            "type": "boolean"
+          },
+          "confirm_strategy_change": {
+            "type": "boolean"
+          },
+          "content": {
+            "type": "string"
+          },
+          "deployment_strategy": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "secrets": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "DeployResourceRequirements": {
         "type": "object",
         "required": [
@@ -8842,6 +10379,57 @@
           }
         }
       },
+      "ExchangeRequest": {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "ExchangeResponse": {
+        "type": "object",
+        "required": [
+          "token",
+          "expires_at",
+          "workspace_id",
+          "repository",
+          "source_ref",
+          "source_commit",
+          "ci_run_url",
+          "repository_private"
+        ],
+        "properties": {
+          "ci_run_url": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "repository": {
+            "type": "string"
+          },
+          "repository_private": {
+            "type": "boolean"
+          },
+          "source_commit": {
+            "type": "string"
+          },
+          "source_ref": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
       "ExposePortRequest": {
         "type": "object",
         "required": [
@@ -8956,6 +10544,77 @@
             "type": "string"
           }
         }
+      },
+      "ForkRequest": {
+        "type": "object",
+        "required": [
+          "source_repository_id",
+          "installation_id",
+          "repository_id",
+          "branch",
+          "manifest_path"
+        ],
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "installation_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "manifest_path": {
+            "type": "string"
+          },
+          "repository_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "source_repository_id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "GenerateRequest": {
+        "type": "object",
+        "required": [
+          "repository",
+          "branch",
+          "settings"
+        ],
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "existing": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "repository": {
+            "type": "string"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/Settings"
+          }
+        }
+      },
+      "GeneratedCredential": {
+        "type": "object",
+        "required": [
+          "key",
+          "env_var"
+        ],
+        "properties": {
+          "env_var": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       },
       "GetAiDefaultsResponse": {
         "type": "object",
@@ -9227,6 +10886,281 @@
           }
         }
       },
+      "GithubBindingResponse": {
+        "type": "object",
+        "required": [
+          "binding"
+        ],
+        "properties": {
+          "binding": {
+            "$ref": "#/components/schemas/GithubRepoBinding"
+          }
+        }
+      },
+      "GithubBindingsResponse": {
+        "type": "object",
+        "required": [
+          "bindings"
+        ],
+        "properties": {
+          "bindings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GithubRepoBinding"
+            }
+          }
+        }
+      },
+      "GithubConnection": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "installation_id",
+          "github_user_id",
+          "github_login",
+          "account_login"
+        ],
+        "properties": {
+          "account_login": {
+            "type": "string"
+          },
+          "github_login": {
+            "type": "string"
+          },
+          "github_user_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "installation_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
+      "GithubJob": {
+        "type": "object",
+        "required": [
+          "builds",
+          "id",
+          "binding_id",
+          "source_commit",
+          "source_ref",
+          "status",
+          "created_at"
+        ],
+        "properties": {
+          "binding_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "builds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Build"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_commit": {
+            "type": "string"
+          },
+          "source_ref": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "GithubProject": {
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "workspace_id",
+          "repository_name",
+          "deployment_mode",
+          "deployment_strategy",
+          "production_branch",
+          "manifest_path",
+          "allow_reimage"
+        ],
+        "properties": {
+          "allow_reimage": {
+            "type": "boolean"
+          },
+          "deployment_mode": {
+            "type": "string"
+          },
+          "deployment_strategy": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "installation_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "manifest_path": {
+            "type": "string"
+          },
+          "production_branch": {
+            "type": "string"
+          },
+          "repository_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "repository_name": {
+            "type": "string"
+          },
+          "repository_owner_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "GithubRepoBinding": {
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "workspace_id",
+          "repository_name",
+          "status",
+          "claim_expires_at",
+          "created_at"
+        ],
+        "properties": {
+          "claim_expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "repository_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "repository_name": {
+            "type": "string"
+          },
+          "repository_owner_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "InspectRequest": {
+        "type": "object",
+        "required": [
+          "installation_id",
+          "repository_id",
+          "branch",
+          "manifest_path"
+        ],
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "installation_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "manifest_path": {
+            "type": "string"
+          },
+          "repository_id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Inspection": {
+        "type": "object",
+        "required": [
+          "repository",
+          "commit",
+          "settings",
+          "requires_pull_request",
+          "manifest_paths"
+        ],
+        "properties": {
+          "commit": {
+            "type": "string"
+          },
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "manifest_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "repository": {
+            "$ref": "#/components/schemas/Repository"
+          },
+          "requires_pull_request": {
+            "type": "boolean"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/Settings"
+          }
+        }
+      },
       "InstallAppRequest": {
         "type": "object",
         "required": [
@@ -9314,7 +11248,7 @@
           },
           "status": {
             "type": "string",
-            "description": "Job execution status: \"running\", \"done\", \"failed\", \"cancelled\", \"unknown\""
+            "description": "Job execution status: \"running\", \"finalizing\" (script finished, app\nstatus pending), \"done\", \"failed\", \"cancelled\", \"unknown\""
           },
           "stderr": {
             "type": [
@@ -9364,6 +11298,13 @@
           "manifest"
         ],
         "properties": {
+          "deploy_config_digest": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "SHA-256 of the versioned CLI deployment configuration, lowercase hexadecimal."
+          },
           "manifest": {
             "description": "Inline `AppManifest` (the same canonical JSON shape recipes\nstore under `manifest`). Validation runs server-side via\n`validate_app_recipe` with the caller's publish context."
           },
@@ -9478,6 +11419,20 @@
             "type": "array",
             "items": {
               "type": "string"
+            }
+          }
+        }
+      },
+      "ListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppRelease"
             }
           }
         }
@@ -9612,6 +11567,20 @@
           }
         }
       },
+      "LogsResponse": {
+        "type": "object",
+        "required": [
+          "lines"
+        ],
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "LookupByEmailRequest": {
         "type": "object",
         "required": [
@@ -9646,6 +11615,20 @@
           },
           "user_id": {
             "type": "string"
+          }
+        }
+      },
+      "ManifestPaths": {
+        "type": "object",
+        "required": [
+          "paths"
+        ],
+        "properties": {
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -9690,6 +11673,18 @@
           "v": {
             "type": "number",
             "format": "double"
+          }
+        }
+      },
+      "Owner": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -10290,6 +12285,27 @@
           "textarea"
         ]
       },
+      "PathsRequest": {
+        "type": "object",
+        "required": [
+          "installation_id",
+          "repository_id",
+          "branch"
+        ],
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "installation_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "repository_id": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "PollCliSessionResponse": {
         "type": "object",
         "required": [
@@ -10360,6 +12376,27 @@
           },
           "user_id": {
             "type": "string"
+          }
+        }
+      },
+      "ProjectList": {
+        "type": "object",
+        "required": [
+          "projects",
+          "jobs"
+        ],
+        "properties": {
+          "jobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GithubJob"
+            }
+          },
+          "projects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GithubProject"
+            }
           }
         }
       },
@@ -10516,6 +12553,73 @@
           }
         }
       },
+      "RefreshSourceRequest": {
+        "type": "object",
+        "required": [
+          "source_commit",
+          "source_repo"
+        ],
+        "properties": {
+          "source_commit": {
+            "type": "string",
+            "description": "Exact, lowercase 40- or 64-character Git commit object ID."
+          },
+          "source_repo": {
+            "type": "string",
+            "description": "Expected credential-free HTTPS origin. GitHub URL spelling is normalized."
+          }
+        },
+        "additionalProperties": false
+      },
+      "RefreshSourceResponse": {
+        "type": "object",
+        "required": [
+          "job_id",
+          "workspace_id",
+          "source_commit"
+        ],
+        "properties": {
+          "job_id": {
+            "type": "string"
+          },
+          "source_commit": {
+            "type": "string"
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "RefreshSourceStatusResponse": {
+        "type": "object",
+        "required": [
+          "job_id",
+          "status",
+          "stdout",
+          "stderr"
+        ],
+        "properties": {
+          "exit_code": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "job_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "stderr": {
+            "type": "string"
+          },
+          "stdout": {
+            "type": "string"
+          }
+        }
+      },
       "RegisterPendingKeyRequest": {
         "type": "object",
         "required": [
@@ -10539,6 +12643,234 @@
         "properties": {
           "token": {
             "type": "string"
+          }
+        }
+      },
+      "ReleaseApp": {
+        "type": "object",
+        "required": [
+          "name",
+          "kind",
+          "start_command",
+          "source_files"
+        ],
+        "properties": {
+          "allowed_emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "build_command": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "configure_command": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "custom_domain": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dependency_input_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependency_output_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "environment": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "executables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "generated_credentials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeneratedCredential"
+            }
+          },
+          "health_command": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "health_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "health_timeout_seconds": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "install_command": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/ResourceLimits"
+          },
+          "name": {
+            "type": "string"
+          },
+          "port": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "reconfigure_command": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "restart_policy": {
+            "type": "string"
+          },
+          "source_files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceFile"
+            }
+          },
+          "start_command": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "volumes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReleaseVolume"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReleaseResponse": {
+        "type": "object",
+        "required": [
+          "release"
+        ],
+        "properties": {
+          "release": {
+            "$ref": "#/components/schemas/AppRelease"
+          }
+        }
+      },
+      "ReleaseVolume": {
+        "type": "object",
+        "required": [
+          "name",
+          "mount_path",
+          "size_mb"
+        ],
+        "properties": {
+          "mount_path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "size_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "RepoList": {
+        "type": "object",
+        "required": [
+          "repositories"
+        ],
+        "properties": {
+          "next_page": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "repositories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Repository"
+            }
+          }
+        }
+      },
+      "Repository": {
+        "type": "object",
+        "required": [
+          "id",
+          "full_name",
+          "default_branch",
+          "private",
+          "owner"
+        ],
+        "properties": {
+          "default_branch": {
+            "type": "string"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/Owner"
+          },
+          "private": {
+            "type": "boolean"
           }
         }
       },
@@ -10598,6 +12930,36 @@
             "$ref": "#/components/schemas/Vm"
           }
         }
+      },
+      "ResourceLimits": {
+        "type": "object",
+        "properties": {
+          "cpu_percent": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "memory_max_mb": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "tasks_max": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
       },
       "RestoreSnapshotResponse": {
         "type": "object",
@@ -10673,6 +13035,83 @@
             "items": {
               "$ref": "#/components/schemas/RolePreset"
             }
+          }
+        }
+      },
+      "SaveRequest": {
+        "type": "object",
+        "required": [
+          "installation_id",
+          "repository_id",
+          "workspace_id",
+          "branch",
+          "manifest_path",
+          "expected_commit",
+          "content",
+          "pull_request",
+          "deployment_mode",
+          "allow_reimage"
+        ],
+        "properties": {
+          "allow_reimage": {
+            "type": "boolean"
+          },
+          "branch": {
+            "type": "string"
+          },
+          "confirm_strategy_change": {
+            "type": "boolean"
+          },
+          "content": {
+            "type": "string"
+          },
+          "deployment_mode": {
+            "type": "string"
+          },
+          "deployment_strategy": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expected_commit": {
+            "type": "string"
+          },
+          "installation_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "manifest_path": {
+            "type": "string"
+          },
+          "pull_request": {
+            "type": "boolean"
+          },
+          "replace_binding_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "repository_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "secrets": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "workspace_id": {
+            "type": "string"
           }
         }
       },
@@ -10882,6 +13321,45 @@
           "visibility": {
             "type": "string",
             "description": "`private` (owner-only) or `community` (listed for everyone)."
+          }
+        }
+      },
+      "Settings": {
+        "type": "object",
+        "required": [
+          "name",
+          "port",
+          "start",
+          "install"
+        ],
+        "properties": {
+          "build": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "install": {
+            "type": "string"
+          },
+          "memory_mb": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "start": {
+            "type": "string"
           }
         }
       },
@@ -11098,6 +13576,44 @@
             "format": "int32"
           },
           "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "SourceFile": {
+        "type": "object",
+        "required": [
+          "path",
+          "content_base64"
+        ],
+        "properties": {
+          "content_base64": {
+            "type": "string"
+          },
+          "executable": {
+            "type": "boolean"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SourceRequest": {
+        "type": "object",
+        "required": [
+          "repository",
+          "branch",
+          "manifest_path"
+        ],
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "manifest_path": {
+            "type": "string"
+          },
+          "repository": {
             "type": "string"
           }
         }
@@ -13729,6 +16245,9 @@
     },
     {
       "name": "Auth"
+    },
+    {
+      "name": "GitHub Deployments"
     },
     {
       "name": "API Keys"

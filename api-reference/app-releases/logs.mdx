@@ -1,0 +1,7 @@
+---
+title: Get App Release Logs
+openapi: GET /api/v1/workspaces/{id}/app-releases/{release_id}/logs
+description: Read staging and activation progress for an app release.
+---
+
+The response contains log lines for the selected release. Poll while an operation is running, and use the release status to determine completion. The CLI provides the same view with `rig app-release logs --workspace <workspace> --release <release-id>`.

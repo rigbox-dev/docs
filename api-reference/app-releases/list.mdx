@@ -1,0 +1,9 @@
+---
+title: List App Releases
+openapi: GET /api/v1/workspaces/{id}/app-releases
+description: List retained app releases and activation history for a workspace.
+---
+
+The response identifies current releases with `is_current` and available rollback targets with `can_rollback`. Use these fields instead of inferring the active version from creation time.
+
+See [app releases and rollback](/guides/releases-and-rollback) for retention and persistent-data behavior.

@@ -1,0 +1,11 @@
+---
+title: Stage an App Release
+openapi: POST /api/v1/workspaces/{id}/app-releases
+description: Prepare app source and dependencies inside an existing running workspace.
+---
+
+Returns **202 Accepted** while staging runs. Staging preserves the workspace and does not activate the candidate. Poll the release and its logs, then activate it when its status is `ready`.
+
+Reuse the same `idempotency_key` only for the same request. Duplicate submissions return the existing attempt; a changed request with the same key is rejected. Failed or interrupted installation is not silently replayed.
+
+For normal deployments, [use the CLI](/guides/deploying) to collect source files and validate the manifest. Runtime secrets belong in the request’s protected runtime configuration, not in Git or source archives.

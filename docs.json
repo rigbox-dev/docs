@@ -142,6 +142,16 @@
             ]
           },
           {
+            "group": "App Releases",
+            "pages": [
+              "api-reference/app-releases/list",
+              "api-reference/app-releases/stage",
+              "api-reference/app-releases/get",
+              "api-reference/app-releases/activate",
+              "api-reference/app-releases/logs"
+            ]
+          },
+          {
             "group": "App Logs",
             "pages": [
               "api-reference/app-logs/get-logs",

@@ -1,11 +1,11 @@
 ---
 title: Deploying with rig deploy
-description: Ship a project to a workspace from a single rig.yaml — the standard rsync deploy, reproducible frozen-image builds, multi-app graphs, and blue-green promotion.
+description: Deploy app releases inside a persistent workspace, with explicit image replacement available for environment rebuilds.
 ---
 
 `rig deploy` is the one command that takes a project on your machine and runs it as a live app in a Rigbox workspace. It reads a `rig.yaml` in the project directory, resolves a target workspace, syncs your code, and brings the service up behind a public subdomain.
 
-For push-to-deploy workflows, use the [GitHub Actions guide](/guides/github-actions). It deploys to a bound workspace with a short-lived credential.
+For push-to-deploy workflows, connect the GitHub App in workspace creation or settings, use a [Deploy button](/guides/deploy-button), or configure [GitHub Actions](/guides/github-actions).
 
 ```bash
 cd my-app
@@ -179,31 +179,73 @@ health:
 
 ## Deploy modes
 
-`rig deploy` picks its mode from `rig.yaml`. There is **no `--reproducible` flag** — the app-level `reproducible: true` key is the only signal.
+Choose `--strategy incremental|image` or declare `workspace.deployment.strategy` in `rig.yaml`. The explicit CLI option takes precedence over the manifest. Without an explicit strategy, the legacy `reproducible: true` setting retains image behavior; otherwise source apps default to incremental. New GitHub connections use the reviewed explicit strategy, and existing bindings retain their previous behavior.
 
-### Standard deploy
+### Incremental app releases
 
-With `reproducible` unset (or `false`) and local source, `rig deploy`:
-
-1. Rsyncs the app directory into the workspace.
-2. Runs `install:` on the VM.
-3. (Re)starts the service.
-
-This is the default and fits most apps with fast installs.
+An incremental deployment keeps the workspace running and installs app files in a managed release directory, separate from your development checkout. It stages source, installs dependencies when needed, builds the app, then briefly restarts affected services on their original ports and checks health. Your SSH session, tools, unrelated apps, and development files remain in place.
 
 ```yaml
 name: my-app
+workspace:
+  deployment:
+    strategy: incremental
 port: 8080
+install: npm ci
+dependencyInputs: [package.json, package-lock.json]
+build: npm run build
 start: node server.js
-install: npm ci && npm run build
 health: { path: /healthz, timeoutSeconds: 30 }
 ```
 
+`dependencyInputs` lists exact files relative to the app source directory. Use it only when those files describe all installation inputs. Matching inputs and runtime allow safe reuse; missing or empty inputs run installation conservatively. Source-dependent work belongs in `build`, not a dependency-only installation step. Avoid mutable shared environments and globally installed dependencies; Python apps should use a release-local virtual environment.
+
+For an installation whose dependencies can remain read-only, declare the generated directories with `dependencyOutputs`. Rigbox retains these immutable outputs separately, so source-only updates reuse the same dependency environment instead of copying its entire file tree:
+
+```yaml
+install: npm ci --omit=dev
+dependencyInputs: [package.json, package-lock.json]
+dependencyOutputs: [node_modules]
+start: node server.js
+```
+
+This optional mode requires nonempty `install` and `dependencyInputs`, and currently cannot be combined with `build`, `configure`, or `reconfigure` hooks. Output paths must be safe, non-overlapping relative directories; they cannot overlap source files or dependency inputs. Runtime writes belong in `RIGBOX_APP_DATA_DIR`, not in cached dependencies. Omit `dependencyOutputs` to retain ordinary release-local copying. Each release keeps its dependency version for rollback; changing installation inputs can require another full installation and additional storage.
+
+Install/build commands run under an unprivileged app identity inside the guest. They cannot use sudo or modify arbitrary workspace paths. Services use that identity and receive `RIGBOX_APP_DATA_DIR`, a persistent app-owned directory outside release files. This data survives app updates and app rollback, but it is not a substitute for backups or a promise about workspace deletion. Declared workspace volumes must already exist; provisioning volumes and changing workspace resources are separate operations.
+
+CLI apps declare controlled entrypoints rather than writing global symlinks themselves:
+
+```yaml
+name: tools
+kind: cli
+workspace:
+  deployment:
+    strategy: incremental
+executables:
+  workspace-info: bin/workspace-info
+```
+
+Each executable path is relative to the release. Rigbox registers the command, preserving the SSH user's arguments, terminal input, and working directory. A CLI health command is optional when executables are declared; otherwise provide an explicit `health.command`. Activation changes subsequent invocations, not already-running CLI processes.
+
+Source transfer excludes environment files, version-control metadata, dependency directories, and generated build output. It rejects symlinks and oversized payloads. Keep runtime secrets in Rigbox secret inputs, never in source files. Custom working directories are not supported by the managed release layout.
+
+To resume a specific attempt explicitly, keep the deployment identifier stable:
+
+```bash
+rig deploy --strategy incremental --deployment-id release-2026-09-08
+```
+
+Identifiers contain 1–128 letters, numbers, dots, underscores, or hyphens. Duplicate submissions use persisted deployment state; a failed attempt is not implicitly replayed. Inspect its app-release logs before explicitly retrying with the same identifier; do not create another workspace as a retry mechanism. Installation scripts with external side effects must still be written defensively.
+
+Use `rig app-release ls --workspace <workspace>` and `rig app-release rollback --workspace <workspace> --release <id>` for app history and rollback. Restoring a release briefly restarts its apps, without restoring database contents or undoing migrations. Existing unmanaged apps require explicit ownership import; a matching name is not enough to adopt them. No fallback reimage occurs after an incremental failure.
+
+Managed app runtime configuration remains in `rig.yaml`. To change commands, parameters, or environment, update the manifest and deploy a new release. Direct parameter/environment edits and source-refresh shortcuts are rejected for release-managed apps so retained configuration stays accurate. Display name, access controls, and ordinary service start/stop/restart remain separate controls when no deployment operation is active.
+
 ### Reproducible deploy
 
-> **`reproducible: true` in `rig.yaml` makes the deploy reproducible — the same `install:` script, frozen once.**
+> **Image mode is an explicit environment rebuild. It replaces the workspace root filesystem; it is separate from an app release.**
 
-When an app sets `reproducible: true`, `rig deploy` runs its `install:` script in an isolated builder workspace and freezes the result into a content-addressed image. It boots the target from that image digest. With `source.kind: local`, app code is then synced from your machine. With `source.kind: git`, the builder fetches the resolved commit and the CLI does not overlay the local checkout.
+With `workspace.deployment.strategy: image` (or legacy `reproducible: true` when no explicit strategy is set), `rig deploy` runs its `install:` script in an isolated builder workspace and freezes the result into a content-addressed image. It boots the target from that image digest. With `source.kind: local`, app code is then synced from your machine. With `source.kind: git`, the builder fetches the resolved commit and the CLI does not overlay the local checkout.
 
 ```yaml
 name: ai-chat
@@ -216,7 +258,7 @@ start: uvicorn chat:app --host 0.0.0.0 --port 8080
 health: { path: /healthz, timeoutSeconds: 30 }
 ```
 
-Nothing about the manifest changes except the flag: the same `install:` you would run on every standard deploy is what gets frozen. The image is always built on top of the platform base image (`workspace.image`, default `base`), so the agent and systemd are present and you keep the platform's opinions while layering your own dependencies on top.
+In image mode: the same `install:` you would run on every standard deploy is what gets frozen. The image is always built on top of the platform base image (`workspace.image`, default `base`), so the agent and systemd are present and you keep the platform's opinions while layering your own dependencies on top.
 
 <Note>
 Install dependencies to system paths, such as pip `--break-system-packages`, so deployed code can find them. Git source is fetched into the build at its resolved commit; local source is synced after the image is ready.
@@ -286,8 +328,8 @@ Every reproducible deploy also auto-records a **release** (an image digest + run
 
 #### When to use which
 
-- **`install:` alone** — simple apps with fast installs. The default.
-- **`reproducible: true`** — heavier or slower installs you want frozen and byte-identical across deploys and rollbacks. `rig deploy` freezes and mounts the image for you, and only rebuilds when the build inputs change.
+- **Incremental strategy** — normal app updates in a persistent development workspace, with retained app releases.
+- **Image strategy** — reviewed environment rebuilds and installers that require system-level changes. Existing image connections retain their behavior until an explicitly reviewed migration.
 
 ---
 
@@ -313,6 +355,8 @@ Application environment values are stored in plaintext metadata and are readable
 </Note>
 
 ## Blue-green deploys and promotion
+
+These are separate advanced operations. Incremental app releases do not create preview workspaces, move your SSH connection, change ports, or promise uninterrupted service.
 
 For zero-downtime rollouts, stage a change, verify it, then swap production over atomically — either a whole-workspace clone (`rig deploy --bluegreen preview`) or an in-VM sibling (`rig deploy --bluegreen <suffix>`), each cut over with `--promote`. See **[Blue-green deploys & promotion](/guides/bluegreen)** for both flows, the service-host-vs-live-environment boundary, and rollback.
 
