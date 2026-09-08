@@ -16,7 +16,7 @@ Open http://localhost:3000/introduction. Publishing to `main` triggers the conne
 
 `style.css` keeps the sidebar at the edge and centers content in the remaining space. Homepage styles are scoped under `.rigbox-home`. Articles use a 720px column and a 208px outline on wide screens; API prose and samples share a wider centered container. Geist Sans/Mono, neutral surfaces, and restrained green work in light and dark appearance.
 
-Existing routes and heading anchors are inventoried in `scripts/legacy-routes.json`. Keep extracted sections as short signposts at their original anchors. Each page has one canonical navigation location.
+Existing routes and heading anchors are inventoried in `scripts/legacy-routes.json`. Keep extracted sections as short signposts at their original anchors. Guide pages have one canonical navigation location. Individual CLI command pages are reached through the CLI reference article directory and subcommand links, rather than appearing in the sidebar. The integrity check verifies those pages remain reachable.
 
 ## Maintenance and verification
 

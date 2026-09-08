@@ -34,7 +34,17 @@ walk(json.loads((ROOT/'docs.json').read_text())['navigation'])
 for route,n in Counter(nav).items():
  if route not in pages:errors.append(f'Navigation missing page: {route}')
  if n>1:errors.append(f'Duplicate navigation page: {route}')
-for route in pages.keys()-set(nav):errors.append(f'Page absent from navigation: {route}')
+# Command lookup lives in the article directory rather than the sidebar.
+# Require every omitted command to remain reachable from that landing page.
+reachable=set()
+def visit(route):
+ if route in reachable or route not in pages:return
+ reachable.add(route)
+ for target in re.findall(r'\]\(/(cli-reference/commands/[^\s)#]+)',pages[route]):visit(target)
+visit('cli-reference/cli')
+for route in pages.keys()-set(nav):
+ if not (route.startswith('cli-reference/commands/') and route in reachable):
+  errors.append(f'Page absent from navigation or command directory: {route}')
 for route,text in pages.items():
  prose=clean(text)
  links=re.findall(r'\]\((/[^\s)]+)\)',prose)+re.findall(r'\bhref=["\'](/[^"\']+)',prose)

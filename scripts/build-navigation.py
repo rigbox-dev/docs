@@ -43,8 +43,7 @@ area('Examples',[
  group('Build an app',['examples/overview','examples/first-app','examples/frontend-api','examples/ai-chat','examples/webhook','examples/background-worker','examples/persistent-notes','examples/parameters']),
  group('Environments',['examples/bluegreen','examples/self-hosted','examples/catalog'])]),
 area('CLI reference',[
- group('Use the CLI',['cli-reference/cli','cli-reference/authentication','guides/using-cli','cli-reference/configuration','cli-reference/execution-modes']),
- group('Commands',json.loads(Path('scripts/cli-navigation.json').read_text()))]),
+ group('Use the CLI',['cli-reference/cli','cli-reference/authentication','guides/using-cli','cli-reference/configuration','cli-reference/execution-modes'])]),
 area('Build on Rigbox',[
  group('Integrate',['build/overview','build/quickstart','build/workspace-lifecycle','build/deploy-monitor','guides/build-hosting-platform','build/api-conventions']),
  group('Platform',['concepts/architecture','concepts/security']),

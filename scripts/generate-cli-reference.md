@@ -13,7 +13,7 @@ python3 scripts/generate-cli-reference.py --check
 ```
 
 The generator writes one page per canonical non-hidden command path and
-`scripts/cli-navigation.json` for Mintlify navigation. It merges local/workspace
+`scripts/cli-navigation.json` as a command hierarchy inventory (individual commands are intentionally excluded from the sidebar). It merges local/workspace
 surfaces by canonical path; each mode retains its own usage and flag table.
 Clap's auto-generated help-routing tree is omitted to avoid duplicate command
 pages. Aliases link to the canonical command.
