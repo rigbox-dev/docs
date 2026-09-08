@@ -29,11 +29,17 @@ rig app-release activate --workspace my-project --release <app-release-id>
 
 `activate` requires a ready release; `rollback` selects a previously successful release. Neither command creates a preview workspace or an alternate listening port.
 
+### Retention and retries
+
+Rigbox retains three distinct successful app artifacts for each deployment owner, preserving artifacts still referenced by active apps. Repeated activation of the same artifact does not consume another artifact slot. Plan disk space for retained dependencies, a staged candidate, caches, and persistent app data.
+
+Rollback restores retained code and configuration; it leaves runtime data untouched. Failed attempts keep their deployment IDs so a retry or reload can resume the same attempt without creating another workspace. An expired artifact cannot be activated: deploy a reviewed new attempt with a new deployment ID instead.
+
 ## Image releases: replace the root filesystem
 
 The commands below operate on **workspace image releases**, not app releases. Their behavior is deliberately unchanged. Activating one replaces the workspace root filesystem and can disconnect SSH sessions. Use `rig app-release` when you intend to restore only deployed apps.
 
-A **release** is an immutable record of what ran: an image digest plus its run-config. Every reproducible `rig deploy` (one whose `rig.yaml` sets `reproducible: true`) auto-records a release, giving you a linear history you can roll back to at any time.
+An **image release** records an image digest and its run configuration. Deployments using the image strategy record this history. Legacy `reproducible: true` selects that strategy only when no explicit strategy overrides it: `workspace.deployment.strategy: incremental` still produces an app release, even if an older `reproducible: true` field remains.
 
 Because the image is content-addressed and frozen, activating an old release boots the workspace from the exact environment that release captured — not an approximate rebuild.
 
@@ -95,7 +101,7 @@ This is useful for promoting an image you built and tested separately, or for co
 
 ## rig build: the explicit image build
 
-`rig build image` is the explicit, standalone image build. It runs an install script once in an ephemeral builder VM on top of a base image (the same content-addressed mechanism `rig deploy` uses for `reproducible: true`) and returns a digest and cache key:
+`rig build image` is the explicit, standalone image build. It runs an install script once in an ephemeral builder VM on top of a base image (the same content-addressed mechanism `rig deploy` uses with the image strategy) and returns a digest and cache key:
 
 ```bash
 rig build image --workspace my-project --base-image base \
