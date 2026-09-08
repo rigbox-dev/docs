@@ -44,7 +44,7 @@
   #topbar-cta-button svg { display: none; }
   /* Reserve the navigation rail, then center every page in the remaining space. */
   div:has(> #sidebar) { max-width: none !important; padding: 0 0 0 300px !important; }
-  #sidebar { left: 0; top: calc(64px + var(--banner-height, 0px)) !important; width: 288px; border: 0; }
+  #sidebar { position: fixed !important; left: 0; top: calc(64px + var(--banner-height, 0px)) !important; width: 288px; border: 0; }
   #sidebar-content { padding: 64px 12px 32px; }
   #sidebar-content > div > .sticky { display: none; }
   #sidebar #navigation-items > div { margin: 0 0 28px; padding: 0; border: 0; }
