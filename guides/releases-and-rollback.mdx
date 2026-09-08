@@ -19,6 +19,16 @@ Rollback records another activation; it does not reset your Git branch. The next
 
 Managed app runtime configuration remains in `rig.yaml`. To change commands, parameters, or environment, update the manifest and deploy a new release. Direct parameter/environment edits and source-refresh shortcuts are rejected for release-managed apps so retained configuration stays accurate. Display name, access controls, and ordinary service start/stop/restart remain separate controls when no deployment operation is active.
 
+### Activate a staged release
+
+`rig deploy --sync-only` prepares a ready app release without activating it. Activate that ready release explicitly:
+
+```bash
+rig app-release activate --workspace my-project --release <app-release-id>
+```
+
+`activate` requires a ready release; `rollback` selects a previously successful release. Neither command creates a preview workspace or an alternate listening port.
+
 ## Image releases: replace the root filesystem
 
 The commands below operate on **workspace image releases**, not app releases. Their behavior is deliberately unchanged. Activating one replaces the workspace root filesystem and can disconnect SSH sessions. Use `rig app-release` when you intend to restore only deployed apps.
