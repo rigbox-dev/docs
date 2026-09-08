@@ -1,0 +1,24 @@
+---
+title: "Manage workspace lifecycles"
+description: "Track provisioning and runtime state from your own backend."
+---
+
+## Before provisioning
+
+Authenticate your end user in your own application and authorize the requested operation. Choose a supported template and resource allocation. Keep the mapping from your project to its Rigbox workspace ID on your backend.
+
+## Create and track the workspace
+
+Use [Create Workspace](/api-reference/workspaces/create) with the request schema shown in the API reference. Persist the returned ID before starting other operations. Poll [Get Workspace](/api-reference/workspaces/get) until its state allows the next action; do not treat an accepted creation request as a healthy application.
+
+## Start, stop, and remove
+
+Use the [start](/api-reference/workspaces/start) and [stop](/api-reference/workspaces/stop) endpoints for lifecycle operations. Display the observed state in your UI and prevent conflicting actions while a transition is pending.
+
+Deletion is a separate destructive operation. Make its effect on workspace files and attached storage clear in your own UI. Do not delete and recreate a workspace automatically to recover an app deployment failure.
+
+## Verify and recover
+
+Check workspace state and then inspect application health independently. Preserve failure details and resource IDs. Back off when polling, and do not blindly retry resource creation after an ambiguous response; inspect whether it succeeded first.
+
+Continue with [deployment and monitoring](/build/deploy-monitor) or [storage recovery](/workspaces/recovery-limits).

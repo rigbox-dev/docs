@@ -5,6 +5,10 @@ description: Define long-running background services that start automatically in
 
 Service specs define long-running background processes that run inside your workspaces. Each spec becomes a systemd unit file, giving you process management, automatic restarts, and log capture out of the box.
 
+## Before you begin
+
+Use the [v0.13 CLI](/guides/install-cli) and [authenticate](/cli-reference/authentication). Run workspace-management and recipe commands from your local terminal. Commands identified as running inside a workspace require its console terminal or SSH session. Replace example resource IDs with the values returned for your account.
+
 ## How Service Specs Work
 
 When you attach a service spec to a workspace, Rigbox generates a systemd service unit file inside the VM:
@@ -76,19 +80,19 @@ Once inside the workspace VM, you can manage services using standard `systemctl`
 
 ```bash
 # Check status
-systemctl --user status rigbox-svc-api-server
+sudo systemctl status rigbox-svc-api-server
 
 # View logs
-journalctl --user -u rigbox-svc-api-server -f
+sudo journalctl -u rigbox-svc-api-server -f
 
 # Manually start/stop/restart
-systemctl --user start rigbox-svc-api-server
-systemctl --user stop rigbox-svc-api-server
-systemctl --user restart rigbox-svc-api-server
+sudo systemctl start rigbox-svc-api-server
+sudo systemctl stop rigbox-svc-api-server
+sudo systemctl restart rigbox-svc-api-server
 ```
 
 <Note>
-Services run under the `developer` user's systemd instance, so use `systemctl --user` (not `sudo systemctl`).
+Service specs create system units under `/etc/systemd/system` with `User=developer`. Use `sudo systemctl` to manage the unit; the service process runs as the developer user.
 </Note>
 
 ## List Your Service Specs
@@ -259,6 +263,12 @@ cd frontend && npm ci && npm run build && cd ..
 ```
 
 Both services start on workspace boot, and you can expose either or both via apps.
+
+## Verify and troubleshoot
+
+Use the returned definition ID when attaching it to a workspace. After startup, inspect `rig workspace logs --workspace WORKSPACE_ID`; for service specs, check the installed unit with the commands above. A running VM does not prove a setup script or application completed successfully.
+
+For failures, start with [runtime logs](/operate/app-logs), [health checks](/operate/health), or [resource exhaustion](/operate/resources).
 
 ## Next Steps
 

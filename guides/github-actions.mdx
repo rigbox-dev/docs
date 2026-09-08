@@ -1,15 +1,27 @@
 ---
 title: Deploy from GitHub Actions
+sidebarTitle: GitHub Actions
 description: Push a GitHub repository to its bound Rigbox workspace using short-lived OIDC credentials.
 ---
 
 Use [rigbox-dev/deploy-action](https://github.com/rigbox-dev/deploy-action) to deploy on a push. The Action exchanges GitHub's OpenID Connect identity for a short-lived Rigbox credential scoped to one existing workspace. You do not store a Rigbox API key or register an SSH key on the runner.
 
-This guide uses Action `v1` and Rigbox CLI **v0.12.64 or newer**. GitHub OIDC deployments must be enabled for your Rigbox account. For automatic deployments without a workflow, connect a repository through the workspace creation page or the workspace’s GitHub deployment settings. Automatic pull-request preview environments are not yet supported.
+This v0.13 preview requires a compatible deploy Action revision and Rigbox CLI **v0.13.0 or newer**. Verify the Action release supports your target CLI before enabling the workflow. GitHub OIDC deployments must be enabled for your Rigbox account. For automatic deployments without a workflow, connect a repository through the workspace creation page or the workspace’s GitHub deployment settings. Automatic pull-request preview environments are not yet supported.
 
-## Prepare the manifest
+## Prerequisites
 
-Every app deployed from CI must declare `source.kind: git` and the HTTPS URL of the workflow's repository. Local source deployments are rejected before deployment starts. For a private repository, also set `reproducible: true` on every app.
+- [Install the CLI](/guides/install-cli) on your machine and run `rig --version`. Use v0.13.0 or newer.
+- Have an existing target workspace and a GitHub repository where you can add workflows.
+- Enable GitHub OIDC deployments for your Rigbox account.
+- Prepare a working app with known install/start commands, port, and health path.
+
+For automatic deployments managed in the console, use [Deploy from GitHub](/guides/github). Continue here when deployment belongs in your own GitHub Actions workflow.
+
+<span id="prepare-the-manifest" />
+
+## 1. Prepare the manifest
+
+Every app deployed from CI must declare `source.kind: git` and the HTTPS URL of the workflow's repository. Local source deployments are rejected before deployment starts. For incremental deployment, declare `workspace.deployment.strategy: incremental`. Private Git source is supported by the v0.13 incremental path using the job token. For image deployment, set `reproducible: true` on every app.
 
 Add the source settings to your existing `rig.yaml`:
 
@@ -20,7 +32,8 @@ source:
   kind: git
   repo: https://github.com/YOUR_ORG/YOUR_REPO
   branch: main
-reproducible: true
+workspace:
+  deployment: { strategy: incremental }
 install: npm ci
 start: npm start
 health:
@@ -29,11 +42,13 @@ health:
 visibility: public
 ```
 
-Replace the repository URL, commands, port, and health path with your app's values. In a multi-app manifest, put `source` and `reproducible` in each app definition. See [Deploying with rig deploy](/guides/deploying) for manifest shapes.
+Replace the repository URL, commands, port, and health path with your app's values. In a multi-app manifest, put `source` in each app definition and strategy in the root workspace block. See [Deploying with rig deploy](/guides/deploying) for manifest shapes.
 
-The deployed source is the exact `GITHUB_SHA` from the workflow. The CLI records that SHA in the build inputs and release provenance. A new commit changes the reproducible image cache key, even when the branch name stays the same. The git path does not rsync the runner's checkout over the server-side clone.
+The deployed source is the exact `GITHUB_SHA` from the workflow. The CLI records that SHA in source provenance. Incremental deployment prepares managed app releases; image deployment uses a frozen build whose inputs include the revision. Neither path should silently deploy an uncommitted runner checkout instead of the verified commit.
 
-## Link the repository once
+<span id="link-the-repository-once" />
+
+## 2. Link the repository
 
 From your project directory on your machine, authenticate with your full Rigbox account credential and link an existing workspace:
 
@@ -43,7 +58,7 @@ rig ci link --repo YOUR_ORG/YOUR_REPO --workspace production
 rig ci status --repo YOUR_ORG/YOUR_REPO
 ```
 
-For a private repository, add `--private` to make the link preflight check the required reproducible settings:
+The current `rig ci link --private` preflight still requires `reproducible: true` for each app. For a private incremental project, keep that field to pass linking and also declare `workspace.deployment.strategy: incremental` explicitly so it overrides the reproducible default. Then link with `--private`:
 
 ```bash
 rig ci link --repo YOUR_ORG/YOUR_REPO --workspace production --private
@@ -56,12 +71,14 @@ The new binding is **pending for 24 hours**. The first claim relies on control o
 Once claimed, the binding stores GitHub's immutable repository and owner IDs. A deleted-and-recreated repository cannot inherit access by taking the same name. Repository ownership transfers require the Rigbox account owner to unlink and link again; the old owner ID is rejected.
 
 ```bash
-rig ci unlink --repo YOUR_ORG/YOUR_REPO
+rig ci unlink --repo YOUR_ORG/YOUR_REPO --workspace production
 ```
 
 Unlinking removes the binding and revokes credentials issued through it. Run `rig ci status` without `--repo` to list your bindings. These setup commands require an account credential; a deployment credential cannot manage bindings.
 
-## Add the workflow
+<span id="add-the-workflow" />
+
+## 3. Add the workflow
 
 Create `.github/workflows/deploy.yml` in the linked repository:
 
@@ -87,31 +104,39 @@ jobs:
       - uses: rigbox-dev/deploy-action@v1
         id: deploy
         with:
-          cli-version: v0.12.64
+          cli-version: v0.13.0
 ```
 
 Use your deployment branch instead of `main` if needed. Keep changes to the deployment workflow under the repository's normal review controls. You can pin the Action to a reviewed commit rather than a moving major-version tag.
 
-The Action requests the audience `https://api.rigbox.dev`, validates the exchanged repository and commit, then runs `rig deploy --workspace <bound-id> --output json`. Both identity and deploy credentials are masked immediately. For private source, it forwards the job's ephemeral `github.token` to the builder; no token is stored in the manifest or build record. Public source is fetched anonymously. CI does not create or register an account SSH key.
+The Action requests the audience `https://api.rigbox.dev`, validates the exchanged repository and commit, then runs `rig deploy --workspace <bound-id> --output json`. Both identity and deploy credentials are masked immediately. For private source, it supplies the job's ephemeral `github.token` for authenticated source retrieval; no token is stored in the manifest or build record. Public source is fetched anonymously. CI does not create or register an account SSH key.
 
 ### First image deployment to an existing workspace
+
+This section applies only when the manifest selects image strategy. Do not enable re-image for an incremental deployment.
 
 A workspace that is not already image-pinned may require explicit consent before its first reproducible deployment. Re-imaging replaces the workspace filesystem and discards files stored there. Back up data you need to keep, then set this input for that setup deployment:
 
 ```yaml
       - uses: rigbox-dev/deploy-action@v1
         with:
-          cli-version: v0.12.64
+          cli-version: v0.13.0
           reimage: "true"
 ```
 
 Remove `reimage` after setup. It defaults to `false`; the Action never enables disk replacement automatically. Keep durable data in [persistent volumes](/guides/persistent-volumes).
 
+## 4. Run and verify
+
+Commit the manifest and workflow, then push to the configured branch or run the workflow manually from GitHub's **Actions** tab. Open the deployment job and inspect its result.
+
+Use `rig ci status --repo YOUR_ORG/YOUR_REPO` to confirm the binding is active after the first successful identity exchange. Check the job's `success`, app outcomes, and URL; a successful identity exchange alone does not mean the app deployed successfully. See [Results and failures](#results-and-failures) if the job fails.
+
 ## Inputs and runner support
 
 | Input | Default | Purpose |
 | --- | --- | --- |
-| `cli-version` | `latest` | Stable CLI version, at least v0.12.64. Pin a release for repeatability. |
+| `cli-version` | `latest` | Stable CLI version, at least v0.13.0. Pin a release for repeatability. |
 | `working-directory` | `.` | Directory containing `rig.yaml`. |
 | `api-url` | `https://api.rigbox.dev` | HTTPS API base URL. |
 | `audience` | `https://api.rigbox.dev` | OIDC audience accepted by that server. |
@@ -128,7 +153,7 @@ Workflow `env:` supplies values for the manifest's existing `secrets` declaratio
         env:
           APP_TOKEN: ${{ secrets.APP_TOKEN }}
         with:
-          cli-version: v0.12.64
+          cli-version: v0.13.0
 ```
 
 ```yaml
@@ -150,7 +175,7 @@ A failed app fails the job even when other apps succeeded. The CLI's nonzero exi
 | No permitted binding | Check `rig ci status`, the repository URL, and the workspace owner. Renew an expired pending binding. |
 | GitHub OIDC deployments disabled | Enable the capability for your Rigbox account before retrying. |
 | Repository transferred or recreated | Review the new ownership, then unlink and link again. |
-| Private source refused | Set `reproducible: true`, keep `source.kind: git`, and grant `contents: read`. |
+| Private source refused | Use a compatible v0.13 CLI/Action, keep `source.kind: git`, and grant `contents: read`. Image strategy also requires reproducible app settings. |
 | Re-image consent required | Review the filesystem replacement above before explicitly setting `reimage: "true"`. |
 | CLI too old or ARM asset missing | Use a supported release and runner architecture. |
 

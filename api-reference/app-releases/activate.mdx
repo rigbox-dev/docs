@@ -1,0 +1,8 @@
+---
+title: "Activate an app release"
+openapi: "/openapi/app-releases-api.json POST /api/v1/workspaces/{id}/app-releases/{release_id}/activate"
+---
+
+Requires the v0.13 app-release capability for your account. See [app release workflows](/deploy/overview) for preparation, activation, and recovery.
+
+The handler can accept work asynchronously. Poll the release and inspect its status rather than treating an accepted request as a healthy deployment.

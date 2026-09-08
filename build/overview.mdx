@@ -1,0 +1,28 @@
+---
+title: "Build on Rigbox"
+description: "Use the API from your backend to manage workspaces and applications."
+---
+
+Build a hosting interface, an agent environment, or a developer platform on top of Rigbox. Your backend owns your users and product policy; Rigbox provides workspace, application, and deployment primitives.
+
+## Start with a read-only request
+
+Follow the [API quickstart](/build/quickstart) to authenticate and list workspaces. Keep account credentials on your backend. A personal Rigbox API key is not a credential to distribute to every end user.
+
+## Build the lifecycle
+
+1. Map your user or project to a Rigbox workspace ID.
+2. [Create and manage the workspace](/build/workspace-lifecycle).
+3. [Prepare and monitor app releases](/build/deploy-monitor).
+4. Apply app visibility and your own authorization checks.
+5. Collect health, logs, and usage for your interface.
+
+## Reference and examples
+
+- [Hosting-platform walkthrough](/guides/build-hosting-platform)
+- [API conventions](/build/api-conventions)
+- [Sandbox integration map](/sandbox-api-surface)
+- [Agent integration map](/clawd-api-surface)
+- [Security boundaries](/concepts/security)
+
+The integration maps describe first-party consumers. Their console-specific operations are not a replacement for the public API contract.

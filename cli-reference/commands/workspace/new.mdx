@@ -1,0 +1,184 @@
+---
+title: "rig workspace new"
+sidebarTitle: "new"
+description: "Create a new workspace without starting it"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+
+```bash
+rig workspace new --name my-project
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig workspace new --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox workspace new [OPTIONS] --name <NAME>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-n, --name` | Workspace name | Required; Value: NAME |
+| `-t, --template` | Template id (e.g. base, dev, ai-agent-starter) | Value: TEMPLATE |
+| `-r, --ram` | RAM in MB (raised to template+catalog floor if lower) | Value: RAM |
+| `--vcpu` | vCPU count (minimum: 1) | Value: VCPU |
+| `-d, --disk` | Disk size in MB (raised to template+catalog floor if lower) | Value: DISK |
+| `-c, --catalog` | Catalog recipe id to install at first boot (repeatable) | Value: CATALOG |
+| `--setup-script-id` | Setup-script id to attach at first boot (repeatable; from `rig setup-script ls`) | Value: SETUP_SCRIPT_IDS |
+| `--service-spec-id` | Service-spec id to attach at first boot (repeatable; from `rig service-spec ls`) | Value: SERVICE_SPEC_IDS |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Create a new workspace without starting it
+
+Usage: rigbox workspace new [OPTIONS] --name <NAME>
+
+Options:
+  -n, --name <NAME>
+          Workspace name
+
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+  -t, --template <TEMPLATE>
+          Template id (e.g. base, dev, ai-agent-starter)
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+  -r, --ram <RAM>
+          RAM in MB (raised to template+catalog floor if lower)
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --vcpu <VCPU>
+          vCPU count (minimum: 1)
+
+  -d, --disk <DISK>
+          Disk size in MB (raised to template+catalog floor if lower)
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+  -c, --catalog <CATALOG>
+          Catalog recipe id to install at first boot (repeatable)
+
+      --no-pager
+          Do not pipe help output through a pager
+
+      --setup-script-id <SETUP_SCRIPT_IDS>
+          Setup-script id to attach at first boot (repeatable; from `rig setup-script ls`)
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+      --service-spec-id <SERVICE_SPEC_IDS>
+          Service-spec id to attach at first boot (repeatable; from `rig service-spec ls`)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox workspace new [OPTIONS] --name <NAME>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-n, --name` | Workspace name | Required; Value: NAME |
+| `-t, --template` | Template id (e.g. base, dev, ai-agent-starter) | Value: TEMPLATE |
+| `-r, --ram` | RAM in MB (raised to template+catalog floor if lower) | Value: RAM |
+| `--vcpu` | vCPU count (minimum: 1) | Value: VCPU |
+| `-d, --disk` | Disk size in MB (raised to template+catalog floor if lower) | Value: DISK |
+| `-c, --catalog` | Catalog recipe id to install at first boot (repeatable) | Value: CATALOG |
+| `--setup-script-id` | Setup-script id to attach at first boot (repeatable; from `rig setup-script ls`) | Value: SETUP_SCRIPT_IDS |
+| `--service-spec-id` | Service-spec id to attach at first boot (repeatable; from `rig service-spec ls`) | Value: SERVICE_SPEC_IDS |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Create a new workspace without starting it
+
+Usage: rigbox workspace new [OPTIONS] --name <NAME>
+
+Options:
+  -n, --name <NAME>
+          Workspace name
+
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -t, --template <TEMPLATE>
+          Template id (e.g. base, dev, ai-agent-starter)
+
+  -r, --ram <RAM>
+          RAM in MB (raised to template+catalog floor if lower)
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+      --vcpu <VCPU>
+          vCPU count (minimum: 1)
+
+  -d, --disk <DISK>
+          Disk size in MB (raised to template+catalog floor if lower)
+
+  -c, --catalog <CATALOG>
+          Catalog recipe id to install at first boot (repeatable)
+
+      --setup-script-id <SETUP_SCRIPT_IDS>
+          Setup-script id to attach at first boot (repeatable; from `rig setup-script ls`)
+
+      --service-spec-id <SERVICE_SPEC_IDS>
+          Service-spec id to attach at first boot (repeatable; from `rig service-spec ls`)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

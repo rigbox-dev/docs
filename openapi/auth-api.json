@@ -490,7 +490,7 @@
           {
             "name": "max_results",
             "in": "query",
-            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "description": "Maximum number of items to return. Defaults to 50; values are clamped to the range 1\u2013200.",
             "required": false,
             "schema": {
               "type": "integer",
@@ -643,7 +643,7 @@
           {
             "name": "max_results",
             "in": "query",
-            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "description": "Maximum number of items to return. Defaults to 50; values are clamped to the range 1\u2013200.",
             "required": false,
             "schema": {
               "type": "integer",
@@ -1771,7 +1771,7 @@
           {
             "name": "max_results",
             "in": "query",
-            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "description": "Maximum number of items to return. Defaults to 50; values are clamped to the range 1\u2013200.",
             "required": false,
             "schema": {
               "type": "integer",
@@ -2027,7 +2027,7 @@
           {
             "name": "max_results",
             "in": "query",
-            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "description": "Maximum number of items to return. Defaults to 50; values are clamped to the range 1\u2013200.",
             "required": false,
             "schema": {
               "type": "integer",
@@ -2799,7 +2799,7 @@
           {
             "name": "max_results",
             "in": "query",
-            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "description": "Maximum number of items to return. Defaults to 50; values are clamped to the range 1\u2013200.",
             "required": false,
             "schema": {
               "type": "integer",
@@ -3713,7 +3713,7 @@
           {
             "name": "max_results",
             "in": "query",
-            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "description": "Maximum number of items to return. Defaults to 50; values are clamped to the range 1\u2013200.",
             "required": false,
             "schema": {
               "type": "integer",
@@ -4336,7 +4336,7 @@
           {
             "name": "max_results",
             "in": "query",
-            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "description": "Maximum number of items to return. Defaults to 50; values are clamped to the range 1\u2013200.",
             "required": false,
             "schema": {
               "type": "integer",
@@ -5593,7 +5593,7 @@
           {
             "name": "max_results",
             "in": "query",
-            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "description": "Maximum number of items to return. Defaults to 50; values are clamped to the range 1\u2013200.",
             "required": false,
             "schema": {
               "type": "integer",
@@ -5791,7 +5791,7 @@
           {
             "name": "max_results",
             "in": "query",
-            "description": "Maximum items to return. Clamped to `[1, MAX_LIMIT]`. Default 50.\n\nDeserialized leniently from a string: axum's `Query` (serde_urlencoded)\ncannot coerce a *flattened* numeric field, so a struct that\n`#[serde(flatten)]`s `PageParams` (e.g. `ListAppsQuery`) would otherwise\nfail with \"invalid type: string, expected u32\" on `?max_results=50`.",
+            "description": "Maximum number of items to return. Defaults to 50; values are clamped to the range 1\u2013200.",
             "required": false,
             "schema": {
               "type": "integer",

@@ -1,0 +1,26 @@
+---
+title: "Troubleshoot resource limits"
+description: "Distinguish capacity, workspace sizing, and disk usage."
+---
+
+## Inspect current allocation
+
+Run locally:
+
+```bash
+rig limits
+rig capacity
+rig workspace ls
+```
+
+Account limits, fleet capacity, and a workspace's own resources are different constraints. Increasing a manifest value does not guarantee capacity or automatically resize every existing target.
+
+## Memory or CPU pressure
+
+Inspect workspace metrics and app logs. Exit signals or abrupt process termination may indicate resource pressure; corroborate with system logs before assuming an application bug. Use the [workspace resize workflow](/guides/workspaces#resizing-a-workspace) when appropriate.
+
+## Disk pressure
+
+Check root-disk and volume usage separately over SSH. Managed release artifacts, runtime packages, caches, and user data consume different storage. Do not manually remove managed release metadata or current dependency caches to free space; this can break activation and rollback integrity checks.
+
+Grow a [persistent volume](/workspaces/volume-management) if the application data disk is full. Back up data before removal. For limits and supported allocations, use [resource limits](/concepts/limits) and the effective values returned for your account.

@@ -1,0 +1,43 @@
+---
+title: "Catalog agents and services"
+description: "Understand the difference between an SSH-first CLI recipe and an HTTP service."
+---
+
+The [catalog examples](https://github.com/rigbox-dev/rigbox-examples/tree/2612ffc9138d3b2f8169b10e3a54abd5495db8b8/catalog-apps) reproduce agent and service installations as editable manifests. These examples require v0.13 and explicitly select image deployment.
+
+## Choose an execution model
+
+**CLI examples** declare `kind: cli`: Claude, Codex, OpenCode, Junie, Kilo Code, and Pi. They install an executable for use inside the workspace. They do not expose a port or have an HTTP health check.
+
+**Service examples** expose a port and health endpoint: Jupyter, Marimo, Streamlit, pgweb, Excalidraw, File Browser, OpenTerminal, Firecrawl, Hermes, T3 Code, Open WebUI, and OpenClaw Gateway. Read the selected README for provider credentials and resource needs.
+
+## Deploy from your machine
+
+After [installing the CLI](/guides/install-cli), run:
+
+```bash
+git clone --branch codex/examples-docs-v013 https://github.com/rigbox-dev/rigbox-examples.git
+cd rigbox-examples/catalog-apps/cli/codex
+rig login
+rig deploy --strategy image
+```
+
+These examples use `reproducible: true` and the image strategy. Retain the printed workspace/app IDs. Incremental CLI deployments have executable verification requirements; this tutorial uses image installation explicitly.
+
+## Verify inside the workspace
+
+Connect using [SSH access](/guides/ssh-access), then run the installed executable's version/help command, such as `codex --version`. Installation success does not establish provider authentication. Configure [managed AI](/guides/managed-proxy) or the provider credentials required by your selected tool before making an AI request.
+
+For an HTTP service, deploy from its `catalog-apps/service/NAME` directory instead, inspect `rig app health --app APP_ID`, and open the reported URL. Check the manifest's visibility before sharing; do not assume a product's own authentication is enabled.
+
+If a CLI installation fails, inspect `rig app logs --app APP_ID --install` and the image build logs. Do not debug a CLI recipe by adding a fake HTTP port.
+
+## Clean up
+
+Export workspace files you need, then remove only the disposable workspace:
+
+```bash
+rig workspace rm --workspace WORKSPACE_ID
+```
+
+For a managed installation instead of editing a recipe, see [Catalog apps](/guides/catalog).

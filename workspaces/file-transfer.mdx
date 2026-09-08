@@ -1,0 +1,27 @@
+---
+title: "Transfer files"
+description: "Copy files between your machine and a workspace using its SSH target."
+---
+
+## Prerequisites
+
+Register an [SSH key](/workspaces/ssh-keys), start the workspace, and install `jq` locally. Work from your own terminal.
+
+## Find the target
+
+```bash
+TARGET=$(rig workspace ssh-info --workspace WORKSPACE --output json | jq -r .ssh_target)
+ssh "$TARGET"
+```
+
+Exit the SSH session before running the local transfer commands below. Use a development directory for manually copied source; incremental app releases manage their own directories.
+
+## Copy files
+
+```bash
+scp ./notes.txt "$TARGET:/home/developer/notes.txt"
+scp "$TARGET:/home/developer/notes.txt" ./notes.downloaded.txt
+rsync -av ./project/ "$TARGET:/home/developer/project/"
+```
+
+Compare the downloaded file with the original. If permissions fail, choose a path owned by the workspace user rather than using a system or managed release directory. Use [local deployment](/guides/deploying) when the goal is to update an app rather than transfer working files.

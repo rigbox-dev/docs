@@ -1,0 +1,28 @@
+---
+title: "Source and dependency fields"
+description: "Select deployed files and describe ordering and cache requirements."
+---
+
+| Field | Meaning |
+| --- | --- |
+| `apps.<name>.path` | Local app directory relative to the project |
+| `apps.<name>.ref` | Published recipe identity; alternative to `path` |
+| `source.kind` | `local` or `git`; local is the default |
+| `source.repo` | Required Git clone URL for Git source |
+| `source.branch` | Branch/ref to resolve for Git source |
+| `dependsOn` | Named app dependencies in a project |
+| `dependencyInputs` | Relative files determining dependency installation |
+| `dependencyOutputs` | Installed directories reusable by incremental releases |
+
+```yaml
+source:
+  kind: git
+  repo: https://github.com/YOUR_ORG/YOUR_REPO.git
+  branch: main
+```
+
+Git-source deployment uses the resolved revision, not uncommitted files in your checkout. In GitHub Actions, the verified workflow SHA identifies the source. App paths must remain within the project/repository.
+
+Incremental upload budgets are 32 MiB total source, 8 MiB per file, and 10,000 files across the selected apps. Do not upload dependency directories, archives, secrets, or generated assets that can be recreated by installation. Unsafe paths and unsupported filesystem entries fail collection.
+
+`dependencyOutputs` requires nonempty `dependencyInputs` and `install`, is limited to 32 nonoverlapping relative directories, and cannot overlap source/input files. It cannot be combined with `build` or configure/reconfigure hooks and is not supported by image deployment. See [cache behavior](/deploy/build-cache).

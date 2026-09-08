@@ -1,0 +1,28 @@
+---
+title: "Read application logs"
+description: "Inspect running services and follow their output."
+---
+
+## Prerequisites
+
+Run locally after authenticating. Find your application first:
+
+```bash
+rig app ls --workspace WORKSPACE
+rig app health --app APP
+```
+
+## Read and follow logs
+
+```bash
+rig app logs --app APP
+rig app logs --app APP --follow
+```
+
+Use Ctrl+C to stop following; this does not stop the app. Check for exceptions, missing configuration, and whether the process binds the configured port. Runtime output can include application secrets, so review it before sharing.
+
+## Distinguish the failing stage
+
+If the executable never started, read [install/build/release logs](/operate/build-logs). If the process runs but deployment fails readiness, compare the manifest with [health requirements](/configure/health). If health succeeds but a browser cannot open the URL, check [visibility](/guides/visibility) and [routing](/guides/expose-and-route).
+
+For custom log sources and API streaming, follow the [App Logs API](/api-reference/app-logs/get-logs).

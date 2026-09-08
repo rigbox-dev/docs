@@ -1,0 +1,28 @@
+---
+title: "API conventions"
+description: "Handle authentication, identifiers, pagination, and asynchronous work."
+---
+
+## URLs and credentials
+
+The public HTTP base is `https://api.rigbox.dev/api/v1`. Send `Authorization: Bearer` with a valid credential. The CLI's `rig api` accepts paths such as `/v1/workspaces`; use the HTTP reference for direct requests.
+
+The VM-local managed AI proxy is a separate interface. Its base URL, caller identity, and protocol differ from the account API. Do not send personal account keys to it.
+
+## Identifiers and collections
+
+Persist returned IDs and treat them as opaque. Read each endpoint's response envelope: not every list is a bare array. Follow its `next_cursor` when present, stopping when there is no next page. Do not infer URLs or IDs from a user-visible name.
+
+## Asynchronous operations
+
+Creation, installation, and activation may continue after the HTTP response. Poll the documented resource status with bounded backoff, show progress, and distinguish readiness from request acceptance. Treat an unknown result after a transport failure as ambiguous, not automatically failed.
+
+Use idempotency keys only on operations that support them. Do not invent a general header or retry guarantee across the API.
+
+## Errors and streaming
+
+Handle authentication, authorization, validation, conflict, and rate-limit errors distinctly. A rejected request requires a correction or permission change; repeated retries do not fix it. Follow any returned retry guidance.
+
+Log streams use their endpoint-specific protocol and parameters. Close streams when the user leaves the page and sanitize application log content before embedding it in your UI.
+
+See the [API reference](/api-reference/workspaces/list) for authoritative per-operation fields and responses.

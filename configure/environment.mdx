@@ -1,0 +1,28 @@
+---
+title: "Environment variables"
+description: "Pass nonsecret settings consistently to application processes."
+---
+
+## Declare application values
+
+```yaml
+env:
+  NODE_ENV: production
+  PORT: "3000"
+```
+
+Quote numeric values: environment values are strings. `workspace.env` supplies shared defaults in a multi-app project; each local app's `env` overrides the same key. Published recipe references use their own recipe configuration.
+
+## Load local values for deployment
+
+The CLI loads `.env` files for secret resolution. From the project directory:
+
+```bash
+rig deploy --workspace my-project --stage production
+```
+
+Precedence is the real process environment, `.env.production.local`, `.env.local`, `.env.production`, then `.env`. `RIG_ENV` supplies the stage when the flag is absent. Use `--no-env-file` to disable file loading. A loaded shell value reaches an app through a declared [secret](/configure/secrets); loading a file does not automatically forward every variable.
+
+## Verify
+
+After deployment, check application behavior and inspect environment keys using `rig app env ls --app <APP_NAME>`. Avoid revealing values in shared logs. Runtime environment metadata can be read by authorized callers; do not treat it as an encrypted secrets vault. Keep sensitive values out of committed `env` blocks.

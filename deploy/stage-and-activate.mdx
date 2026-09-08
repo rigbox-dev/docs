@@ -1,0 +1,35 @@
+---
+title: "Stage and activate"
+description: "Prepare an incremental release without immediately changing running services."
+---
+
+## Prepare the release
+
+From your local project directory, target an existing workspace:
+
+```bash
+rig deploy --workspace my-project --strategy incremental --sync-only
+rig app-release ls --workspace my-project
+```
+
+With incremental deployment, `--sync-only` prepares a managed release and leaves it ready for explicit activation. It does not merely copy files over the running app. Wait for preparation to finish and identify the ready release ID.
+
+## Review preparation logs
+
+```bash
+rig app-release logs --workspace my-project --release <RELEASE_ID>
+```
+
+Check dependency installation, build output, and the intended application set. A ready release has not yet passed the running service's activation health check.
+
+## Activate and verify
+
+```bash
+rig app-release activate --workspace my-project --release <RELEASE_ID>
+rig app ls --workspace my-project
+rig app health --app <APP_NAME> --output json
+```
+
+Activation briefly restarts affected applications and checks them. Verify the returned release state and each app's health. Do not use a failed or already superseded release as though it were ready; inspect history and stage again if necessary.
+
+To restore a retained release after an unsuccessful change, follow [app rollback](/deploy/app-rollback). Image deployment uses different staging semantics; do not combine incremental staging with `--bluegreen`, `--promote`, `--build-only`, or `--reimage`.

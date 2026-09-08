@@ -1,0 +1,180 @@
+---
+title: "rig app log-source update"
+sidebarTitle: "update"
+description: "Update an app log source"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+
+```bash
+rig app log-source update --app APP_ID --source SOURCE
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig app log-source update --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox app log-source update [OPTIONS] --app <APP> --source <SOURCE>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-a, --app` | App name or id | Required; Value: APP |
+| `--source` | Log source id (from `rig app log-source ls`) | Required; Value: SOURCE |
+| `--type` | Replace the source type | Value: SOURCE_TYPE; Choices: systemd_unit, docker_container, file_path |
+| `--ref` | Replace the source ref (unit, container, or file path) | Value: SOURCE_REF |
+| `-n, --name` | Replace the display name | Value: NAME |
+| `--primary` | Mark as primary | Default: false; Conflicts: not_primary |
+| `--not-primary` | Mark as non-primary | Default: false; Conflicts: primary |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Update an app log source
+
+Usage: rigbox app log-source update [OPTIONS] --app <APP> --source <SOURCE>
+
+Options:
+  -a, --app <APP>
+          App name or id
+
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --source <SOURCE>
+          Log source id (from `rig app log-source ls`)
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+      --type <SOURCE_TYPE>
+          Replace the source type
+          
+          [possible values: systemd_unit, docker_container, file_path]
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --ref <SOURCE_REF>
+          Replace the source ref (unit, container, or file path)
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+  -n, --name <NAME>
+          Replace the display name
+
+      --no-pager
+          Do not pipe help output through a pager
+
+      --primary
+          Mark as primary
+
+      --not-primary
+          Mark as non-primary
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox app log-source update [OPTIONS] --app <APP> --source <SOURCE>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-a, --app` | App name or id | Required; Value: APP |
+| `--source` | Log source id (from `rig app log-source ls`) | Required; Value: SOURCE |
+| `--type` | Replace the source type | Value: SOURCE_TYPE; Choices: systemd_unit, docker_container, file_path |
+| `--ref` | Replace the source ref (unit, container, or file path) | Value: SOURCE_REF |
+| `-n, --name` | Replace the display name | Value: NAME |
+| `--primary` | Mark as primary | Default: false; Conflicts: not_primary |
+| `--not-primary` | Mark as non-primary | Default: false; Conflicts: primary |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Update an app log source
+
+Usage: rigbox app log-source update [OPTIONS] --app <APP> --source <SOURCE>
+
+Options:
+  -a, --app <APP>
+          App name or id
+
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+      --source <SOURCE>
+          Log source id (from `rig app log-source ls`)
+
+      --type <SOURCE_TYPE>
+          Replace the source type
+          
+          [possible values: systemd_unit, docker_container, file_path]
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+      --ref <SOURCE_REF>
+          Replace the source ref (unit, container, or file path)
+
+  -n, --name <NAME>
+          Replace the display name
+
+      --primary
+          Mark as primary
+
+      --not-primary
+          Mark as non-primary
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

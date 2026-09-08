@@ -1,0 +1,29 @@
+---
+title: "Deploy applications"
+description: "Choose a source and deployment strategy, then prepare, activate, and verify your application."
+---
+
+Start with [your first app](/quickstart). Rigbox runs applications inside workspaces: deploying application code and replacing a workspace image are different operations.
+
+| Workflow | Use it for | Guide |
+| --- | --- | --- |
+| Incremental app release | Frequent code/configuration updates in an existing environment | [Local deployment](/guides/deploying) |
+| GitHub deployment | Deploy a reviewed repository revision | [Console integration](/guides/github) or [GitHub Actions](/guides/github-actions) |
+| Workspace image | Freeze the install/build environment and boot from its digest | [Reproducible builds](/deploy/reproducible-builds) |
+| Catalog installation | Install a published app or CLI recipe | [Catalog apps](/guides/catalog) |
+
+An incremental release prepares code separately, then activates and verifies the affected apps. It retains workspace identity and development files. Activation can briefly interrupt an app. Store mutable data outside the managed code directories, preferably on [persistent volumes](/guides/persistent-volumes).
+
+## Select a strategy
+
+For predictable local and CI behavior, declare `workspace.deployment.strategy: incremental` or `image` in `rig.yaml`. CLI flags override that declaration. Without either, the CLI chooses image deployment when any app has `reproducible: true`, and incremental otherwise. Catalog-only and legacy preview flows have separate compatibility paths; use their dedicated guides.
+
+The console retains its reviewed repository strategy. A manifest declaration must match it; editing the file alone does not approve a console strategy change.
+
+## Organize a project
+
+Use one manifest for [multiple cooperating apps](/deploy/multi-app), [declare dependencies](/deploy/dependencies), or [deploy one app](/deploy/single-app). Keep [configuration](/configure/overview) in the manifest and credentials out of source control.
+
+## Operate a release
+
+[Develop and redeploy](/deploy/development-loop), [stage before activation](/deploy/stage-and-activate), and [restore app code and configuration](/deploy/app-rollback). Use [image release history](/guides/releases-and-rollback) only for workspace images.

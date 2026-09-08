@@ -1,0 +1,64 @@
+---
+title: "rig proxy status"
+sidebarTitle: "status"
+description: "Show proxy status, route, and credit balance"
+---
+
+Available **workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command inside a workspace.
+
+## Examples
+
+Inside a workspace, inspect managed AI proxy configuration.
+
+```bash
+rig proxy status
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig proxy status --help
+```
+
+## Workspace syntax
+
+```text
+Usage: rigbox proxy status [OPTIONS]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Show proxy status, route, and credit balance
+
+Usage: rigbox proxy status [OPTIONS]
+
+Options:
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

@@ -1,0 +1,87 @@
+---
+title: "rig uninstall"
+sidebarTitle: "uninstall"
+description: "Remove the local Rigbox CLI install"
+---
+
+Available **local**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+<Warning>
+This command removes the local CLI installation. Review its flags before running it.
+</Warning>
+
+Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+
+```bash
+rig uninstall
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig uninstall --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox uninstall [OPTIONS]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--purge-config` | Also remove saved credentials and legacy config files | Default: false |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Remove the local Rigbox CLI install
+
+Usage: rigbox uninstall [OPTIONS]
+
+Options:
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --purge-config
+          Also remove saved credentials and legacy config files
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

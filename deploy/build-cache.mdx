@@ -1,0 +1,35 @@
+---
+title: "Build and dependency caching"
+description: "Choose the cache mechanism that matches your deployment strategy."
+---
+
+## Incremental dependency outputs
+
+For an incremental app, declare both the files that determine installation and the directories installation creates:
+
+```yaml
+install: npm ci
+dependencyInputs:
+  - package.json
+  - package-lock.json
+dependencyOutputs:
+  - node_modules
+```
+
+Outputs allow prepared dependency directories to be reused when the relevant inputs and install configuration match. `dependencyInputs` alone does not declare any installed files to restore. Keep generated dependencies out of uploaded source.
+
+The parser requires nonempty inputs and an install command when outputs are present. It rejects outputs combined with `build`, `lifecycle.configure`, or `lifecycle.reconfigure`. Outputs must be relative, nonoverlapping directories, at most 32, and must not overlap input or source files. Do not declare database or user-upload directories as dependency outputs.
+
+## Image cache
+
+Image deployments use frozen build inputs rather than incremental dependency outputs. `dependencyOutputs` is rejected for image deployment. To prebuild a reproducible project without creating or re-imaging a workspace:
+
+```bash
+rig deploy --strategy image --build-only
+```
+
+A later image deploy can reuse its frozen result. Changes to relevant inputs, including a resolved Git commit, can invalidate the image cache.
+
+## Diagnose a miss
+
+Compare the install command, declared input files, source revision, and strategy. Read the release logs for incremental preparation or `rig build logs <BUILD_ID>` for an image build. Correct declarations instead of relying on undeclared files left in an older directory.

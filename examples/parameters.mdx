@@ -1,0 +1,58 @@
+---
+title: "Validate application configuration"
+description: "A Django link shortener demonstrates string, URL, number, boolean, select, email, secret, and textarea parameters."
+---
+
+## Before you begin
+
+Install the [CLI](/guides/install-cli), authenticate with `rig login`, and use an isolated test workspace. These examples require the v0.13 CLI. The manifests have been checked with the v0.13 parser; verify application health after deployment.
+
+[Open the url-shortener source](https://github.com/rigbox-dev/rigbox-examples/tree/2612ffc9138d3b2f8169b10e3a54abd5495db8b8/url-shortener). These manifests explicitly select **incremental** deployment.
+
+## Deploy from your machine
+
+From a terminal on your machine, clone the repository and enter the example directory:
+
+```bash
+git clone --branch codex/examples-docs-v013 https://github.com/rigbox-dev/rigbox-examples.git
+cd rigbox-examples/url-shortener
+rig --version
+```
+
+Install runs Django migrations and collectstatic. Migrations affect persistent data; returning to an earlier app release does not undo schema changes.
+
+```bash
+rig deploy --strategy incremental
+```
+
+Record the workspace and app IDs printed by deployment. Use those exact IDs wherever this guide shows `WORKSPACE_ID` or `APP_ID`; do not guess a public URL from an app name.
+
+## Verify the result
+
+```bash
+rig app health --app APP_ID
+rig app logs --app APP_ID
+```
+
+Create a short link and follow it. List parameters, set a valid `site_name`, then try a value outside the declared validation pattern and confirm an error.
+
+```bash
+rig app param ls --app APP_ID
+rig app param set --app APP_ID site_name=Example
+```
+
+## Access and recovery
+
+The web app is public. Treat it as a demonstration; public link creation requires abuse controls before production use.
+
+If deployment fails, read the terminal error and installation output before retrying. `rig app logs --app APP_ID --install` shows install logs when an app exists. Check required credentials, resource limits, the start command, and the configured health path. An image deployment may require explicit root-filesystem replacement consent; do not add `--reimage` to a workspace containing data you need.
+
+## Clean up
+
+After saving any data you need, delete only the isolated example workspace. This deletes its applications and workspace data; inspect persistent volumes and snapshots separately before removing them.
+
+```bash
+rig workspace rm --workspace WORKSPACE_ID
+```
+
+Continue with [deployment guides](/guides/deploying) or [the manifest reference](/reference/rig-yaml).

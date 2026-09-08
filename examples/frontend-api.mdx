@@ -1,0 +1,53 @@
+---
+title: "Deploy a frontend and API"
+description: "Run a Next.js frontend and a separate API in one workspace, with SQLite on a named volume."
+---
+
+## Before you begin
+
+Install the [CLI](/guides/install-cli), authenticate with `rig login`, and use an isolated test workspace. These examples require the v0.13 CLI. The manifests have been checked with the v0.13 parser; verify application health after deployment.
+
+[Open the todo-app source](https://github.com/rigbox-dev/rigbox-examples/tree/2612ffc9138d3b2f8169b10e3a54abd5495db8b8/todo-app). These manifests explicitly select **incremental** deployment.
+
+## Deploy from your machine
+
+From a terminal on your machine, clone the repository and enter the example directory:
+
+```bash
+git clone --branch codex/examples-docs-v013 https://github.com/rigbox-dev/rigbox-examples.git
+cd rigbox-examples/todo-app
+rig --version
+```
+
+`dependsOn: [todo-api]` controls startup ordering. The incremental payload does not inject a discovery URL, so the corrected manifest explicitly sets `RIGBOX_TODO_API_URL=http://127.0.0.1:5100` in the frontend environment. Both apps remain in the root manifest; use `rig deploy --app todo-web` from this directory to select just the frontend.
+
+```bash
+rig deploy --strategy incremental
+```
+
+Record the workspace and app IDs printed by deployment. Use those exact IDs wherever this guide shows `WORKSPACE_ID` or `APP_ID`; do not guess a public URL from an app name.
+
+## Verify the result
+
+```bash
+rig app health --app APP_ID
+rig app logs --app APP_ID
+```
+
+Open the frontend URL, add a todo, and reload. Deploy again and confirm the todo remains. Inspect both app health states; the API uses port 5100 and frontend port 5101.
+
+## Access and recovery
+
+The frontend is public. The API is private at the Rigbox route; sibling applications connect over workspace loopback. This is route access control, not network isolation between workspace processes.
+
+If deployment fails, read the terminal error and installation output before retrying. `rig app logs --app APP_ID --install` shows install logs when an app exists. Check required credentials, resource limits, the start command, and the configured health path. An image deployment may require explicit root-filesystem replacement consent; do not add `--reimage` to a workspace containing data you need.
+
+## Clean up
+
+After saving any data you need, delete only the isolated example workspace. This deletes its applications and workspace data; inspect persistent volumes and snapshots separately before removing them.
+
+```bash
+rig workspace rm --workspace WORKSPACE_ID
+```
+
+Continue with [deployment guides](/guides/deploying) or [the manifest reference](/reference/rig-yaml).

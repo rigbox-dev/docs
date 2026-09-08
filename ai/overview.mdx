@@ -1,0 +1,25 @@
+---
+title: "AI and tools"
+description: "Run coding agents and developer services in a Rigbox workspace."
+---
+
+Choose whether you need an interactive coding environment or an HTTP service. A CLI app has no public URL; connect over SSH and run its executable. A service app has a process, port, and health check.
+
+## Set up your environment
+
+1. [Create a workspace](/guides/workspaces) with the runtime your tool needs.
+2. [Install a catalog app](/guides/catalog) or follow a [catalog example](/examples/catalog).
+3. Select [managed AI](/guides/managed-proxy) or [bring your own keys](/guides/byok).
+4. Connect with [SSH](/guides/ssh-access), or open the service URL reported by Rigbox.
+
+## Choose a tool
+
+- [Coding agents](/guides/ai-coding-tools) for terminal-based development.
+- [Spawn](/ai/spawn) for an agent-first launch workflow.
+- [Virtual browser](/guides/virtual-browser) for browser sessions in a workspace.
+- [Firecrawl](/guides/firecrawl) for crawling and extraction.
+- [Architecture explorer](/guides/architecture-explorer) for exploring code.
+
+## Verify readiness
+
+A running workspace does not guarantee an agent finished installing. Inspect install logs, then verify the executable over SSH. For service apps, inspect app health and access settings. Never place a personal Rigbox account key into an untrusted agent workspace simply to enable workspace-scoped CLI commands.

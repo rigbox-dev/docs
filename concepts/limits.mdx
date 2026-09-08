@@ -7,20 +7,7 @@ Every Rigbox account has limits on workspaces, resources, and AI credits based o
 
 ## Plan tiers
 
-| | Free | Pro |
-| --- | --- | --- |
-| **Workspaces** | 2 | 10 |
-| **Apps per workspace** | 5 | 20 |
-| **Max RAM per workspace** | 1 GB | 4 GB |
-| **Max vCPUs per workspace** | 1 | 4 |
-| **Max disk per workspace** | 4 GB | 10 GB |
-| **AI credits / month** | 250 | 2,000 |
-| **Snapshots per workspace** | 3 | 10 |
-| **SSH keys** | 5 | 20 |
-
-<Note>
-These are representative limits. Check your actual limits with the CLI - they may differ based on promotions or custom arrangements.
-</Note>
+Plan limits cover workspace count, per-workspace CPU/RAM/disk, apps, snapshots, SSH keys, and managed AI credits. Use your account’s reported limits as the source of truth; limits can vary by plan and account configuration.
 
 ## Check your limits
 
@@ -47,7 +34,7 @@ rig workspace spawn \
   --disk 4096
 ```
 
-If the request exceeds your limits, the command fails with a `402 Payment Required` error indicating which limit was exceeded.
+Requests that exceed a resource limit are rejected with an error identifying the constraint. Do not assume every quota failure uses the same HTTP status.
 
 ### Resizing
 
@@ -89,17 +76,11 @@ Shows daily usage broken down by workspace, provider, and model.
 
 - AI requests through the proxy return `402`
 - Non-AI services in your workspace continue running
-- Switch to [BYOK mode](/guides/byok) for unlimited usage with your own keys
+- Switch to [BYOK mode](/guides/byok) to use your own provider account, subject to its limits
 
 ## Rate limits
 
-API requests are rate-limited per user. Limits vary by endpoint class:
-
-| Endpoint class | Requests / minute |
-| --- | --- |
-| Authentication | 120 |
-| Workspaces | 180 |
-| Apps | 240 |
+API requests can be rate-limited. Treat the response and any `Retry-After` header as authoritative instead of assuming a fixed rate across endpoints.
 
 When rate-limited, the API returns `429 Too Many Requests`. Implement exponential backoff in your client:
 
@@ -126,13 +107,7 @@ Before creating a workspace, check if the platform has capacity:
 rig capacity
 ```
 
-```json
-{
-  "available": true,
-  "total": 50,
-  "used": 12
-}
-```
+Inspect the returned availability before provisioning. Capacity is a point-in-time observation, not a reservation.
 
 Rigbox also tracks per-node runtime capacity internally, including bridge IP leases for running VMs. Each compute node has 253 active VM bridge IPs available (`172.16.0.2` through `172.16.0.254`), and stopped or deleted workspaces release their active IP lease.
 

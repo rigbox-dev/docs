@@ -1,0 +1,69 @@
+---
+title: "rig proxy dotenv"
+sidebarTitle: "dotenv"
+description: "Write a .env file with proxy configuration"
+---
+
+Available **workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command inside a workspace.
+
+## Examples
+
+Run inside a workspace. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+
+```bash
+rig proxy dotenv
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig proxy dotenv --help
+```
+
+## Workspace syntax
+
+```text
+Usage: rigbox proxy dotenv [OPTIONS] [PATH]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `path` | Output path (default: ./.env) | Value: PATH |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Write a .env file with proxy configuration
+
+Usage: rigbox proxy dotenv [OPTIONS] [PATH]
+
+Arguments:
+  [PATH]
+          Output path (default: ./.env)
+
+Options:
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

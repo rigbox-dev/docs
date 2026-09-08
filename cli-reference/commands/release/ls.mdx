@@ -1,0 +1,83 @@
+---
+title: "rig release ls"
+sidebarTitle: "ls"
+description: "List releases for a workspace"
+---
+
+Available **local**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+
+```bash
+rig release ls --workspace WORKSPACE_ID
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig release ls --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox release ls [OPTIONS] --workspace <WORKSPACE>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+List releases for a workspace
+
+Usage: rigbox release ls [OPTIONS] --workspace <WORKSPACE>
+
+Options:
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+  -w, --workspace <WORKSPACE>
+          Workspace name or id
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

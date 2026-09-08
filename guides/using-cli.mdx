@@ -1,0 +1,75 @@
+---
+title: Using the CLI
+description: Find commands, select workspaces, inspect apps, and use structured output.
+---
+
+Run these commands on your local machine after [installing and signing in](/guides/install-cli). Use the [command reference](/cli-reference/cli) for the complete list of commands and flags.
+
+## Find a command
+
+Help is available at each level:
+
+```bash
+rig --help
+rig workspace --help
+rig workspace spawn --help
+```
+
+If a guide uses a command missing from your installation, run `rig --version` and [update the CLI](/guides/install-cli#update-the-cli). GitHub Actions bindings require CLI v0.12.64 or newer.
+
+## Select a workspace
+
+List your workspaces and use a name or ID from the result:
+
+```bash
+rig workspace ls
+rig workspace logs --workspace my-project
+```
+
+Replace `my-project` with your workspace. Creation commands use `--name` to name a new workspace; management commands generally use `--workspace` to select an existing one. Check the command's `--help` for its accepted flags.
+
+## Inspect an app
+
+```bash
+rig app ls --workspace my-project
+```
+
+Copy the actual app name from the result, then inspect its health:
+
+```bash
+rig app health --app <APP_NAME>
+```
+
+A running process does not necessarily mean an app is reachable. Check the reported live status and listening port before opening the app URL.
+
+## Deploy a project
+
+From a directory containing `rig.yaml`:
+
+```bash
+rig deploy
+```
+
+The CLI uses an explicitly selected workspace, reuses a workspace recorded in `.rig.lock`, or creates one when no target is bound. Follow [Deploy from your machine](/guides/deploying) to create and review the manifest first.
+
+## Use structured output
+
+Human-readable output is the default. Request JSON when piping results to another program:
+
+```bash
+rig workspace ls --output json
+rig app health --app <APP_NAME> --output json
+```
+
+Use `--query` to select values from structured output, and consult [global flags](/cli-reference/cli#global-flags) for input files and persistent output settings.
+
+## Inside a workspace
+
+Inside a Rigbox workspace, the preinstalled CLI uses the workspace's identity. You do not need to run `rig login`. Account-level commands are not available in this mode.
+
+```bash
+rig --version
+rig --help
+```
+
+Use your local CLI for account-wide tasks such as creating workspaces and managing GitHub bindings. See [runtime modes](/cli-reference/cli#runtime-modes) for details.

@@ -1,0 +1,8 @@
+---
+title: "Delete a persistent volume"
+openapi: "/openapi/deployment-storage-api.json DELETE /api/v1/workspaces/{id}/volumes/{volume_id}"
+---
+
+See [persistent volumes](/guides/persistent-volumes) for mounting, capacity, and recovery guidance. Workspace root filesystem snapshots do not include volume contents.
+
+Deleting a volume removes its data. Back up required application data and stop dependent writes before removal.

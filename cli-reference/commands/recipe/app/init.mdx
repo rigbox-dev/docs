@@ -1,0 +1,238 @@
+---
+title: "rig recipe app init"
+sidebarTitle: "init"
+description: "Scaffold a community app recipe directory"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+
+```bash
+rig recipe app init --vendor VENDOR --slug SLUG --name my-project
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig recipe app init --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox recipe app init [OPTIONS] --vendor <VENDOR> --slug <SLUG> --name <NAME> [DIRECTORY]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `directory` | Directory to scaffold | Value: DIRECTORY; Default: . |
+| `--vendor` | Community vendor username | Required; Value: VENDOR |
+| `-s, --slug` | Recipe slug | Required; Value: SLUG |
+| `-n, --name` | Human-readable recipe name | Required; Value: NAME |
+| `--version` | Initial recipe version | Value: VERSION; Default: 0.1.0 |
+| `--category` | Catalog category | Value: CATEGORY; Default: community |
+| `--visibility` | Recipe visibility: private or community (registered at publish time) | Value: VISIBILITY; Default: private |
+| `--port` | Public app port | Value: PORT; Default: 3000 |
+| `--protocol` | Exposed protocol: http, https, or tcp | Value: PROTOCOL; Default: http |
+| `--exec-start` | systemd ExecStart command | Value: EXEC_START; Default: python3 -m http.server 3000 |
+| `--force` | Overwrite scaffold files that already exist | Default: false |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Scaffold a community app recipe directory
+
+Usage: rigbox recipe app init [OPTIONS] --vendor <VENDOR> --slug <SLUG> --name <NAME> [DIRECTORY]
+
+Arguments:
+  [DIRECTORY]
+          Directory to scaffold
+          
+          [default: .]
+
+Options:
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --vendor <VENDOR>
+          Community vendor username
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+  -s, --slug <SLUG>
+          Recipe slug
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+  -n, --name <NAME>
+          Human-readable recipe name
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --version <VERSION>
+          Initial recipe version
+          
+          [default: 0.1.0]
+
+      --category <CATEGORY>
+          Catalog category
+          
+          [default: community]
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --no-pager
+          Do not pipe help output through a pager
+
+      --visibility <VISIBILITY>
+          Recipe visibility: private or community (registered at publish time)
+          
+          [default: private]
+
+      --port <PORT>
+          Public app port
+          
+          [default: 3000]
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+      --protocol <PROTOCOL>
+          Exposed protocol: http, https, or tcp
+          
+          [default: http]
+
+      --exec-start <EXEC_START>
+          systemd ExecStart command
+          
+          [default: "python3 -m http.server 3000"]
+
+      --force
+          Overwrite scaffold files that already exist
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox recipe app init [OPTIONS] --vendor <VENDOR> --slug <SLUG> --name <NAME> [DIRECTORY]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `directory` | Directory to scaffold | Value: DIRECTORY; Default: . |
+| `--vendor` | Community vendor username | Required; Value: VENDOR |
+| `-s, --slug` | Recipe slug | Required; Value: SLUG |
+| `-n, --name` | Human-readable recipe name | Required; Value: NAME |
+| `--version` | Initial recipe version | Value: VERSION; Default: 0.1.0 |
+| `--category` | Catalog category | Value: CATEGORY; Default: community |
+| `--visibility` | Recipe visibility: private or community (registered at publish time) | Value: VISIBILITY; Default: private |
+| `--port` | Public app port | Value: PORT; Default: 3000 |
+| `--protocol` | Exposed protocol: http, https, or tcp | Value: PROTOCOL; Default: http |
+| `--exec-start` | systemd ExecStart command | Value: EXEC_START; Default: python3 -m http.server 3000 |
+| `--force` | Overwrite scaffold files that already exist | Default: false |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Scaffold a community app recipe directory
+
+Usage: rigbox recipe app init [OPTIONS] --vendor <VENDOR> --slug <SLUG> --name <NAME> [DIRECTORY]
+
+Arguments:
+  [DIRECTORY]
+          Directory to scaffold
+          
+          [default: .]
+
+Options:
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --vendor <VENDOR>
+          Community vendor username
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -s, --slug <SLUG>
+          Recipe slug
+
+  -n, --name <NAME>
+          Human-readable recipe name
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+      --version <VERSION>
+          Initial recipe version
+          
+          [default: 0.1.0]
+
+      --category <CATEGORY>
+          Catalog category
+          
+          [default: community]
+
+      --visibility <VISIBILITY>
+          Recipe visibility: private or community (registered at publish time)
+          
+          [default: private]
+
+      --port <PORT>
+          Public app port
+          
+          [default: 3000]
+
+      --protocol <PROTOCOL>
+          Exposed protocol: http, https, or tcp
+          
+          [default: http]
+
+      --exec-start <EXEC_START>
+          systemd ExecStart command
+          
+          [default: "python3 -m http.server 3000"]
+
+      --force
+          Overwrite scaffold files that already exist
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

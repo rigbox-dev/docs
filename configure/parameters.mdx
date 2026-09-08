@@ -1,0 +1,29 @@
+---
+title: "Validated parameters"
+description: "Expose bounded application settings with defaults and validation."
+---
+
+## Declare a parameter
+
+```yaml
+params:
+  - key: mode
+    type: select
+    label: Runtime mode
+    default: production
+    required: true
+    envVar: APP_MODE
+    options:
+      - { value: production, label: Production }
+      - { value: staging, label: Staging }
+```
+
+Parameters describe user choices, not secrets. The app receives `PARAM_MODE` and the explicit `APP_MODE` mapping. For incremental release preparation, missing required values, values outside declared options, invalid validation patterns, and invalid environment names fail validation.
+
+## Use the setting
+
+Read the mapped variable from your application and deploy from the local manifest directory. Explicit app environment values can override parameter-derived variables, so avoid declaring a conflicting `env.APP_MODE` unless intentional.
+
+After deployment, inspect the app's parameter settings with `rig app param ls --app <APP_NAME>` and verify the application uses the selected behavior. Recipe-backed apps can expose parameter controls and reconfiguration hooks; consult [catalog apps](/guides/catalog) for that flow.
+
+Do not rely on a parameter label or type alone to enforce a security boundary. Validate inputs in the application too. The [configuration reference](/reference/rig-yaml/configuration) describes the field relationships.

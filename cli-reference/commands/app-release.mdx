@@ -1,0 +1,135 @@
+---
+title: "rig app-release"
+sidebarTitle: "app-release"
+description: "List and roll back apps without replacing the workspace"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Run this command in an authenticated local terminal or inside a workspace; see the availability above.
+
+## Examples
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig app-release --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox app-release [OPTIONS] <COMMAND>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+List and roll back apps without replacing the workspace
+
+Usage: rigbox app-release [OPTIONS] <COMMAND>
+
+Commands:
+  activate  Activate a ready app release staged with deploy --sync-only
+  logs      Read app release logs
+  ls        List retained app releases (distinct from workspace image releases)
+  rollback  Restore app code and configuration; briefly restarts affected apps, not the workspace
+  help      Print this message or the help of the given subcommand(s)
+
+Options:
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox app-release [OPTIONS] <COMMAND>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+List and roll back apps without replacing the workspace
+
+Usage: rigbox app-release [OPTIONS] <COMMAND>
+
+Commands:
+  activate  Activate a ready app release staged with deploy --sync-only
+  logs      Read app release logs
+  ls        List retained app releases (distinct from workspace image releases)
+  rollback  Restore app code and configuration; briefly restarts affected apps, not the workspace
+  help      Print this message or the help of the given subcommand(s)
+
+Options:
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Subcommands
+
+- [activate](/cli-reference/commands/app-release/activate)
+- [logs](/cli-reference/commands/app-release/logs)
+- [ls](/cli-reference/commands/app-release/ls)
+- [rollback](/cli-reference/commands/app-release/rollback)

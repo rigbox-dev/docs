@@ -1,0 +1,52 @@
+---
+title: Deploy from GitHub
+description: Connect a repository in the Rigbox console or deploy through GitHub Actions.
+---
+
+Choose how you want GitHub to trigger a deployment:
+
+| Workflow | Use it when |
+| --- | --- |
+| **Rigbox console connection** | You want Rigbox to deploy a connected branch without maintaining a workflow file. |
+| **GitHub Actions** | You want deployment to be a step in your own CI workflow. |
+| **Deploy button** | You want to fork and deploy an example from its README. |
+
+## Prerequisites
+
+- A Rigbox account with GitHub deployments enabled.
+- A repository you can access through the Rigbox GitHub App.
+- An app with installation and start commands, a listening port, and a health endpoint.
+
+## Connect in the console
+
+1. Open **Settings → GitHub** in Rigbox and connect your GitHub account.
+2. Grant the Rigbox GitHub App access to the repository you want to deploy.
+3. Create a workspace and select its GitHub repository, or open an existing workspace's **GitHub deployments** settings.
+4. Select the correct GitHub account and repository. Review the branch, project subdirectory, manifest, and deployment strategy. New connections default to incremental; existing connections retain their reviewed choice.
+5. If the repository has a `rig.yaml`, review the imported app settings. Otherwise, enter the app name, port, install/build/start commands, and memory settings, then review the generated YAML.
+6. Choose automatic GitHub App deployments and save the configuration directly or through a pull request. Protected branches require a pull request.
+7. Follow build and deployment progress in the workspace. Open the resulting app URL after the deployment succeeds.
+
+A manifest `workspace.deployment.strategy` must match the reviewed repository setting. For image strategy, every Git app must declare `reproducible: true`. Changing strategy requires a fresh review and confirmation; editing YAML alone does not approve replacing the workspace filesystem.
+
+The repository's manifest remains the source of truth. Changes made in Rigbox are saved back to Git; review configuration changes before saving them. See [deployment configuration](/guides/deploying#the-rig-yaml-contract) for the manifest fields.
+
+## Deploy through your own CI workflow
+
+Follow [GitHub Actions](/guides/github-actions) to prepare Git sources, bind an existing workspace with `rig ci link`, and add the deploy Action. This flow uses short-lived OIDC credentials rather than a saved account API key.
+
+## Deploy an example
+
+A [Deploy to Rigbox button](/guides/deploy-button) opens a guided flow for choosing a fork, reviewing configuration, and selecting a workspace. That flow creates a deployment branch for its target; push changes to that branch to redeploy it.
+
+## Troubleshooting
+
+| Problem | What to check |
+| --- | --- |
+| Repository is missing | Select the correct GitHub account, grant the GitHub App access, and refresh the repository list. |
+| Configuration cannot be saved | Review YAML validation errors and use a pull request for a protected branch. |
+| A push does not deploy | Confirm the connected branch and selected deployment method. |
+| Strategy mismatch | Match the manifest and reviewed connection strategy, then review the change again. |
+| Deployment fails | Inspect build and app logs in the workspace; verify the start command, port, and health path. |
+
+Automatic pull-request preview environments are not yet supported.

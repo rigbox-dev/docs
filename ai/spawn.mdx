@@ -1,0 +1,29 @@
+---
+title: "Use Rigbox with Spawn"
+description: "Launch an agent workspace through the Spawn integration."
+---
+
+Spawn provides an agent-first interface to Rigbox. Its Rigbox integration invokes the local `rig` CLI and reads structured output, so the installed CLI and integration must be compatible.
+
+## Prerequisites
+
+Install the supported Rigbox CLI and follow the installation instructions in the [Spawn repository](https://github.com/rigbox-dev/spawn). Authenticate locally with `rig login` before launching an agent. Spawn can reuse that login.
+
+## Choose an agent and AI mode
+
+Use Spawn's Rigbox provider and select an agent supported by its current CLI help. The integration supports a managed mode for routing through Rigbox's AI proxy and a provider-key mode for your own credentials. Read the current [Rigbox integration instructions](https://github.com/rigbox-dev/spawn/tree/main/sh/rigbox) for supported launch commands and sizes.
+
+The launch provisions a workspace, waits for the selected app, and connects through the SSH target reported by Rigbox. A CLI agent is an interactive program, not an HTTP service.
+
+## Verify and clean up
+
+Run locally:
+
+```bash
+rig workspace ls
+rig workspace ssh-info --workspace WORKSPACE
+```
+
+Check the selected agent over SSH. Stop a workspace when you no longer need it running; delete it only after copying out needed files and data.
+
+If a launch reports an unknown output event, record both CLI versions and the error. Do not work around it by pasting account credentials into workspace files. See [CLI output](/guides/using-cli) and [SSH troubleshooting](/operate/ssh).

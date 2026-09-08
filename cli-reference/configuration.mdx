@@ -1,0 +1,44 @@
+---
+title: Configuration and output
+sidebarTitle: Configuration and output
+description: Choose output formats, persisted defaults, and structured input for scripts.
+---
+
+Run these commands from your local terminal after [installing the CLI](/guides/install-cli). Verify your identity with `rig whoami` before operating on resources.
+
+## Choose an output format
+
+```bash
+rig workspace ls --output json
+rig config set output json
+rig config list
+```
+
+The first command changes one invocation. The second persists the default. Use `rig config unset output` to return to the default format. Supported values and flags are listed in [config set](/cli-reference/commands/config/set).
+
+## Filter JSON output
+
+Use `--query` with a JMESPath expression. Inspect the unfiltered response first so your expression matches the returned shape.
+
+```bash
+rig workspace ls --output json
+rig workspace ls --output json --query 'items[].id'
+```
+
+## Supply structured input
+
+For commands with several arguments, generate an input template and review it before execution:
+
+```bash
+rig workspace spawn --generate-cli-skeleton
+```
+
+Save the completed template, then pass `--cli-input-json spawn.json` or `--cli-input-yaml spawn.yaml`. These input options conflict; use one. File input still runs the command and is not a dry run. Do not commit credentials in input files.
+
+## Inspect persisted defaults
+
+The local configuration is stored in `$XDG_CONFIG_HOME/rigbox/config.json`, or `~/.config/rigbox/config.json` when XDG_CONFIG_HOME is unset. Use [config get](/cli-reference/commands/config/get), [config set](/cli-reference/commands/config/set), and [config unset](/cli-reference/commands/config/unset) to manage supported settings.
+
+## Troubleshoot
+
+If a query returns no values, rerun without `--query` and inspect the response. If scripted input is rejected, regenerate the skeleton with the installed CLI version and consult the command's arguments. Check [execution modes](/cli-reference/execution-modes) when a flag or command is unavailable inside a workspace.

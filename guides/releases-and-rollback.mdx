@@ -1,15 +1,17 @@
 ---
 title: Releases & Rollback
-description: Every reproducible deploy records an immutable release. List history, roll back to a known-good image, or pin a release manually.
+description: Manage frozen workspace image releases separately from incremental app releases.
 ---
 
-A **release** is an immutable record of what ran: an image digest plus its run-config. Every reproducible `rig deploy` (one whose `rig.yaml` sets `reproducible: true`) auto-records a release, giving you a linear history you can roll back to at any time.
+<Note>This page covers workspace image releases. For v0.13 incremental deployments, use [app release rollback](/deploy/app-rollback) and `rig app-release ls`.</Note>
+
+A **workspace image release** is an immutable record of what ran: an image digest plus its run-config. Every reproducible `rig deploy` (one whose `rig.yaml` sets `reproducible: true`) auto-records a release, giving you retained history to choose from.
 
 Because the image is content-addressed and frozen, activating an old release boots the workspace from the exact environment that release captured — not an approximate rebuild.
 
 ## How releases are recorded
 
-When `rig deploy` takes the [reproducible path](/guides/deploying#reproducible-deploy), it freezes the `install:` result into a content-addressed image and records a release pointing at that digest. Standard (rsync-only) deploys do not produce releases — there is no frozen image to pin.
+When `rig deploy` takes the [reproducible path](/guides/deploying#reproducible-deploy), it freezes the `install:` result into a content-addressed image and records a release pointing at that digest. Incremental deployments produce separate managed app releases, listed with `rig app-release ls`, rather than workspace image releases.
 
 ```text
 $ rig deploy
@@ -21,7 +23,7 @@ $ rig deploy
 ## List release history
 
 ```bash
-rig release ls
+rig release ls --workspace my-project
 ```
 
 ```text
@@ -39,7 +41,7 @@ rig release ls --workspace my-project
 
 ## Roll back to a previous release
 
-To return to a known-good version, activate its release. `rig rollback` is an alias for `rig release activate`:
+To return to a known-good version, activate its release. `rig rollback --release` activates an image release; without `--release`, rollback reverses a preview promotion:
 
 ```bash
 # Both forms are equivalent
@@ -47,10 +49,10 @@ rig release activate --workspace my-project --release rel_01cd
 rig rollback --workspace my-project --release rel_01cd
 ```
 
-Activating a release boots the workspace from that release's frozen image digest. Your app code for that release rides on top exactly as it did originally.
+Activating a release boots the workspace from that release's frozen image digest. Review source mode and recorded run configuration: local-source overlays and Git-built image contents differ. Verify code and data compatibility after activation.
 
 <Note>
-Rolling back changes the **image** and run-config, not your [persistent volumes](/guides/persistent-volumes). Data under `$DATA_DIR` is unaffected by an activate — only the environment and code revert.
+Rolling back changes the **image** and run-config, not your [persistent volumes](/guides/persistent-volumes). Data under `$DATA_DIR` is unaffected by an activate — the image and recorded run configuration change. Verify the behavior of any local-source overlay separately.
 </Note>
 
 ## Pin a release manually
@@ -92,10 +94,10 @@ A typical reproducible workflow:
 `rig deploy` freezes (or reuses) the image and records a release automatically.
 </Step>
 <Step title="Inspect history">
-`rig release ls` shows the linear history and which release is active.
+`rig release ls --workspace my-project` shows the linear history and which release is active.
 </Step>
 <Step title="Roll back if needed">
-`rig rollback --release <id>` boots the previous release's frozen image — instant, no rebuild.
+`rig rollback --workspace my-project --release <id>` boots the previous release's frozen image without rebuilding the image.
 </Step>
 <Step title="Pin a tested image">
 Build separately with `rig build image`, then `rig release create --image-digest <d>` to capture it as a release before activating.

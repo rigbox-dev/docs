@@ -1,0 +1,162 @@
+---
+title: "rig app new"
+sidebarTitle: "new"
+description: "Create a new app in a workspace"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+
+```bash
+rig app new --name my-project
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig app new --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox app new [OPTIONS] --name <NAME>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-n, --name` | App name | Required; Value: NAME |
+| `-p, --port` | Port the app listens on (default: 3000 for service apps; omit for cli apps) | Value: PORT |
+| `-k, --kind` | App kind | Value: KIND; Default: service; Choices: service, cli |
+| `-w, --workspace` | Workspace name or id (default: current rig.yaml workspace) | Value: WORKSPACE |
+| `-d, --description` | App description | Value: DESCRIPTION |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Create a new app in a workspace
+
+Usage: rigbox app new [OPTIONS] --name <NAME>
+
+Options:
+  -n, --name <NAME>
+          App name
+
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+  -p, --port <PORT>
+          Port the app listens on (default: 3000 for service apps; omit for cli apps)
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+  -k, --kind <KIND>
+          App kind
+          
+          [default: service]
+          [possible values: service, cli]
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+  -w, --workspace <WORKSPACE>
+          Workspace name or id (default: current rig.yaml workspace)
+
+  -d, --description <DESCRIPTION>
+          App description
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox app new [OPTIONS] --name <NAME>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-n, --name` | App name | Required; Value: NAME |
+| `-p, --port` | Port the app listens on (default: 3000 for service apps; omit for cli apps) | Value: PORT |
+| `-k, --kind` | App kind | Value: KIND; Default: service; Choices: service, cli |
+| `-d, --description` | App description | Value: DESCRIPTION |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Create a new app in this workspace
+
+Usage: rigbox app new [OPTIONS] --name <NAME>
+
+Options:
+  -n, --name <NAME>
+          App name
+
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -p, --port <PORT>
+          Port the app listens on (default: 3000 for service apps; omit for cli apps)
+
+  -k, --kind <KIND>
+          App kind
+          
+          [default: service]
+          [possible values: service, cli]
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+  -d, --description <DESCRIPTION>
+          App description
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

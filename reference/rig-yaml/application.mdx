@@ -1,0 +1,35 @@
+---
+title: "Application fields"
+description: "Define a service or a command-line application."
+---
+
+| Field | Shape and behavior |
+| --- | --- |
+| `name` | Single-app identity; in a project the `apps` map key supplies it |
+| `kind` | `service` by default, or `cli` |
+| `port`, `start` | Required for services; omitted for CLI applications |
+| `install` | Optional dependency installation command |
+| `build` | Optional command string after install |
+| `health` | `path`, `timeoutSeconds`; `command` for command verification |
+| `restartPolicy` | `always`, `on-failure`, or `no` |
+| `visibility` | `private` by default, `public`, or `{ emails: [...] }` |
+| `customDomain` | Hostname only; requires public visibility |
+| `volumes` | Volume declarations or references to workspace-declared volumes |
+| `executables` | Map of command names to application-relative executable paths |
+| `workingDirectory` | Legacy/image setting; rejected by incremental deployment |
+| `requirements` | Minimum resources and incompatible images/templates |
+| `limits` | Optional app process resource caps |
+
+A CLI app has no long-running service:
+
+```yaml
+name: my-tool
+kind: cli
+install: chmod +x bin/my-tool
+executables:
+  my-tool: bin/my-tool
+```
+
+Incremental CLI deployment requires executables or `health.command` rather than guessing which binary to execute. Services require HTTP health checks in the incremental path.
+
+Resource requirements are checked against the target; incremental deployment does not replace its image or automatically enlarge it. Use [commands](/configure/commands), [health checks](/configure/health), and [workspaces](/guides/workspaces) for operational steps.

@@ -1,0 +1,41 @@
+---
+title: "Reproducible workspace builds"
+description: "Freeze an application environment into an image for workspace deployment."
+---
+
+## Select image deployment deliberately
+
+Use image deployment when you need a frozen install/build environment. It can replace a workspace filesystem, so use a dedicated deployment target or review [re-image consent](/deploy/reimage).
+
+```yaml
+workspace:
+  deployment: { strategy: image }
+name: web
+port: 3000
+reproducible: true
+install: npm ci
+build: npm run build
+start: npm start
+health: { path: /healthz }
+```
+
+`build` is a command string, not a Dockerfile or image mapping. In a multi-app manifest, set `reproducible: true` on each Git app. This is also required by reviewed console image configurations.
+
+## Build and deploy
+
+Run locally from the manifest directory:
+
+```bash
+rig deploy --strategy image --name production
+```
+
+The build uses a content-addressed image. Unchanged build inputs can reuse that image. Git sources are tied to their resolved commit; local source can use the frozen dependency environment with subsequent source synchronization. Do not assume these two source modes produce identical image contents.
+
+## Verify and inspect history
+
+```bash
+rig release ls --workspace production
+rig app ls --workspace production
+```
+
+Verify app health after boot. If the image build fails, inspect `rig build ls` and `rig build logs <BUILD_ID>`. See [build caching](/deploy/build-cache), [image releases](/guides/releases-and-rollback), and [blue-green deployment](/guides/bluegreen).

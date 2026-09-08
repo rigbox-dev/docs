@@ -1,0 +1,331 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Rigbox Deployment and Storage API",
+    "description": "Gateway-owned public API for Rigbox. The gateway composes its local lifecycle API with service-owned exported specs.",
+    "contact": {
+      "name": "Rigbox",
+      "url": "https://rigbox.dev"
+    },
+    "license": {
+      "name": ""
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.rigbox.dev",
+      "description": "Production gateway"
+    }
+  ],
+  "paths": {
+    "/api/v1/workspaces/{id}/volumes": {
+      "get": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "List a workspace's persistent volumes.",
+        "description": "List the persistent volumes attached to this workspace.",
+        "operationId": "list_workspace_volumes",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace volumes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListVolumesResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Create a persistent volume on a workspace.",
+        "description": "Create a persistent volume mounted into this workspace at a path.",
+        "operationId": "create_workspace_volume",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVolumeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Volume created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/volumes/{volume_id}": {
+      "delete": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Delete a persistent volume from a workspace.",
+        "description": "Delete a persistent volume from this workspace; it must be stopped.",
+        "operationId": "delete_workspace_volume",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "volume_id",
+            "in": "path",
+            "description": "Volume ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Volume deleted"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/volumes/{volume_id}/resize": {
+      "post": {
+        "tags": [
+          "Volumes"
+        ],
+        "summary": "Resize a persistent volume on a workspace.",
+        "description": "Grow a persistent volume on this workspace; it must be stopped.",
+        "operationId": "resize_workspace_volume",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workspace ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "volume_id",
+            "in": "path",
+            "description": "Volume ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResizeVolumeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Volume resized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "CreateVolumeRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "size_mb",
+          "mount_path"
+        ],
+        "properties": {
+          "mount_path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "size_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "ListVolumesResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Volume"
+            }
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Always `null` \u2014 volume lists are small and unpaginated. Present so the\nCLI's `{items, next_cursor}` envelope is uniform across resources."
+          }
+        }
+      },
+      "ResizeVolumeRequest": {
+        "type": "object",
+        "required": [
+          "size_mb"
+        ],
+        "properties": {
+          "size_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "Volume": {
+        "type": "object",
+        "description": "A persistent volume attached to a workspace VM.\n\nBacked by a host ext4 file (`host_path`) mounted in-guest at `mount_path`\nvia a second Firecracker drive. Separate from the rootfs image, so its data\nsurvives a rootfs/image swap. Serialized over the wire for `rig volume`.",
+        "required": [
+          "id",
+          "workspace_id",
+          "node_id",
+          "name",
+          "size_mb",
+          "mount_path",
+          "host_path",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "host_path": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "migrated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Set once the one-time rootfs->volume data copy has run (advisory; the\nin-guest sentinel on the volume is authoritative)."
+          },
+          "mount_path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "node_id": {
+            "type": "string"
+          },
+          "size_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "VolumeResponse": {
+        "type": "object",
+        "required": [
+          "volume"
+        ],
+        "properties": {
+          "volume": {
+            "$ref": "#/components/schemas/Volume"
+          }
+        }
+      }
+    }
+  }
+}

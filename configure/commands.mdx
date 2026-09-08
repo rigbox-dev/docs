@@ -1,0 +1,30 @@
+---
+title: "Install, build, and start commands"
+description: "Separate dependency installation, compilation, and the long-running service."
+---
+
+## Declare the process lifecycle
+
+```yaml
+install: npm ci
+build: npm run build
+start: npm start
+env:
+  PORT: "3000"
+port: 3000
+health: { path: /healthz }
+```
+
+`install` prepares dependencies. `build` is an optional command executed after installation. `start` runs the service. `build` must be a string, not a `{ dockerfile: ... }` or `{ image: ... }` mapping.
+
+Put environment assignments in `env`. The incremental runtime executes its start command through Bash, while legacy/image startup has different command handling. For portable manifests, avoid relying on inline shell assignments or implicit expansion; use `env` and a checked-in script for complex startup logic.
+
+## Keep paths portable
+
+Incremental releases run in managed release directories. Use relative application paths and remove `workingDirectory`; that field is rejected for incremental deployment. Write mutable data to an explicit [volume](/guides/persistent-volumes), outside the managed code directory.
+
+## Verify preparation and startup
+
+Deploy locally, inspect the release logs, and check app health. A successful install does not establish that `start` exists or listens on the right port. Missing binaries, incompatible base images, and insufficient workspace resources need correction before retrying.
+
+For a `kind: cli` app, omit service `port` and `start`, and declare an `executables` map or `health.command` so incremental deployment can verify its entrypoint. See [application fields](/reference/rig-yaml/application).

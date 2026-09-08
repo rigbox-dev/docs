@@ -1,0 +1,36 @@
+---
+title: "Read install, build, and release logs"
+description: "Inspect preparation failures before changing a running app."
+---
+
+Run locally and choose the logs for your deployment strategy.
+
+## App releases
+
+```bash
+rig app-release ls --workspace WORKSPACE
+rig app-release logs --workspace WORKSPACE --release RELEASE_ID
+```
+
+Use the release ID returned by the deployment or list command. Preparation failures can happen before activation; inspect status rather than assuming the active app was replaced.
+
+## Installed applications
+
+```bash
+rig app logs --app APP --install
+```
+
+This selects the application's install log source rather than runtime output. CLI tools may have install logs without a long-running service.
+
+## Workspace image builds
+
+```bash
+rig build ls --workspace WORKSPACE
+rig build logs BUILD_ID
+```
+
+Use the build identifier reported by the deployment or build list. Check dependency installation, command exit status, disk space, and runtime availability. Incremental installation is unprivileged; system package installation belongs in the workspace image path.
+
+## Verify the fix
+
+Change the relevant install/build command, then repeat the original deployment. Keep runtime [health checks](/configure/health) separate from a successful build. Use [CLI diagnostics](/operate/telemetry) if the failure occurs before a server-side job exists.

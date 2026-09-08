@@ -1,0 +1,29 @@
+---
+title: "rig.yaml reference"
+description: "The canonical manifest for source deployments and application configuration."
+---
+
+`rig.yaml` lives at the project root. The CLI accepts a single application or an `apps` map. Camel-case field names are canonical; documented snake-case aliases remain accepted by the parser.
+
+```yaml
+workspace:
+  deployment: { strategy: incremental }
+name: web
+port: 3000
+install: npm ci
+start: npm start
+health: { path: /healthz }
+visibility: public
+```
+
+| Reference | Fields |
+| --- | --- |
+| [Application](/reference/rig-yaml/application) | Identity, process, health, routes, volumes, CLI executables |
+| [Workspace](/reference/rig-yaml/workspace) | Image, resource defaults, shared environment, shared volumes |
+| [Source and dependencies](/reference/rig-yaml/source) | Local paths, Git source, app dependencies, cache declarations |
+| [Configuration](/reference/rig-yaml/configuration) | Environment, secrets, generated credentials, parameters |
+| [Deployment strategy](/reference/rig-yaml/deployment) | Incremental versus image selection and restrictions |
+
+For a multi-app project, put local app fields under each name-keyed entry with `path`. A published `ref` entry selects a recipe instead of local source; `path` and `ref` are mutually exclusive. Do not mix root `start`/`port` with `apps`.
+
+See [local deployment](/guides/deploying) for a workflow rather than field lookup. This reference targets v0.13; [deployment strategies](/deploy/overview) explains changed deployment behavior.

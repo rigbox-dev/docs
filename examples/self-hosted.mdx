@@ -1,0 +1,52 @@
+---
+title: "Install self-hosted applications"
+description: "Run code-server, Gitea, or n8n with an explicitly built workspace image."
+---
+
+These examples install products on the Rigbox base environment and freeze their installation into an image. They require v0.13 and explicitly select image deployment.
+
+## Choose a product
+
+| Source directory | Application | Data configuration |
+| --- | --- | --- |
+| [code-server](https://github.com/rigbox-dev/rigbox-examples/tree/2612ffc9138d3b2f8169b10e3a54abd5495db8b8/code-server) | Browser editor | User settings/extensions under `/home/developer/data/code-server` |
+| [gitea](https://github.com/rigbox-dev/rigbox-examples/tree/2612ffc9138d3b2f8169b10e3a54abd5495db8b8/gitea) | Git hosting | SQLite, repositories, and configuration under `DATA_DIR` |
+| [n8n](https://github.com/rigbox-dev/rigbox-examples/tree/2612ffc9138d3b2f8169b10e3a54abd5495db8b8/n8n) | Workflow automation | `N8N_USER_FOLDER=/home/developer/data` |
+
+The example manifests declare a data volume and select `workspace.deployment.strategy: image`. `reproducible: true` freezes the installation; it does not make unpinned upstream downloads reproducible across time. Review installers and version pins before production use.
+
+## Deploy locally
+
+Install the [CLI](/guides/install-cli), sign in, and use a new test workspace. Clone the examples, then choose one directory:
+
+```bash
+git clone --branch codex/examples-docs-v013 https://github.com/rigbox-dev/rigbox-examples.git
+cd rigbox-examples/code-server
+rig login
+rig deploy --strategy image
+```
+
+For Gitea or n8n, change the directory in the command. Record the resulting workspace/app IDs and URL. A subsequent image change can require `--reimage`, replacing the workspace root filesystem. Back up data and verify volume mounts before consenting.
+
+## Verify and access
+
+```bash
+rig app health --app APP_ID
+rig app logs --app APP_ID
+```
+
+Open the reported route and complete the product-specific setup. Create a test file, repository, or workflow and verify it after an application restart. This does not establish backup recovery or image-upgrade compatibility.
+
+All three manifests default to a private Rigbox route. code-server disables its own password authentication in this example, so keep the authenticated Rigbox route or configure code-server authentication before changing visibility. Review each product's user management independently.
+
+If installation fails, inspect the build ID's output with `rig build logs BUILD_ID`. n8n has larger memory and disk requirements than the other examples. Do not repeatedly retry an out-of-memory installation without reviewing resources.
+
+## Clean up
+
+Export files, repositories, or workflows you want to keep. Delete only the test workspace and inspect its persistent storage separately:
+
+```bash
+rig workspace rm --workspace WORKSPACE_ID
+```
+
+See [Images and templates](/guides/images-and-templates) and [Persistent volumes](/guides/persistent-volumes) before hosting important data.

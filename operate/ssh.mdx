@@ -1,0 +1,34 @@
+---
+title: "Troubleshoot SSH access"
+description: "Check workspace readiness, target details, and key propagation."
+---
+
+Run these checks locally:
+
+```bash
+rig workspace ls
+rig workspace ssh-info --workspace WORKSPACE
+rig ssh ls
+```
+
+## Connection refused or timed out
+
+Ensure the workspace is running and use the host, user, and port returned by `ssh-info`. Do not hardcode a compute host or substitute the separate SSH TUI gateway port. Check your network's outbound SSH policy.
+
+## Permission denied
+
+Verify that the offered public key is registered. Sync it to the target workspace:
+
+```bash
+rig ssh sync --workspace WORKSPACE
+```
+
+Use `ssh -i` with the correct local private key when your agent offers several identities. Never send the private key to Rigbox.
+
+## Host-key changes
+
+Compare the new host identity through a trusted channel before changing a known-hosts entry. Do not disable host-key checking globally to make a connection succeed.
+
+## Verify
+
+Open a fresh session using [the documented SSH target](/guides/ssh-access), then run `pwd` and confirm you are in the intended workspace before transferring or deleting files.

@@ -1,0 +1,180 @@
+---
+title: "rig publish"
+sidebarTitle: "publish"
+description: "Publish the project to the community registry"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+
+```bash
+rig publish
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig publish --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox publish [OPTIONS]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--from-dir` | Project directory containing rig.yaml. Defaults to cwd | Value: FROM_DIR; Aliases: from |
+| `--vendor` | Vendor namespace (your community username). Overrides the `publish:` block | Value: VENDOR |
+| `--slug` | Recipe/definition slug. Overrides the `publish:` block | Value: SLUG |
+| `--version` | Version to publish. Required unless the `publish:` block sets one | Value: VERSION |
+| `--app` | Publish only the named child app (multi-app projects); skips the workspace definition | Value: APP |
+| `--from-manifest` | Publish a pre-rendered canonical manifest verbatim (`-` reads stdin); endpoint inferred from its `kind` | Value: FROM_MANIFEST |
+| `-n, --dry-run` | Print the rendered manifest(s) without calling the API | Default: false |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Publish the project to the community registry
+
+Usage: rigbox publish [OPTIONS]
+
+Options:
+      --from-dir <FROM_DIR>
+          Project directory containing rig.yaml. Defaults to cwd
+          
+          [aliases: --from]
+
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --vendor <VENDOR>
+          Vendor namespace (your community username). Overrides the `publish:` block
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+      --slug <SLUG>
+          Recipe/definition slug. Overrides the `publish:` block
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --version <VERSION>
+          Version to publish. Required unless the `publish:` block sets one
+
+      --app <APP>
+          Publish only the named child app (multi-app projects); skips the workspace definition
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --from-manifest <FROM_MANIFEST>
+          Publish a pre-rendered canonical manifest verbatim (`-` reads stdin); endpoint inferred from its `kind`
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -n, --dry-run
+          Print the rendered manifest(s) without calling the API
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox publish [OPTIONS]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--from-dir` | Project directory containing rig.yaml. Defaults to cwd | Value: FROM_DIR; Aliases: from |
+| `--vendor` | Vendor namespace (your community username). Overrides the `publish:` block | Value: VENDOR |
+| `--slug` | Recipe/definition slug. Overrides the `publish:` block | Value: SLUG |
+| `--version` | Version to publish. Required unless the `publish:` block sets one | Value: VERSION |
+| `--app` | Publish only the named child app (multi-app projects); skips the workspace definition | Value: APP |
+| `--from-manifest` | Publish a pre-rendered canonical manifest verbatim (`-` reads stdin); endpoint inferred from its `kind` | Value: FROM_MANIFEST |
+| `-n, --dry-run` | Print the rendered manifest(s) without calling the API | Default: false |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Publish the project to the community registry
+
+Usage: rigbox publish [OPTIONS]
+
+Options:
+      --from-dir <FROM_DIR>
+          Project directory containing rig.yaml. Defaults to cwd
+          
+          [aliases: --from]
+
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+      --vendor <VENDOR>
+          Vendor namespace (your community username). Overrides the `publish:` block
+
+      --slug <SLUG>
+          Recipe/definition slug. Overrides the `publish:` block
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+      --version <VERSION>
+          Version to publish. Required unless the `publish:` block sets one
+
+      --app <APP>
+          Publish only the named child app (multi-app projects); skips the workspace definition
+
+      --from-manifest <FROM_MANIFEST>
+          Publish a pre-rendered canonical manifest verbatim (`-` reads stdin); endpoint inferred from its `kind`
+
+  -n, --dry-run
+          Print the rendered manifest(s) without calling the API
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

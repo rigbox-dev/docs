@@ -1,0 +1,2881 @@
+[
+  {
+    "key": "ai:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ai",
+      "--help"
+    ]
+  },
+  {
+    "key": "ai/defaults:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ai",
+      "defaults"
+    ]
+  },
+  {
+    "key": "ai/defaults:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ai",
+      "defaults",
+      "--help"
+    ]
+  },
+  {
+    "key": "ai/usage:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ai",
+      "usage"
+    ]
+  },
+  {
+    "key": "ai/usage:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ai",
+      "usage",
+      "--help"
+    ]
+  },
+  {
+    "key": "api:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "api",
+      "GET",
+      "/api/v1/workspaces"
+    ]
+  },
+  {
+    "key": "api:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "api",
+      "--help"
+    ]
+  },
+  {
+    "key": "api-key:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "api-key",
+      "--help"
+    ]
+  },
+  {
+    "key": "api-key/create:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "api-key",
+      "create",
+      "--name",
+      "my-project"
+    ]
+  },
+  {
+    "key": "api-key/create:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "api-key",
+      "create",
+      "--help"
+    ]
+  },
+  {
+    "key": "api-key/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "api-key",
+      "ls"
+    ]
+  },
+  {
+    "key": "api-key/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "api-key",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "api-key/rm:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "api-key",
+      "rm",
+      "--id",
+      "ID"
+    ]
+  },
+  {
+    "key": "api-key/rm:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "api-key",
+      "rm",
+      "--help"
+    ]
+  },
+  {
+    "key": "app:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "--help"
+    ]
+  },
+  {
+    "key": "app-release:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app-release",
+      "--help"
+    ]
+  },
+  {
+    "key": "app-release/activate:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app-release",
+      "activate",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--release",
+      "RELEASE_ID"
+    ]
+  },
+  {
+    "key": "app-release/activate:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app-release",
+      "activate",
+      "--help"
+    ]
+  },
+  {
+    "key": "app-release/logs:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app-release",
+      "logs",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--release",
+      "RELEASE_ID"
+    ]
+  },
+  {
+    "key": "app-release/logs:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app-release",
+      "logs",
+      "--help"
+    ]
+  },
+  {
+    "key": "app-release/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app-release",
+      "ls",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "app-release/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app-release",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "app-release/rollback:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app-release",
+      "rollback",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--release",
+      "RELEASE_ID"
+    ]
+  },
+  {
+    "key": "app-release/rollback:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app-release",
+      "rollback",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/domain:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "domain",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/domain/set:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "domain",
+      "set",
+      "--app",
+      "APP_ID",
+      "--domain",
+      "app.example.com"
+    ]
+  },
+  {
+    "key": "app/domain/set:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "domain",
+      "set",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/env:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "env",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/env/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "env",
+      "ls",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "app/env/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "env",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/env/set:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "env",
+      "set",
+      "--app",
+      "APP_ID",
+      "LOG_LEVEL=info"
+    ]
+  },
+  {
+    "key": "app/env/set:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "env",
+      "set",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/env/unset:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "env",
+      "unset",
+      "--app",
+      "APP_ID",
+      "KEYS"
+    ]
+  },
+  {
+    "key": "app/env/unset:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "env",
+      "unset",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/expose-port:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "expose-port",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--port",
+      "3000"
+    ]
+  },
+  {
+    "key": "app/expose-port:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "expose-port",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/health:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "health",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "app/health:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "health",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/log-source:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "log-source",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/log-source/add:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "log-source",
+      "add",
+      "--app",
+      "APP_ID",
+      "--type",
+      "systemd_unit",
+      "--ref",
+      "SOURCE_REF"
+    ]
+  },
+  {
+    "key": "app/log-source/add:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "log-source",
+      "add",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/log-source/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "log-source",
+      "ls",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "app/log-source/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "log-source",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/log-source/rm:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "log-source",
+      "rm",
+      "--app",
+      "APP_ID",
+      "--source",
+      "SOURCE"
+    ]
+  },
+  {
+    "key": "app/log-source/rm:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "log-source",
+      "rm",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/log-source/update:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "log-source",
+      "update",
+      "--app",
+      "APP_ID",
+      "--source",
+      "SOURCE"
+    ]
+  },
+  {
+    "key": "app/log-source/update:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "log-source",
+      "update",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/logs:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "logs",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "app/logs:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "logs",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "ls"
+    ]
+  },
+  {
+    "key": "app/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/new:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "new",
+      "--name",
+      "my-project"
+    ]
+  },
+  {
+    "key": "app/new:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "new",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/param:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "param",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/param/get:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "param",
+      "get",
+      "--app",
+      "APP_ID",
+      "KEY"
+    ]
+  },
+  {
+    "key": "app/param/get:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "param",
+      "get",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/param/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "param",
+      "ls",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "app/param/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "param",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/param/set:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "param",
+      "set",
+      "--app",
+      "APP_ID",
+      "KVS"
+    ]
+  },
+  {
+    "key": "app/param/set:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "param",
+      "set",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/param/unset:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "param",
+      "unset",
+      "--app",
+      "APP_ID",
+      "KEYS"
+    ]
+  },
+  {
+    "key": "app/param/unset:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "param",
+      "unset",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/restart:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "restart",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "app/restart:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "restart",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/rm:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "rm",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "app/rm:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "rm",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/share:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "share",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "app/share:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "share",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/start:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "start",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "app/start:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "start",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/stop:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "stop",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "app/stop:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "stop",
+      "--help"
+    ]
+  },
+  {
+    "key": "app/verify-domain:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "verify-domain",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "app/verify-domain:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "app",
+      "verify-domain",
+      "--help"
+    ]
+  },
+  {
+    "key": "build:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "build",
+      "--help"
+    ]
+  },
+  {
+    "key": "build/image:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "build",
+      "image",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--base-image",
+      "BASE_IMAGE"
+    ]
+  },
+  {
+    "key": "build/image:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "build",
+      "image",
+      "--help"
+    ]
+  },
+  {
+    "key": "build/logs:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "build",
+      "logs",
+      "BUILD_ID"
+    ]
+  },
+  {
+    "key": "build/logs:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "build",
+      "logs",
+      "--help"
+    ]
+  },
+  {
+    "key": "build/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "build",
+      "ls"
+    ]
+  },
+  {
+    "key": "build/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "build",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "capacity:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "capacity"
+    ]
+  },
+  {
+    "key": "capacity:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "capacity",
+      "--help"
+    ]
+  },
+  {
+    "key": "ci:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ci",
+      "--help"
+    ]
+  },
+  {
+    "key": "ci/link:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ci",
+      "link",
+      "--repo",
+      "REPO",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "ci/link:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ci",
+      "link",
+      "--help"
+    ]
+  },
+  {
+    "key": "ci/status:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ci",
+      "status"
+    ]
+  },
+  {
+    "key": "ci/status:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ci",
+      "status",
+      "--help"
+    ]
+  },
+  {
+    "key": "ci/unlink:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ci",
+      "unlink",
+      "--repo",
+      "REPO"
+    ]
+  },
+  {
+    "key": "ci/unlink:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ci",
+      "unlink",
+      "--help"
+    ]
+  },
+  {
+    "key": "completions:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "completions"
+    ]
+  },
+  {
+    "key": "completions:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "completions",
+      "--help"
+    ]
+  },
+  {
+    "key": "config:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "config",
+      "--help"
+    ]
+  },
+  {
+    "key": "config/get:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "config",
+      "get",
+      "KEY"
+    ]
+  },
+  {
+    "key": "config/get:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "config",
+      "get",
+      "--help"
+    ]
+  },
+  {
+    "key": "config/list:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "config",
+      "list"
+    ]
+  },
+  {
+    "key": "config/list:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "config",
+      "list",
+      "--help"
+    ]
+  },
+  {
+    "key": "config/set:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "config",
+      "set",
+      "output",
+      "json"
+    ]
+  },
+  {
+    "key": "config/set:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "config",
+      "set",
+      "--help"
+    ]
+  },
+  {
+    "key": "config/unset:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "config",
+      "unset",
+      "KEY"
+    ]
+  },
+  {
+    "key": "config/unset:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "config",
+      "unset",
+      "--help"
+    ]
+  },
+  {
+    "key": "deploy:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "deploy"
+    ]
+  },
+  {
+    "key": "deploy:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "deploy",
+      "--help"
+    ]
+  },
+  {
+    "key": "init:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "init"
+    ]
+  },
+  {
+    "key": "init:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "init",
+      "--help"
+    ]
+  },
+  {
+    "key": "limits:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "limits"
+    ]
+  },
+  {
+    "key": "limits:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "limits",
+      "--help"
+    ]
+  },
+  {
+    "key": "login:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "login"
+    ]
+  },
+  {
+    "key": "login:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "login",
+      "--help"
+    ]
+  },
+  {
+    "key": "logout:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "logout"
+    ]
+  },
+  {
+    "key": "logout:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "logout",
+      "--help"
+    ]
+  },
+  {
+    "key": "proxy:0",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "--help"
+    ]
+  },
+  {
+    "key": "proxy/dotenv:0",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "dotenv"
+    ]
+  },
+  {
+    "key": "proxy/dotenv:1",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "dotenv",
+      "--help"
+    ]
+  },
+  {
+    "key": "proxy/env:0",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "env"
+    ]
+  },
+  {
+    "key": "proxy/env:1",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "env",
+      "--help"
+    ]
+  },
+  {
+    "key": "proxy/off:0",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "off"
+    ]
+  },
+  {
+    "key": "proxy/off:1",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "off",
+      "--help"
+    ]
+  },
+  {
+    "key": "proxy/on:0",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "on"
+    ]
+  },
+  {
+    "key": "proxy/on:1",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "on",
+      "--help"
+    ]
+  },
+  {
+    "key": "proxy/path:0",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "path"
+    ]
+  },
+  {
+    "key": "proxy/path:1",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "path",
+      "--help"
+    ]
+  },
+  {
+    "key": "proxy/status:0",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "status"
+    ]
+  },
+  {
+    "key": "proxy/status:1",
+    "mode": "workspace",
+    "argv": [
+      "rig",
+      "proxy",
+      "status",
+      "--help"
+    ]
+  },
+  {
+    "key": "publish:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "publish"
+    ]
+  },
+  {
+    "key": "publish:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "publish",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/delete:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "delete",
+      "--ref",
+      "DEPLOY_REF"
+    ]
+  },
+  {
+    "key": "recipe/app/delete:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "delete",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/deprecate:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "deprecate",
+      "--ref",
+      "DEPLOY_REF"
+    ]
+  },
+  {
+    "key": "recipe/app/deprecate:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "deprecate",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/health:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "health"
+    ]
+  },
+  {
+    "key": "recipe/app/health:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "health",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/info:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "info"
+    ]
+  },
+  {
+    "key": "recipe/app/info:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "info",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/init:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "init",
+      "--vendor",
+      "VENDOR",
+      "--slug",
+      "SLUG",
+      "--name",
+      "my-project"
+    ]
+  },
+  {
+    "key": "recipe/app/init:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "init",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/install:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "install",
+      "--ref",
+      "DEPLOY_REF",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "recipe/app/install:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "install",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/install-record:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "install-record",
+      "--app",
+      "APP_ID"
+    ]
+  },
+  {
+    "key": "recipe/app/install-record:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "install-record",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/lint:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "lint"
+    ]
+  },
+  {
+    "key": "recipe/app/lint:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "lint",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "ls"
+    ]
+  },
+  {
+    "key": "recipe/app/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/profile:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "profile"
+    ]
+  },
+  {
+    "key": "recipe/app/profile:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "profile",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/test:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "test"
+    ]
+  },
+  {
+    "key": "recipe/app/test:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "test",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/versions:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "versions",
+      "--ref",
+      "RECIPE_REF"
+    ]
+  },
+  {
+    "key": "recipe/app/versions:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "versions",
+      "--help"
+    ]
+  },
+  {
+    "key": "recipe/app/yank:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "yank",
+      "--ref",
+      "DEPLOY_REF"
+    ]
+  },
+  {
+    "key": "recipe/app/yank:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "yank",
+      "--help"
+    ]
+  },
+  {
+    "key": "release:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "release",
+      "--help"
+    ]
+  },
+  {
+    "key": "release/activate:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "release",
+      "activate",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--release",
+      "RELEASE_ID"
+    ]
+  },
+  {
+    "key": "release/activate:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "release",
+      "activate",
+      "--help"
+    ]
+  },
+  {
+    "key": "release/create:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "release",
+      "create",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--image-digest",
+      "IMAGE_DIGEST"
+    ]
+  },
+  {
+    "key": "release/create:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "release",
+      "create",
+      "--help"
+    ]
+  },
+  {
+    "key": "release/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "release",
+      "ls",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "release/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "release",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "rollback:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "rollback",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "rollback:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "rollback",
+      "--help"
+    ]
+  },
+  {
+    "key": "service-spec:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "service-spec",
+      "--help"
+    ]
+  },
+  {
+    "key": "service-spec/create:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "service-spec",
+      "create",
+      "--file",
+      "./config.json"
+    ]
+  },
+  {
+    "key": "service-spec/create:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "service-spec",
+      "create",
+      "--help"
+    ]
+  },
+  {
+    "key": "service-spec/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "service-spec",
+      "ls"
+    ]
+  },
+  {
+    "key": "service-spec/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "service-spec",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "service-spec/rm:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "service-spec",
+      "rm",
+      "--id",
+      "ID"
+    ]
+  },
+  {
+    "key": "service-spec/rm:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "service-spec",
+      "rm",
+      "--help"
+    ]
+  },
+  {
+    "key": "service-spec/update:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "service-spec",
+      "update",
+      "--id",
+      "ID",
+      "--file",
+      "./config.json"
+    ]
+  },
+  {
+    "key": "service-spec/update:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "service-spec",
+      "update",
+      "--help"
+    ]
+  },
+  {
+    "key": "setup-script:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "setup-script",
+      "--help"
+    ]
+  },
+  {
+    "key": "setup-script/create:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "setup-script",
+      "create",
+      "--name",
+      "my-project",
+      "--file",
+      "./config.json"
+    ]
+  },
+  {
+    "key": "setup-script/create:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "setup-script",
+      "create",
+      "--help"
+    ]
+  },
+  {
+    "key": "setup-script/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "setup-script",
+      "ls"
+    ]
+  },
+  {
+    "key": "setup-script/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "setup-script",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "setup-script/rm:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "setup-script",
+      "rm",
+      "--id",
+      "ID"
+    ]
+  },
+  {
+    "key": "setup-script/rm:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "setup-script",
+      "rm",
+      "--help"
+    ]
+  },
+  {
+    "key": "setup-script/update:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "setup-script",
+      "update",
+      "--id",
+      "ID"
+    ]
+  },
+  {
+    "key": "setup-script/update:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "setup-script",
+      "update",
+      "--help"
+    ]
+  },
+  {
+    "key": "snapshot:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "snapshot",
+      "--help"
+    ]
+  },
+  {
+    "key": "snapshot/create:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "snapshot",
+      "create",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "snapshot/create:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "snapshot",
+      "create",
+      "--help"
+    ]
+  },
+  {
+    "key": "snapshot/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "snapshot",
+      "ls"
+    ]
+  },
+  {
+    "key": "snapshot/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "snapshot",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "snapshot/restore:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "snapshot",
+      "restore",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--snapshot",
+      "SNAPSHOT"
+    ]
+  },
+  {
+    "key": "snapshot/restore:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "snapshot",
+      "restore",
+      "--help"
+    ]
+  },
+  {
+    "key": "snapshot/rm:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "snapshot",
+      "rm",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--snapshot",
+      "SNAPSHOT"
+    ]
+  },
+  {
+    "key": "snapshot/rm:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "snapshot",
+      "rm",
+      "--help"
+    ]
+  },
+  {
+    "key": "ssh:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ssh",
+      "--help"
+    ]
+  },
+  {
+    "key": "ssh/add:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ssh",
+      "add",
+      "--name",
+      "my-project"
+    ]
+  },
+  {
+    "key": "ssh/add:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ssh",
+      "add",
+      "--help"
+    ]
+  },
+  {
+    "key": "ssh/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ssh",
+      "ls"
+    ]
+  },
+  {
+    "key": "ssh/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ssh",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "ssh/rm:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ssh",
+      "rm",
+      "--name",
+      "my-project"
+    ]
+  },
+  {
+    "key": "ssh/rm:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ssh",
+      "rm",
+      "--help"
+    ]
+  },
+  {
+    "key": "ssh/sync:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ssh",
+      "sync",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "ssh/sync:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ssh",
+      "sync",
+      "--help"
+    ]
+  },
+  {
+    "key": "status:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "status"
+    ]
+  },
+  {
+    "key": "status:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "status",
+      "--help"
+    ]
+  },
+  {
+    "key": "tools:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "tools",
+      "--help"
+    ]
+  },
+  {
+    "key": "tools/install:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "tools",
+      "install",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--tool",
+      "TOOL"
+    ]
+  },
+  {
+    "key": "tools/install:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "tools",
+      "install",
+      "--help"
+    ]
+  },
+  {
+    "key": "tools/install-status:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "tools",
+      "install-status",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--tool",
+      "TOOL",
+      "--job-id",
+      "JOB_ID"
+    ]
+  },
+  {
+    "key": "tools/install-status:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "tools",
+      "install-status",
+      "--help"
+    ]
+  },
+  {
+    "key": "tools/launch:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "tools",
+      "launch",
+      "--tool",
+      "TOOL",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "tools/launch:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "tools",
+      "launch",
+      "--help"
+    ]
+  },
+  {
+    "key": "tools/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "tools",
+      "ls",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "tools/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "tools",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "tools/stop:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "tools",
+      "stop",
+      "--tool",
+      "TOOL",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "tools/stop:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "tools",
+      "stop",
+      "--help"
+    ]
+  },
+  {
+    "key": "uninstall:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "uninstall"
+    ]
+  },
+  {
+    "key": "uninstall:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "uninstall",
+      "--help"
+    ]
+  },
+  {
+    "key": "update:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "update"
+    ]
+  },
+  {
+    "key": "update:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "update",
+      "--help"
+    ]
+  },
+  {
+    "key": "volume:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "volume",
+      "--help"
+    ]
+  },
+  {
+    "key": "volume/create:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "volume",
+      "create",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--name",
+      "my-project",
+      "--size-mb",
+      "10240",
+      "--mount-path",
+      "MOUNT_PATH"
+    ]
+  },
+  {
+    "key": "volume/create:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "volume",
+      "create",
+      "--help"
+    ]
+  },
+  {
+    "key": "volume/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "volume",
+      "ls",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "volume/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "volume",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "volume/resize:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "volume",
+      "resize",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--volume",
+      "VOLUME",
+      "--size-mb",
+      "10240"
+    ]
+  },
+  {
+    "key": "volume/resize:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "volume",
+      "resize",
+      "--help"
+    ]
+  },
+  {
+    "key": "volume/rm:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "volume",
+      "rm",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--volume",
+      "VOLUME"
+    ]
+  },
+  {
+    "key": "volume/rm:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "volume",
+      "rm",
+      "--help"
+    ]
+  },
+  {
+    "key": "whoami:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "whoami"
+    ]
+  },
+  {
+    "key": "whoami:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "whoami",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/ai:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ai",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/ai/mode:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ai",
+      "mode",
+      "managed",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/ai/mode:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ai",
+      "mode",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/ai/show:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ai",
+      "show",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/ai/show:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ai",
+      "show",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/cancel:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "cancel",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/cancel:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "cancel",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/env:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "env",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/env/get:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "env",
+      "get",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/env/get:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "env",
+      "get",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/env/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "env",
+      "ls",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/env/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "env",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/env/set:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "env",
+      "set",
+      "PAIRS",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/env/set:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "env",
+      "set",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/env/unset:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "env",
+      "unset",
+      "KEYS",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/env/unset:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "env",
+      "unset",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/logs:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "logs",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/logs:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "logs",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/ls:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ls"
+    ]
+  },
+  {
+    "key": "workspace/ls:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ls",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/metrics:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "metrics",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/metrics:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "metrics",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/new:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "new",
+      "--name",
+      "my-project"
+    ]
+  },
+  {
+    "key": "workspace/new:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "new",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/ports:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ports",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/ports:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ports",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/reconcile:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "reconcile",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/reconcile:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "reconcile",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/resize:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "resize",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/resize:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "resize",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/restart:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "restart",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/restart:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "restart",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/retry:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "retry",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/retry:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "retry",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/rm:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "rm",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/rm:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "rm",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/services:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "services",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/services:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "services",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/spawn:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "spawn",
+      "--name",
+      "my-project",
+      "--template",
+      "dev"
+    ]
+  },
+  {
+    "key": "workspace/spawn:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "spawn",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/ssh-info:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ssh-info",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/ssh-info:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ssh-info",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/start:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "start",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/start:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "start",
+      "--help"
+    ]
+  },
+  {
+    "key": "workspace/stop:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "stop",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "workspace/stop:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "stop",
+      "--help"
+    ]
+  }
+]

@@ -1,86 +1,57 @@
 ---
-title: Introduction
-description: Rigbox is an API-first platform for running code in isolated micro-VMs with built-in app routing, AI credits, and developer tooling.
+title: Build and run on Rigbox
+sidebarTitle: Overview
+description: Deploy applications, run coding agents, and build with the Rigbox API.
+mode: wide
 ---
 
-Rigbox gives you isolated Linux VMs - each with its own kernel, filesystem, and network - managed entirely through an API. Deploy workspaces, expose apps to the internet, run AI agents with managed credits, and automate everything with setup scripts and service specs.
-
-## Quick example
-
-Deploy a workspace in one command:
-
-```bash
-rig template deploy --template dev --name <WORKSPACE_NAME>
+<div className="rigbox-home">
+  <span id="when-to-use-rigbox" />
+  <div className="rigbox-hero">
+    <div>
+      <p className="rigbox-kicker">RIGBOX DOCUMENTATION</p>
+      <h1>Build and run<br />on Rigbox</h1>
+      <p className="rigbox-lead">Turn your project into a running app. Keep your workspace, update your code, and control how you deploy.</p>
+      <div className="rigbox-actions">
+        <a className="rigbox-button rigbox-button-primary" href="/quickstart">Deploy your first app</a>
+        <a className="rigbox-button" href="/ai/overview">Create an AI workspace</a>
+        <a className="rigbox-button" href="/build/quickstart">Build with the API</a>
+      </div>
+    </div>
+    <div className="rigbox-terminal">
+      <span id="quick-example" />
+```bash Local terminal
+rig login
+# From a project with rig.yaml
+rig deploy --strategy incremental
 ```
-
-Replace `<WORKSPACE_NAME>` with a name of your choice. The CLI is authenticated via `rig login` - no API key handling required.
-
-This provisions an isolated micro-VM with Python, Node.js, build tools, and SSH access - ready in seconds.
-
-<Tip>
-New to Rigbox? Follow the [Quickstart](/quickstart) for a step-by-step walkthrough with polling, app exposure, and health checks.
-</Tip>
-
-## When to use Rigbox
-
-| Use case | How Rigbox helps |
-| --- | --- |
-| **AI agent sandboxes** | Run untrusted AI-generated code in isolated VMs with no access to your infrastructure |
-| **App hosting** | Expose any port as a public URL with automatic HTTPS and subdomain routing |
-| **AI coding tools** | Run Claude Code, Codex, Aider with managed credits - no API keys needed |
-| **Development environments** | Reproducible dev environments with setup scripts, snapshots, and pre-installed tools |
-| **Bot deployment** | Deploy Telegram bots, chat interfaces, and AI agents in isolated micro-VMs |
-| **Build a platform** | Use the API to build your own hosting service on top of Rigbox infrastructure |
-
-## Core capabilities
-
-<CardGroup cols={2}>
-  <Card title="Workspaces" icon="server" href="/guides/workspaces">
-    Isolated micro-VMs with configurable CPU, memory, disk, and full SSH access
-  </Card>
-  <Card title="Apps & Routing" icon="globe" href="/guides/expose-and-route">
-    Expose ports as public URLs on `rigbox.dev` with automatic HTTPS and health checks
-  </Card>
-  <Card title="AI & Credits" icon="sparkles" href="/guides/managed-proxy">
-    Managed AI proxy with credits for Anthropic, OpenAI, and Google - or bring your own keys
-  </Card>
-  <Card title="Tools" icon="wrench" href="/guides/architecture-explorer">
-    Architecture Explorer for code visualization, Virtual Browser for remote browsing
-  </Card>
-  <Card title="Catalog Apps" icon="grid-2x2" href="/guides/catalog">
-    Install VS Code, Jupyter, Streamlit, and more in one call
-  </Card>
-  <Card title="Snapshots" icon="camera" href="/guides/snapshots">
-    Checkpoint full workspace state and restore instantly
-  </Card>
-  <Card title="Automation" icon="repeat" href="/guides/setup-scripts">
-    Setup scripts and service specs for reproducible environments
-  </Card>
-  <Card title="SSH & CLI" icon="terminal" href="/guides/ssh-access">
-    SSH access, file transfer, and full CLI management with `rig`
-  </Card>
-</CardGroup>
-
-## Get started
-
-<CardGroup cols={3}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Deploy your first workspace and app in 5 steps
-  </Card>
-  <Card title="Authentication" icon="key" href="/cli-reference/authentication">
-    API keys, JWTs, and session tokens
-  </Card>
-  <Card title="Guides" icon="book-open" href="/guides/workspaces">
-    In-depth guides for every feature
-  </Card>
-</CardGroup>
-
-## Base URL
-
-All API requests go to:
-
-```
-https://api.rigbox.dev/api/v1
-```
-
-See the [API Reference](/api-reference/workspaces/list) for the full endpoint catalog, or the [Authentication](/cli-reference/authentication) page for how to authenticate.
+      <p className="rigbox-terminal-note">New to Rigbox? Start with the <a href="/quickstart">first-app walkthrough</a>.</p>
+    </div>
+  </div>
+  <section className="rigbox-section">
+    <span id="core-capabilities" /><span id="get-started" />
+    <h2>Find your next step</h2>
+    <p>Choose an area to open its guides and reference pages.</p>
+    <div className="rigbox-card-grid">
+      <a className="rigbox-feature-card" href="/quickstart"><span className="rigbox-card-title">Start here</span><p>A first deployment and the concepts behind it.</p><span className="rigbox-card-arrow" aria-hidden="true">→</span></a>
+      <a className="rigbox-feature-card" href="/deploy/overview"><span className="rigbox-card-title">Deploy applications</span><p>Ship local projects or GitHub commits, stage releases, and roll back.</p><span className="rigbox-card-arrow" aria-hidden="true">→</span></a>
+      <a className="rigbox-feature-card" href="/configure/overview"><span className="rigbox-card-title">Configure applications</span><p>Define commands, environment, health, and access.</p><span className="rigbox-card-arrow" aria-hidden="true">→</span></a>
+      <a className="rigbox-feature-card" href="/workspaces/overview"><span className="rigbox-card-title">Workspaces and storage</span><p>Manage Linux environments, SSH access, volumes, and recovery.</p><span className="rigbox-card-arrow" aria-hidden="true">→</span></a>
+      <a className="rigbox-feature-card" href="/ai/overview"><span className="rigbox-card-title">AI and tools</span><p>Set up coding agents and developer services.</p><span className="rigbox-card-arrow" aria-hidden="true">→</span></a>
+      <a className="rigbox-feature-card" href="/operate/overview"><span className="rigbox-card-title">Operate and troubleshoot</span><p>Find logs, diagnose failures, and recover deliberately.</p><span className="rigbox-card-arrow" aria-hidden="true">→</span></a>
+      <a className="rigbox-feature-card" href="/examples/overview"><span className="rigbox-card-title">Examples</span><p>Learn from complete applications you can run and adapt.</p><span className="rigbox-card-arrow" aria-hidden="true">→</span></a>
+      <a className="rigbox-feature-card" href="/cli-reference/cli"><span className="rigbox-card-title">CLI reference</span><p>Find exact syntax, flags, and examples for every command.</p><span className="rigbox-card-arrow" aria-hidden="true">→</span></a>
+      <a className="rigbox-feature-card" href="/build/overview"><span className="rigbox-card-title">Build on Rigbox</span><p>Integrate workspace and app lifecycles into your backend.</p><span className="rigbox-card-arrow" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+  <section className="rigbox-section">
+    <h2>Start from a working example</h2>
+    <p>Explore the source, understand the manifest, and verify the result.</p>
+    <div className="rigbox-card-grid">
+      <a className="rigbox-feature-card" href="/examples/first-app"><span className="rigbox-card-title">Your first app</span><p>A small HTTP service with a health endpoint and a clear deployment workflow.</p></a>
+      <a className="rigbox-feature-card" href="/examples/frontend-api"><span className="rigbox-card-title">Frontend and API</span><p>Deploy related services and keep the backend private.</p></a>
+      <a className="rigbox-feature-card" href="/examples/persistent-notes"><span className="rigbox-card-title">Persistent notes</span><p>Keep application data on a volume across code updates.</p></a>
+    </div>
+  </section>
+  <span id="base-url" />
+</div>

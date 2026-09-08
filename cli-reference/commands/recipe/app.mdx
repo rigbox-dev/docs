@@ -1,0 +1,162 @@
+---
+title: "rig recipe app"
+sidebarTitle: "app"
+description: "Per-app recipes for installing into existing workspaces"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Run this command in an authenticated local terminal or inside a workspace; see the availability above.
+
+## Examples
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig recipe app --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox recipe app [OPTIONS] <COMMAND>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Per-app recipes for installing into existing workspaces
+
+Usage: rigbox recipe app [OPTIONS] <COMMAND>
+
+Commands:
+  init            Scaffold a community app recipe directory
+  ls              List visible app recipes
+  lint            Validate a rig.yaml against the canonical schema
+  profile         Show or update your community recipe profile
+  info            Show a manifest summary or deploy preview
+  install         Install an exact recipe ref into a workspace
+  versions        List published versions, newest first
+  delete          Delete published recipe version(s)
+  health          Show aggregate community registry health
+  install-record  Show the community install record for an installed app
+  test            Lint and print the disposable workspace test plan
+  yank            Yank a published recipe version
+  deprecate       Deprecate a published recipe version
+  help            Print this message or the help of the given subcommand(s)
+
+Options:
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox recipe app [OPTIONS] <COMMAND>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Per-app recipes for installing into existing workspaces
+
+Usage: rigbox recipe app [OPTIONS] <COMMAND>
+
+Commands:
+  init            Scaffold a community app recipe directory
+  ls              List visible app recipes
+  lint            Validate a rig.yaml against the canonical schema
+  profile         Show or update your community recipe profile
+  info            Show a manifest summary or deploy preview
+  install         Install an exact recipe ref into a workspace
+  versions        List published versions, newest first
+  delete          Delete published recipe version(s)
+  health          Show aggregate community registry health
+  install-record  Show the community install record for an installed app
+  test            Lint and print the disposable workspace test plan
+  yank            Yank a published recipe version
+  deprecate       Deprecate a published recipe version
+  help            Print this message or the help of the given subcommand(s)
+
+Options:
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Subcommands
+
+- [delete](/cli-reference/commands/recipe/app/delete)
+- [deprecate](/cli-reference/commands/recipe/app/deprecate)
+- [health](/cli-reference/commands/recipe/app/health)
+- [info](/cli-reference/commands/recipe/app/info)
+- [init](/cli-reference/commands/recipe/app/init)
+- [install](/cli-reference/commands/recipe/app/install)
+- [install-record](/cli-reference/commands/recipe/app/install-record)
+- [lint](/cli-reference/commands/recipe/app/lint)
+- [ls](/cli-reference/commands/recipe/app/ls)
+- [profile](/cli-reference/commands/recipe/app/profile)
+- [test](/cli-reference/commands/recipe/app/test)
+- [versions](/cli-reference/commands/recipe/app/versions)
+- [yank](/cli-reference/commands/recipe/app/yank)

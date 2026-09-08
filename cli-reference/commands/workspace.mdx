@@ -1,0 +1,177 @@
+---
+title: "rig workspace"
+sidebarTitle: "workspace"
+description: "Manage workspace lifecycle and configuration"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Run this command in an authenticated local terminal or inside a workspace; see the availability above.
+
+## Examples
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig workspace --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox workspace [OPTIONS] <COMMAND>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Manage workspace lifecycle and configuration
+
+Usage: rigbox workspace [OPTIONS] <COMMAND>
+
+Commands:
+  ls         List all workspaces in your account
+  spawn      Create and start a workspace in one step
+  new        Create a new workspace without starting it
+  rm         Delete a workspace
+  cancel     Cancel an in-progress workspace creation
+  retry      Retry a workspace that failed during creation
+  restart    Restart a workspace
+  start      Start a workspace
+  stop       Stop a workspace
+  logs       View workspace logs
+  ssh-info   Print SSH connection info for a workspace
+  env        Manage workspace environment variables
+  ai         Manage workspace AI configuration
+  metrics    Show live CPU, RAM, and disk metrics
+  services   List background services tracked in the workspace
+  ports      List ports the workspace is currently listening on
+  resize     Resize workspace resources
+  reconcile  Reconcile workspace apps with the template
+  help       Print this message or the help of the given subcommand(s)
+
+Options:
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox workspace [OPTIONS] <COMMAND>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Manage this workspace's config and logs
+
+Usage: rigbox workspace [OPTIONS] <COMMAND>
+
+Commands:
+  ai         Manage workspace AI configuration
+  cancel     Cancel an in-progress workspace creation
+  env        Manage workspace environment variables
+  logs       View this workspace's logs
+  ls         List all workspaces in your account
+  metrics    Show live CPU, RAM, and disk metrics
+  new        Create a new workspace without starting it
+  ports      List ports the workspace is currently listening on
+  reconcile  Reconcile workspace apps with the template
+  resize     Resize workspace resources
+  restart    Restart a workspace
+  retry      Retry a workspace that failed during creation
+  rm         Delete a workspace
+  services   List background services tracked in the workspace
+  spawn      Create and start a workspace in one step
+  ssh-info   Print this workspace's SSH connection info
+  start      Start a workspace
+  stop       Stop a workspace
+  help       Print this message or the help of the given subcommand(s)
+
+Options:
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Subcommands
+
+- [ai](/cli-reference/commands/workspace/ai)
+- [cancel](/cli-reference/commands/workspace/cancel)
+- [env](/cli-reference/commands/workspace/env)
+- [logs](/cli-reference/commands/workspace/logs)
+- [ls](/cli-reference/commands/workspace/ls)
+- [metrics](/cli-reference/commands/workspace/metrics)
+- [new](/cli-reference/commands/workspace/new)
+- [ports](/cli-reference/commands/workspace/ports)
+- [reconcile](/cli-reference/commands/workspace/reconcile)
+- [resize](/cli-reference/commands/workspace/resize)
+- [restart](/cli-reference/commands/workspace/restart)
+- [retry](/cli-reference/commands/workspace/retry)
+- [rm](/cli-reference/commands/workspace/rm)
+- [services](/cli-reference/commands/workspace/services)
+- [spawn](/cli-reference/commands/workspace/spawn)
+- [ssh-info](/cli-reference/commands/workspace/ssh-info)
+- [start](/cli-reference/commands/workspace/start)
+- [stop](/cli-reference/commands/workspace/stop)

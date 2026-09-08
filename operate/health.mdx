@@ -1,0 +1,31 @@
+---
+title: "Troubleshoot health checks"
+description: "Connect the process, port, and readiness endpoint."
+---
+
+## Inspect the app
+
+Run locally:
+
+```bash
+rig app health --app APP
+rig app logs --app APP
+```
+
+Check the manifest's `port`, `start`, and health path together. For HTTP services, bind the process to `0.0.0.0` and make the configured path return a successful response when the app is ready.
+
+## Common failures
+
+| Evidence | Check |
+| --- | --- |
+| Connection refused | Process exited, wrong port, or loopback-only binding |
+| HTTP 404 | Health path does not exist |
+| HTTP 401/403 from the app | Application authentication blocks the readiness endpoint |
+| Timeout | Startup stalled, dependency unavailable, or readiness budget too short |
+| CLI app rejected before install | Declare executable verification or a supported health command |
+
+Connect through [SSH](/guides/ssh-access) to test the process locally when needed. Do not make an app public just to fix an internal readiness failure.
+
+## Recover
+
+Read the release status and [release logs](/operate/build-logs). Correct the start command or readiness endpoint and redeploy. Use a larger timeout only when measured startup time justifies it. See [health configuration](/configure/health).

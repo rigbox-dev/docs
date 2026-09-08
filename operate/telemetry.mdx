@@ -1,0 +1,31 @@
+---
+title: "CLI traces and telemetry"
+description: "Control diagnostics and inspect command stages."
+---
+
+## Local diagnostics
+
+Run the original command with `--verbose` to write diagnostic details to stderr. Keep stdout available for structured output:
+
+```bash
+rig workspace ls --verbose --output json
+```
+
+If available to your account, open **Traces** in the Rigbox console and find the command by time. Inspect the stage that failed before retrying.
+
+## Body capture and privacy
+
+The CLI supports redacted HTTP body capture in traces. Redaction does not make application data appropriate to share without review. Control capture locally:
+
+```bash
+rig config set trace-bodies false
+rig config set telemetry false
+```
+
+For a single command, `RIGBOX_TRACE_BODIES=false` disables body capture. The environment setting overrides the saved body-capture setting. Disabling telemetry disables export; it does not delete previously recorded traces.
+
+To re-enable, set the corresponding config value to `true`. Bodies not captured at request time cannot be reconstructed later. Streaming responses and uploads are not buffered for body capture.
+
+## Report a problem
+
+Include the CLI version, command, approximate time, resource IDs, and sanitized error. Never include account keys, GitHub tokens, or raw secret-bearing environment output. See [configuration and output](/guides/using-cli).

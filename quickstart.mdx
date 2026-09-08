@@ -1,108 +1,94 @@
 ---
-title: Quickstart
-description: Launch your first workspace and install your first app with production-safe CLI steps
+title: "Deploy your first app"
+description: "Deploy the quickstart example as an incremental app release."
 ---
 
-This guide walks you through creating a workspace, installing an app recipe onto it, and validating live routing — all with the `rig` CLI.
+<Note>Incremental app releases require the v0.13 CLI and matching server capability. v0.13 is currently available as a release candidate; see [installation requirements](/guides/install-cli).</Note>
 
 ## Prerequisites
 
-- A Rigbox account ([sign up here](https://rigbox.dev/signup))
-- The Rigbox CLI installed: `curl -fsSL https://rigbox.dev/install.sh | bash`
+Create a [Rigbox account](https://rigbox.dev/signup), [install the CLI](/guides/install-cli), and install Git locally. Run every command below on your local machine.
 
-## Step 0: Authenticate
+<span id="step-0-authenticate" />
 
-The CLI opens your browser to sign in and stores credentials locally, so the rest of these commands need no tokens or headers.
+## 1. Sign in
 
 ```bash
 rig login
+rig whoami
+rig --version
 ```
 
-## Step 1: Create a Workspace
+Use the v0.13 CLI. Browser sign-in stores credentials for subsequent commands.
 
-`rig workspace spawn` creates the workspace, boots it, and waits until it's ready — all in one call. The `dev` template is a general-purpose development image with Node.js, Python, and common build tools. Replace `my-project` with a name of your choice.
+## 2. Get the example
 
 ```bash
-rig workspace spawn --name my-project --template dev
+git clone --branch codex/examples-docs-v013 https://github.com/rigbox-dev/rigbox-examples.git
+cd rigbox-examples/quickstart
 ```
 
-The built-in templates are `base` (minimal) and `dev` (full toolchain). Everything else — VS Code, Jupyter, Firecrawl, and so on — is installed as an **app recipe** on top of a workspace, which is the next step.
+The example is a TypeScript HTTP service. Its `rig.yaml` declares port 8080, `npm ci`, `npm start`, and `/healthz`. Open that file and make the deployment choice and route explicit:
 
-<Tip>
-`spawn` blocks until the workspace is `running`. To create without starting, use `rig workspace new` instead and start it later with `rig workspace start --workspace my-project`.
-</Tip>
+```yaml
+workspace:
+  deployment:
+    strategy: incremental
+  resources: { ramMb: 1024, vcpuCount: 1, diskSizeMb: 3072 }
+```
 
-## Step 2: Install an App
+Keep the other application fields. Add `visibility: public` at the top level if you want anyone to open the example URL; otherwise the route stays private.
 
-App recipes are pre-packaged applications you install into a workspace with a single command. Official recipes are addressed as `@rigbox/<id>@builtin`. Install the VS Code Server recipe:
+## 3. Deploy
+
+From the example directory:
 
 ```bash
-rig recipe app install -r @rigbox/vscode@builtin -w my-project
+rig deploy --name my-first-app
 ```
 
-The install blocks until the app is live, then prints its name and URL. The app is served at `https://<APP_NAME>.rigbox.dev` — here, `https://my-project-vscode.rigbox.dev`.
+Rigbox creates a workspace, prepares the app in a managed release directory, installs dependencies, activates it, and checks health. Subsequent deploys reuse the workspace recorded in `.rig.lock`. Keep that file locally; do not copy a production binding into an unrelated project.
 
-<Tip>
-Preview any official recipe before installing it with `rig recipe app info @rigbox/<id>@builtin`. See [Catalog Apps](/guides/catalog) for the full list of built-in app recipes (Jupyter, Streamlit, Firecrawl, and more).
-</Tip>
+<span id="step-3-list-apps-and-validate-live-health" />
 
-## Step 3: List Apps and Validate Live Health
-
-List the apps in your workspace:
+## 4. Check the app
 
 ```bash
-rig app ls --workspace my-project
+rig app ls --workspace my-first-app
+rig app health --app <APP_NAME> --output json
+rig app-release ls --workspace my-first-app
 ```
 
-Check a specific app is reachable before surfacing its URL in your own UI:
+Replace `<APP_NAME>` with the name returned by the list command. Verify `live` and `port_open` are true, then open the actual URL returned by Rigbox. A private route may require authentication.
 
-```bash
-rig app health --app <APP_NAME>
-```
+## Deploy a change
 
-Expected output:
+Edit the example and run `rig deploy` again from the same directory. Activation briefly restarts the affected service; it does not replace the workspace filesystem. See [the development loop](/deploy/development-loop) and [app rollback](/deploy/app-rollback).
 
-```json
-{
-  "live": true,
-  "service_status": "running",
-  "port_open": true
-}
-```
+## Troubleshooting
+
+If install or health checking fails, find the release ID with `rig app-release ls --workspace my-first-app` and read `rig app-release logs --workspace my-first-app --release <RELEASE_ID>`. Confirm the process listens on port 8080 and `/healthz` returns success before retrying.
+
+## Cleanup
+
+When you no longer need this test environment, inspect its apps and data first, then remove the workspace with `rig workspace rm --workspace my-first-app`. This removes the workspace; export data you want to retain before cleanup.
+
+<span id="step-1-create-a-workspace" />
+
+## 2. Create a workspace
+
+For the earlier workspace-first quickstart, use [Create and manage workspaces](/guides/workspaces), then [install a catalog app](/guides/catalog).
+
+<span id="step-2-install-an-app" />
+
+## 3. Install an app
+
+Catalog recipes are documented in [Catalog apps](/guides/catalog). Source deployment above uses an app release instead.
 
 ## Optional: Configure AI Settings
 
-For workspaces with AI integration, set the AI mode:
-
-```bash
-rig workspace ai mode --workspace my-project managed
-```
-
-Provider and model are account-level defaults — set them once with `rig ai defaults`:
-
-```bash
-rig ai defaults --provider google --model google/gemini-2.5-pro
-```
+Follow [AI coding tools](/guides/ai-coding-tools) and [Managed AI proxy](/guides/managed-proxy).
 
 ## Next Steps
 
-<CardGroup cols={2}>
-  <Card title="Catalog Apps" icon="grid" href="/guides/catalog">
-    Install VS Code, Jupyter, Streamlit, and more as app recipes
-  </Card>
-  <Card title="Workspace API" icon="server" href="/api-reference/workspaces/list">
-    Full workspace lifecycle management
-  </Card>
-  <Card title="App Management" icon="globe" href="/api-reference/apps/list">
-    Port exposure, visibility controls, and health checks
-  </Card>
-  <Card title="Snapshots" icon="camera" href="/api-reference/snapshots/list">
-    Save and restore workspace state
-  </Card>
-  <Card title="AI Configuration" icon="sparkles" href="/api-reference/ai/get-workspace-ai-config">
-    Workspace AI mode, account defaults, and credits
-  </Card>
-  <Card title="API Keys" icon="key" href="/api-reference/api-keys/list">
-    Manage programmatic access
-  </Card>
-</CardGroup>
+Continue with [multi-app projects](/deploy/multi-app), [GitHub deployment](/guides/github), or the [manifest reference](/reference/rig-yaml).

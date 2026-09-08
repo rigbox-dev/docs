@@ -1,0 +1,152 @@
+---
+title: "rig app expose-port"
+sidebarTitle: "expose-port"
+description: "Detect or expose a workspace port as an app"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+
+```bash
+rig app expose-port --workspace WORKSPACE_ID --port 3000
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig app expose-port --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox app expose-port [OPTIONS] --workspace <WORKSPACE> --port <PORT>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
+| `-p, --port` | Port to detect or expose | Required; Value: PORT |
+| `-n, --name` | App name to use when wrapping the port | Value: NAME |
+| `--wrap` | Create the app route instead of only detecting the process | Default: false |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Detect or expose a workspace port as an app
+
+Usage: rigbox app expose-port [OPTIONS] --workspace <WORKSPACE> --port <PORT>
+
+Options:
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+  -w, --workspace <WORKSPACE>
+          Workspace name or id
+
+  -p, --port <PORT>
+          Port to detect or expose
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+  -n, --name <NAME>
+          App name to use when wrapping the port
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --wrap
+          Create the app route instead of only detecting the process
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox app expose-port [OPTIONS] --workspace <WORKSPACE> --port <PORT>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
+| `-p, --port` | Port to detect or expose | Required; Value: PORT |
+| `-n, --name` | App name to use when wrapping the port | Value: NAME |
+| `--wrap` | Create the app route instead of only detecting the process | Default: false |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Detect or expose a workspace port as an app
+
+Usage: rigbox app expose-port [OPTIONS] --workspace <WORKSPACE> --port <PORT>
+
+Options:
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+  -w, --workspace <WORKSPACE>
+          Workspace name or id
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -p, --port <PORT>
+          Port to detect or expose
+
+  -n, --name <NAME>
+          App name to use when wrapping the port
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+      --wrap
+          Create the app route instead of only detecting the process
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

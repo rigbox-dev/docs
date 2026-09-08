@@ -1,0 +1,39 @@
+---
+title: "Configuration fields"
+description: "Environment, secrets, credentials, and validated app parameters."
+---
+
+```yaml
+env:
+  NODE_ENV: production
+secrets:
+  - name: APP_TOKEN
+    from: LOCAL_APP_TOKEN
+credentials:
+  admin_token:
+    generate: true
+    envVar: ADMIN_TOKEN
+params:
+  - key: mode
+    type: select
+    default: production
+    required: true
+    envVar: APP_MODE
+    options:
+      - { value: production, label: Production }
+      - { value: staging, label: Staging }
+```
+
+| Field | Rules |
+| --- | --- |
+| `env` | String map; local app values override workspace defaults |
+| `secrets` | Names to resolve from the operator environment; `from` renames input; `optional` permits absence |
+| `credentials` | Named map; incremental generated entries require `generate: true` |
+| `params` | List of parameter definitions with `key`, defaults, validation, options, and optional environment mapping |
+| `ai.managed` | Requests managed AI provider environment configuration for the application |
+
+Resolved secrets win over matching `env` keys. Parameter values map to `PARAM_<UPPER_KEY>` and optional `envVar`; explicit runtime environment values can override those mappings. Unknown supplied parameters and invalid required/option/pattern values fail incremental validation.
+
+Generated credential defaults use `CRED_<UPPER_KEY>` unless `envVar` is declared. App environment metadata is readable by authorized callers; these declarations are not an encrypted secrets vault.
+
+See [environment](/configure/environment), [secrets](/configure/secrets), [parameters](/configure/parameters), and [managed AI](/guides/managed-proxy) for workflows.

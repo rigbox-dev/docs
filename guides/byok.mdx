@@ -3,18 +3,24 @@ title: Bring Your Own Keys
 description: Use your own AI provider API keys instead of Rigbox-managed credits.
 ---
 
-Bring Your Own Keys (BYOK) mode lets you use your own AI provider API keys with Rigbox workspaces. You set the workspace to BYOK mode and provide your provider key as a workspace environment variable - you get unlimited usage billed directly by your provider, with no Rigbox credit limits.
+Bring Your Own Keys (BYOK) mode lets you use your own AI provider API keys with Rigbox workspaces. You set the workspace to BYOK mode and provide your provider key as a workspace environment variable - provider requests are billed to your provider account and remain subject to its quotas, rate limits, and available balance.
 
 <Note>
-[Managed mode](/guides/managed-proxy) routes traffic through Rigbox's OpenRouter gateway and meters it against your credit balance. BYOK skips OpenRouter entirely and connects your workspace directly to the provider you specify, using the key you supply.
+[Managed mode](/guides/managed-proxy) routes traffic through Rigbox's OpenRouter gateway and meters it against your credit balance. In BYOK mode, configure your SDK or agent with your provider key and endpoint. The selected tool and endpoint determine the route; changing the workspace mode does not intercept or rewrite every outgoing SDK request.
 </Note>
+
+## Before you begin
+
+Use the [v0.13 CLI](/guides/install-cli) and [authenticate](/cli-reference/authentication). Run workspace-management and recipe commands from your local terminal. Commands identified as running inside a workspace require its console terminal or SSH session. Replace example resource IDs with the values returned for your account.
+
+Start the target workspace first and verify its identity with `rig workspace ls`. AI calls require managed credits or an appropriately configured provider account.
 
 ## When to Use BYOK
 
 BYOK is the right choice when:
 
 - **You already have API keys** from Anthropic, OpenAI, Google, or another provider
-- **You need unlimited usage** beyond the managed credit tiers
+- **You want provider-billed usage** instead of managed credits
 - **You need a specific model** not available in managed mode
 - **Your organization requires** that API keys stay under your own provider account for billing, audit, or compliance reasons
 
@@ -32,10 +38,10 @@ rig workspace ai mode --workspace <workspace_id> byok
 rig workspace env set --workspace <workspace_id> ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-Rigbox detects BYOK from the presence of a provider key in the workspace environment and routes your code straight to that provider, bypassing the managed proxy.
+Set the tool’s provider endpoint explicitly when moving from managed mode. Remove any managed base-URL overrides retained in its configuration or current shell, then restart the tool.
 
 <Note>
-Environment changes apply on the next workspace start. Restart the workspace (`rig workspace stop` then `rig workspace start`) if it is already running.
+The API stores workspace environment changes and pushes configuration files to a running workspace. Existing processes retain their current environment; restart the affected tool or service and open a fresh login shell. Stopped workspaces receive the configuration on their next start.
 </Note>
 
 ## How Keys Are Stored and Injected
@@ -47,7 +53,9 @@ When you set a BYOK key:
 3. **Injected at runtime** - the key is exported into the workspace environment, so SDKs pick it up with no extra setup
 4. **Scoped to the workspace** - each workspace has its own environment; changing one does not affect others
 
-The key is available inside the workspace as the standard environment variable for the provider SDK (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`).
+Workspace environment values are stored in workspace metadata and written to guest configuration files, including `/home/developer/.rigbox/.env`. Masking CLI output does not encrypt the values or prevent workspace code from reading them. Do not treat this mechanism as a dedicated secret vault.
+
+The consuming process must load the configured provider environment variable, such as `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `GOOGLE_API_KEY`.
 
 ## Clear a Key
 
@@ -57,7 +65,7 @@ To remove a provider key from a workspace, unset the environment variable:
 rig workspace env unset --workspace <workspace_id> ANTHROPIC_API_KEY
 ```
 
-The workspace will no longer have access to the provider until you set a new key.
+Restart processes that loaded the old key. Unsetting it does not revoke the provider credential or erase copies your application already made; revoke it at the provider when needed.
 
 ## Switch Back to Managed Mode
 
@@ -67,10 +75,10 @@ You can switch from BYOK to managed mode at any time. This starts routing throug
 rig workspace ai mode --workspace <workspace_id> managed
 ```
 
-Switching the mode does not delete your provider key — managed mode simply injects its own credentials and ignores it. To fully remove the key, unset the environment variable as shown above.
+Switching the mode does not delete your provider key or change a tool’s explicitly configured endpoint. Unset the key and reopen the shell or restart the tool, then verify that it uses the managed endpoint.
 
 <Note>
-Mode changes take effect on the next AI API call. A new provider key requires a workspace restart to be injected.
+Mode updates refresh the workspace’s routing profile for new shells. An existing shell or process can retain old values until restarted.
 </Note>
 
 ## Set Defaults for New Workspaces
@@ -89,8 +97,8 @@ Account defaults cover mode, provider, and model only — the provider **key** i
 |---------|---------|------|
 | API keys required | No | Yes |
 | Credit tracking | Automatic | N/A (billed by your provider) |
-| Cost | Included credits (Free: 250, Pro: 2,000) | Your provider billing |
-| Supported providers | Anthropic, OpenAI, Google, Brave | Any supported provider |
+| Cost | Your account’s managed credit balance | Your provider billing |
+| Supported providers | Models and protocols exposed by the managed gateway | Providers supported by your SDK or agent |
 | Usage limits | Credit balance | Your provider's rate limits |
 | Setup time | Instant | Need existing API key |
 | Best for | Quick start, prototyping, demos | Production, high volume, specific models |
@@ -168,6 +176,12 @@ Set provider keys with `rig workspace env set`, not by hardcoding them in your c
 - **Use scoped keys** - if your provider supports project-scoped or restricted keys, prefer those over organization-wide keys
 - **Audit usage** - monitor your provider dashboard for unexpected usage patterns
 - **One key per workspace** - avoid sharing the same key across many workspaces; this makes it easier to revoke access to a single workspace
+
+## Verify and troubleshoot
+
+Inside the workspace, inspect `rig proxy status`, then make one small request with your chosen tool. Verify the configured endpoint and check the corresponding Rigbox or provider usage. After changing keys or mode, start a fresh shell and restart processes that retained their old configuration. Never print a provider key to verify it.
+
+For failures, start with [runtime logs](/operate/app-logs), [health checks](/operate/health), or [resource exhaustion](/operate/resources).
 
 ## Next Steps
 

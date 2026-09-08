@@ -1,0 +1,26 @@
+---
+title: "Troubleshoot storage and recovery"
+description: "Find where data was written before choosing a recovery action."
+---
+
+## Identify the data location
+
+Connect through SSH and inspect the application's configured data path and mounts. Determine whether files were stored in a managed app release directory, the workspace root disk, or a separate volume.
+
+| Symptom | Check |
+| --- | --- |
+| Files disappear after redeploy | Application wrote mutable data beside source instead of its data mount |
+| Database missing after re-image | Database lived on the replaced root disk |
+| Snapshot restore did not rewind database | Database resides on an attached volume, outside the snapshot |
+| Restored app cannot read data | Mount path, ownership, configuration, or schema is incompatible |
+| Volume operation rejected | Stop the workspace before changing the drive set |
+
+## Recover carefully
+
+Preserve the current disk and error evidence. Choose a retained app release for a code/configuration failure, a root-disk snapshot for a system filesystem failure, or an application backup for data loss. Check [recovery boundaries](/workspaces/recovery-limits) first.
+
+A snapshot is not a backup of persistent volumes, and creating a new snapshot replaces the workspace's previous checkpoint. Do not create one reflexively when trying to recover the old one.
+
+## Prevent recurrence
+
+Store mutable files on a declared [persistent volume](/guides/persistent-volumes), configure an application-consistent backup, and test restoring it. Verify persistence by creating a record, redeploying, and reading the same record afterward.

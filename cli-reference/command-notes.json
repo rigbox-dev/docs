@@ -1,0 +1,1875 @@
+{
+  "ai": {
+    "description": "Run this command on your local machine.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ai --help"
+      }
+    ]
+  },
+  "ai/defaults": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig ai defaults"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ai defaults --help"
+      }
+    ]
+  },
+  "ai/usage": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig ai usage"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ai usage --help"
+      }
+    ]
+  },
+  "api": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig api GET /api/v1/workspaces"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig api --help"
+      }
+    ]
+  },
+  "api-key": {
+    "description": "Run this command on your local machine.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig api-key --help"
+      }
+    ]
+  },
+  "api-key/create": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig api-key create --name my-project"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig api-key create --help"
+      }
+    ]
+  },
+  "api-key/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig api-key ls"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig api-key ls --help"
+      }
+    ]
+  },
+  "api-key/rm": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig api-key rm --id ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig api-key rm --help"
+      }
+    ],
+    "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
+  },
+  "ci": {
+    "description": "Run this command on your local machine.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ci --help"
+      }
+    ]
+  },
+  "ci/link": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig ci link --repo REPO --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ci link --help"
+      }
+    ]
+  },
+  "ci/status": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig ci status"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ci status --help"
+      }
+    ]
+  },
+  "ci/unlink": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig ci unlink --repo REPO"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ci unlink --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "capacity": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig capacity"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig capacity --help"
+      }
+    ]
+  },
+  "config": {
+    "description": "Run this command on your local machine.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig config --help"
+      }
+    ]
+  },
+  "config/set": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Use JSON output for subsequent commands.",
+        "command": "rig config set output json"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig config set --help"
+      }
+    ]
+  },
+  "config/get": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig config get KEY"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig config get --help"
+      }
+    ]
+  },
+  "config/unset": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig config unset KEY"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig config unset --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "config/list": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Inspect persisted CLI defaults.",
+        "command": "rig config list"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig config list --help"
+      }
+    ]
+  },
+  "completions": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig completions"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig completions --help"
+      }
+    ]
+  },
+  "limits": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig limits"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig limits --help"
+      }
+    ]
+  },
+  "login": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Authenticate from your local terminal; complete browser approval.",
+        "command": "rig login"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig login --help"
+      }
+    ]
+  },
+  "logout": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig logout"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig logout --help"
+      }
+    ]
+  },
+  "service-spec": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig service-spec --help"
+      }
+    ]
+  },
+  "service-spec/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig service-spec ls"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig service-spec ls --help"
+      }
+    ]
+  },
+  "service-spec/create": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig service-spec create --file ./config.json"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig service-spec create --help"
+      }
+    ]
+  },
+  "service-spec/update": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig service-spec update --id ID --file ./config.json"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig service-spec update --help"
+      }
+    ]
+  },
+  "service-spec/rm": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig service-spec rm --id ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig service-spec rm --help"
+      }
+    ],
+    "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
+  },
+  "setup-script": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig setup-script --help"
+      }
+    ]
+  },
+  "setup-script/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig setup-script ls"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig setup-script ls --help"
+      }
+    ]
+  },
+  "setup-script/create": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig setup-script create --name my-project --file ./config.json"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig setup-script create --help"
+      }
+    ]
+  },
+  "setup-script/update": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig setup-script update --id ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig setup-script update --help"
+      }
+    ]
+  },
+  "setup-script/rm": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig setup-script rm --id ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig setup-script rm --help"
+      }
+    ],
+    "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
+  },
+  "ssh": {
+    "description": "Run this command on your local machine.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ssh --help"
+      }
+    ]
+  },
+  "ssh/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig ssh ls"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ssh ls --help"
+      }
+    ]
+  },
+  "ssh/add": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig ssh add --name my-project"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ssh add --help"
+      }
+    ]
+  },
+  "ssh/rm": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig ssh rm --name my-project"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ssh rm --help"
+      }
+    ],
+    "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
+  },
+  "ssh/sync": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig ssh sync --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig ssh sync --help"
+      }
+    ]
+  },
+  "status": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig status"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig status --help"
+      }
+    ]
+  },
+  "uninstall": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig uninstall"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig uninstall --help"
+      }
+    ],
+    "warning": "This command removes the local CLI installation. Review its flags before running it."
+  },
+  "update": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig update"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig update --help"
+      }
+    ]
+  },
+  "whoami": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Verify the active identity.",
+        "command": "rig whoami"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig whoami --help"
+      }
+    ]
+  },
+  "app": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app --help"
+      }
+    ]
+  },
+  "app/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Inside a workspace, list installed apps.",
+        "command": "rig app ls"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app ls --help"
+      }
+    ]
+  },
+  "app/new": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app new --name my-project"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app new --help"
+      }
+    ]
+  },
+  "app/logs": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app logs --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app logs --help"
+      }
+    ]
+  },
+  "app/expose-port": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app expose-port --workspace WORKSPACE_ID --port 3000"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app expose-port --help"
+      }
+    ]
+  },
+  "app/start": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app start --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app start --help"
+      }
+    ]
+  },
+  "app/stop": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app stop --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app stop --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "app/restart": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app restart --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app restart --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "app/rm": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app rm --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app rm --help"
+      }
+    ],
+    "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
+  },
+  "app/share": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app share --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app share --help"
+      }
+    ]
+  },
+  "app/health": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app health --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app health --help"
+      }
+    ]
+  },
+  "app/verify-domain": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app verify-domain --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app verify-domain --help"
+      }
+    ]
+  },
+  "app/domain": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app domain --help"
+      }
+    ]
+  },
+  "app/domain/set": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app domain set --app APP_ID --domain app.example.com"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app domain set --help"
+      }
+    ]
+  },
+  "app/env": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app env --help"
+      }
+    ]
+  },
+  "app/env/set": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app env set --app APP_ID LOG_LEVEL=info"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app env set --help"
+      }
+    ]
+  },
+  "app/env/unset": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app env unset --app APP_ID KEYS"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app env unset --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "app/env/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app env ls --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app env ls --help"
+      }
+    ]
+  },
+  "app/param": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app param --help"
+      }
+    ]
+  },
+  "app/param/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app param ls --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app param ls --help"
+      }
+    ]
+  },
+  "app/param/get": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app param get --app APP_ID KEY"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app param get --help"
+      }
+    ]
+  },
+  "app/param/set": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app param set --app APP_ID KVS"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app param set --help"
+      }
+    ]
+  },
+  "app/param/unset": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app param unset --app APP_ID KEYS"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app param unset --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "app/log-source": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app log-source --help"
+      }
+    ]
+  },
+  "app/log-source/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app log-source ls --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app log-source ls --help"
+      }
+    ]
+  },
+  "app/log-source/add": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app log-source add --app APP_ID --type systemd_unit --ref SOURCE_REF"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app log-source add --help"
+      }
+    ]
+  },
+  "app/log-source/update": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app log-source update --app APP_ID --source SOURCE"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app log-source update --help"
+      }
+    ]
+  },
+  "app/log-source/rm": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app log-source rm --app APP_ID --source SOURCE"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app log-source rm --help"
+      }
+    ],
+    "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
+  },
+  "init": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "From your application directory, scaffold rig.yaml and review it before deploying.",
+        "command": "rig init"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig init --help"
+      }
+    ]
+  },
+  "snapshot": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig snapshot --help"
+      }
+    ]
+  },
+  "snapshot/create": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig snapshot create --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig snapshot create --help"
+      }
+    ]
+  },
+  "snapshot/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig snapshot ls"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig snapshot ls --help"
+      }
+    ]
+  },
+  "snapshot/restore": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig snapshot restore --workspace WORKSPACE_ID --snapshot SNAPSHOT"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig snapshot restore --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "snapshot/rm": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig snapshot rm --workspace WORKSPACE_ID --snapshot SNAPSHOT"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig snapshot rm --help"
+      }
+    ],
+    "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
+  },
+  "volume": {
+    "description": "Run this command on your local machine.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig volume --help"
+      }
+    ]
+  },
+  "volume/create": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig volume create --workspace WORKSPACE_ID --name my-project --size-mb 10240 --mount-path MOUNT_PATH"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig volume create --help"
+      }
+    ]
+  },
+  "volume/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig volume ls --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig volume ls --help"
+      }
+    ]
+  },
+  "volume/resize": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig volume resize --workspace WORKSPACE_ID --volume VOLUME --size-mb 10240"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig volume resize --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "volume/rm": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig volume rm --workspace WORKSPACE_ID --volume VOLUME"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig volume rm --help"
+      }
+    ],
+    "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
+  },
+  "build": {
+    "description": "Run this command on your local machine.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig build --help"
+      }
+    ]
+  },
+  "build/image": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig build image --workspace WORKSPACE_ID --base-image BASE_IMAGE"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig build image --help"
+      }
+    ]
+  },
+  "build/logs": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig build logs BUILD_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig build logs --help"
+      }
+    ]
+  },
+  "build/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig build ls"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig build ls --help"
+      }
+    ]
+  },
+  "release": {
+    "description": "Run this command on your local machine.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig release --help"
+      }
+    ]
+  },
+  "release/create": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig release create --workspace WORKSPACE_ID --image-digest IMAGE_DIGEST"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig release create --help"
+      }
+    ]
+  },
+  "release/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig release ls --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig release ls --help"
+      }
+    ]
+  },
+  "release/activate": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig release activate --workspace WORKSPACE_ID --release RELEASE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig release activate --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "app-release": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app-release --help"
+      }
+    ]
+  },
+  "app-release/activate": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app-release activate --workspace WORKSPACE_ID --release RELEASE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app-release activate --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "app-release/logs": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app-release logs --workspace WORKSPACE_ID --release RELEASE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app-release logs --help"
+      }
+    ]
+  },
+  "app-release/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app-release ls --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app-release ls --help"
+      }
+    ]
+  },
+  "app-release/rollback": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig app-release rollback --workspace WORKSPACE_ID --release RELEASE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig app-release rollback --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "rollback": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig rollback --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig rollback --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "tools": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig tools --help"
+      }
+    ]
+  },
+  "tools/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig tools ls --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig tools ls --help"
+      }
+    ]
+  },
+  "tools/launch": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig tools launch --tool TOOL --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig tools launch --help"
+      }
+    ]
+  },
+  "tools/stop": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig tools stop --tool TOOL --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig tools stop --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "tools/install": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig tools install --workspace WORKSPACE_ID --tool TOOL"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig tools install --help"
+      }
+    ]
+  },
+  "tools/install-status": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig tools install-status --workspace WORKSPACE_ID --tool TOOL --job-id JOB_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig tools install-status --help"
+      }
+    ]
+  },
+  "deploy": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Deploy the project from the local directory containing rig.yaml. Review the deployment strategy before running.",
+        "command": "rig deploy"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig deploy --help"
+      }
+    ]
+  },
+  "publish": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig publish"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig publish --help"
+      }
+    ]
+  },
+  "workspace": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace --help"
+      }
+    ]
+  },
+  "workspace/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "List accessible workspaces.",
+        "command": "rig workspace ls"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace ls --help"
+      }
+    ]
+  },
+  "workspace/spawn": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Create a development workspace from your local machine.",
+        "command": "rig workspace spawn --name my-project --template dev"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace spawn --help"
+      }
+    ]
+  },
+  "workspace/new": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace new --name my-project"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace new --help"
+      }
+    ]
+  },
+  "workspace/rm": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace rm --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace rm --help"
+      }
+    ],
+    "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
+  },
+  "workspace/cancel": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace cancel --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace cancel --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "workspace/retry": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace retry --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace retry --help"
+      }
+    ]
+  },
+  "workspace/restart": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace restart --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace restart --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "workspace/start": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace start --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace start --help"
+      }
+    ]
+  },
+  "workspace/stop": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace stop --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace stop --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "workspace/logs": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace logs --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace logs --help"
+      }
+    ]
+  },
+  "workspace/ssh-info": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace ssh-info --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace ssh-info --help"
+      }
+    ]
+  },
+  "workspace/env": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace env --help"
+      }
+    ]
+  },
+  "workspace/env/set": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace env set PAIRS --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace env set --help"
+      }
+    ]
+  },
+  "workspace/env/unset": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace env unset KEYS --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace env unset --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "workspace/env/get": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace env get --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace env get --help"
+      }
+    ]
+  },
+  "workspace/env/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace env ls --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace env ls --help"
+      }
+    ]
+  },
+  "workspace/ai": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace ai --help"
+      }
+    ]
+  },
+  "workspace/ai/mode": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace ai mode managed --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace ai mode --help"
+      }
+    ]
+  },
+  "workspace/ai/show": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace ai show --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace ai show --help"
+      }
+    ]
+  },
+  "workspace/metrics": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace metrics --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace metrics --help"
+      }
+    ]
+  },
+  "workspace/services": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace services --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace services --help"
+      }
+    ]
+  },
+  "workspace/ports": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace ports --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace ports --help"
+      }
+    ]
+  },
+  "workspace/resize": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace resize --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace resize --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "workspace/reconcile": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig workspace reconcile --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig workspace reconcile --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "recipe": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe --help"
+      }
+    ]
+  },
+  "recipe/app": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app --help"
+      }
+    ]
+  },
+  "recipe/app/init": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app init --vendor VENDOR --slug SLUG --name my-project"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app init --help"
+      }
+    ]
+  },
+  "recipe/app/ls": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app ls"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app ls --help"
+      }
+    ]
+  },
+  "recipe/app/lint": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app lint"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app lint --help"
+      }
+    ]
+  },
+  "recipe/app/profile": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app profile"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app profile --help"
+      }
+    ]
+  },
+  "recipe/app/info": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app info"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app info --help"
+      }
+    ]
+  },
+  "recipe/app/install": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app install --ref DEPLOY_REF --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app install --help"
+      }
+    ]
+  },
+  "recipe/app/versions": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app versions --ref RECIPE_REF"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app versions --help"
+      }
+    ]
+  },
+  "recipe/app/delete": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app delete --ref DEPLOY_REF"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app delete --help"
+      }
+    ],
+    "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
+  },
+  "recipe/app/health": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app health"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app health --help"
+      }
+    ]
+  },
+  "recipe/app/install-record": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app install-record --app APP_ID"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app install-record --help"
+      }
+    ]
+  },
+  "recipe/app/test": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app test"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app test --help"
+      }
+    ]
+  },
+  "recipe/app/yank": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app yank --ref DEPLOY_REF"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app yank --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "recipe/app/deprecate": {
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "examples": [
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig recipe app deprecate --ref DEPLOY_REF"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig recipe app deprecate --help"
+      }
+    ],
+    "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
+  },
+  "proxy": {
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig proxy --help"
+      }
+    ]
+  },
+  "proxy/status": {
+    "description": "Use this command inside a workspace.",
+    "examples": [
+      {
+        "description": "Inside a workspace, inspect managed AI proxy configuration.",
+        "command": "rig proxy status"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig proxy status --help"
+      }
+    ]
+  },
+  "proxy/on": {
+    "description": "Use this command inside a workspace.",
+    "examples": [
+      {
+        "description": "Run inside a workspace. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig proxy on"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig proxy on --help"
+      }
+    ]
+  },
+  "proxy/off": {
+    "description": "Use this command inside a workspace.",
+    "examples": [
+      {
+        "description": "Run inside a workspace. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig proxy off"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig proxy off --help"
+      }
+    ]
+  },
+  "proxy/env": {
+    "description": "Use this command inside a workspace.",
+    "examples": [
+      {
+        "description": "Run inside a workspace. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig proxy env"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig proxy env --help"
+      }
+    ]
+  },
+  "proxy/dotenv": {
+    "description": "Use this command inside a workspace.",
+    "examples": [
+      {
+        "description": "Run inside a workspace. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig proxy dotenv"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig proxy dotenv --help"
+      }
+    ]
+  },
+  "proxy/path": {
+    "description": "Use this command inside a workspace.",
+    "examples": [
+      {
+        "description": "Run inside a workspace. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "command": "rig proxy path"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig proxy path --help"
+      }
+    ]
+  }
+}

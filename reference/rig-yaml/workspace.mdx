@@ -1,0 +1,29 @@
+---
+title: "Workspace fields"
+description: "Declare the environment shared by an application project."
+---
+
+```yaml
+workspace:
+  deployment:
+    strategy: incremental
+  image: dev
+  resources:
+    ramMb: 2048
+    vcpuCount: 2
+    diskSizeMb: 10240
+  env:
+    NODE_ENV: production
+  volumes:
+    - name: data
+      mountPath: /home/developer/data
+      sizeMb: 1024
+```
+
+`image` and `resources` provide workspace creation defaults. They do not imply that an incremental deploy will replace or resize an existing workspace. Update resources separately and review image replacement explicitly.
+
+`workspace.env` merges below each local app's environment. `workspace.secrets` merges by secret name, with an app's declaration taking precedence. Published `ref` apps use their recipe configuration rather than this local rendering merge.
+
+Shared volume declarations allow local apps to reference a volume by name, for example `volumes: [data]`. Choose mount paths deliberately and keep mutable data out of managed release directories. See [persistent volumes](/guides/persistent-volumes).
+
+For strategy selection and console differences, see [deployment fields](/reference/rig-yaml/deployment).

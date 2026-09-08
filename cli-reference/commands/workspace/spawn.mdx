@@ -1,0 +1,216 @@
+---
+title: "rig workspace spawn"
+sidebarTitle: "spawn"
+description: "Create and start a workspace in one step"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+Create a development workspace from your local machine.
+
+```bash
+rig workspace spawn --name my-project --template dev
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig workspace spawn --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox workspace spawn [OPTIONS] --name <NAME>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-n, --name` | Workspace name | Required; Value: NAME |
+| `-t, --template` | Template id (e.g. base, dev, ai-agent-starter) | Value: TEMPLATE |
+| `-r, --ram` | RAM in MB (raised to template+catalog floor if lower) | Value: RAM |
+| `--vcpu` | vCPU count (minimum: 1) | Value: VCPU |
+| `-d, --disk` | Disk size in MB (raised to template+catalog floor if lower) | Value: DISK |
+| `-c, --catalog` | Catalog recipe id to install at first boot (repeatable) | Value: CATALOG |
+| `--env` | Workspace-level environment variable in `KEY=VALUE` form (repeatable) | Value: ENV |
+| `--setup-script-id` | Setup-script id to attach at first boot (repeatable; from `rig setup-script ls`) | Value: SETUP_SCRIPT_IDS |
+| `--service-spec-id` | Service-spec id to attach at first boot (repeatable; from `rig service-spec ls`) | Value: SERVICE_SPEC_IDS |
+| `--app-param` | Catalog-app parameter in `catalog_id:key=value` form (repeatable) | Value: APP_PARAMS |
+| `--wait-for-apps` | Wait until every catalog app is active (default: on when --catalog is set) | Default: false |
+| `-a, --auto-size` | Auto-size RAM and disk from catalog minimums (default: on when --ram/--disk unset) | Default: false |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Create and start a workspace in one step
+
+Usage: rigbox workspace spawn [OPTIONS] --name <NAME>
+
+Options:
+  -n, --name <NAME>
+          Workspace name
+
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+  -t, --template <TEMPLATE>
+          Template id (e.g. base, dev, ai-agent-starter)
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+  -r, --ram <RAM>
+          RAM in MB (raised to template+catalog floor if lower)
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --vcpu <VCPU>
+          vCPU count (minimum: 1)
+
+  -d, --disk <DISK>
+          Disk size in MB (raised to template+catalog floor if lower)
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+  -c, --catalog <CATALOG>
+          Catalog recipe id to install at first boot (repeatable)
+
+      --no-pager
+          Do not pipe help output through a pager
+
+      --env <ENV>
+          Workspace-level environment variable in `KEY=VALUE` form (repeatable)
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+      --setup-script-id <SETUP_SCRIPT_IDS>
+          Setup-script id to attach at first boot (repeatable; from `rig setup-script ls`)
+
+      --service-spec-id <SERVICE_SPEC_IDS>
+          Service-spec id to attach at first boot (repeatable; from `rig service-spec ls`)
+
+      --app-param <APP_PARAMS>
+          Catalog-app parameter in `catalog_id:key=value` form (repeatable)
+
+      --wait-for-apps
+          Wait until every catalog app is active (default: on when --catalog is set)
+
+  -a, --auto-size
+          Auto-size RAM and disk from catalog minimums (default: on when --ram/--disk unset)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox workspace spawn [OPTIONS] --name <NAME>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-n, --name` | Workspace name | Required; Value: NAME |
+| `-t, --template` | Template id (e.g. base, dev, ai-agent-starter) | Value: TEMPLATE |
+| `-r, --ram` | RAM in MB (raised to template+catalog floor if lower) | Value: RAM |
+| `--vcpu` | vCPU count (minimum: 1) | Value: VCPU |
+| `-d, --disk` | Disk size in MB (raised to template+catalog floor if lower) | Value: DISK |
+| `-c, --catalog` | Catalog recipe id to install at first boot (repeatable) | Value: CATALOG |
+| `--env` | Workspace-level environment variable in `KEY=VALUE` form (repeatable) | Value: ENV |
+| `--setup-script-id` | Setup-script id to attach at first boot (repeatable; from `rig setup-script ls`) | Value: SETUP_SCRIPT_IDS |
+| `--service-spec-id` | Service-spec id to attach at first boot (repeatable; from `rig service-spec ls`) | Value: SERVICE_SPEC_IDS |
+| `--app-param` | Catalog-app parameter in `catalog_id:key=value` form (repeatable) | Value: APP_PARAMS |
+| `--wait-for-apps` | Wait until every catalog app is active (default: on when --catalog is set) | Default: false |
+| `-a, --auto-size` | Auto-size RAM and disk from catalog minimums (default: on when --ram/--disk unset) | Default: false |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Create and start a workspace in one step
+
+Usage: rigbox workspace spawn [OPTIONS] --name <NAME>
+
+Options:
+  -n, --name <NAME>
+          Workspace name
+
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -t, --template <TEMPLATE>
+          Template id (e.g. base, dev, ai-agent-starter)
+
+  -r, --ram <RAM>
+          RAM in MB (raised to template+catalog floor if lower)
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+      --vcpu <VCPU>
+          vCPU count (minimum: 1)
+
+  -d, --disk <DISK>
+          Disk size in MB (raised to template+catalog floor if lower)
+
+  -c, --catalog <CATALOG>
+          Catalog recipe id to install at first boot (repeatable)
+
+      --env <ENV>
+          Workspace-level environment variable in `KEY=VALUE` form (repeatable)
+
+      --setup-script-id <SETUP_SCRIPT_IDS>
+          Setup-script id to attach at first boot (repeatable; from `rig setup-script ls`)
+
+      --service-spec-id <SERVICE_SPEC_IDS>
+          Service-spec id to attach at first boot (repeatable; from `rig service-spec ls`)
+
+      --app-param <APP_PARAMS>
+          Catalog-app parameter in `catalog_id:key=value` form (repeatable)
+
+      --wait-for-apps
+          Wait until every catalog app is active (default: on when --catalog is set)
+
+  -a, --auto-size
+          Auto-size RAM and disk from catalog minimums (default: on when --ram/--disk unset)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

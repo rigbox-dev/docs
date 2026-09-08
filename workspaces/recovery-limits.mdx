@@ -1,0 +1,24 @@
+---
+title: "Recovery boundaries"
+description: "Choose app rollback, an image release, a root-disk snapshot, or a data backup."
+---
+
+| Recovery method | Restores | Does not restore |
+| --- | --- | --- |
+| App-release rollback | Retained application source and configuration | Mutable data, whole workspace filesystem |
+| Image-release activation | Recorded image and supported run configuration | A historical copy of attached volume data |
+| Workspace snapshot | Saved root filesystem of the same workspace | Attached volumes, running processes, memory |
+| Application backup | Data captured by your database or file backup process | Code and platform configuration unless explicitly included |
+
+## Plan a recoverable change
+
+Before a schema migration, take an application-consistent data backup and record the app release ID. Test the restore procedure in an isolated environment. Rolling back code is insufficient if the database schema has become incompatible.
+
+A root-disk checkpoint is useful before changing system packages. Snapshot creation requires a stopped workspace and replaces its previous snapshot. Do not use snapshots as a multi-version backup archive.
+
+## Continue
+
+- [App-release rollback](/deploy/app-rollback)
+- [Workspace image releases](/guides/releases-and-rollback)
+- [Restore a snapshot](/workspaces/snapshot-restore)
+- [Persistent notes example](/examples/persistent-notes)

@@ -3,11 +3,11 @@ title: Persistent Volumes
 description: Durable ext4 storage that survives redeploys and stop→start — the right home for SQLite databases, uploads, and logs.
 ---
 
-A persistent volume is an ext4 drive attached to a workspace as a **second disk**, separate from the workspace's root filesystem. Because it lives outside the directory that `rig deploy` rsyncs, anything you write there survives redeploys, restarts, and stop→start cycles.
+A persistent volume is an ext4 drive attached to a workspace as a **second disk**, separate from the workspace's root filesystem. It keeps application data separate from managed app releases and workspace image replacement.
 
 ## Why you need one
 
-`rig deploy` **wipes and re-rsyncs the synced app directory on every deploy**. That makes deploys clean and reproducible, but it means you must never store durable data inside the app dir — a redeploy would erase it.
+In v0.13, incremental deployment prepares application code in managed release directories. Those directories are not durable writable storage. Put databases, uploads, and other mutable files on a data volume instead of beside source code.
 
 Durable state belongs on a persistent volume. The usual convention is a volume named `data` mounted at `/home/developer/data`, exposed to the app as `DATA_DIR`:
 
@@ -19,7 +19,7 @@ env:
 Store SQLite databases, uploaded files, and logs under `$DATA_DIR` and they stay put across deploys.
 
 <Note>
-A persistent volume survives **redeploys** (the rsync wipe), **app restarts**, and **stop→start** of the workspace. It is destroyed only when you delete the volume or the workspace itself.
+A persistent volume survives **app redeploys**, **app restarts**, and **stop→start** of the workspace. It is destroyed only when you delete the volume or the workspace itself.
 </Note>
 
 ## Declare a volume in rig.yaml
@@ -82,9 +82,10 @@ volumes:
 
 ## Manage volumes with the CLI
 
-You can also create and manage volumes imperatively, independent of a deploy:
+You can also manage volumes independently of a deploy. Run locally, stop the workspace before create/resize/remove, then start it to attach the updated drive set:
 
 ```bash
+rig workspace stop --workspace <WORKSPACE_NAME>
 # create a volume (size in MiB, mounted at an absolute path)
 rig volume create --workspace <WORKSPACE_NAME> --name data --size-mb 1024 --mount-path /home/developer/data
 rig volume ls --workspace <WORKSPACE_NAME>                       # list volumes for a workspace
@@ -128,14 +129,16 @@ os.makedirs(DATA_DIR, exist_ok=True)        # the dir may not exist on a fresh w
 db = sqlite3.connect(os.path.join(DATA_DIR, "notes.db"))
 ```
 
-Because `notes.db` lives on the volume, not in the synced app directory, a `rig deploy` rsyncs your new code over the app dir while the database file is left untouched.
+Because `notes.db` lives on the volume, not in the synced app directory, an app release updates code while the database file remains on its separate disk.
 
 <Tip>
-To verify persistence, deploy the app, create some data, run `rig deploy` again, and confirm the data is still there. The rsync wipe replaces your code; `$DATA_DIR` survives.
+To verify persistence, deploy the app, create some data, run `rig deploy` again, and confirm the data is still there. Verify the mount and data path; an environment variable alone does not create durable storage.
 </Tip>
 
 ## Next steps
 
-- [Deploying with rig deploy](/guides/deploying) — the full deploy workflow and the rsync model.
+- [Deploying with rig deploy](/guides/deploying) — the v0.13 deployment workflow.
 - [Releases & Rollback](/guides/releases-and-rollback) — roll the environment back without touching volume data.
-- [Snapshots](/guides/snapshots) — capture the *entire* disk (including the volume) for checkpoint and recovery.
+- [Snapshots](/guides/snapshots) — checkpoint the root disk only; attached volumes need separate backups.
+
+For complete resize/removal steps, see [volume management](/workspaces/volume-management).

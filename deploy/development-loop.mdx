@@ -1,0 +1,33 @@
+---
+title: "Development loop"
+description: "Redeploy local changes while preserving the workspace environment."
+---
+
+## Start from a successful deployment
+
+Run locally from the same directory and retain `.rig.lock`. Keep application data outside managed release directories. Incremental deployment does not re-image the workspace or rewrite your separate development checkout.
+
+## Redeploy a change
+
+```bash
+rig deploy --workspace my-project --strategy incremental
+```
+
+The CLI submits a release, waits for preparation, activates it, and waits for verification. Preparation runs install/build commands in managed release directories. Activation changes the service to the prepared release and can briefly restart it.
+
+For one app with local source, watch files:
+
+```bash
+rig deploy --workspace my-project --watch
+```
+
+Watch mode requires one local-source app; it is not supported for Git-source releases. Stop watching with Ctrl+C when finished.
+
+## Check and recover
+
+```bash
+rig app-release ls --workspace my-project
+rig app-release logs --workspace my-project --release <RELEASE_ID>
+```
+
+If preparation fails, fix the install/build error and redeploy. If activation fails, inspect the terminal release state and current app health before retrying. Use [app rollback](/deploy/app-rollback) to select a retained known-good release. Dependency declarations can enable [cache reuse](/deploy/build-cache); a lockfile alone does not make installed outputs reusable.

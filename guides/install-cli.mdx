@@ -1,0 +1,92 @@
+---
+title: Install the CLI
+description: Install Rigbox on your machine, sign in, and verify your connection.
+---
+
+Use the `rig` CLI to deploy projects and manage workspaces from your terminal. The installer also provides `rigbox` as an alias for the same binary.
+
+## Prerequisites
+
+- A [Rigbox account](https://rigbox.dev/signup).
+- macOS on Apple Silicon or Intel, or Linux on x86-64.
+- A terminal with Bash and curl.
+
+The CLI is already installed inside Rigbox workspaces. For that environment, see [Using the CLI](/guides/using-cli#inside-a-workspace).
+
+<Note>The default installer follows the stable release. Incremental app-release commands require v0.13, currently available as a [release candidate](https://github.com/rigbox-dev/cli/releases/tag/v0.13.0-rc.2). Follow the release’s installation instructions and verify `rig --version` before using those commands.</Note>
+
+## 1. Install
+
+Run this on your local machine:
+
+```bash
+curl -fsSL https://rigbox.dev/install.sh | bash
+```
+
+The installer places `rig` and `rigbox` in `~/.local/bin`. Confirm the installation:
+
+```bash
+rig --version
+```
+
+If your shell reports `command not found`, add the installation directory to your path:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Add that line to your shell configuration file to keep it for new terminals, then open a new terminal and run `rig --version` again.
+
+## 2. Sign in
+
+```bash
+rig login
+```
+
+Approve the CLI session in the browser window that opens. Return to your terminal and confirm which account is connected:
+
+```bash
+rig whoami
+```
+
+The CLI saves its credential in `~/.config/rigbox/config.json`, or `$XDG_CONFIG_HOME/rigbox/config.json` when that variable is set. See [Authentication](/cli-reference/authentication) for headless login and API keys.
+
+## 3. Choose your next step
+
+<CardGroup cols={2}>
+  <Card title="Create your first workspace" href="/quickstart">Create a Linux workspace and install an app.</Card>
+  <Card title="Deploy your own project" href="/guides/deploying">Configure rig.yaml and deploy from your machine.</Card>
+</CardGroup>
+
+## Update the CLI
+
+```bash
+rig update
+rig --version
+```
+
+You can also rerun the installer. To install a specific published release, set `RIG_VERSION` on the Bash process that executes the installer:
+
+```bash
+curl -fsSL https://rigbox.dev/install.sh | RIG_VERSION=v0.12.68 bash
+```
+
+Set `RIG_INSTALL_DIR` on the same process to choose another writable installation directory.
+
+## Build the CLI from source
+
+Building the CLI itself is different from building an app for deployment. The CLI source repository is private; these instructions require repository access and a Rust toolchain:
+
+```bash
+cargo install --git https://github.com/rigbox-dev/cli --bin rig --bin rigbox
+```
+
+For normal use, install the published binary above. A Linux ARM binary is not currently published by the installer.
+
+## Remove the CLI
+
+```bash
+rig uninstall
+```
+
+Add `--purge-config` only if you also want to remove saved credentials and configuration. This does not delete your hosted workspaces.

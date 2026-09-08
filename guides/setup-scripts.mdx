@@ -5,9 +5,13 @@ description: Automate workspace initialization with reusable bash scripts.
 
 Setup scripts are bash scripts that run automatically when a workspace starts. They let you define reproducible environments - install packages, clone repos, seed databases, configure tools - so every workspace boots into a ready-to-use state.
 
+## Before you begin
+
+Use the [v0.13 CLI](/guides/install-cli) and [authenticate](/cli-reference/authentication). Run workspace-management and recipe commands from your local terminal. Commands identified as running inside a workspace require its console terminal or SSH session. Replace example resource IDs with the values returned for your account.
+
 ## How Setup Scripts Work
 
-When a workspace starts, Rigbox executes all attached setup scripts inside the VM as the `developer` user. Scripts run sequentially in the order you specify, with full network access and sudo privileges.
+When a workspace starts, Rigbox executes all attached setup scripts inside the VM as the `developer` user. Scripts run sequentially in the order you specify, with the workspace’s network access and sudo privileges.
 
 Each script has a **run mode** that controls when it executes:
 
@@ -22,7 +26,7 @@ Use `first_boot` for one-time setup like installing packages or cloning repos. U
 
 ## Create a Setup Script
 
-Write the script to a local file, then create it with the CLI. Once created, you can attach it to any number of workspaces.
+Write the script to a local file, then create it with the CLI. The CLI create command uses the API’s default `first_boot` run mode; use the [Setup Scripts API](/api-reference/setup-scripts/create) when you need to explicitly choose `every_start`. Once created, attach its returned ID to the intended workspaces.
 
 ```bash
 cat > python-data-stack.sh <<'EOF'
@@ -153,7 +157,7 @@ rig setup-script rm --id ss_abc123
 ```
 
 <Warning>
-Deleting a script that is still attached to workspaces will cause those workspaces to skip that script on future starts. The workspace itself is not affected.
+Check which workspaces reference a script before deleting it. Removing the stored definition does not undo changes made by an earlier run.
 </Warning>
 
 ## Combining with Templates
@@ -235,15 +239,21 @@ Combine this with a [service spec](/guides/service-specs) that auto-starts the a
 
 If a setup script fails, the workspace will still start, but the script's exit code and output are captured.
 
-To check script execution results, look at the workspace status after it starts:
+Read workspace logs after startup; there is no `setup_status` field to query on the workspace response:
 
 ```bash
-rig api GET /v1/workspaces/{workspace_id} --query setup_status
+rig workspace logs --workspace WORKSPACE_ID
 ```
 
 <Tip>
 Add `echo` statements throughout your scripts for visibility. The output is captured and available in the workspace details, making it easier to pinpoint where a script failed.
 </Tip>
+
+## Verify and troubleshoot
+
+Use the returned definition ID when attaching it to a workspace. After startup, inspect `rig workspace logs --workspace WORKSPACE_ID`; for service specs, check the installed unit with the commands above. A running VM does not prove a setup script or application completed successfully.
+
+For failures, start with [runtime logs](/operate/app-logs), [health checks](/operate/health), or [resource exhaustion](/operate/resources).
 
 ## Next Steps
 

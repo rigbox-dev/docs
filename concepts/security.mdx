@@ -1,117 +1,61 @@
 ---
-title: Security & Isolation
-description: How Rigbox isolates workspaces, protects credentials, and controls access.
+title: "Security boundaries"
+description: "Understand workspace isolation, credentials, and application access."
 ---
 
-Rigbox is designed to run untrusted code safely. Every workspace is an isolated micro-VM with no access to platform secrets, other users' data, or the control plane.
+Rigbox runs workspaces in separate Firecracker micro-VMs. Isolation boundaries and application credentials are different concerns: an app can read the credentials you deliberately provide to it.
 
 ## VM-level isolation
 
-Each workspace runs in a micro-VM - not a container. This means:
+Each workspace has its own guest kernel and root filesystem. Workspace apps share that VM; app releases do not create a separate micro-VM for each app. Treat workspace administrators and code with guest root access as trusted with that workspace's contents.
 
-| Property | What it means |
-| --- | --- |
-| **Dedicated kernel** | Each VM boots its own Linux kernel. No kernel sharing between workspaces. |
-| **Separate filesystem** | Each VM has its own ext4 disk. No shared volumes or overlays. |
-| **Network isolation** | VMs sit on an internal network with no direct access to other VMs or the database. |
-| **Process isolation** | Processes in one VM cannot see or signal processes in another. |
-
-Even if code running inside a workspace achieves root access, it is confined to that VM's kernel and filesystem. It cannot reach other workspaces, the API gateway, or the database.
+The platform uses network and service authorization boundaries in addition to VM isolation. Do not interpret a VM boundary as a guarantee that all outbound network access is blocked or that malicious code cannot contact public APIs.
 
 ## Credential protection
 
 ### Platform secrets
 
-Database credentials, internal auth tokens, provider keys, and service keys are held outside workspace VMs. They never enter the VM.
+Control-plane credentials are not required in ordinary workspace code. VM-local Rigbox services use the workspace's bridge-network identity, scoped to its compute node, rather than a personal account key copied into the guest.
 
-Each VM receives immutable workspace metadata at `/etc/rigbox/workspace.json`, but that file is not an authentication secret. VM-local Rigbox services authenticate the workspace by the source IP of the VM on the compute node's bridge network, scoped by the compute node ID. In other words, identity is resolved as `(node, VM source IP)`, not by a token that code inside the VM can swap out.
-
-<Note>
-  The baked-in `rig` CLI inside a workspace uses this ambient VM identity. It does not require `rig login`, and it does not read your personal `~/.rigbox/config.json` for normal workspace-scoped commands.
-</Note>
+The CLI inside a workspace uses this ambient identity for supported workspace-scoped commands. Use the [execution-mode reference](/cli-reference/execution-modes) for its actual command surface.
 
 ### AI provider keys
 
-In [managed mode](/guides/managed-proxy), AI provider API keys (Anthropic, OpenAI, Google) are held by the AI proxy service. The proxy injects keys at request time - they never enter the VM. Your code calls the standard SDK endpoint, and the proxy transparently adds authentication.
+[Managed AI](/guides/managed-proxy) routes requests through the platform proxy without requiring your provider key in application code. [BYOK](/guides/byok) means supplying credentials for your own provider. If a credential is injected into the guest or application's environment, code there can read it. Do not claim that environment injection makes a secret inaccessible or guarantees it never reaches disk.
 
-In [BYOK mode](/guides/byok), you provide your own keys via the AI config API. Keys are stored encrypted and injected into the VM's environment at boot - they are not persisted to disk inside the VM.
+Application `secrets:` are deployment inputs, not a promise of an encrypted application secret store. Treat environment output, app metadata, logs, and process access as potential disclosure paths.
 
 ### API keys
 
-User API keys use the `rb_` prefix and grant full account access. Best practices:
+Personal `rb_` API keys grant account access. Keep them on a trusted local machine or backend, rotate them when exposed, and never distribute your own key to end-user browser code or an untrusted workspace.
 
-- Store keys in environment variables or a secrets manager
-- Never commit keys to version control
-- Use the [API](/api-reference/api-keys/create) to rotate keys regularly
-- Use scoped workspace access when possible
+GitHub deployment credentials are a distinct short-lived credential flow bound to a repository/workspace. They are not interchangeable with personal account keys.
 
 ## App access control
 
-Every app exposed from a workspace has a [visibility setting](/guides/visibility):
+Private, public, and email-restricted app visibility governs access through the app route. It does not isolate apps sharing a workspace or secure a database against other code with local access. Apply application authentication when your own product needs it.
 
-| Mode | Who can access | Use for |
-| --- | --- | --- |
-| **Private** (default) | Only the workspace owner | Development, testing |
-| **Public** | Anyone with the URL | Demos, public APIs, static sites |
-| **Privileged** | Owner + specific email addresses | Team collaboration, internal tools |
-
-Access is enforced at the reverse proxy layer - unauthorized requests are blocked before reaching your workspace.
+For programmatic access to a private route, use an authorized key as described in [authentication](/cli-reference/authentication). A valid key alone does not grant access to every owner's app.
 
 ## SSH authentication
 
-SSH access uses public key authentication exclusively. No password authentication is supported.
-
-- Register keys via the [API](/api-reference/ssh-keys/add) or [CLI](/cli-reference/cli) (`rig ssh add`)
-- Keys are synced to workspace VMs on start and on-demand via the [sync endpoint](/api-reference/ssh-keys/sync-workspace)
-- The SSH gateway authenticates your key and routes to your workspace
+Register public keys and connect to the target returned by `rig workspace ssh-info`. The workspace SSH path and the separate SSH TUI gateway are different. Do not infer the host, username, or port from an old infrastructure diagram.
 
 ## Network model
 
-```mermaid
-flowchart TB
-    INTERNET[Internet] --> GW[API Gateway]
-    INTERNET --> RP[Reverse Proxy]
-    INTERNET --> SSH[SSH Gateway]
-    
-    GW --> VM1[Workspace VM 1]
-    GW --> VM2[Workspace VM 2]
-    RP --> VM1
-    RP --> VM2
-    SSH --> VM1
-    SSH --> VM2
-    
-    VM1 --> PROXY[AI Proxy]
-    VM2 --> PROXY
-    PROXY --> AI[AI Providers]
-```
-
-- Workspace VMs are on an internal network - not directly accessible from the internet
-- All inbound traffic flows through the API gateway, reverse proxy, or SSH gateway
-- VM-local Rigbox services are exposed only on the compute bridge (`172.16.0.1:9090`) and resolve callers from node-scoped VM IP leases
-- Outbound AI requests can flow through the managed proxy (when enabled)
-- VMs can make outbound HTTP requests to the public internet for package installation, git clones, etc.
+Workspace apps can make outbound connections for dependencies and supported services. The managed proxy is a bridge-local service with its own identity checks. Public API calls and private app requests have separate authentication rules.
 
 ## Rate limiting
 
-API requests are rate-limited per user to prevent abuse. Limits vary by endpoint class:
+Handle rate-limit responses using the endpoint's returned guidance and bounded backoff. Use [effective resource limits](/concepts/limits) rather than assuming a fixed numeric table applies to every account and endpoint.
 
-| Endpoint class | Default limit |
-| --- | --- |
-| Authentication | 120 requests/min |
-| Workspaces | 180 requests/min |
-| Apps | 240 requests/min |
+## App release integrity
 
-If you exceed the limit, the API returns `429 Too Many Requests`. Retry with exponential backoff.
-
-See [Resource Limits](/concepts/limits) for plan-level quotas.
+Managed source and dependency caches are protected from ordinary app writes and checked during reuse and activation. This is not protection against a workspace administrator with root access. Rollback restores retained app code/configuration, not application data or a compromised whole workspace.
 
 ## Learn more
 
-<CardGroup cols={2}>
-  <Card title="Architecture" icon="sitemap" href="/concepts/architecture">
-    How the two-zone model works
-  </Card>
-  <Card title="App Visibility" icon="eye" href="/guides/visibility">
-    Control who can access your apps
-  </Card>
-</CardGroup>
+- [Architecture](/concepts/architecture)
+- [Authentication](/cli-reference/authentication)
+- [Recovery boundaries](/workspaces/recovery-limits)
+- [App visibility](/guides/visibility)

@@ -1,0 +1,25 @@
+---
+title: "Restore a workspace snapshot"
+description: "Restore the root filesystem of a stopped workspace."
+---
+
+## Before restoring
+
+A snapshot belongs to a workspace and captures its root disk. It does not rewind persistent volumes, application data stored on those volumes, or running processes. Keep application-level backups for databases.
+
+Restoring replaces the current root disk. Do not create a replacement snapshot just to preserve the current state unless you intend to replace the existing checkpoint: this implementation retains one snapshot per workspace.
+
+## Restore and verify
+
+Run locally using IDs from the list command:
+
+```bash
+rig snapshot ls --workspace WORKSPACE
+rig workspace stop --workspace WORKSPACE
+rig snapshot restore --workspace WORKSPACE --snapshot SNAPSHOT_ID
+rig workspace start --workspace WORKSPACE
+```
+
+Check workspace status, app health, and mounted data. Older application code may not understand a database schema that changed after the snapshot; restore compatible application data separately when needed.
+
+If the restore fails, preserve the error and inspect [storage troubleshooting](/operate/storage). Do not remove the workspace or its volumes to retry.

@@ -1,0 +1,271 @@
+[
+  {
+    "group": "ai",
+    "root": "cli-reference/commands/ai",
+    "pages": [
+      "cli-reference/commands/ai/defaults",
+      "cli-reference/commands/ai/usage"
+    ]
+  },
+  "cli-reference/commands/api",
+  {
+    "group": "api-key",
+    "root": "cli-reference/commands/api-key",
+    "pages": [
+      "cli-reference/commands/api-key/create",
+      "cli-reference/commands/api-key/ls",
+      "cli-reference/commands/api-key/rm"
+    ]
+  },
+  {
+    "group": "app",
+    "root": "cli-reference/commands/app",
+    "pages": [
+      {
+        "group": "domain",
+        "root": "cli-reference/commands/app/domain",
+        "pages": [
+          "cli-reference/commands/app/domain/set"
+        ]
+      },
+      {
+        "group": "env",
+        "root": "cli-reference/commands/app/env",
+        "pages": [
+          "cli-reference/commands/app/env/ls",
+          "cli-reference/commands/app/env/set",
+          "cli-reference/commands/app/env/unset"
+        ]
+      },
+      "cli-reference/commands/app/expose-port",
+      "cli-reference/commands/app/health",
+      {
+        "group": "log-source",
+        "root": "cli-reference/commands/app/log-source",
+        "pages": [
+          "cli-reference/commands/app/log-source/add",
+          "cli-reference/commands/app/log-source/ls",
+          "cli-reference/commands/app/log-source/rm",
+          "cli-reference/commands/app/log-source/update"
+        ]
+      },
+      "cli-reference/commands/app/logs",
+      "cli-reference/commands/app/ls",
+      "cli-reference/commands/app/new",
+      {
+        "group": "param",
+        "root": "cli-reference/commands/app/param",
+        "pages": [
+          "cli-reference/commands/app/param/get",
+          "cli-reference/commands/app/param/ls",
+          "cli-reference/commands/app/param/set",
+          "cli-reference/commands/app/param/unset"
+        ]
+      },
+      "cli-reference/commands/app/restart",
+      "cli-reference/commands/app/rm",
+      "cli-reference/commands/app/share",
+      "cli-reference/commands/app/start",
+      "cli-reference/commands/app/stop",
+      "cli-reference/commands/app/verify-domain"
+    ]
+  },
+  {
+    "group": "app-release",
+    "root": "cli-reference/commands/app-release",
+    "pages": [
+      "cli-reference/commands/app-release/activate",
+      "cli-reference/commands/app-release/logs",
+      "cli-reference/commands/app-release/ls",
+      "cli-reference/commands/app-release/rollback"
+    ]
+  },
+  {
+    "group": "build",
+    "root": "cli-reference/commands/build",
+    "pages": [
+      "cli-reference/commands/build/image",
+      "cli-reference/commands/build/logs",
+      "cli-reference/commands/build/ls"
+    ]
+  },
+  "cli-reference/commands/capacity",
+  {
+    "group": "ci",
+    "root": "cli-reference/commands/ci",
+    "pages": [
+      "cli-reference/commands/ci/link",
+      "cli-reference/commands/ci/status",
+      "cli-reference/commands/ci/unlink"
+    ]
+  },
+  "cli-reference/commands/completions",
+  {
+    "group": "config",
+    "root": "cli-reference/commands/config",
+    "pages": [
+      "cli-reference/commands/config/get",
+      "cli-reference/commands/config/list",
+      "cli-reference/commands/config/set",
+      "cli-reference/commands/config/unset"
+    ]
+  },
+  "cli-reference/commands/deploy",
+  "cli-reference/commands/init",
+  "cli-reference/commands/limits",
+  "cli-reference/commands/login",
+  "cli-reference/commands/logout",
+  {
+    "group": "proxy",
+    "root": "cli-reference/commands/proxy",
+    "pages": [
+      "cli-reference/commands/proxy/dotenv",
+      "cli-reference/commands/proxy/env",
+      "cli-reference/commands/proxy/off",
+      "cli-reference/commands/proxy/on",
+      "cli-reference/commands/proxy/path",
+      "cli-reference/commands/proxy/status"
+    ]
+  },
+  "cli-reference/commands/publish",
+  {
+    "group": "recipe",
+    "root": "cli-reference/commands/recipe",
+    "pages": [
+      {
+        "group": "app",
+        "root": "cli-reference/commands/recipe/app",
+        "pages": [
+          "cli-reference/commands/recipe/app/delete",
+          "cli-reference/commands/recipe/app/deprecate",
+          "cli-reference/commands/recipe/app/health",
+          "cli-reference/commands/recipe/app/info",
+          "cli-reference/commands/recipe/app/init",
+          "cli-reference/commands/recipe/app/install",
+          "cli-reference/commands/recipe/app/install-record",
+          "cli-reference/commands/recipe/app/lint",
+          "cli-reference/commands/recipe/app/ls",
+          "cli-reference/commands/recipe/app/profile",
+          "cli-reference/commands/recipe/app/test",
+          "cli-reference/commands/recipe/app/versions",
+          "cli-reference/commands/recipe/app/yank"
+        ]
+      }
+    ]
+  },
+  {
+    "group": "release",
+    "root": "cli-reference/commands/release",
+    "pages": [
+      "cli-reference/commands/release/activate",
+      "cli-reference/commands/release/create",
+      "cli-reference/commands/release/ls"
+    ]
+  },
+  "cli-reference/commands/rollback",
+  {
+    "group": "service-spec",
+    "root": "cli-reference/commands/service-spec",
+    "pages": [
+      "cli-reference/commands/service-spec/create",
+      "cli-reference/commands/service-spec/ls",
+      "cli-reference/commands/service-spec/rm",
+      "cli-reference/commands/service-spec/update"
+    ]
+  },
+  {
+    "group": "setup-script",
+    "root": "cli-reference/commands/setup-script",
+    "pages": [
+      "cli-reference/commands/setup-script/create",
+      "cli-reference/commands/setup-script/ls",
+      "cli-reference/commands/setup-script/rm",
+      "cli-reference/commands/setup-script/update"
+    ]
+  },
+  {
+    "group": "snapshot",
+    "root": "cli-reference/commands/snapshot",
+    "pages": [
+      "cli-reference/commands/snapshot/create",
+      "cli-reference/commands/snapshot/ls",
+      "cli-reference/commands/snapshot/restore",
+      "cli-reference/commands/snapshot/rm"
+    ]
+  },
+  {
+    "group": "ssh",
+    "root": "cli-reference/commands/ssh",
+    "pages": [
+      "cli-reference/commands/ssh/add",
+      "cli-reference/commands/ssh/ls",
+      "cli-reference/commands/ssh/rm",
+      "cli-reference/commands/ssh/sync"
+    ]
+  },
+  "cli-reference/commands/status",
+  {
+    "group": "tools",
+    "root": "cli-reference/commands/tools",
+    "pages": [
+      "cli-reference/commands/tools/install",
+      "cli-reference/commands/tools/install-status",
+      "cli-reference/commands/tools/launch",
+      "cli-reference/commands/tools/ls",
+      "cli-reference/commands/tools/stop"
+    ]
+  },
+  "cli-reference/commands/uninstall",
+  "cli-reference/commands/update",
+  {
+    "group": "volume",
+    "root": "cli-reference/commands/volume",
+    "pages": [
+      "cli-reference/commands/volume/create",
+      "cli-reference/commands/volume/ls",
+      "cli-reference/commands/volume/resize",
+      "cli-reference/commands/volume/rm"
+    ]
+  },
+  "cli-reference/commands/whoami",
+  {
+    "group": "workspace",
+    "root": "cli-reference/commands/workspace",
+    "pages": [
+      {
+        "group": "ai",
+        "root": "cli-reference/commands/workspace/ai",
+        "pages": [
+          "cli-reference/commands/workspace/ai/mode",
+          "cli-reference/commands/workspace/ai/show"
+        ]
+      },
+      "cli-reference/commands/workspace/cancel",
+      {
+        "group": "env",
+        "root": "cli-reference/commands/workspace/env",
+        "pages": [
+          "cli-reference/commands/workspace/env/get",
+          "cli-reference/commands/workspace/env/ls",
+          "cli-reference/commands/workspace/env/set",
+          "cli-reference/commands/workspace/env/unset"
+        ]
+      },
+      "cli-reference/commands/workspace/logs",
+      "cli-reference/commands/workspace/ls",
+      "cli-reference/commands/workspace/metrics",
+      "cli-reference/commands/workspace/new",
+      "cli-reference/commands/workspace/ports",
+      "cli-reference/commands/workspace/reconcile",
+      "cli-reference/commands/workspace/resize",
+      "cli-reference/commands/workspace/restart",
+      "cli-reference/commands/workspace/retry",
+      "cli-reference/commands/workspace/rm",
+      "cli-reference/commands/workspace/services",
+      "cli-reference/commands/workspace/spawn",
+      "cli-reference/commands/workspace/ssh-info",
+      "cli-reference/commands/workspace/start",
+      "cli-reference/commands/workspace/stop"
+    ]
+  }
+]

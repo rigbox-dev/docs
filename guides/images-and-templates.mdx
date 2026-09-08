@@ -5,6 +5,10 @@ description: Choose the right base image and template for your workspace.
 
 Every workspace runs on a **base image** - a pre-built Debian 12 root filesystem with tools and runtimes already installed. **Templates** combine an image with default resource settings (RAM, vCPU, disk) so you can deploy in one call.
 
+## Before you begin
+
+Use the [v0.13 CLI](/guides/install-cli) and [authenticate](/cli-reference/authentication). Run workspace-management and recipe commands from your local terminal. Commands identified as running inside a workspace require its console terminal or SSH session. Replace example resource IDs with the values returned for your account.
+
 ## Images
 
 Images determine what software is available inside your workspace out of the box. All images include SSH access, systemd, and the Rigbox CLI.
@@ -25,26 +29,26 @@ Both images are built on Debian 12 (Bookworm) and include Python 3.12 and Node.j
 - Node.js 22 with npm
 - git, vim, tmux, curl, wget, jq
 - GitHub CLI (`gh`)
-- Pre-warmed npm caches for popular tools (Jupyter, Marimo, Streamlit, Excalidraw)
+- Package caches where included in the selected image revision
 
 **dev** adds build tooling on top of base:
-- Docker CLI (for building images - Docker daemon runs on the host)
+- Docker tooling where provided by the selected image; use the supported build workflow instead of assuming access to a shared host daemon
 - cmake, make, gcc, g++
 - strace, gdb, ltrace for debugging
 - PostgreSQL client (`psql`)
 
 ### Listing Available Images
 
-Images are not exposed as a standalone resource. The set of images you can boot is implied by the templates the server publishes — every template's `image` field names the base image it uses. To see which images are currently available, list templates and read the `image` column:
+List the server’s available templates and their readiness before selecting a starting environment. The legacy `template` commands remain callable in v0.13 but are hidden from general help:
 
 ```bash
 rig template ls
 ```
 
-To extract just the unique image names, filter the structured output with `--query`:
+To extract template identifiers, filter the structured output with `--query`. The CLI summary does not expose an `image` field:
 
 ```bash
-rig template ls --output json --query "templates[].image"
+rig template ls --output json --query "templates[].id"
 ```
 
 See [List Templates](/api-reference/templates/list) for the full response schema.
@@ -81,11 +85,11 @@ If you're compiling C/C++ code, building Docker images, or need debugging tools 
 
 ### For everything else, use base
 
-The **base** image covers Python, Node.js, and general development. It's the smallest and fastest to boot.
+The **base** image is the starting point for Python, Node.js, and general development.
 
 
 <Tip>
-You can always install additional packages inside any workspace with `apt-get`. The image choice just determines what's pre-installed for faster startup.
+You can install additional packages with `apt-get` when the image provides it and your workspace has network access, permissions, and sufficient disk space. The image choice just determines what's pre-installed for faster startup.
 </Tip>
 
 ## Quick Deploy with a Template
@@ -128,16 +132,22 @@ See [Update Workspace Resources](/api-reference/workspaces/update-resources) for
 
 ## Pre-warmed Caches
 
-The **base** image includes pre-warmed npm caches for several popular tools. This means installing catalog apps like Jupyter, Marimo, Streamlit, and Excalidraw is significantly faster because dependencies are already downloaded.
+Some image revisions include package caches. Cache presence, network access, and selected dependency versions affect installation time; do not depend on a fixed install duration.
 
 | Tool | Cache benefit |
 |------|---------------|
-| Jupyter Lab | npm packages cached, installs in ~30 seconds |
-| Marimo | npm packages cached, installs in ~20 seconds |
-| Streamlit | pip packages cached via uv |
-| Excalidraw | npm packages cached, installs in ~15 seconds |
+| Jupyter Lab | Python dependencies may reuse available package caches |
+| Marimo | Python dependencies may reuse available package caches |
+| Streamlit | Python dependencies may reuse available package caches |
+| Excalidraw | JavaScript dependencies may reuse available package caches |
 
 See [Catalog Apps](/guides/catalog) for how to install these tools.
+
+## Verify and troubleshoot
+
+Inspect `rig workspace ls` and `rig workspace services --workspace WORKSPACE_ID`. For installed apps, check their status and health before opening the returned URL. A created resource or running VM does not by itself prove the application is ready.
+
+For failures, start with [runtime logs](/operate/app-logs), [health checks](/operate/health), or [resource exhaustion](/operate/resources).
 
 ## Next Steps
 

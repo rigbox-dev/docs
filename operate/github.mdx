@@ -1,0 +1,22 @@
+---
+title: "Troubleshoot GitHub deployments"
+description: "Separate console integration failures from GitHub Actions failures."
+---
+
+## Identify the path
+
+The console GitHub integration reacts to repository events using a reviewed project configuration. The deploy Action runs in your workflow and exchanges GitHub OIDC for deployment credentials. They have different logs and setup requirements.
+
+## Console integration
+
+Check repository installation access, branch selection, manifest path, target workspace, and deployment strategy in the console. Verify that the commit belongs to the configured repository and that private source access is still available. A strategy change may require explicit review; image deployment requires root-disk replacement consent.
+
+## GitHub Actions
+
+Check the workflow's `contents: read` and `id-token: write` permissions, the Rigbox repository binding, and the Action's working directory. The initial repository claim has a limited window; inspect the binding before retrying. Never solve an OIDC failure by copying personal credentials into the manifest.
+
+Read the failed step and its structured outputs. A partial deployment can return app results while the workflow still fails. Do not interpret a nonempty URL as proof that every app succeeded.
+
+## Verify recovery
+
+Push or rerun the intended commit, confirm the reported workspace ID and source revision, and inspect application health. Follow [console deployment](/guides/github) or [GitHub Actions](/guides/github-actions) for the corresponding setup.

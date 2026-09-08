@@ -1,0 +1,34 @@
+---
+title: "Troubleshoot deployments"
+description: "Resolve target, manifest, and release errors without discarding workspace data."
+---
+
+## Locate the failure
+
+Run locally:
+
+```bash
+rig --version
+rig workspace ls
+rig app-release ls --workspace WORKSPACE
+```
+
+Check whether the failure happened before submission, during preparation, or during activation. Read the original command's error and [release logs](/operate/build-logs).
+
+## Common causes
+
+| Error category | Recovery |
+| --- | --- |
+| Unknown field or removed build shape | Compare with the [v0.13 manifest reference](/reference/rig-yaml) |
+| Existing app or port owned by another deployment | Choose a new target or explicitly plan migration; do not overwrite unrelated apps |
+| App requires system packages | Provision the workspace image; incremental installers are unprivileged |
+| Invalid working directory | Use release-relative paths and move mutable data to a persistent volume |
+| Source exceeds upload limits | Remove generated output, caches, or large assets from deployment input |
+| Strategy not enabled | Verify account access and deployed server compatibility |
+| Re-image requested by an image deployment | Back up root-disk data and review the image strategy before opting in |
+
+## Retry safely
+
+Fix one identified cause, then repeat the same deployment against its intended target. Keep `.rig.lock` unless you deliberately intend to change the deployment identity. Check the latest release before attempting activation again.
+
+Use [deployment strategies](/deploy/overview) for an older project and [app rollback](/deploy/app-rollback) for retained code/configuration. Neither is a substitute for a data restore.

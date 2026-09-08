@@ -1,0 +1,61 @@
+---
+title: "Stage a blog with blue-green deployment"
+description: "A Sinatra blog demonstrates a separate staged application and explicit promotion using the image deployment workflow."
+---
+
+## Before you begin
+
+Install the [CLI](/guides/install-cli), authenticate with `rig login`, and use an isolated test workspace. These examples require the v0.13 CLI. The manifests have been checked with the v0.13 parser; verify application health after deployment.
+
+[Open the bluegreen-blog source](https://github.com/rigbox-dev/rigbox-examples/tree/2612ffc9138d3b2f8169b10e3a54abd5495db8b8/bluegreen-blog). These manifests explicitly select **image** deployment.
+
+## Deploy from your machine
+
+From a terminal on your machine, clone the repository and enter the example directory:
+
+```bash
+git clone --branch codex/examples-docs-v013 https://github.com/rigbox-dev/rigbox-examples.git
+cd rigbox-examples/bluegreen-blog
+rig --version
+```
+
+This example explicitly uses the image strategy. Incremental releases reject blue-green flags. Image replacement and workspace preview promotion have different storage consequences from a same-workspace sibling; use disposable test data first.
+
+```bash
+rig deploy --strategy image
+```
+
+Record the workspace and app IDs printed by deployment. Use those exact IDs wherever this guide shows `WORKSPACE_ID` or `APP_ID`; do not guess a public URL from an app name.
+
+## Verify the result
+
+```bash
+rig app health --app APP_ID
+rig app logs --app APP_ID
+```
+
+Create a post and check the theme on the production route. Stage a sibling, inspect its URL and health, then promote only after checking data and configuration.
+
+After the first successful deployment, stage locally:
+
+```bash
+rig deploy --strategy image --bluegreen v2
+```
+
+Inspect the staging app ID from the output and its health before promotion. Follow [Blue-green deployments](/guides/bluegreen) for promotion and recovery; do not treat a staging health check as a data-consistency check.
+
+## Access and recovery
+
+The blog is public. Set the optional `ADMIN_TOKEN` before exposing publishing; without it anyone who reaches the app can publish.
+
+If deployment fails, read the terminal error and installation output before retrying. `rig app logs --app APP_ID --install` shows install logs when an app exists. Check required credentials, resource limits, the start command, and the configured health path. An image deployment may require explicit root-filesystem replacement consent; do not add `--reimage` to a workspace containing data you need.
+
+## Clean up
+
+After saving any data you need, delete only the isolated example workspace. This deletes its applications and workspace data; inspect persistent volumes and snapshots separately before removing them.
+
+```bash
+rig workspace rm --workspace WORKSPACE_ID
+```
+
+Continue with [deployment guides](/guides/deploying) or [the manifest reference](/reference/rig-yaml).

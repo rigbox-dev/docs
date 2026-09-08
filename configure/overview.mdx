@@ -1,0 +1,19 @@
+---
+title: "Configure applications"
+description: "Declare runtime behavior once and verify it after deployment."
+---
+
+Use `rig.yaml` for repeatable configuration. A redeploy reapplies declared application settings; a temporary console or CLI edit can be overwritten by the manifest.
+
+| Configure | Use |
+| --- | --- |
+| Nonsecret runtime values | [Environment variables](/configure/environment) |
+| Supplied or generated credentials | [Secrets and credentials](/configure/secrets) |
+| Validated user choices | [Parameters](/configure/parameters) |
+| Installation and process startup | [Commands](/configure/commands) |
+| Readiness verification | [Health checks](/configure/health) |
+| Public/private routes | [App visibility](/guides/visibility) |
+| Listening ports and routing | [Expose ports](/guides/expose-and-route) |
+| Hostnames | [Custom domains](/guides/custom-domains) |
+
+Run deployment commands locally from the manifest directory. After changing settings, deploy and check both release status and application behavior. Use the [manifest reference](/reference/rig-yaml) for field shapes and strategy-specific limits.

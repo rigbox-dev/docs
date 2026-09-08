@@ -1,0 +1,32 @@
+{
+  "target": "v0.13",
+  "status": "publication-authorized",
+  "cli": {
+    "revision": "09bd4024dd729ef31ae62f0f6985849974a9651d",
+    "version": "0.13.0-rc.2",
+    "worktree": "/Users/jonathanjames/workspace/rigbox-cli-docs"
+  },
+  "server": {
+    "revision": "0f3a2634f9a713b24f0bc18fb0e361188f857759"
+  },
+  "examples": {
+    "revision": "7a53798b53de5729e68fd5831001b7956b32327f",
+    "worktree": "/tmp/rigbox-examples-docs-v013",
+    "published_revision": "2612ffc9138d3b2f8169b10e3a54abd5495db8b8"
+  },
+  "api": {
+    "url": "https://api.rigbox.dev/api-docs/openapi.json",
+    "sha256": "90b83ad92b94ad1dc3bb974ba6447165553c059c85d39e7d06a461020f7a7192",
+    "retrieved": "2026-09-08",
+    "selection": "app-release paths and transitive component references; original wire definitions retained"
+  },
+  "deploy_action": {
+    "revision": "50c638276a9fa71b9a3b6d70bfda4274dabb1ca2",
+    "worktree": "/tmp/rigbox-deploy-action-docs-v013"
+  },
+  "release_gate": "User authorized documentation publication on 2026-09-08. CLI release-candidate requirements remain explicit. Outstanding runtime verification is recorded in live-tests.md.",
+  "docs": {
+    "revision": "0f1983796b7fa5ff93485cb96419f28b32340a91",
+    "branch": "codex/docs-ui-refresh"
+  }
+}

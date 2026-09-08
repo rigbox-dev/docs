@@ -1,0 +1,34 @@
+---
+title: "Manage SSH keys"
+description: "Register, sync, and remove the public keys used to access workspaces."
+---
+
+## Prerequisites
+
+Run these commands on your local machine after `rig login`. Use a public key file ending in `.pub`; never upload its private-key counterpart.
+
+## Register and inspect keys
+
+```bash
+rig ssh add --name my-laptop --file ~/.ssh/id_ed25519.pub
+rig ssh ls
+```
+
+Key registration is account-level; existing workspaces may require a sync before the key is available.
+
+## Sync to a workspace
+
+```bash
+rig ssh sync --workspace WORKSPACE
+rig workspace ssh-info --workspace WORKSPACE
+```
+
+Use the connection details returned by the CLI. Verify the key by opening a new SSH session before removing an older working key.
+
+## Remove a key
+
+```bash
+rig ssh rm --help
+```
+
+Select the key ID from `rig ssh ls`. Keep an alternate authorized key until you have verified access. See [SSH troubleshooting](/operate/ssh) if authentication fails.

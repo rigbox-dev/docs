@@ -1,0 +1,34 @@
+---
+title: "Resize and remove volumes"
+description: "Change durable storage while the workspace is stopped."
+---
+
+## Prerequisites
+
+Run locally. Back up data you need and record the volume ID returned by the list command. Volume mutations require a stopped workspace.
+
+```bash
+rig volume ls --workspace WORKSPACE
+rig workspace stop --workspace WORKSPACE
+```
+
+## Grow a volume
+
+```bash
+rig volume resize --workspace WORKSPACE --volume VOLUME_ID --size-mb 5120
+rig workspace start --workspace WORKSPACE
+```
+
+The size is in MiB. Verify the mounted filesystem size from inside the workspace and confirm the application can still read its data. Do not assume shrinking is supported.
+
+## Remove a volume
+
+<Warning>Removing a volume destroys its data. A workspace root-disk snapshot is not a backup of that volume.</Warning>
+
+Stop the workspace, remove the volume from the app's manifest, and then remove the volume by ID:
+
+```bash
+rig volume rm --workspace WORKSPACE --volume VOLUME_ID
+```
+
+Update applications that used the mount before starting them. If the volume remains declared in `rig.yaml`, a later deployment can attempt to create or attach storage again. See [storage recovery](/operate/storage) for backup boundaries.

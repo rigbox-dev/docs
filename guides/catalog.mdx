@@ -3,7 +3,13 @@ title: Catalog Apps
 description: Install pre-packaged apps like VS Code, Jupyter, and Streamlit in one call.
 ---
 
-The Rigbox app catalog provides curated, pre-packaged applications that you can install into any workspace with a single CLI command. Each catalog app is configured with the correct port, subdomain, and systemd service — no manual setup required.
+The Rigbox app catalog provides curated, pre-packaged applications that you can install into a workspace with sufficient resources with a single CLI command. Service recipes declare their runtime, route, and health checks; CLI recipes install an executable. Review each recipe’s configuration and resource requirements before installation.
+
+## Before you begin
+
+Use the [v0.13 CLI](/guides/install-cli) and [authenticate](/cli-reference/authentication). Run workspace-management and recipe commands from your local terminal. Commands identified as running inside a workspace require its console terminal or SSH session. Replace example resource IDs with the values returned for your account.
+
+Start the target workspace and verify its identity with `rig workspace ls`.
 
 ## How It Works
 
@@ -14,7 +20,7 @@ When you install a catalog app:
 3. For **CLI-shape** apps: the binary is dropped into `$PATH` (and any routing/profile.d shims are written), then the install returns — no systemd unit, no port, no route, no probe
 4. The app row is registered either way, so the workspace UI shows the app as installed
 
-You manage installed Service-shape apps with the same endpoints you use for any other app — start, stop, restart, delete, and change visibility. CLI-shape apps don't expose those endpoints; you invoke them interactively over SSH.
+You manage installed Service-shape apps with the same endpoints you use for any other app — start, stop, restart, delete, and change visibility. CLI-shape apps have no service process to start or stop; invoke their executable interactively over SSH.
 
 ## App shapes
 
@@ -31,7 +37,7 @@ User-created apps (those you `POST` to [`/apps`](/api-reference/apps/create) dir
 
 ## Available Apps
 
-Catalog apps are official **app recipes**, addressed as `@rigbox/<id>@builtin`. The Service-shape and CLI-shape reference tables below list every available app and its catalog ID. Preview any one before installing:
+Catalog apps are official **app recipes**, addressed as `@rigbox/<id>@builtin`. The Service-shape and CLI-shape reference tables below show common apps and their catalog IDs. Preview any one before installing:
 
 ```bash
 rig recipe app info @rigbox/vscode@builtin
@@ -72,10 +78,10 @@ Install one of them the same way as a Service-shape app:
 rig recipe app install -r @rigbox/claude@builtin -w <WORKSPACE_NAME>
 ```
 
-Inside a workspace VM, drop the `--workspace` flag — `rig` infers it from the ambient identity. Then SSH in and run the agent — `rig ssh-info <workspace>` will print the right `ssh` command.
+Inside a workspace VM, drop the `--workspace` flag — `rig` infers it from the ambient identity. Then SSH in and run the agent — `rig workspace ssh-info --workspace <workspace>` will print the right `ssh` command.
 
 <Note>
-CLI-shape recipes don't appear in the [Start App](/api-reference/apps/start) / [Stop App](/api-reference/apps/stop) / visibility endpoints — there's no daemon to control. To uninstall, delete the app row; the catalog's cleanup paths (e.g. `/etc/profile.d/codex-routing.sh`) are removed automatically.
+CLI-shape recipes have no daemon or HTTP route to control with [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop), or visibility settings. To uninstall, delete the app row; the catalog's cleanup paths (e.g. `/etc/profile.d/codex-routing.sh`) are removed automatically.
 </Note>
 
 ## Installing a Catalog App
@@ -189,6 +195,12 @@ rig recipe app install -r @rigbox/jupyter@builtin -w my-project
 ```
 
 Each command blocks until the install completes and prints the app's URL. After both finish, the apps are accessible at `https://my-project-vscode.rigbox.dev` and `https://my-project-jupyter.rigbox.dev`.
+
+## Verify and troubleshoot
+
+Inspect `rig workspace ls` and `rig workspace services --workspace WORKSPACE_ID`. For installed apps, check their status and health before opening the returned URL. A created resource or running VM does not by itself prove the application is ready.
+
+For failures, start with [runtime logs](/operate/app-logs), [health checks](/operate/health), or [resource exhaustion](/operate/resources).
 
 ## Next Steps
 

@@ -1,0 +1,598 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Rigbox App Releases API",
+    "description": "Gateway-owned public API for Rigbox. The gateway composes its local lifecycle API with service-owned exported specs.",
+    "contact": {
+      "name": "Rigbox",
+      "url": "https://rigbox.dev"
+    },
+    "license": {
+      "name": ""
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.rigbox.dev",
+      "description": "Production gateway"
+    }
+  ],
+  "paths": {
+    "/api/v1/workspaces/{id}/app-releases": {
+      "get": {
+        "tags": [
+          "App releases"
+        ],
+        "operationId": "list",
+        "responses": {
+          "200": {
+            "description": "App release result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "App releases"
+        ],
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAppRelease"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "App release result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/app-releases/{release_id}": {
+      "get": {
+        "tags": [
+          "App releases"
+        ],
+        "operationId": "read",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "release_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "App release result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/app-releases/{release_id}/activate": {
+      "post": {
+        "tags": [
+          "App releases"
+        ],
+        "operationId": "activate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "release_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "App release result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workspaces/{id}/app-releases/{release_id}/logs": {
+      "get": {
+        "tags": [
+          "App releases"
+        ],
+        "operationId": "logs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "release_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "App release result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "AppRelease": {
+        "type": "object",
+        "required": [
+          "id",
+          "is_current",
+          "can_rollback",
+          "workspace_id",
+          "user_id",
+          "owner_key",
+          "idempotency_key",
+          "status",
+          "artifact_release_id",
+          "apps",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "apps": {},
+          "artifact_release_id": {
+            "type": "string"
+          },
+          "can_rollback": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "is_current": {
+            "type": "boolean"
+          },
+          "owner_key": {
+            "type": "string"
+          },
+          "previous_release_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_commit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "workspace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateAppRelease": {
+        "type": "object",
+        "required": [
+          "idempotency_key",
+          "apps"
+        ],
+        "properties": {
+          "apps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReleaseApp"
+            }
+          },
+          "deployment_scope": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "replace_app_set": {
+            "type": "boolean"
+          },
+          "source_commit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "GeneratedCredential": {
+        "type": "object",
+        "required": [
+          "key",
+          "env_var"
+        ],
+        "properties": {
+          "env_var": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ListResponse": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppRelease"
+            }
+          }
+        }
+      },
+      "LogsResponse": {
+        "type": "object",
+        "required": [
+          "lines"
+        ],
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ReleaseApp": {
+        "type": "object",
+        "required": [
+          "name",
+          "kind",
+          "start_command",
+          "source_files"
+        ],
+        "properties": {
+          "allowed_emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "build_command": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "configure_command": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "custom_domain": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dependency_input_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependency_output_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "environment": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "executables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "generated_credentials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeneratedCredential"
+            }
+          },
+          "health_command": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "health_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "health_timeout_seconds": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "install_command": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/ResourceLimits"
+          },
+          "name": {
+            "type": "string"
+          },
+          "port": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "reconfigure_command": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "restart_policy": {
+            "type": "string"
+          },
+          "source_files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceFile"
+            }
+          },
+          "start_command": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "volumes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReleaseVolume"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReleaseResponse": {
+        "type": "object",
+        "required": [
+          "release"
+        ],
+        "properties": {
+          "release": {
+            "$ref": "#/components/schemas/AppRelease"
+          }
+        }
+      },
+      "ReleaseVolume": {
+        "type": "object",
+        "required": [
+          "name",
+          "mount_path",
+          "size_mb"
+        ],
+        "properties": {
+          "mount_path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "size_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResourceLimits": {
+        "type": "object",
+        "properties": {
+          "cpu_percent": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "memory_max_mb": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "tasks_max": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "SourceFile": {
+        "type": "object",
+        "required": [
+          "path",
+          "content_base64"
+        ],
+        "properties": {
+          "content_base64": {
+            "type": "string"
+          },
+          "executable": {
+            "type": "boolean"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

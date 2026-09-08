@@ -1,0 +1,168 @@
+---
+title: "rig app"
+sidebarTitle: "app"
+description: "Manage apps inside a workspace"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Run this command in an authenticated local terminal or inside a workspace; see the availability above.
+
+## Examples
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig app --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox app [OPTIONS] <COMMAND>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Manage apps inside a workspace
+
+Usage: rigbox app [OPTIONS] <COMMAND>
+
+Commands:
+  ls             List apps in a workspace (or all your workspaces)
+  new            Create a new app in a workspace
+  logs           View app logs
+  expose-port    Detect or expose a workspace port as an app
+  start          Start an app
+  stop           Stop an app
+  restart        Restart an app
+  rm             Delete an app
+  share          Set app visibility (public, private, or emails)
+  health         Show app runtime health
+  verify-domain  Re-check DNS for an app custom domain
+  domain         Manage app custom domain
+  env            Manage app environment variables
+  param          Read and write catalog-app parameters
+  log-source     Manage app log sources
+  help           Print this message or the help of the given subcommand(s)
+
+Options:
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox app [OPTIONS] <COMMAND>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Manage apps in this workspace
+
+Usage: rigbox app [OPTIONS] <COMMAND>
+
+Commands:
+  ls             List apps in this workspace
+  new            Create a new app in this workspace
+  logs           View app logs
+  start          Start an app
+  stop           Stop an app
+  restart        Restart an app
+  rm             Delete an app
+  share          Set app visibility (public, private, or emails)
+  expose-port    Detect or expose a workspace port as an app
+  health         Show app runtime health
+  verify-domain  Re-check DNS for an app custom domain
+  domain         Manage app custom domain
+  env            Manage app environment variables
+  param          Read and write catalog-app parameters
+  log-source     Manage app log sources
+  help           Print this message or the help of the given subcommand(s)
+
+Options:
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Subcommands
+
+- [domain](/cli-reference/commands/app/domain)
+- [env](/cli-reference/commands/app/env)
+- [expose-port](/cli-reference/commands/app/expose-port)
+- [health](/cli-reference/commands/app/health)
+- [log-source](/cli-reference/commands/app/log-source)
+- [logs](/cli-reference/commands/app/logs)
+- [ls](/cli-reference/commands/app/ls)
+- [new](/cli-reference/commands/app/new)
+- [param](/cli-reference/commands/app/param)
+- [restart](/cli-reference/commands/app/restart)
+- [rm](/cli-reference/commands/app/rm)
+- [share](/cli-reference/commands/app/share)
+- [start](/cli-reference/commands/app/start)
+- [stop](/cli-reference/commands/app/stop)
+- [verify-domain](/cli-reference/commands/app/verify-domain)

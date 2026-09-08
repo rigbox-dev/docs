@@ -11,7 +11,7 @@ A **Deploy to Rigbox** button opens workspace creation with a repository, branch
 2. Connect GitHub. Select an existing fork, including a renamed fork, or choose **Fork on GitHub**. Forking opens a separate tab. Return to Rigbox and select **Refresh after forking**, then **Continue with my fork**.
 3. If the fork is missing, grant the Rigbox GitHub App access to it and refresh the connection. Choose the correct GitHub account when you have several connected accounts.
 4. Choose **New workspace**, or select a workspace you already own. Previous deployments of the same example are marked in the destination list.
-5. Review the apps and resource allocation. Choose **Deploy with defaults**, or **Customize** to edit resources, app settings, and YAML. Required settings and secrets must be supplied; invalid manifests and insufficient capacity block deployment.
+5. Review the apps, resource allocation, and deployment strategy. Choose **Deploy with defaults**, or **Customize** to edit resources, app settings, and YAML. Required settings and secrets must be supplied; invalid manifests and insufficient capacity block deployment.
 6. Rigbox starts the workspace, queues deployment, and opens its detail page. Follow the build and deployment progress there. HTTP services get app links; CLI tools are available from the workspace terminal or SSH.
 
 The badge source must be a public GitHub repository. Your fork is checked using GitHub repository identity and ancestry, so renaming a fork is supported. The GitHub App needs access to the selected fork; the flow does not expand its permissions or retain a GitHub user token.
@@ -26,9 +26,9 @@ Redeploying the same target reuses its branch. Existing connections keep their c
 
 ## Existing workspaces
 
-Rigbox imports the workspace's actual vCPU, RAM, disk, and base image into the configuration preview. Confirm **root-filesystem and app replacement** before deploying. Persistent volumes are retained; changes stored only on the root filesystem are replaced.
+Rigbox imports the workspace's actual vCPU, RAM, disk, and base image into the configuration preview. Review the deployment strategy. Incremental deployment prepares managed app releases; image deployment requires explicit consent to replace the root filesystem. Persistent volumes are separate, but back up data and review mounts before an image deployment.
 
-If the workspace already has a different automatic deployment connection, review and explicitly confirm replacing it. Rigbox keeps one active automatic deployment connection per workspace. Adding apps without replacing the root filesystem is a separate planned capability.
+If the workspace already has a different automatic deployment connection, review and explicitly confirm replacing it. Rigbox keeps one active automatic deployment connection per workspace. A change of strategy requires explicit confirmation. A declared manifest strategy must match the reviewed configuration; image strategy requires `reproducible: true` for every Git app.
 
 ## Secrets and retries
 

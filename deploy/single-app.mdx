@@ -1,0 +1,27 @@
+---
+title: "Deploy one app"
+description: "Update a selected app without replacing the rest of the managed application set."
+---
+
+## Prerequisites
+
+Start from a working [multi-app project](/deploy/multi-app) and its existing workspace. Run these commands locally from the root manifest directory.
+
+## Select an app
+
+```bash
+rig deploy --workspace my-project --app web
+```
+
+Use the exact key under `apps`. A partial incremental deployment does not replace the entire deployment scope's app set. Keep the full manifest in place so project identity and relationships remain clear.
+
+## Verify dependencies and results
+
+```bash
+rig app ls --workspace my-project
+rig app-release ls --workspace my-project
+```
+
+Exercise the changed app and its interactions with existing dependencies. Deploy required backend/schema changes separately before an app that depends on them; selecting one app is not a coordinated migration of the whole project.
+
+If the selected app conflicts with an unmanaged app or another deployment scope, use a distinct name/port or a new workspace. Do not remove unrelated applications to force an update. For a coordinated app set, use the full [multi-app deployment](/deploy/multi-app).

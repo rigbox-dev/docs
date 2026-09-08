@@ -1,0 +1,31 @@
+---
+title: "Workspaces and storage"
+description: "Create development environments and manage the data that outlives deployments."
+---
+
+Use a workspace for a project, a set of related services, or an AI coding environment. Choose its CPU, memory, disk, and starting image independently from the apps you deploy into it.
+
+## Start with a workspace
+
+Run locally after [installing the CLI](/guides/install-cli):
+
+```bash
+rig login
+rig workspace spawn --name my-workspace --template dev
+rig workspace ls
+```
+
+Use the reported name or ID for later commands. Starting a workspace and waiting for every installed application to become ready are different stages; inspect app health when you need a particular service.
+
+## Find a task
+
+- [Workspace lifecycle](/guides/workspaces): create, start, stop, resize, and remove.
+- [SSH access](/guides/ssh-access): connect from your terminal.
+- [Persistent volumes](/guides/persistent-volumes): keep mutable data outside release directories.
+- [Snapshots](/guides/snapshots): checkpoint a stopped workspace root disk.
+- [Images and templates](/guides/images-and-templates): choose your initial environment.
+- [Services](/guides/workspace-services), [setup scripts](/guides/setup-scripts), and [service specifications](/guides/service-specs): configure reusable environment components.
+
+## Verify and recover
+
+Check the workspace state with `rig workspace ls`, then inspect [logs](/operate/app-logs) and [resource limits](/concepts/limits). A stopped workspace cannot serve its apps. Do not delete a workspace as a troubleshooting step if it contains data you need.

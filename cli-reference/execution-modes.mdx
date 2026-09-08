@@ -1,0 +1,37 @@
+---
+title: Local versus workspace CLI
+sidebarTitle: Local versus workspace CLI
+description: Understand the two Rigbox command surfaces and where to run each command.
+---
+
+Rigbox exposes a local command surface and an in-workspace surface. The generated command pages identify which modes support each command and show separate syntax when flags differ.
+
+## Local terminal
+
+Install the CLI on your machine and authenticate with `rig login`. Use this mode to create workspaces, configure your account, upload a local application, and manage resources across workspaces.
+
+```bash
+rig login
+rig whoami
+rig workspace ls
+```
+
+When a command requires an identifier, use the identifier returned by the preceding list or create operation. Do not assume workspace-mode examples accept the same local flags.
+
+## Inside a workspace
+
+The workspace CLI operates in the workspace environment. It has workspace-specific commands such as [proxy](/cli-reference/commands/proxy) and may infer context that the local CLI must receive explicitly.
+
+```bash
+rig whoami
+rig app ls
+rig proxy status
+```
+
+Run these after connecting through the console terminal or SSH. A local `rig deploy` uploads a project from your machine; run it from the directory containing `rig.yaml` unless you explicitly select a different source.
+
+## Resolve a command mismatch
+
+Run `rig --version` and `rig COMMAND --help` in the terminal where the command failed. Check the mode section on that command's reference page. A workspace's installed version may differ from your local installation; this documentation preview describes v0.13.0-rc.2.
+
+Continue with [authentication](/cli-reference/authentication) or [configuration and output](/cli-reference/configuration).

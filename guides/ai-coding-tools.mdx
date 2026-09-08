@@ -5,6 +5,12 @@ description: Use Rigbox credits to power Claude Code, Codex CLI, OpenCode, Kiloc
 
 Rigbox workspaces come with a full Linux environment, SSH access, and a managed AI proxy — making them a natural home for AI coding agents. Tools like Claude Code, Codex CLI, OpenCode, and Kilocode can use Rigbox credits without ever seeing a provider API key.
 
+## Before you begin
+
+Use the [v0.13 CLI](/guides/install-cli) and [authenticate](/cli-reference/authentication). Run workspace-management and recipe commands from your local terminal. Commands identified as running inside a workspace require its console terminal or SSH session. Replace example resource IDs with the values returned for your account.
+
+Start the target workspace first and verify its identity with `rig workspace ls`. AI calls require managed credits or an appropriately configured provider account.
+
 ## How It Works
 
 Managed workspaces expose `OPENROUTER_BASE_URL` and `OPENROUTER_API_KEY` to every login shell. The bridge-local proxy at `172.16.0.1:9090` fronts OpenRouter, which in turn routes to the appropriate upstream provider for whatever model you ask for. Your credits cover the usage; provider API keys stay outside the VM.
@@ -106,7 +112,7 @@ Use the `dev` or `full` image for AI coding tools. They include build toolchains
 claude
 ```
 
-Claude Code can edit files, run shell commands, manage git, and run tests inside the workspace. Since each workspace is an isolated VM, there's no risk of the agent affecting other projects.
+Claude Code can edit files, run shell commands, manage git, and run tests inside the workspace. The VM provides an isolation boundary, but the agent can access files and credentials available inside that workspace and can act on external services those credentials authorize. See [security boundaries](/concepts/security).
 
 <Note>
 Claude Code uses Claude Sonnet by default. To use Opus, pass `--model claude-opus-4-20250514`. Credit consumption is higher for Opus.
@@ -138,20 +144,17 @@ kilocode
 
 ### Gemini CLI
 
-Gemini CLI doesn't have a catalog recipe yet — install with `npm install -g @google/gemini-cli`. It reads `GOOGLE_API_KEY` or a configured base URL from the environment; run `eval "$(rig proxy on)"` to export equivalent variables in your current shell, then start the agent:
+Gemini CLI doesn't have a catalog recipe yet — install with `npm install -g @google/gemini-cli`. Configure the authentication and provider endpoint supported by your installed Gemini CLI. Native Google requests are not automatically translated by the OpenAI-compatible gateway. With your own Google credentials configured, start the agent:
 
 ```bash
-eval "$(rig proxy on)"
 gemini
 ```
 
 ### Aider
 
-Aider supports multiple providers and reads provider-native env vars. Run `rig proxy on` first to export them, then choose a model:
+Aider supports multiple providers. The following examples use provider-native model identifiers and require that provider’s credentials and endpoint configuration. Choose a model available to your provider account; do not assume a native Google request is translated by the managed OpenAI-compatible gateway:
 
 ```bash
-eval "$(rig proxy on)"
-
 # Use with Anthropic
 aider --model claude-sonnet-4-20250514
 
@@ -198,17 +201,23 @@ rig workspace ai mode --workspace <workspace_id> byok
 rig workspace env set --workspace <workspace_id> ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-Then run `eval "$(rig proxy on)"` again to update the environment.
+Restart the tool in a fresh shell and configure its provider key and endpoint. Verify that no managed base-URL override remains in the tool configuration.
 
 ## Why Rigbox for AI Coding
 
 | Benefit | Detail |
 |---------|--------|
 | **Isolated environment** | Agents can run commands, install packages, and modify files without affecting your local machine |
-| **No key management** | Managed credits mean zero API key configuration |
-| **Full Linux VM** | Build tools, compilers, databases - everything agents need is available |
+| **No key management** | Compatible managed recipes configure the gateway without your own upstream provider key |
+| **Full Linux VM** | Install the build tools and services required by your project |
 | **SSH access** | Work alongside the agent: SSH in to review changes, run tests, or pair-program |
 | **Snapshots** | [Snapshot](/guides/snapshots) before a big refactor, restore if the agent goes sideways |
+
+## Verify and troubleshoot
+
+Inside the workspace, inspect `rig proxy status`, then make one small request with your chosen tool. Verify the configured endpoint and check the corresponding Rigbox or provider usage. After changing keys or mode, start a fresh shell and restart processes that retained their old configuration. Never print a provider key to verify it.
+
+For failures, start with [runtime logs](/operate/app-logs), [health checks](/operate/health), or [resource exhaustion](/operate/resources).
 
 ## Next Steps
 

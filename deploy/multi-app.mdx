@@ -1,0 +1,54 @@
+---
+title: "Multi-app projects"
+description: "Deploy cooperating applications from one project manifest."
+---
+
+## Prerequisites
+
+Use the v0.13 CLI on your local machine, sign in, and put each app under the project directory. The [todo example](https://github.com/rigbox-dev/rigbox-examples/tree/2612ffc9138d3b2f8169b10e3a54abd5495db8b8/todo-app) is a complete frontend/API project.
+
+## Define the application set
+
+Create a root `rig.yaml` with an `apps` map. Each local entry needs `path`; its map key is the app name. Do not mix a root `start` or `port` with `apps`.
+
+```yaml
+workspace:
+  deployment: { strategy: incremental }
+apps:
+  api:
+    path: ./api
+    port: 5100
+    install: npm ci
+    start: npm start
+    env: { PORT: "5100" }
+    health: { path: /healthz }
+  web:
+    path: ./web
+    port: 5101
+    install: npm ci
+    start: npm start
+    env: { PORT: "5101", RIGBOX_API_URL: "http://127.0.0.1:5100" }
+    dependsOn: [api]
+    visibility: public
+    health: { path: /healthz }
+```
+
+Adapt commands to each app; both must implement their health paths and listen on their declared ports.
+
+## Deploy and verify
+
+```bash
+rig deploy --name my-project
+rig app ls --workspace my-project
+rig app-release ls --workspace my-project
+```
+
+Check every app's health and the frontend's connection to the API. A successful frontend response alone does not prove all app outcomes succeeded.
+
+## Ownership and changes
+
+A full incremental deploy replaces the managed application set within its deployment scope. Removing a managed app from that project's manifest can remove it from the active set. An unrelated project's apps are not part of that set. Existing unmanaged apps or apps owned by another scope cannot be silently adopted: resolve the name/port conflict or deploy to a new workspace.
+
+Preserve `.rig.lock` for local project identity. Git projects derive identity from repository and project path when no scope is stored. Use [deploy one app](/deploy/single-app) for a partial update; do not delete other entries merely to skip them.
+
+Incremental releases accept 1–32 selected apps. Recipe `ref` entries require the catalog flow rather than an explicit incremental source release.

@@ -1,0 +1,27 @@
+---
+title: "Deployment fields"
+description: "Select app releases or frozen workspace images without ambiguous defaults."
+---
+
+```yaml
+workspace:
+  deployment:
+    strategy: incremental
+```
+
+| Setting | Behavior |
+| --- | --- |
+| `workspace.deployment.strategy` | `incremental` or `image` |
+| `rig deploy --strategy` | Overrides the manifest for the CLI invocation |
+| `reproducible: true` | Selects image by default when neither CLI nor manifest supplies a strategy |
+| `--sync-only` with incremental | Prepares a ready app release without activation |
+| `--build-only` with image | Builds frozen project images without deploying |
+| `--reimage` with image | Explicitly permits replacement when required |
+
+The CLI selects its flag first, then manifest strategy, then image if any app is reproducible, otherwise incremental. An explicit image strategy makes apps use the frozen path. Declare `reproducible: true` on each Git app as well for console image compatibility.
+
+Console repository settings retain the reviewed strategy; new settings default to incremental. A declared manifest strategy must match the reviewed choice. A strategy change requires review/confirmation in that flow.
+
+Incremental releases reject `--reimage`, `--build-only`, `--bluegreen`, and `--promote`; `workingDirectory`; non-HTTP service protocols; and recipe refs. Watch mode requires one local-source app. Dependency outputs require incremental deployment.
+
+Catalog-only and legacy preview commands have compatibility paths when no strategy is explicit. Follow [catalog](/guides/catalog) or [blue-green](/guides/bluegreen) guidance rather than relying on a default for those flows.

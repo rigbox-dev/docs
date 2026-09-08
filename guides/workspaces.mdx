@@ -3,9 +3,13 @@ title: Workspaces
 description: Create, manage, and monitor isolated micro-VM workspaces.
 ---
 
-A **workspace** is an isolated micro-VM running full Debian 12 Linux with systemd, SSH access, and its own private IP address. Each workspace gets dedicated CPU, RAM, and disk - nothing is shared with other workspaces.
+A **workspace** is an isolated micro-VM running full Debian 12 Linux with systemd, SSH access, and its own private IP address. Each workspace has its own kernel and filesystem, with configured vCPU, RAM, and disk allocations. Physical host infrastructure is shared; a vCPU allocation does not promise a dedicated physical core.
 
 Workspaces are the core primitive in Rigbox. You create one, run code inside it, expose services to the internet, and tear it down when you're done.
+
+## Before you begin
+
+Use the [v0.13 CLI](/guides/install-cli) and [authenticate](/cli-reference/authentication). Run workspace-management and recipe commands from your local terminal. Commands identified as running inside a workspace require its console terminal or SSH session. Replace example resource IDs with the values returned for your account.
 
 ## Workspace Lifecycle
 
@@ -43,7 +47,7 @@ Use the [Rigbox CLI](/cli-reference/cli) to create a workspace. Replace `<WORKSP
 rig workspace new --name <WORKSPACE_NAME> --template base --ram 512 --vcpu 1 --disk 3072
 ```
 
-The flags are optional - leave them off to use the `base` template. If requested resources are below the template or catalog floor, Rigbox raises them before creating the workspace. `rig workspace new` prints the new workspace's ID, status, and connection info on stdout.
+The resource and template flags are optional; `--name` is required. Omit the resource flags to use the selected template’s defaults. If requested resources are below the template or catalog floor, Rigbox raises them before creating the workspace. `rig workspace new` prints the new workspace's ID, status, and connection info on stdout.
 
 For the underlying HTTP shape, see [Create Workspace](/api-reference/workspaces/create) in the API reference.
 
@@ -101,7 +105,7 @@ See [Update Workspace Resources](/api-reference/workspaces/update-resources) for
 
 ## Environment Variables
 
-Set environment variables that are injected into the workspace on boot.
+Set workspace environment variables. The API saves them and updates guest configuration files for a running workspace; existing processes must reload their configuration or restart to use new values.
 
 ```bash
 rig workspace env set --workspace $WORKSPACE_ID \
@@ -117,7 +121,7 @@ See [Update Workspace Environment](/api-reference/workspaces/update-env) for det
 
 ## Live Metrics
 
-Monitor CPU, RAM, and disk usage in real time.
+Read the latest CPU, RAM, and disk metrics. Repeat the command when you need a new sample.
 
 ```bash
 rig workspace metrics --workspace $WORKSPACE_ID
@@ -133,7 +137,7 @@ See [Get Metrics](/api-reference/workspaces/get-metrics) for the full response s
 
 ## Logs
 
-Tail recent workspace system logs or follow them in real time:
+Read workspace logs or follow the log stream:
 
 ```bash
 rig workspace logs --workspace <WORKSPACE_NAME_OR_ID>          # recent logs
@@ -167,6 +171,12 @@ When it returns, the workspace is running and SSH-reachable. Get the connection 
 ```bash
 rig workspace ssh-info --workspace demo-workspace
 ```
+
+## Verify and troubleshoot
+
+Inspect `rig workspace ls` and `rig workspace services --workspace WORKSPACE_ID`. For installed apps, check their status and health before opening the returned URL. A created resource or running VM does not by itself prove the application is ready.
+
+For failures, start with [runtime logs](/operate/app-logs), [health checks](/operate/health), or [resource exhaustion](/operate/resources).
 
 ## Next Steps
 

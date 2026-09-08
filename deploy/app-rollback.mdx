@@ -1,0 +1,29 @@
+---
+title: "Roll back app code"
+description: "Restore a retained app release without replacing the workspace filesystem."
+---
+
+## Choose a retained release
+
+Run locally with access to the target workspace:
+
+```bash
+rig app-release ls --workspace my-project
+rig app-release logs --workspace my-project --release <RELEASE_ID>
+```
+
+Choose a known-good retained release that belongs to this workspace. Review its application set and configuration before activation.
+
+## Roll back
+
+```bash
+rig app-release rollback --workspace my-project --release <RELEASE_ID>
+```
+
+Rollback restores app code and configuration and briefly restarts affected services. It does not restart or re-image the entire workspace. It does **not** revert application data, database migrations, or persistent volumes. Ensure the older code can use the current data schema before rolling back.
+
+## Verify the result
+
+List apps and run `rig app health --app <APP_NAME> --output json` for each affected service. Exercise an application operation that reads existing data. If the release is unavailable or incompatible, prepare a new corrective release instead.
+
+`rig release activate` and `rig rollback --release` address [workspace image releases](/guides/releases-and-rollback), not app releases. A [snapshot restore](/guides/snapshots) is a separate filesystem recovery operation.

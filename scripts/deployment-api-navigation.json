@@ -1,0 +1,21 @@
+{
+  "source": {
+    "url": "https://api.rigbox.dev/api-docs/openapi.json",
+    "sha256": "90b83ad92b94ad1dc3bb974ba6447165553c059c85d39e7d06a461020f7a7192",
+    "retrieved": "2026-09-08"
+  },
+  "groups": {
+    "builds": [],
+    "images": [],
+    "volumes": [
+      "api-reference/volumes/list",
+      "api-reference/volumes/create",
+      "api-reference/volumes/delete",
+      "api-reference/volumes/resize"
+    ]
+  },
+  "coverage_notes": {
+    "builds": "No build operations are exposed by the live public OpenAPI specification. No endpoint definitions invented.",
+    "images": "No workspace image or image-release operations are exposed by the live public OpenAPI specification. App-release documentation is separate."
+  }
+}

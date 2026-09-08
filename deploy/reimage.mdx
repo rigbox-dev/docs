@@ -1,0 +1,24 @@
+---
+title: "Re-image a workspace"
+description: "Review filesystem replacement before deploying a frozen image into an existing workspace."
+---
+
+## Before you replace the filesystem
+
+An image deployment into an existing workspace that is not already image-pinned can require explicit `--reimage` consent. Export development files and back up application data first. Persistent volumes are separate from the root filesystem, but verify mounts and recovery procedures before proceeding.
+
+## Deploy the image
+
+From the local project directory, after reviewing the target:
+
+```bash
+rig deploy --workspace production --strategy image --reimage
+```
+
+This is permission to replace the workspace filesystem, not a routine flag for incremental updates. Do not add it globally to every deploy command. Incremental strategy rejects it.
+
+## Verify recovery
+
+Check the workspace is running, verify every application, and confirm expected volume data is available. If boot or health fails, inspect the build/deployment logs and [image release history](/guides/releases-and-rollback).
+
+A root filesystem [snapshot](/guides/snapshots) does not include persistent volumes. It is not a complete database backup. For code-only updates that should retain the environment, use [incremental releases](/deploy/development-loop).

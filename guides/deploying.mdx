@@ -1,346 +1,110 @@
 ---
-title: Deploying with rig deploy
-description: Ship a project to a workspace from a single rig.yaml — the standard rsync deploy, reproducible frozen-image builds, multi-app graphs, and blue-green promotion.
+title: "Deploy from your machine"
+description: "Prepare, activate, and verify an incremental application release."
 ---
 
-`rig deploy` is the one command that takes a project on your machine and runs it as a live app in a Rigbox workspace. It reads a `rig.yaml` in the project directory, resolves a target workspace, syncs your code, and brings the service up behind a public subdomain.
+Run the v0.13 CLI locally from a directory containing `rig.yaml`. Ordinary source deployments create managed app releases. For a runnable first project, follow [Deploy your first app](/quickstart).
 
-For push-to-deploy workflows, use the [GitHub Actions guide](/guides/github-actions). It deploys to a bound workspace with a short-lived credential.
+## Prerequisites
+
+Install the v0.13 CLI, run `rig login`, and confirm your app has install/start commands, a listening port, and an HTTP health endpoint. Use relative paths and put mutable data outside the managed release directory.
+
+## 1. Create the manifest
+
+Run `rig init` in your project, then review the generated values. Declare `workspace.deployment.strategy: incremental` for app releases. Check the [canonical manifest reference](/reference/rig-yaml) before deployment.
+
+## 2. Deploy
 
 ```bash
-cd my-app
-rig deploy
+rig deploy --name my-project
 ```
 
-That's the whole workflow for most projects. The rest of this guide explains what happens under the hood and how to control it.
+The CLI prepares a release, installs/builds its code, activates it, and checks affected apps. Keep `.rig.lock` so later deployments retain project identity and workspace bindings.
 
----
+## 3. Check the result
+
+```bash
+rig app ls --workspace my-project
+rig app-release ls --workspace my-project
+rig app health --app <APP_NAME> --output json
+```
+
+Use the actual app name and URL returned by Rigbox. Inspect every app outcome, not just the first URL. Read failed preparation or activation logs with `rig app-release logs --workspace my-project --release <RELEASE_ID>`.
+
+## 4. Deploy a change
+
+Run `rig deploy` from the same directory. Incremental activation briefly restarts affected services without replacing the workspace filesystem. Use [the development loop](/deploy/development-loop), [staging](/deploy/stage-and-activate), or [app rollback](/deploy/app-rollback).
 
 ## Configure a GitHub repository in the console
 
-GitHub repository imports must be enabled for your account. Connect GitHub under **Settings → GitHub**, then choose a repository when creating
-a workspace or under an existing workspace’s **GitHub deployments** settings.
-Choose an account before loading its repositories when several accounts are connected.
-You can switch accounts while a repository page loads.
-
-If the repository already contains `rig.yaml`, Rigbox loads that document and
-shows its app name, listening port, install/build/start commands, and memory limit
-as editable fields. Changes update the manifest preview immediately while keeping
-other fields and comments. Use **Edit YAML** for configuration outside the form.
-
-If no `rig.yaml` exists, configure the app using the same fields and watch the
-manifest compose in the preview. Invalid values must be corrected before saving.
-Choose automatic GitHub App deployments or a custom GitHub Actions workflow, then
-save the reviewed configuration directly or through a pull request. Protected
-branches require a pull request. The repository manifest remains the source of truth.
+Follow [Deploy from GitHub](/guides/github). The console retains a reviewed deployment strategy; a manifest strategy must match that selection.
 
 ## How rig deploy resolves a workspace
 
-`rig deploy` never makes you name a workspace by hand on every run. It resolves the target in this order:
+An explicit `--workspace` targets a name or ID. Otherwise the CLI reuses the workspace binding in `.rig.lock` or creates a new workspace. Inspect bindings before reusing a checkout for another environment; specify the target explicitly when uncertain.
 
-1. **`--workspace <name|id>`** — an explicit flag always wins.
-2. **`.rig.lock`** — a gitignored, per-project lock file that records the last workspace this project deployed to. If it exists, the redeploy reuses that same workspace.
-3. **Spawn a fresh workspace** — if neither of the above applies, `rig deploy` creates and starts a new workspace, then writes it into `.rig.lock` so the next deploy reuses it. Pass `--name <name>` to choose the workspace name.
-
-```bash
-# First deploy in a new project — spawns a workspace named "my-app" and locks it
-rig deploy --name my-app
-
-# Later deploys — no flags needed; the lock points back at the same workspace
-rig deploy
-
-# Override the target for a one-off deploy
-rig deploy --workspace staging-box
-```
-
-<Note>
-`.rig.lock` is per-project and should stay gitignored. It records *where* this project last deployed, so redeploys are idempotent and never spawn duplicate workspaces. Delete it (or pass `--name`) to start fresh against a new workspace.
-</Note>
-
----
+<span id="the-rig-yaml-contract" />
 
 ## The rig.yaml contract
 
-`rig.yaml` is the source of truth for a deploy. CLI and UI edits to params are transient overlays — the next `rig deploy` re-applies whatever `rig.yaml` says.
+The field reference now lives at [rig.yaml](/reference/rig-yaml). Keep a single canonical manifest per project.
 
 ### Single-app shape
 
-```yaml
-name: my-app
-port: 8080
-start: uvicorn app:app --host 0.0.0.0 --port 8080
-install: |
-  pip install --break-system-packages --no-cache-dir fastapi uvicorn
-health:
-  path: /healthz
-  timeoutSeconds: 30
-env:
-  DATA_DIR: /home/developer/data
-volumes: [data]
-secrets:
-  - name: STRIPE_KEY
-  - name: SENTRY_DSN
-    optional: true
-credentials:
-  - generate: true
-params:
-  - key: model
-    type: select
-    label: Model
-    default: rigbox/default
-    envVar: MODEL
-    options:
-      - { value: rigbox/default, label: "Default" }
-      - { value: rigbox/fast, label: "Fast" }
-visibility: public
-workspace:
-  image: base
-  resources: { ramMb: 1024, vcpuCount: 1, diskSizeMb: 3072 }
-  volumes:
-    - name: data
-      mountPath: /home/developer/data
-      sizeMb: 1024
-```
-
-| Field | Purpose |
-| --- | --- |
-| `name` | App name → public subdomain `name.rigbox.dev`. |
-| `port` | The port your process listens on. Your `start` command **must** bind `0.0.0.0:<port>`. |
-| `start` | The long-lived command run under systemd. |
-| `install` | One-time setup run on the VM after the code syncs (build steps, dependency installs, migrations). |
-| `health` | `{ path, timeoutSeconds }` — the platform gates on `GET <path>` → 2xx. See [The health contract](#the-health-contract). |
-| `env` | Plain environment variables. |
-| `secrets` | `[{ name, optional? }]` — user-supplied secrets read from your local env at deploy time and injected. See [Secrets](#env-secrets-credentials-params-and-visibility). |
-| `credentials` | `[{ generate: true }]` — the server mints a stable random value, injected as `CRED_<UPPER_KEY>`. |
-| `params` | Server-validated config (types: `string`, `number`, `boolean`, `secret`, `select`, `email`, `url`, `textarea`). |
-| `visibility` | `private` (default), `public`, or `{ emails: [...] }`. |
-| `build` | A build command run on the VM after `install:`, before `start:`. |
-| `reproducible` | `true` to freeze `install:` into a content-addressed image and boot from it. See [Deploy modes](#deploy-modes). |
-| `source` | `kind: local` (default; rsync the dir) or `kind: git` with `repo`/`branch`. |
-| `volumes` | App opt-in mounts. Use workspace volume refs (`[data]`) or full app-local specs. See [Persistent Volumes](/guides/persistent-volumes). |
-| `workspace` | `{ image, resources, volumes }` — VM image/sizing plus reusable workspace volume declarations. |
+Put `name`, `port`, `start`, and other app fields at the root. See [application fields](/reference/rig-yaml/application).
 
 ### Multi-app shape
 
-For a project that runs several services together, use a top-level `workspace:` block and an `apps:` map. Each app declares a `path:` to its directory plus its own inline spec.
-
-```yaml
-workspace:
-  image: base
-  resources: { ramMb: 2048, vcpuCount: 2, diskSizeMb: 10240 }
-  volumes:
-    - name: data
-      mountPath: /home/developer/data
-      sizeMb: 1024
-apps:
-  api:
-    path: ./api
-    port: 5100
-    start: uvicorn main:app --host 0.0.0.0 --port 5100
-    install: pip install --break-system-packages -r requirements.txt
-    health: { path: /healthz, timeoutSeconds: 30 }
-    volumes: [data]
-    env:
-      DATA_DIR: /home/developer/data
-  web:
-    path: ./web
-    port: 5101
-    start: npm start
-    install: npm ci && npm run build
-    dependsOn: [api]
-    visibility: public
-    health: { path: /healthz, timeoutSeconds: 60 }
-```
-
-`dependsOn: [api]` injects `RIGBOX_API_URL` (the UPPER_SNAKE of the sibling app name) into the dependent app's environment, pointing at the sibling over loopback. Boot order follows the dependency graph — `api` comes up before `web`. Here only the front door (`web`) is public; `api` stays private and is reachable only from `web` over the loopback URL.
-
-<Tip>
-Keep public surface minimal: mark only the user-facing app `public` and leave internal services at the default `private`. Dependents reach them via the injected `RIGBOX_<NAME>_URL`, not the internet.
-</Tip>
-
----
+Use a name-keyed `apps` map with a `path` for each local app. Do not mix root service fields with `apps`. Follow [multi-app projects](/deploy/multi-app).
 
 ## The health contract
 
-The platform gates every deploy on a health check. This is non-negotiable:
-
-1. Your process **must bind `0.0.0.0:<port>`** — never `127.0.0.1` or `localhost`, where `<port>` matches `port:`.
-2. It **must serve `GET <health.path>` → 2xx** quickly. Use a generous `timeoutSeconds`: 30 for fast apps, 60–90 when `install:` does a heavy build (a Next.js or Rails build, for example).
-
-If health never goes green within `timeoutSeconds`, the deploy is marked **failed and rolled back** — your previously running version stays up.
-
-```yaml
-health:
-  path: /healthz
-  timeoutSeconds: 30
-```
-
----
+Implement a successful HTTP readiness endpoint and declare its path/timeout. See [health checks](/configure/health). Incremental service releases currently require HTTP.
 
 ## Deploy modes
 
-`rig deploy` picks its mode from `rig.yaml`. There is **no `--reproducible` flag** — the app-level `reproducible: true` key is the only signal.
+Choose explicitly between app releases and workspace images. See [deployment strategy](/reference/rig-yaml/deployment).
 
 ### Standard deploy
 
-With `reproducible` unset (or `false`) and local source, `rig deploy`:
-
-1. Rsyncs the app directory into the workspace.
-2. Runs `install:` on the VM.
-3. (Re)starts the service.
-
-This is the default and fits most apps with fast installs.
-
-```yaml
-name: my-app
-port: 8080
-start: node server.js
-install: npm ci && npm run build
-health: { path: /healthz, timeoutSeconds: 30 }
-```
+The v0.13 default source flow is an incremental app release, not a filesystem overlay. See [the development loop](/deploy/development-loop).
 
 ### Reproducible deploy
 
-> **`reproducible: true` in `rig.yaml` makes the deploy reproducible — the same `install:` script, frozen once.**
-
-When an app sets `reproducible: true`, `rig deploy` runs its `install:` script in an isolated builder workspace and freezes the result into a content-addressed image. It boots the target from that image digest. With `source.kind: local`, app code is then synced from your machine. With `source.kind: git`, the builder fetches the resolved commit and the CLI does not overlay the local checkout.
-
-```yaml
-name: ai-chat
-port: 8080
-reproducible: true
-install: |
-  pip install --break-system-packages --no-cache-dir \
-    fastapi uvicorn pydantic httpx
-start: uvicorn chat:app --host 0.0.0.0 --port 8080
-health: { path: /healthz, timeoutSeconds: 30 }
-```
-
-Nothing about the manifest changes except the flag: the same `install:` you would run on every standard deploy is what gets frozen. The image is always built on top of the platform base image (`workspace.image`, default `base`), so the agent and systemd are present and you keep the platform's opinions while layering your own dependencies on top.
-
-<Note>
-Install dependencies to system paths, such as pip `--break-system-packages`, so deployed code can find them. Git source is fetched into the build at its resolved commit; local source is synced after the image is ready.
-</Note>
+`reproducible: true` selects image deployment when no strategy is explicit. Use [reproducible builds](/deploy/reproducible-builds).
 
 #### `build:` is always a command
 
-`build:` is a shell command run after `install:` and before the service starts. For reproducible Git source it runs against the exact checkout in the builder, so the image includes its output. It has no other shape.
+`build: npm run build` is valid; Dockerfile/image mapping forms are not. See [commands](/configure/commands).
 
 ### Local source: freeze dependencies and sync code
 
-The reproducible path is **hybrid** — the slow, stable environment is built once and frozen into an image; fast-changing app code rides over it via rsync.
-
-For local source, the image is cached by the **build inputs** — the `install:` script, the `build:` command, the base image, and dependency lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `poetry.lock`, `requirements.txt`, `Cargo.lock`, `Gemfile.lock`, `go.sum`) — **not** your app code. So:
-
-<CodeGroup>
-```text First deploy (freezes the image)
-$ rig deploy
-→ running install in builder workspace (from base)
-  + pip install fastapi uvicorn pydantic httpx
-→ image frozen: sha256:9f3c… (build bld_01…)
-→ booting workspace from image digest
-→ rsyncing app code (chat.py, static/)
-→ starting service · health GET /healthz → 200 OK
-deployed to https://ai-chat.rigbox.dev   (release rel_01…)
-```
-
-```text Later deploy (build inputs unchanged)
-$ rig deploy
-→ build inputs unchanged — reusing cached image sha256:9f3c…
-→ rsyncing changed app code (chat.py)
-→ restarting service · health GET /healthz → 200 OK
-deployed to https://ai-chat.rigbox.dev   (release rel_02…)
-```
-</CodeGroup>
-
-Editing `install:`, `build:`, or a lockfile changes a build input, so the next deploy rebuilds the image. Editing only app code reuses the cached image and just rsyncs the change — no rebuild, no re-install.
+This image workflow is described in [reproducible builds](/deploy/reproducible-builds). Incremental deployment instead prepares code in managed release directories.
 
 ### Git source: deploy the resolved commit
 
-```yaml
-source:
-  kind: git
-  repo: https://github.com/YOUR_ORG/YOUR_REPO
-  branch: main
-reproducible: true
-```
-
-For git source, the resolved commit SHA is part of the image cache key. A new commit therefore produces different build inputs even on the same branch. The server checks out that commit; the CLI does not rsync local files over it. Standard public-git deployments can refresh the source without reinstalling when their install configuration and lockfiles are unchanged and no `build:` command needs to regenerate artifacts.
-
-All CI apps must use git source. Private CI repositories also require `reproducible: true`; the [GitHub Action](/guides/github-actions) forwards the job's ephemeral repository token for the build. No runner SSH key is needed.
-
-Deploying a frozen image into an existing workspace that is not image-pinned requires `rig deploy --reimage`. This explicitly permits replacement of the workspace filesystem. Back up needed files before opting in; keep durable data in separate volumes.
+Git source uses the resolved revision; uncommitted local files are not a Git deployment input. See [source fields](/reference/rig-yaml/source) and [GitHub Actions](/guides/github-actions).
 
 #### Pre-warm the image with `--build-only`
 
-`rig deploy --build-only` runs the freeze step and stops — no workspace is created, re-imaged, or synced. It uses the same build-inputs digest a full deploy computes, so a later `rig deploy` can reuse the cached image. Use it to pay the install cost before a launch window.
-
-```bash
-rig deploy --build-only     # freeze (or reuse) the image, print its digest, exit
-rig deploy                  # later: reuses the image, rsyncs, starts
-```
-
-<Note>
-Every reproducible deploy also auto-records a **release** (an image digest + run-config), so you can roll back later. See [Releases & Rollback](/guides/releases-and-rollback).
-</Note>
+Run `rig deploy --strategy image --build-only` for an image build without deployment. See [build caching](/deploy/build-cache).
 
 #### When to use which
 
-- **`install:` alone** — simple apps with fast installs. The default.
-- **`reproducible: true`** — heavier or slower installs you want frozen and byte-identical across deploys and rollbacks. `rig deploy` freezes and mounts the image for you, and only rebuilds when the build inputs change.
-
----
+Use [app releases](/deploy/overview) for ordinary code updates and [workspace images](/deploy/reproducible-builds) for a frozen environment.
 
 ## Env, secrets, credentials, params, and visibility
 
-These are all declared in `rig.yaml` and applied on every deploy.
-
-- **`env`** — plain environment variables baked into the unit.
-- **`secrets`** — `[{ name, optional? }]`. The value is read from your local environment at deploy time and injected into the VM (it is never stored in `rig.yaml`). Set `optional: true` to skip cleanly when unset.
-- **`credentials`** — `[{ generate: true }]`. The server mints a random value on first deploy, injected as `CRED_<UPPER_KEY>`, stable across redeploys.
-- **`params`** — server-validated config that is live-editable with `rig app param set <key>=<value>`. Every param the app reads must set `envVar`; `select` params require `options: [{ value, label }]`.
-- **`visibility`** — `private` (default, gateway auth-gates every request), `public`, or `{ emails: [...] }` (owner + allow-list). Declare it in `rig.yaml` so redeploys preserve it. See the [Visibility guide](/guides/visibility).
-
-```bash
-export STRIPE_KEY="sk_live_…"   # picked up by secrets: [{ name: STRIPE_KEY }]
-rig deploy
-```
-
----
-
-<Note>
-Application environment values are stored in plaintext metadata and are readable through the API, `rig app env ls --reveal`, and JSON output. The manifest `secrets` field reads values from your environment; it does not create an encrypted Rigbox secrets store.
-</Note>
+Follow [configuration](/configure/overview). Generated credentials use a named map; environment metadata remains readable by authorized callers.
 
 ## Blue-green deploys and promotion
 
-For zero-downtime rollouts, stage a change, verify it, then swap production over atomically — either a whole-workspace clone (`rig deploy --bluegreen preview`) or an in-VM sibling (`rig deploy --bluegreen <suffix>`), each cut over with `--promote`. See **[Blue-green deploys & promotion](/guides/bluegreen)** for both flows, the service-host-vs-live-environment boundary, and rollback.
-
----
+See [blue-green deployment](/guides/bluegreen). Explicit incremental strategy rejects preview/promotion flags.
 
 ## Deploy via the API
 
-`rig deploy` orchestrates several REST calls. The freeze step maps to the builds endpoint (a recipe: base image plus install script), and the resulting digest is recorded as a release. For endpoints without a dedicated command, `rig api` sends a raw authenticated request:
-
-```bash
-# Kick off an explicit image build (the deploy auto-build uses the same endpoint)
-rig api POST /v1/builds --body - <<'JSON'
-{
-  "base_image": "base",
-  "recipe": { "install_script": "pip install --break-system-packages flask" },
-  "label": "ai-chat"
-}
-JSON
-```
-
-See [Releases & Rollback](/guides/releases-and-rollback) for the release lifecycle and the `rig build` commands.
-
----
+Use the native [API reference](/api-reference/workspaces/list). App releases and workspace image releases are separate APIs; do not use image activation for an app rollback.
 
 ## Next steps
 
-- [Persistent Volumes](/guides/persistent-volumes) — durable storage that survives redeploys and stop→start.
-- [Releases & Rollback](/guides/releases-and-rollback) — pin and roll back image digests.
-- [Visibility](/guides/visibility) — private, public, and email-allow-listed apps.
-- [Expose and Route](/guides/expose-and-route) — how apps map to subdomains.
-- [The Rigbox CLI](/cli-reference/cli) — the full command surface.
+Continue with [multi-app projects](/deploy/multi-app), [configuration](/configure/overview), and [deployment strategies](/deploy/overview).

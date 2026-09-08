@@ -3,19 +3,19 @@ title: Authentication
 description: How to authenticate with the Rigbox CLI and API using login or API keys.
 ---
 
-# Authentication
+<span id="authentication" />
 
 The `rig` CLI is the primary way to authenticate. Run `rig login` once and every subsequent command (including raw `rig api` calls) reuses your stored credentials — no headers to manage.
 
 ## Log in with the CLI
 
 ```bash
-rig login          # opens your browser for OAuth and stores the token locally
+rig login          # opens your browser to approve a CLI session and saves its API key locally
 rig whoami         # confirm the current user and workspace
 rig logout         # remove saved credentials
 ```
 
-For headless environments, two non-interactive variants paste or import a token instead of opening a browser:
+For headless environments, you can paste a token interactively or import a token instead of opening a browser:
 
 ```bash
 rig login --token          # paste a token at the prompt
@@ -30,7 +30,7 @@ rig workspace ls
 
 ## API keys
 
-For backend services, CI, or agents, mint a long-lived API key. API keys (`rb_…`) are full-account credentials, shown once at creation and stored hash-only. Create one from the [dashboard](https://rigbox.dev) under **Settings → API Keys**, or with the CLI:
+For GitHub deployments, use [GitHub Actions OIDC credentials](/guides/github-actions). For other backend services or agents that need account API access, create an API key. API keys (`rb_…`) are full-account credentials, shown once at creation and stored hash-only. Create one from the [dashboard](https://rigbox.dev) under **Settings → API Keys**, or with the CLI:
 
 ```bash
 rig api-key create --name ci-runner   # plaintext printed once — copy it now
@@ -74,7 +74,7 @@ When you run `rig login` on your local machine, the CLI walks you through a brow
 | CLI | `GET /api/v1/auth/cli-session/{code}` | Poll until the browser approves; the approved response carries the API key |
 | Dashboard | `POST /api/v1/auth/cli-session/{code}/approve` | Approve the pending session (requires a fresh dashboard JWT) |
 
-The approval step **rotates a single canonical `"CLI login"` API key**: any prior CLI-login key on your account is revoked before a fresh one is issued. The new key is returned to the polling CLI and written to `~/.rigbox/config.json`. This matches what `gcloud auth login`, `aws sso login`, and `kubectl auth login` do — a fresh login means a fresh credential, and the previous credential is invalidated on every other machine that was using it.
+The approval step **rotates a single canonical `"CLI login"` API key**: any prior CLI-login key on your account is revoked before a fresh one is issued. The new key is returned to the polling CLI and written to `~/.config/rigbox/config.json`.
 
 <Note>
   If you want a long-lived key that survives re-logging in (e.g. for a CI runner or a second laptop), create it explicitly under **Settings → API Keys** instead of relying on the `rig login` slot.
@@ -92,7 +92,9 @@ The Rigbox frontends (`rigbox.dev`, `clawd.rigbox.dev`, `sandbox.rigbox.dev`) ha
 
 | Client type | Recommended | Why |
 | --- | --- | --- |
-| Backend service, CI, agent | API key | Stable, easy to rotate, no expiry |
+| Local terminal | `rig login` | Browser-approved CLI session |
+| GitHub Actions deployment | OIDC deploy credential | Short-lived and scoped to a bound workspace |
+| Backend service or agent | API key | Account API access without an interactive session |
 | First-party dashboard | Session token | User-scoped, automatic refresh |
 | Third-party web app | Your backend + API key | Keep keys server-side, proxy requests |
 
@@ -107,14 +109,14 @@ These endpoints do not require authentication:
 
 When an app's visibility is set to **private** or **privileged**, requests from outside the workspace must include an `X-Rigbox-Key` header. This is separate from the `Authorization` header used for the main API.
 
-Any valid API key (`rb_*`) will work as the value:
+Use an API key authorized to access the target app; a valid key for another owner is not sufficient:
 
 ```bash
 curl https://<APP_NAME>.rigbox.dev/endpoint \
   -H "X-Rigbox-Key: $RIGBOX_API_KEY"
 ```
 
-Replace `<APP_NAME>` with the name of your app (the value you passed to `rig app new` or the app create endpoint).
+Use the URL returned in the app details; do not infer the subdomain from a display name.
 
 <Note>
 Requests made from inside the workspace (e.g. between services on `localhost`) do not need this header. It is only required for requests arriving from the public internet.

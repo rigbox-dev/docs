@@ -1,0 +1,24 @@
+---
+title: "Deploy and monitor applications"
+description: "Integrate the v0.13 app-release lifecycle into your backend."
+---
+
+## Choose the deployment contract
+
+Use app releases to update managed application code and configuration within an existing workspace. Use image workflows for a frozen runtime environment. These have different recovery boundaries; see [deployment strategy](/reference/rig-yaml/deployment).
+
+## Prepare a release
+
+Call [Prepare an app release](/api-reference/app-releases/create) with source files, app configuration, a deployment scope, and an idempotency key according to the generated schema. Reuse the key only for the same logical attempt. Your backend must not let unrelated tenants claim another deployment's scope or workspace.
+
+Poll [Get an app release](/api-reference/app-releases/get) and display [release logs](/api-reference/app-releases/logs) while preparation runs. Keep failures visible; an HTTP acceptance response does not mean the app is live.
+
+## Activate and observe
+
+When the release is ready, call [Activate an app release](/api-reference/app-releases/activate), then continue observing its status and app health. Preserve the existing resource IDs and use the URL returned for the app rather than constructing one from a display name.
+
+## Recovery
+
+List retained releases and expose only supported activation or rollback choices. App rollback restores code and configuration, not database contents. Handle a failed candidate as a deployment outcome; do not replace the workspace to hide the failure.
+
+For a working terminal workflow, follow [stage and activate](/deploy/stage-and-activate). For log delivery, see [App Logs](/api-reference/app-logs/get-logs).

@@ -1,0 +1,23 @@
+---
+title: "Runnable examples"
+description: "Learn one Rigbox capability at a time with a complete application."
+---
+
+Each example includes application source and a `rig.yaml`. Start with the first app, then choose the capability you need. Run examples in isolated workspaces and remove them when finished.
+
+Use the v0.13 CLI and the linked examples revision. Manifest validation does not replace checking the deployed application’s health.
+
+| Example | Learn | Strategy |
+| --- | --- | --- |
+| [First app](/examples/first-app) | Deploy, verify health, redeploy | Incremental |
+| [Frontend and API](/examples/frontend-api) | Multi-app dependencies and service discovery | Incremental |
+| [AI chat](/examples/ai-chat) | Managed AI and model selection | Incremental |
+| [Webhook receiver](/examples/webhook) | Required secrets and generated credentials | Incremental |
+| [Background worker](/examples/background-worker) | Application-managed timers and health | Incremental |
+| [Persistent notes](/examples/persistent-notes) | Volume-backed SQLite | Incremental |
+| [Validated configuration](/examples/parameters) | Typed parameters and validation | Incremental |
+| [Blue-green blog](/examples/bluegreen) | Stage and inspect before promotion | Image |
+| [Self-hosted applications](/examples/self-hosted) | Install code-server, Gitea, and n8n | Image |
+| [Catalog agents and services](/examples/catalog) | CLI agents and HTTP services | Image |
+
+[Browse the source repository](https://github.com/rigbox-dev/rigbox-examples). Use the [manifest reference](/reference/rig-yaml) when adapting an example. Keep durable application data on declared volumes; app rollback does not restore data.

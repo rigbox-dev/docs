@@ -1,0 +1,256 @@
+---
+title: "rig deploy"
+sidebarTitle: "deploy"
+description: "Deploy the project from its rig.yaml"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+Deploy the project from the local directory containing rig.yaml. Review the deployment strategy before running.
+
+```bash
+rig deploy
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig deploy --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox deploy [OPTIONS]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--from-dir` | Project directory containing rig.yaml. Defaults to cwd | Value: FROM_DIR; Aliases: from |
+| `-w, --workspace` | Target workspace (name or id). When unset, reuses the single workspace bound in .rig.lock, or spawns a fresh one | Value: WORKSPACE |
+| `-n, --name` | Workspace name when spawning a new workspace | Value: NAME |
+| `--app` | Deploy only the named app (multi-app projects) | Value: APP |
+| `--watch` | Re-deploy on source changes (single-app projects only) | Default: false |
+| `--prune-stale` | Drop .rig.lock bindings to workspaces that no longer exist, then exit without deploying | Default: false |
+| `--stage` | Deployment stage. Also loads `.env.&lt;stage&gt;` and `.env.&lt;stage&gt;.local` (precedence: real env &gt; .env.&lt;stage&gt;.local &gt; .env.local &gt; .env.&lt;stage&gt; &gt; .env). Falls back to $RIG_ENV | Value: STAGE |
+| `--no-env-file` | Skip auto-loading `.env` / `.env.&lt;stage&gt;` files | Default: false |
+| `--reimage` | Allow re-imaging a pre-existing workspace from a frozen image, discarding its current filesystem. Required to deploy a `reproducible: true` app into a workspace that wasn&#x27;t created by this deploy and isn&#x27;t already image-pinned | Default: false |
+| `--build-only` | Build/publish the frozen image(s) for `reproducible: true` apps and stop — no workspace, re-image, or rsync. A later `rig deploy` reuses the image | Default: false |
+| `--sync-only` | Sync every app&#x27;s files but skip the restart pass — stage code without interrupting the running services | Default: false |
+| `--strategy` | Deploy managed app releases or explicitly build a workspace image | Value: STRATEGY; Choices: incremental, image |
+| `--deployment-id` | Stable deployment attempt ID for retries (incremental releases only) | Value: DEPLOYMENT_ID |
+| `--bluegreen` | Stage a change before swinging production traffic at it; pair with `--promote` to swap atomically (zero-downtime). `&lt;suffix&gt;` stages an sibling app at `&lt;base&gt;-&lt;suffix&gt;` on its own subdomain. The special value `preview` instead clones the WHOLE workspace into a hidden preview (every app), overlays your new code, and serves it at `&lt;app&gt;-pv-&lt;id&gt;.rigbox.dev` — `--promote` then re-homes prod onto it.<br /><br />Pick by what the workspace IS: `preview` is for production SERVICE hosts (it swaps to a new workspace, so the old one is retired — open SSH sessions in it don&#x27;t follow the swap). For a workspace people actively work IN (SSH, shells, dev processes), deploy in place or use `&lt;suffix&gt;` (same workspace, ~1s app restart) so sessions and workspace state survive. | Value: BLUEGREEN |
+| `--promote` | After staging via `--bluegreen &lt;suffix&gt;`, swap the production subdomain to the staged sibling in one atomic DB transaction (zero-downtime). The previous production app is retained as a rollback target until you delete it.<br /><br />Requires `--bluegreen`. | Default: false |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help (see a summary with &#x27;-h&#x27;) |  |
+
+<Accordion title="Complete command help">
+
+```text
+Deploy the project from its rig.yaml
+
+Usage: rigbox deploy [OPTIONS]
+
+Options:
+      --from-dir <FROM_DIR>
+          Project directory containing rig.yaml. Defaults to cwd
+          
+          [aliases: --from]
+
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+  -w, --workspace <WORKSPACE>
+          Target workspace (name or id). When unset, reuses the single workspace bound in .rig.lock, or spawns a fresh one
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+  -n, --name <NAME>
+          Workspace name when spawning a new workspace
+
+      --app <APP>
+          Deploy only the named app (multi-app projects)
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --watch
+          Re-deploy on source changes (single-app projects only)
+
+      --no-pager
+          Do not pipe help output through a pager
+
+      --prune-stale
+          Drop .rig.lock bindings to workspaces that no longer exist, then exit without deploying
+
+      --stage <STAGE>
+          Deployment stage. Also loads `.env.<stage>` and `.env.<stage>.local` (precedence: real env > .env.<stage>.local > .env.local > .env.<stage> > .env). Falls back to $RIG_ENV
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+      --no-env-file
+          Skip auto-loading `.env` / `.env.<stage>` files
+
+      --reimage
+          Allow re-imaging a pre-existing workspace from a frozen image, discarding its current filesystem. Required to deploy a `reproducible: true` app into a workspace that wasn't created by this deploy and isn't already image-pinned
+
+      --build-only
+          Build/publish the frozen image(s) for `reproducible: true` apps and stop — no workspace, re-image, or rsync. A later `rig deploy` reuses the image
+
+      --sync-only
+          Sync every app's files but skip the restart pass — stage code without interrupting the running services
+
+      --strategy <STRATEGY>
+          Deploy managed app releases or explicitly build a workspace image
+          
+          [possible values: incremental, image]
+
+      --deployment-id <DEPLOYMENT_ID>
+          Stable deployment attempt ID for retries (incremental releases only)
+
+      --bluegreen <BLUEGREEN>
+          Stage a change before swinging production traffic at it; pair with `--promote` to swap atomically (zero-downtime). `<suffix>` stages an sibling app at `<base>-<suffix>` on its own subdomain. The special value `preview` instead clones the WHOLE workspace into a hidden preview (every app), overlays your new code, and serves it at `<app>-pv-<id>.rigbox.dev` — `--promote` then re-homes prod onto it.
+          
+          Pick by what the workspace IS: `preview` is for production SERVICE hosts (it swaps to a new workspace, so the old one is retired — open SSH sessions in it don't follow the swap). For a workspace people actively work IN (SSH, shells, dev processes), deploy in place or use `<suffix>` (same workspace, ~1s app restart) so sessions and workspace state survive.
+
+      --promote
+          After staging via `--bluegreen <suffix>`, swap the production subdomain to the staged sibling in one atomic DB transaction (zero-downtime). The previous production app is retained as a rollback target until you delete it.
+          
+          Requires `--bluegreen`.
+
+  -h, --help
+          Print help (see a summary with '-h')
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox deploy [OPTIONS]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--from-dir` | Project directory containing rig.yaml. Defaults to cwd | Value: FROM_DIR; Aliases: from |
+| `-w, --workspace` | Target workspace (name or id). When unset, reuses the single workspace bound in .rig.lock, or spawns a fresh one | Value: WORKSPACE |
+| `-n, --name` | Workspace name when spawning a new workspace | Value: NAME |
+| `--app` | Deploy only the named app (multi-app projects) | Value: APP |
+| `--watch` | Re-deploy on source changes (single-app projects only) | Default: false |
+| `--prune-stale` | Drop .rig.lock bindings to workspaces that no longer exist, then exit without deploying | Default: false |
+| `--stage` | Deployment stage. Also loads `.env.&lt;stage&gt;` and `.env.&lt;stage&gt;.local` (precedence: real env &gt; .env.&lt;stage&gt;.local &gt; .env.local &gt; .env.&lt;stage&gt; &gt; .env). Falls back to $RIG_ENV | Value: STAGE |
+| `--no-env-file` | Skip auto-loading `.env` / `.env.&lt;stage&gt;` files | Default: false |
+| `--reimage` | Allow re-imaging a pre-existing workspace from a frozen image, discarding its current filesystem. Required to deploy a `reproducible: true` app into a workspace that wasn&#x27;t created by this deploy and isn&#x27;t already image-pinned | Default: false |
+| `--build-only` | Build/publish the frozen image(s) for `reproducible: true` apps and stop — no workspace, re-image, or rsync. A later `rig deploy` reuses the image | Default: false |
+| `--sync-only` | Sync every app&#x27;s files but skip the restart pass — stage code without interrupting the running services | Default: false |
+| `--strategy` | Deploy managed app releases or explicitly build a workspace image | Value: STRATEGY; Choices: incremental, image |
+| `--deployment-id` | Stable deployment attempt ID for retries (incremental releases only) | Value: DEPLOYMENT_ID |
+| `--bluegreen` | Stage a change before swinging production traffic at it; pair with `--promote` to swap atomically (zero-downtime). `&lt;suffix&gt;` stages an sibling app at `&lt;base&gt;-&lt;suffix&gt;` on its own subdomain. The special value `preview` instead clones the WHOLE workspace into a hidden preview (every app), overlays your new code, and serves it at `&lt;app&gt;-pv-&lt;id&gt;.rigbox.dev` — `--promote` then re-homes prod onto it.<br /><br />Pick by what the workspace IS: `preview` is for production SERVICE hosts (it swaps to a new workspace, so the old one is retired — open SSH sessions in it don&#x27;t follow the swap). For a workspace people actively work IN (SSH, shells, dev processes), deploy in place or use `&lt;suffix&gt;` (same workspace, ~1s app restart) so sessions and workspace state survive. | Value: BLUEGREEN |
+| `--promote` | After staging via `--bluegreen &lt;suffix&gt;`, swap the production subdomain to the staged sibling in one atomic DB transaction (zero-downtime). The previous production app is retained as a rollback target until you delete it.<br /><br />Requires `--bluegreen`. | Default: false |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help (see a summary with &#x27;-h&#x27;) |  |
+
+<Accordion title="Complete command help">
+
+```text
+Deploy the project from its rig.yaml
+
+Usage: rigbox deploy [OPTIONS]
+
+Options:
+      --from-dir <FROM_DIR>
+          Project directory containing rig.yaml. Defaults to cwd
+          
+          [aliases: --from]
+
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -w, --workspace <WORKSPACE>
+          Target workspace (name or id). When unset, reuses the single workspace bound in .rig.lock, or spawns a fresh one
+
+  -n, --name <NAME>
+          Workspace name when spawning a new workspace
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+      --app <APP>
+          Deploy only the named app (multi-app projects)
+
+      --watch
+          Re-deploy on source changes (single-app projects only)
+
+      --prune-stale
+          Drop .rig.lock bindings to workspaces that no longer exist, then exit without deploying
+
+      --stage <STAGE>
+          Deployment stage. Also loads `.env.<stage>` and `.env.<stage>.local` (precedence: real env > .env.<stage>.local > .env.local > .env.<stage> > .env). Falls back to $RIG_ENV
+
+      --no-env-file
+          Skip auto-loading `.env` / `.env.<stage>` files
+
+      --reimage
+          Allow re-imaging a pre-existing workspace from a frozen image, discarding its current filesystem. Required to deploy a `reproducible: true` app into a workspace that wasn't created by this deploy and isn't already image-pinned
+
+      --build-only
+          Build/publish the frozen image(s) for `reproducible: true` apps and stop — no workspace, re-image, or rsync. A later `rig deploy` reuses the image
+
+      --sync-only
+          Sync every app's files but skip the restart pass — stage code without interrupting the running services
+
+      --strategy <STRATEGY>
+          Deploy managed app releases or explicitly build a workspace image
+          
+          [possible values: incremental, image]
+
+      --deployment-id <DEPLOYMENT_ID>
+          Stable deployment attempt ID for retries (incremental releases only)
+
+      --bluegreen <BLUEGREEN>
+          Stage a change before swinging production traffic at it; pair with `--promote` to swap atomically (zero-downtime). `<suffix>` stages an sibling app at `<base>-<suffix>` on its own subdomain. The special value `preview` instead clones the WHOLE workspace into a hidden preview (every app), overlays your new code, and serves it at `<app>-pv-<id>.rigbox.dev` — `--promote` then re-homes prod onto it.
+          
+          Pick by what the workspace IS: `preview` is for production SERVICE hosts (it swaps to a new workspace, so the old one is retired — open SSH sessions in it don't follow the swap). For a workspace people actively work IN (SSH, shells, dev processes), deploy in place or use `<suffix>` (same workspace, ~1s app restart) so sessions and workspace state survive.
+
+      --promote
+          After staging via `--bluegreen <suffix>`, swap the production subdomain to the staged sibling in one atomic DB transaction (zero-downtime). The previous production app is retained as a rollback target until you delete it.
+          
+          Requires `--bluegreen`.
+
+  -h, --help
+          Print help (see a summary with '-h')
+```
+
+</Accordion>

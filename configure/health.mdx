@@ -1,0 +1,32 @@
+---
+title: "Health checks"
+description: "Make release success reflect an application that is ready to serve."
+---
+
+## Add a readiness endpoint
+
+Your HTTP service should return a successful response only when it can handle requests. Declare its port and path:
+
+```yaml
+port: 3000
+health:
+  path: /healthz
+  timeoutSeconds: 60
+```
+
+Implement `/healthz` in the app and ensure the process listens on the declared port. Incremental service releases currently require HTTP health checks; a non-HTTP protocol is rejected. Avoid returning success unconditionally before critical initialization completes.
+
+## Deploy and inspect
+
+```bash
+rig deploy --workspace my-project
+rig app health --app <APP_NAME> --output json
+```
+
+Run locally. The default HTTP health path is `/` with a 60-second budget when not declared. Set an explicit endpoint so redirects, authentication, or an unrelated homepage do not obscure readiness.
+
+## Recover from failure
+
+Read `rig app-release logs --workspace my-project --release <RELEASE_ID>` for preparation/startup failures. Confirm the process and port before increasing the timeout. Inspect the current release state and test the active URL after a failed activation. If necessary, [roll back app code](/deploy/app-rollback) to a retained compatible release.
+
+CLI applications use declared executables or `health.command` to verify an entrypoint and do not need a public service port.

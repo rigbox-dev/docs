@@ -1,0 +1,144 @@
+---
+title: "rig recipe app install"
+sidebarTitle: "install"
+description: "Install an exact recipe ref into a workspace"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+
+```bash
+rig recipe app install --ref DEPLOY_REF --workspace WORKSPACE_ID
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig recipe app install --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox recipe app install [OPTIONS] --ref <DEPLOY_REF> --workspace <WORKSPACE>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-r, --ref` | Exact recipe ref to install, e.g. @vendor/slug@1.2.3 | Required; Value: DEPLOY_REF |
+| `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
+| `--param` | Recipe parameter in `key=value` form (repeatable) | Value: PARAMS |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Install an exact recipe ref into a workspace
+
+Usage: rigbox recipe app install [OPTIONS] --ref <DEPLOY_REF> --workspace <WORKSPACE>
+
+Options:
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+  -r, --ref <DEPLOY_REF>
+          Exact recipe ref to install, e.g. @vendor/slug@1.2.3
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+  -w, --workspace <WORKSPACE>
+          Workspace name or id
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+      --param <PARAMS>
+          Recipe parameter in `key=value` form (repeatable)
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox recipe app install [OPTIONS] --ref <DEPLOY_REF> --workspace <WORKSPACE>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `-r, --ref` | Exact recipe ref to install, e.g. @vendor/slug@1.2.3 | Required; Value: DEPLOY_REF |
+| `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
+| `--param` | Recipe parameter in `key=value` form (repeatable) | Value: PARAMS |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Install an exact recipe ref into a workspace
+
+Usage: rigbox recipe app install [OPTIONS] --ref <DEPLOY_REF> --workspace <WORKSPACE>
+
+Options:
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+  -r, --ref <DEPLOY_REF>
+          Exact recipe ref to install, e.g. @vendor/slug@1.2.3
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -w, --workspace <WORKSPACE>
+          Workspace name or id
+
+      --param <PARAMS>
+          Recipe parameter in `key=value` form (repeatable)
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

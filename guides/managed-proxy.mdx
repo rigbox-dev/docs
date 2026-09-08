@@ -5,11 +5,17 @@ description: Use Rigbox-provided AI credits without managing your own API keys.
 
 The managed AI proxy lets your workspace code call supported AI providers without putting provider API keys in the VM. Rigbox holds managed provider keys on your behalf, injects them at request time, and tracks usage against your credit balance.
 
+## Before you begin
+
+Use the [v0.13 CLI](/guides/install-cli) and [authenticate](/cli-reference/authentication). Run workspace-management and recipe commands from your local terminal. Commands identified as running inside a workspace require its console terminal or SSH session. Replace example resource IDs with the values returned for your account.
+
+Start the target workspace first and verify its identity with `rig workspace ls`. AI calls require managed credits or an appropriately configured provider account.
+
 ## How It Works
 
-Every workspace can reach the proxy at `http://172.16.0.1:9090` from inside the VM. When managed mode is active, AI SDK requests are routed through that bridge-local proxy, which fronts an OpenRouter gateway. The proxy:
+Every workspace can reach the proxy at `http://172.16.0.1:9090` from inside the VM. When managed mode is active, SDK requests configured to use this endpoint pass through that bridge-local proxy, which fronts an OpenRouter gateway. The proxy:
 
-1. Intercepts the request from your workspace VM
+1. Receives the request addressed to the proxy by your workspace code
 2. Resolves the workspace from the VM's source IP on the compute bridge
 3. Injects Rigbox's managed OpenRouter key (your VM never sees it)
 4. Forwards the request to OpenRouter, which routes to the appropriate upstream provider for the requested model
@@ -45,12 +51,7 @@ A small set of free-tier models is also exposed through a `free` alias when Rigb
 
 ## Credit Tiers
 
-Every Rigbox account comes with AI credits that reset monthly.
-
-| Tier | Credits / Month | Best For |
-|------|----------------|----------|
-| **Free** | 250 | Trying out the platform, small experiments |
-| **Pro** | 2,000 | Active development, prototyping, demos |
+Use `rig status` and your account’s credit response to inspect the current balance and renewal information. Included credits depend on your plan; purchased credits and included credit buckets can have different renewal behavior.
 
 Credits map roughly to API cost - one credit equals approximately $0.01 of upstream provider spend. The exact mapping depends on the model and token count.
 
@@ -81,7 +82,7 @@ eval "$(rig proxy on)"
 This command:
 - Prints shell `export` statements for `OPENROUTER_BASE_URL` and `OPENROUTER_API_KEY` (plus a small set of compatibility variables for SDKs that prefer provider-native names)
 - Uses `managed-by-rigbox` placeholder API keys where SDKs require a non-empty key and don't read `OPENROUTER_API_KEY`
-- Routes subsequent AI SDK calls in that shell through the Rigbox proxy
+- Configures compatible tools that read those environment variables; explicit SDK settings may override them
 
 <Tip>
 Use `rig proxy status` to see the configured endpoints, current shell state, and credit balance.
@@ -279,7 +280,7 @@ Here is a complete flow: activate managed mode, make an AI call from inside the 
 
 ```bash
 rig workspace ai mode --workspace ws_abc123 managed
-rig ai defaults --provider google --model gemini-2.5-flash-lite
+rig ai defaults --provider google --model google/gemini-2.5-flash-lite
 ```
 
 **Step 2 - Inside the workspace VM, configure the shell and make a call:**
@@ -309,7 +310,7 @@ rig api GET /v1/users/me/credits
 ```
 
 <Note>
-Credit deduction happens synchronously - the balance is updated before the proxy returns the response to your code, so the credits endpoint always reflects the latest usage.
+Credit deduction happens synchronously - the balance is updated before the proxy returns the response to your code, so a completed request’s settled usage can be checked after its response.
 </Note>
 
 ## Switching Providers and Models
@@ -325,6 +326,12 @@ curl -sS "$OPENROUTER_BASE_URL/chat/completions" \
 ```
 
 The account-level AI defaults (set with `rig ai defaults`) define the default provider and model used by tools that don't ask for one explicitly, and are also surfaced by `rig proxy status`.
+
+## Verify and troubleshoot
+
+Inside the workspace, inspect `rig proxy status`, then make one small request with your chosen tool. Verify the configured endpoint and check the corresponding Rigbox or provider usage. After changing keys or mode, start a fresh shell and restart processes that retained their old configuration. Never print a provider key to verify it.
+
+For failures, start with [runtime logs](/operate/app-logs), [health checks](/operate/health), or [resource exhaustion](/operate/resources).
 
 ## Next Steps
 

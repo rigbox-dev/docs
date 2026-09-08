@@ -5,7 +5,13 @@ description: Monitor and manage backing infrastructure like databases, caches, a
 
 When you deploy a workspace from a template, Rigbox often provisions **backing services** alongside your app. These are infrastructure components like PostgreSQL, Redis, and RabbitMQ that your apps depend on to function.
 
-You do not need to install, start, or stop these services manually. Rigbox manages them for you. This guide covers how to monitor their health and understand how they connect to your apps.
+You do not need to install, start, or stop these services manually. Their installed service configuration manages startup. This guide covers how to monitor their health and understand how they connect to your apps.
+
+## Before you begin
+
+Use the [v0.13 CLI](/guides/install-cli) and [authenticate](/cli-reference/authentication). Run workspace-management and recipe commands from your local terminal. Commands identified as running inside a workspace require its console terminal or SSH session. Replace example resource IDs with the values returned for your account.
+
+Start the target workspace and verify its identity with `rig workspace ls`.
 
 ## What Are Workspace Services?
 
@@ -45,7 +51,7 @@ Open your workspace detail page. The **infrastructure bar** appears at the top o
 
 ## App Dependencies
 
-Apps can declare which services they depend on using the `depends_on` field. This creates a dependency tree that the dashboard visualizes, so you can see exactly which services power which apps.
+Catalog and template metadata can declare backing-service relationships that the dashboard visualizes. In a multi-app `rig.yaml`, `depends_on` controls deployment ordering; it does not by itself inject database credentials or connection URLs. Configure those connections explicitly.
 
 For example, a Firecrawl app might depend on PostgreSQL, Redis, and RabbitMQ. If one of those services goes unhealthy, you know immediately which apps are affected.
 
@@ -61,11 +67,17 @@ The output includes each service's name, type, and current health status.
 
 ## Managed Automatically
 
-Workspace services are fully managed by Rigbox. When you start a workspace, the services start with it. When you stop the workspace, they shut down gracefully. You do not need to run any commands to keep them running.
+Workspace services follow their installed startup and restart policies. Starting or stopping the workspace also affects those processes. You remain responsible for application configuration, backups, and investigating unhealthy services.
 
 <Warning>
 Do not manually stop or modify the systemd units for workspace services. Rigbox manages their lifecycle, and manual changes may cause health checks to report incorrect status.
 </Warning>
+
+## Verify and troubleshoot
+
+Inspect `rig workspace ls` and `rig workspace services --workspace WORKSPACE_ID`. For installed apps, check their status and health before opening the returned URL. A created resource or running VM does not by itself prove the application is ready.
+
+For failures, start with [runtime logs](/operate/app-logs), [health checks](/operate/health), or [resource exhaustion](/operate/resources).
 
 ## Next Steps
 

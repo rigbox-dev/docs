@@ -1,91 +1,493 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Rigbox API",
+  "name": "Rigbox Docs",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#10b981",
-    "light": "#00a866",
-    "dark": "#0f0f11"
+    "primary": "#087f5b",
+    "light": "#4adea1",
+    "dark": "#087f5b"
   },
-  "openapi": [
-    "openapi/rigbox-api.json",
-    "openapi/auth-api.json",
-    "openapi/managed-proxy-api.json"
-  ],
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "Docs",
         "groups": [
           {
-            "group": "Getting Started",
+            "group": "Start here",
             "pages": [
               "introduction",
               "quickstart",
-              "guides/workspaces",
-              "guides/ssh-access",
-              "guides/deploying"
+              "guides/install-cli",
+              "concepts/core"
             ]
           },
           {
-            "group": "Concepts",
+            "group": "Deploy applications",
             "pages": [
-              "concepts/architecture",
-              "concepts/security",
-              "concepts/limits",
-              "guides/images-and-templates"
+              "deploy/overview",
+              "guides/deploying",
+              {
+                "group": "GitHub",
+                "pages": [
+                  "guides/github",
+                  "guides/github-actions",
+                  "guides/deploy-button"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "Multi-app projects",
+                "pages": [
+                  "deploy/multi-app",
+                  "deploy/dependencies",
+                  "deploy/single-app"
+                ],
+                "expanded": false
+              },
+              "deploy/development-loop",
+              "deploy/stage-and-activate",
+              "deploy/app-rollback",
+              {
+                "group": "Reproducible builds",
+                "pages": [
+                  "deploy/reproducible-builds",
+                  "deploy/build-cache",
+                  "deploy/reimage",
+                  "guides/releases-and-rollback"
+                ],
+                "expanded": false
+              },
+              "guides/bluegreen"
             ]
           },
           {
-            "group": "Deploying & hosting",
+            "group": "Configure applications",
             "pages": [
-              "guides/deploy-button",
-              "guides/github-actions",
-              "guides/bluegreen",
-              "guides/releases-and-rollback",
-              "guides/persistent-volumes",
-              "guides/expose-and-route",
+              "configure/overview",
+              "configure/environment",
+              "configure/secrets",
+              "configure/parameters",
+              "configure/commands",
+              "configure/health",
               "guides/visibility",
-              "guides/custom-domains"
+              "guides/expose-and-route",
+              "guides/custom-domains",
+              {
+                "group": "rig.yaml",
+                "pages": [
+                  "reference/rig-yaml",
+                  "reference/rig-yaml/application",
+                  "reference/rig-yaml/workspace",
+                  "reference/rig-yaml/source",
+                  "reference/rig-yaml/configuration",
+                  "reference/rig-yaml/deployment"
+                ],
+                "expanded": false
+              }
             ]
           },
           {
-            "group": "AI, automation & data",
+            "group": "Workspaces and storage",
             "pages": [
+              "workspaces/overview",
+              "guides/workspaces",
+              "concepts/limits",
+              {
+                "group": "SSH",
+                "pages": [
+                  "guides/ssh-access",
+                  "workspaces/ssh-keys",
+                  "workspaces/file-transfer"
+                ],
+                "expanded": false
+              },
+              "guides/images-and-templates",
+              {
+                "group": "Persistent volumes",
+                "pages": [
+                  "guides/persistent-volumes",
+                  "workspaces/volume-management"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "Snapshots",
+                "pages": [
+                  "guides/snapshots",
+                  "workspaces/snapshot-restore",
+                  "workspaces/recovery-limits"
+                ],
+                "expanded": false
+              },
+              "guides/workspace-services",
+              "guides/setup-scripts",
+              "guides/service-specs"
+            ]
+          },
+          {
+            "group": "AI and tools",
+            "pages": [
+              "ai/overview",
+              "guides/ai-coding-tools",
               "guides/managed-proxy",
               "guides/byok",
-              "guides/ai-coding-tools",
-              "guides/setup-scripts",
-              "guides/service-specs",
-              "guides/workspace-services",
-              "guides/snapshots"
+              "guides/catalog",
+              "ai/spawn",
+              "guides/virtual-browser",
+              "guides/firecrawl",
+              "guides/architecture-explorer"
             ]
           },
           {
-            "group": "CLI Reference",
+            "group": "Operate and troubleshoot",
+            "pages": [
+              "operate/overview",
+              "operate/app-logs",
+              "operate/build-logs",
+              "operate/telemetry",
+              "operate/health",
+              "operate/deployment",
+              "operate/github",
+              "operate/ssh",
+              "operate/resources",
+              "operate/storage"
+            ]
+          },
+          {
+            "group": "Examples",
+            "pages": [
+              "examples/overview",
+              "examples/first-app",
+              "examples/frontend-api",
+              "examples/ai-chat",
+              "examples/webhook",
+              "examples/background-worker",
+              "examples/persistent-notes",
+              "examples/parameters",
+              "examples/bluegreen",
+              "examples/self-hosted",
+              "examples/catalog"
+            ]
+          },
+          {
+            "group": "CLI reference",
             "pages": [
               "cli-reference/cli",
-              "cli-reference/authentication"
-            ]
-          },
-          {
-            "group": "Integrations & tools",
-            "pages": [
-              "guides/catalog",
-              "guides/architecture-explorer",
-              "guides/virtual-browser",
-              "guides/firecrawl"
+              "cli-reference/authentication",
+              "guides/using-cli",
+              "cli-reference/configuration",
+              "cli-reference/execution-modes",
+              {
+                "group": "ai",
+                "pages": [
+                  "cli-reference/commands/ai",
+                  "cli-reference/commands/ai/defaults",
+                  "cli-reference/commands/ai/usage"
+                ],
+                "expanded": false
+              },
+              "cli-reference/commands/api",
+              {
+                "group": "api-key",
+                "pages": [
+                  "cli-reference/commands/api-key",
+                  "cli-reference/commands/api-key/create",
+                  "cli-reference/commands/api-key/ls",
+                  "cli-reference/commands/api-key/rm"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "app",
+                "pages": [
+                  "cli-reference/commands/app",
+                  {
+                    "group": "domain",
+                    "pages": [
+                      "cli-reference/commands/app/domain",
+                      "cli-reference/commands/app/domain/set"
+                    ],
+                    "expanded": false
+                  },
+                  {
+                    "group": "env",
+                    "pages": [
+                      "cli-reference/commands/app/env",
+                      "cli-reference/commands/app/env/ls",
+                      "cli-reference/commands/app/env/set",
+                      "cli-reference/commands/app/env/unset"
+                    ],
+                    "expanded": false
+                  },
+                  "cli-reference/commands/app/expose-port",
+                  "cli-reference/commands/app/health",
+                  {
+                    "group": "log-source",
+                    "pages": [
+                      "cli-reference/commands/app/log-source",
+                      "cli-reference/commands/app/log-source/add",
+                      "cli-reference/commands/app/log-source/ls",
+                      "cli-reference/commands/app/log-source/rm",
+                      "cli-reference/commands/app/log-source/update"
+                    ],
+                    "expanded": false
+                  },
+                  "cli-reference/commands/app/logs",
+                  "cli-reference/commands/app/ls",
+                  "cli-reference/commands/app/new",
+                  {
+                    "group": "param",
+                    "pages": [
+                      "cli-reference/commands/app/param",
+                      "cli-reference/commands/app/param/get",
+                      "cli-reference/commands/app/param/ls",
+                      "cli-reference/commands/app/param/set",
+                      "cli-reference/commands/app/param/unset"
+                    ],
+                    "expanded": false
+                  },
+                  "cli-reference/commands/app/restart",
+                  "cli-reference/commands/app/rm",
+                  "cli-reference/commands/app/share",
+                  "cli-reference/commands/app/start",
+                  "cli-reference/commands/app/stop",
+                  "cli-reference/commands/app/verify-domain"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "app-release",
+                "pages": [
+                  "cli-reference/commands/app-release",
+                  "cli-reference/commands/app-release/activate",
+                  "cli-reference/commands/app-release/logs",
+                  "cli-reference/commands/app-release/ls",
+                  "cli-reference/commands/app-release/rollback"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "build",
+                "pages": [
+                  "cli-reference/commands/build",
+                  "cli-reference/commands/build/image",
+                  "cli-reference/commands/build/logs",
+                  "cli-reference/commands/build/ls"
+                ],
+                "expanded": false
+              },
+              "cli-reference/commands/capacity",
+              {
+                "group": "ci",
+                "pages": [
+                  "cli-reference/commands/ci",
+                  "cli-reference/commands/ci/link",
+                  "cli-reference/commands/ci/status",
+                  "cli-reference/commands/ci/unlink"
+                ],
+                "expanded": false
+              },
+              "cli-reference/commands/completions",
+              {
+                "group": "config",
+                "pages": [
+                  "cli-reference/commands/config",
+                  "cli-reference/commands/config/get",
+                  "cli-reference/commands/config/list",
+                  "cli-reference/commands/config/set",
+                  "cli-reference/commands/config/unset"
+                ],
+                "expanded": false
+              },
+              "cli-reference/commands/deploy",
+              "cli-reference/commands/init",
+              "cli-reference/commands/limits",
+              "cli-reference/commands/login",
+              "cli-reference/commands/logout",
+              {
+                "group": "proxy",
+                "pages": [
+                  "cli-reference/commands/proxy",
+                  "cli-reference/commands/proxy/dotenv",
+                  "cli-reference/commands/proxy/env",
+                  "cli-reference/commands/proxy/off",
+                  "cli-reference/commands/proxy/on",
+                  "cli-reference/commands/proxy/path",
+                  "cli-reference/commands/proxy/status"
+                ],
+                "expanded": false
+              },
+              "cli-reference/commands/publish",
+              {
+                "group": "recipe",
+                "pages": [
+                  "cli-reference/commands/recipe",
+                  {
+                    "group": "app",
+                    "pages": [
+                      "cli-reference/commands/recipe/app",
+                      "cli-reference/commands/recipe/app/delete",
+                      "cli-reference/commands/recipe/app/deprecate",
+                      "cli-reference/commands/recipe/app/health",
+                      "cli-reference/commands/recipe/app/info",
+                      "cli-reference/commands/recipe/app/init",
+                      "cli-reference/commands/recipe/app/install",
+                      "cli-reference/commands/recipe/app/install-record",
+                      "cli-reference/commands/recipe/app/lint",
+                      "cli-reference/commands/recipe/app/ls",
+                      "cli-reference/commands/recipe/app/profile",
+                      "cli-reference/commands/recipe/app/test",
+                      "cli-reference/commands/recipe/app/versions",
+                      "cli-reference/commands/recipe/app/yank"
+                    ],
+                    "expanded": false
+                  }
+                ],
+                "expanded": false
+              },
+              {
+                "group": "release",
+                "pages": [
+                  "cli-reference/commands/release",
+                  "cli-reference/commands/release/activate",
+                  "cli-reference/commands/release/create",
+                  "cli-reference/commands/release/ls"
+                ],
+                "expanded": false
+              },
+              "cli-reference/commands/rollback",
+              {
+                "group": "service-spec",
+                "pages": [
+                  "cli-reference/commands/service-spec",
+                  "cli-reference/commands/service-spec/create",
+                  "cli-reference/commands/service-spec/ls",
+                  "cli-reference/commands/service-spec/rm",
+                  "cli-reference/commands/service-spec/update"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "setup-script",
+                "pages": [
+                  "cli-reference/commands/setup-script",
+                  "cli-reference/commands/setup-script/create",
+                  "cli-reference/commands/setup-script/ls",
+                  "cli-reference/commands/setup-script/rm",
+                  "cli-reference/commands/setup-script/update"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "snapshot",
+                "pages": [
+                  "cli-reference/commands/snapshot",
+                  "cli-reference/commands/snapshot/create",
+                  "cli-reference/commands/snapshot/ls",
+                  "cli-reference/commands/snapshot/restore",
+                  "cli-reference/commands/snapshot/rm"
+                ],
+                "expanded": false
+              },
+              {
+                "group": "ssh",
+                "pages": [
+                  "cli-reference/commands/ssh",
+                  "cli-reference/commands/ssh/add",
+                  "cli-reference/commands/ssh/ls",
+                  "cli-reference/commands/ssh/rm",
+                  "cli-reference/commands/ssh/sync"
+                ],
+                "expanded": false
+              },
+              "cli-reference/commands/status",
+              {
+                "group": "tools",
+                "pages": [
+                  "cli-reference/commands/tools",
+                  "cli-reference/commands/tools/install",
+                  "cli-reference/commands/tools/install-status",
+                  "cli-reference/commands/tools/launch",
+                  "cli-reference/commands/tools/ls",
+                  "cli-reference/commands/tools/stop"
+                ],
+                "expanded": false
+              },
+              "cli-reference/commands/uninstall",
+              "cli-reference/commands/update",
+              {
+                "group": "volume",
+                "pages": [
+                  "cli-reference/commands/volume",
+                  "cli-reference/commands/volume/create",
+                  "cli-reference/commands/volume/ls",
+                  "cli-reference/commands/volume/resize",
+                  "cli-reference/commands/volume/rm"
+                ],
+                "expanded": false
+              },
+              "cli-reference/commands/whoami",
+              {
+                "group": "workspace",
+                "pages": [
+                  "cli-reference/commands/workspace",
+                  {
+                    "group": "ai",
+                    "pages": [
+                      "cli-reference/commands/workspace/ai",
+                      "cli-reference/commands/workspace/ai/mode",
+                      "cli-reference/commands/workspace/ai/show"
+                    ],
+                    "expanded": false
+                  },
+                  "cli-reference/commands/workspace/cancel",
+                  {
+                    "group": "env",
+                    "pages": [
+                      "cli-reference/commands/workspace/env",
+                      "cli-reference/commands/workspace/env/get",
+                      "cli-reference/commands/workspace/env/ls",
+                      "cli-reference/commands/workspace/env/set",
+                      "cli-reference/commands/workspace/env/unset"
+                    ],
+                    "expanded": false
+                  },
+                  "cli-reference/commands/workspace/logs",
+                  "cli-reference/commands/workspace/ls",
+                  "cli-reference/commands/workspace/metrics",
+                  "cli-reference/commands/workspace/new",
+                  "cli-reference/commands/workspace/ports",
+                  "cli-reference/commands/workspace/reconcile",
+                  "cli-reference/commands/workspace/resize",
+                  "cli-reference/commands/workspace/restart",
+                  "cli-reference/commands/workspace/retry",
+                  "cli-reference/commands/workspace/rm",
+                  "cli-reference/commands/workspace/services",
+                  "cli-reference/commands/workspace/spawn",
+                  "cli-reference/commands/workspace/ssh-info",
+                  "cli-reference/commands/workspace/start",
+                  "cli-reference/commands/workspace/stop"
+                ],
+                "expanded": false
+              }
             ]
           },
           {
             "group": "Build on Rigbox",
             "pages": [
+              "build/overview",
+              "build/quickstart",
+              "build/workspace-lifecycle",
+              "build/deploy-monitor",
               "guides/build-hosting-platform",
+              "build/api-conventions",
+              "concepts/architecture",
+              "concepts/security",
               "sandbox-api-surface",
               "clawd-api-surface",
               "clawd-runtime-services"
@@ -97,194 +499,254 @@
         "tab": "API Reference",
         "groups": [
           {
+            "group": "Start",
+            "pages": [
+              "api-reference/overview"
+            ]
+          },
+          {
+            "group": "Access",
+            "pages": [
+              {
+                "group": "API Keys",
+                "pages": [
+                  "api-reference/api-keys/list",
+                  "api-reference/api-keys/create",
+                  "api-reference/api-keys/delete"
+                ]
+              },
+              {
+                "group": "Access Control",
+                "pages": [
+                  "api-reference/access-control/search-principals",
+                  "api-reference/access-control/list-bindings",
+                  "api-reference/access-control/create-binding",
+                  "api-reference/access-control/update-binding",
+                  "api-reference/access-control/delete-binding",
+                  "api-reference/access-control/get-tags",
+                  "api-reference/access-control/put-tags",
+                  "api-reference/access-control/get-throttle-binding",
+                  "api-reference/access-control/put-throttle-binding",
+                  "api-reference/access-control/list-throttle-presets",
+                  "api-reference/access-control/list-role-presets",
+                  "api-reference/access-control/simulate"
+                ]
+              }
+            ]
+          },
+          {
             "group": "Workspaces",
             "pages": [
-              "api-reference/workspaces/list",
-              "api-reference/workspaces/create",
-              "api-reference/workspaces/get",
-              "api-reference/workspaces/delete",
-              "api-reference/workspaces/start",
-              "api-reference/workspaces/stop",
-              "api-reference/workspaces/update-env",
-              "api-reference/workspaces/update-resources",
-              "api-reference/workspaces/get-metrics",
-              "api-reference/workspaces/get-logs",
-              "api-reference/workspaces/stream-logs"
+              {
+                "group": "Workspaces",
+                "pages": [
+                  "api-reference/workspaces/list",
+                  "api-reference/workspaces/create",
+                  "api-reference/workspaces/get",
+                  "api-reference/workspaces/delete",
+                  "api-reference/workspaces/start",
+                  "api-reference/workspaces/stop",
+                  "api-reference/workspaces/update-env",
+                  "api-reference/workspaces/update-resources",
+                  "api-reference/workspaces/get-metrics",
+                  "api-reference/workspaces/get-logs",
+                  "api-reference/workspaces/stream-logs"
+                ]
+              },
+              {
+                "group": "Workspace Services",
+                "pages": [
+                  "api-reference/workspace-services/list",
+                  "api-reference/workspace-services/get"
+                ]
+              },
+              {
+                "group": "SSH Keys",
+                "pages": [
+                  "api-reference/ssh-keys/list",
+                  "api-reference/ssh-keys/add",
+                  "api-reference/ssh-keys/delete",
+                  "api-reference/ssh-keys/list-workspace",
+                  "api-reference/ssh-keys/sync-workspace"
+                ]
+              }
             ]
           },
           {
-            "group": "Workspace Services",
+            "group": "Applications and releases",
             "pages": [
-              "api-reference/workspace-services/list",
-              "api-reference/workspace-services/get"
+              {
+                "group": "Apps",
+                "pages": [
+                  "api-reference/apps/list",
+                  "api-reference/apps/create",
+                  "api-reference/apps/get",
+                  "api-reference/apps/update",
+                  "api-reference/apps/delete",
+                  "api-reference/apps/start",
+                  "api-reference/apps/stop",
+                  "api-reference/apps/restart",
+                  "api-reference/apps/get-params",
+                  "api-reference/apps/update-params",
+                  "api-reference/apps/update-visibility",
+                  "api-reference/apps/update-status",
+                  "api-reference/apps/health-check",
+                  "api-reference/apps/expose-port",
+                  "api-reference/apps/reconcile",
+                  "api-reference/apps/listening-ports",
+                  "api-reference/apps/verify-domain"
+                ]
+              },
+              {
+                "group": "App Logs",
+                "pages": [
+                  "api-reference/app-logs/get-logs",
+                  "api-reference/app-logs/stream-logs",
+                  "api-reference/app-logs/list-sources",
+                  "api-reference/app-logs/create-source",
+                  "api-reference/app-logs/update-source",
+                  "api-reference/app-logs/delete-source"
+                ]
+              },
+              {
+                "group": "App releases",
+                "pages": [
+                  "api-reference/app-releases/list",
+                  "api-reference/app-releases/create",
+                  "api-reference/app-releases/get",
+                  "api-reference/app-releases/activate",
+                  "api-reference/app-releases/logs"
+                ]
+              }
             ]
           },
           {
-            "group": "Apps",
+            "group": "Storage",
             "pages": [
-              "api-reference/apps/list",
-              "api-reference/apps/create",
-              "api-reference/apps/get",
-              "api-reference/apps/update",
-              "api-reference/apps/delete",
-              "api-reference/apps/start",
-              "api-reference/apps/stop",
-              "api-reference/apps/restart",
-              "api-reference/apps/get-params",
-              "api-reference/apps/update-params",
-              "api-reference/apps/update-visibility",
-              "api-reference/apps/update-status",
-              "api-reference/apps/health-check",
-              "api-reference/apps/expose-port",
-              "api-reference/apps/reconcile",
-              "api-reference/apps/listening-ports",
-              "api-reference/apps/verify-domain"
+              {
+                "group": "Snapshots",
+                "pages": [
+                  "api-reference/snapshots/list",
+                  "api-reference/snapshots/create",
+                  "api-reference/snapshots/delete",
+                  "api-reference/snapshots/restore",
+                  "api-reference/snapshots/list-all",
+                  "api-reference/snapshots/delete-by-id",
+                  "api-reference/snapshots/restore-by-id"
+                ]
+              },
+              {
+                "group": "Volumes",
+                "pages": [
+                  "api-reference/volumes/list",
+                  "api-reference/volumes/create",
+                  "api-reference/volumes/delete",
+                  "api-reference/volumes/resize"
+                ]
+              }
             ]
           },
           {
-            "group": "App Logs",
+            "group": "AI and tools",
             "pages": [
-              "api-reference/app-logs/get-logs",
-              "api-reference/app-logs/stream-logs",
-              "api-reference/app-logs/list-sources",
-              "api-reference/app-logs/create-source",
-              "api-reference/app-logs/update-source",
-              "api-reference/app-logs/delete-source"
+              {
+                "group": "AI",
+                "pages": [
+                  "api-reference/ai/get-credits",
+                  "api-reference/ai/get-limits",
+                  "api-reference/ai/get-usage",
+                  "api-reference/ai/get-defaults",
+                  "api-reference/ai/update-defaults",
+                  "api-reference/ai/update-mode",
+                  "api-reference/ai/get-workspace-ai-config",
+                  "api-reference/ai/update-workspace-ai-config"
+                ]
+              },
+              {
+                "group": "Managed Proxy",
+                "pages": [
+                  "api-reference/managed-proxy/chat-completions",
+                  "api-reference/managed-proxy/get-subject-usage"
+                ]
+              },
+              {
+                "group": "Tools",
+                "pages": [
+                  "api-reference/tools/list",
+                  "api-reference/tools/status",
+                  "api-reference/tools/launch",
+                  "api-reference/tools/stop",
+                  "api-reference/tools/install",
+                  "api-reference/tools/install-status"
+                ]
+              }
             ]
           },
           {
-            "group": "App Catalog",
+            "group": "Registry",
             "pages": [
-              "api-reference/app-catalog/list",
-              "api-reference/app-catalog/install",
-              "api-reference/app-catalog/job-status"
+              {
+                "group": "App Catalog",
+                "pages": [
+                  "api-reference/app-catalog/list",
+                  "api-reference/app-catalog/install",
+                  "api-reference/app-catalog/job-status"
+                ]
+              },
+              {
+                "group": "Templates",
+                "pages": [
+                  "api-reference/templates/list",
+                  "api-reference/templates/quick-deploy"
+                ]
+              },
+              {
+                "group": "Setup Scripts",
+                "pages": [
+                  "api-reference/setup-scripts/list",
+                  "api-reference/setup-scripts/create",
+                  "api-reference/setup-scripts/get",
+                  "api-reference/setup-scripts/update",
+                  "api-reference/setup-scripts/delete"
+                ]
+              },
+              {
+                "group": "Service Specs",
+                "pages": [
+                  "api-reference/service-specs/list",
+                  "api-reference/service-specs/create",
+                  "api-reference/service-specs/get",
+                  "api-reference/service-specs/update",
+                  "api-reference/service-specs/delete"
+                ]
+              }
             ]
           },
           {
-            "group": "Snapshots",
+            "group": "Account and platform",
             "pages": [
-              "api-reference/snapshots/list",
-              "api-reference/snapshots/create",
-              "api-reference/snapshots/delete",
-              "api-reference/snapshots/restore",
-              "api-reference/snapshots/list-all",
-              "api-reference/snapshots/delete-by-id",
-              "api-reference/snapshots/restore-by-id"
-            ]
-          },
-          {
-            "group": "SSH Keys",
-            "pages": [
-              "api-reference/ssh-keys/list",
-              "api-reference/ssh-keys/add",
-              "api-reference/ssh-keys/delete",
-              "api-reference/ssh-keys/list-workspace",
-              "api-reference/ssh-keys/sync-workspace"
-            ]
-          },
-          {
-            "group": "Templates",
-            "pages": [
-              "api-reference/templates/list",
-              "api-reference/templates/quick-deploy"
-            ]
-          },
-          {
-            "group": "AI",
-            "pages": [
-              "api-reference/ai/get-credits",
-              "api-reference/ai/get-limits",
-              "api-reference/ai/get-usage",
-              "api-reference/ai/get-defaults",
-              "api-reference/ai/update-defaults",
-              "api-reference/ai/update-mode",
-              "api-reference/ai/get-workspace-ai-config",
-              "api-reference/ai/update-workspace-ai-config"
-            ]
-          },
-          {
-            "group": "Managed Proxy",
-            "pages": [
-              "api-reference/managed-proxy/chat-completions",
-              "api-reference/managed-proxy/get-subject-usage"
-            ]
-          },
-          {
-            "group": "Tools",
-            "pages": [
-              "api-reference/tools/list",
-              "api-reference/tools/status",
-              "api-reference/tools/launch",
-              "api-reference/tools/stop",
-              "api-reference/tools/install",
-              "api-reference/tools/install-status"
-            ]
-          },
-          {
-            "group": "Setup Scripts",
-            "pages": [
-              "api-reference/setup-scripts/list",
-              "api-reference/setup-scripts/create",
-              "api-reference/setup-scripts/get",
-              "api-reference/setup-scripts/update",
-              "api-reference/setup-scripts/delete"
-            ]
-          },
-          {
-            "group": "Service Specs",
-            "pages": [
-              "api-reference/service-specs/list",
-              "api-reference/service-specs/create",
-              "api-reference/service-specs/get",
-              "api-reference/service-specs/update",
-              "api-reference/service-specs/delete"
-            ]
-          },
-          {
-            "group": "User Settings",
-            "pages": [
-              "api-reference/users/get-settings",
-              "api-reference/users/update-settings",
-              "api-reference/users/list-regions"
-            ]
-          },
-          {
-            "group": "API Keys",
-            "pages": [
-              "api-reference/api-keys/list",
-              "api-reference/api-keys/create",
-              "api-reference/api-keys/delete"
-            ]
-          },
-          {
-            "group": "Access Control",
-            "pages": [
-              "api-reference/access-control/search-principals",
-              "api-reference/access-control/list-bindings",
-              "api-reference/access-control/create-binding",
-              "api-reference/access-control/update-binding",
-              "api-reference/access-control/delete-binding",
-              "api-reference/access-control/get-tags",
-              "api-reference/access-control/put-tags",
-              "api-reference/access-control/get-throttle-binding",
-              "api-reference/access-control/put-throttle-binding",
-              "api-reference/access-control/list-throttle-presets",
-              "api-reference/access-control/list-role-presets",
-              "api-reference/access-control/simulate"
-            ]
-          },
-          {
-            "group": "Roadmap",
-            "pages": [
-              "api-reference/roadmap/get-votes",
-              "api-reference/roadmap/toggle-vote"
-            ]
-          },
-          {
-            "group": "System",
-            "pages": [
-              "api-reference/system/feature-flags",
-              "api-reference/other/capacity"
+              {
+                "group": "User Settings",
+                "pages": [
+                  "api-reference/users/get-settings",
+                  "api-reference/users/update-settings",
+                  "api-reference/users/list-regions"
+                ]
+              },
+              {
+                "group": "Roadmap",
+                "pages": [
+                  "api-reference/roadmap/get-votes",
+                  "api-reference/roadmap/toggle-vote"
+                ]
+              },
+              {
+                "group": "System",
+                "pages": [
+                  "api-reference/system/feature-flags",
+                  "api-reference/other/capacity"
+                ]
+              }
             ]
           }
         ]
@@ -293,5 +755,37 @@
   },
   "api": {
     "baseUrl": "https://api.rigbox.dev/api/v1"
+  },
+  "fonts": {
+    "family": "Geist"
+  },
+  "appearance": {
+    "default": "system",
+    "strict": false
+  },
+  "background": {
+    "color": {
+      "light": "#ffffff",
+      "dark": "#000000"
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Rigbox",
+        "href": "https://rigbox.dev"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get started",
+      "href": "/quickstart"
+    }
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs"
+  },
+  "interaction": {
+    "drilldown": false
   }
 }

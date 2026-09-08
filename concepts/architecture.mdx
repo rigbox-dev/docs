@@ -3,7 +3,7 @@ title: Architecture
 description: How Rigbox isolates workspaces, routes traffic, and manages AI provider access.
 ---
 
-Rigbox separates platform operations from user code. Your workspaces run in isolated micro-VMs that have no access to platform credentials, other users' data, or control plane services.
+Rigbox separates platform operations from user code. Workspaces run in micro-VMs with separate kernels and filesystems. Network controls and authenticated bridges mediate access to platform capabilities; see [security boundaries](/concepts/security) for the limits of this model.
 
 ## Workspace isolation
 
@@ -11,11 +11,11 @@ Each workspace is a micro-VM - not a container. This gives you:
 
 - **Dedicated kernel** - each VM boots its own Linux kernel, fully independent from other workspaces
 - **Own filesystem** - isolated ext4 disk with no shared volumes
-- **Private network** - workspaces cannot communicate with each other directly
+- **VM networking** - each VM uses a private interface, with platform routing and network controls governing traffic
 - **systemd init** - full Linux userspace with service management
-- **No platform secrets** - credentials and internal tokens never enter the VM
+- **Scoped credentials** - managed upstream provider keys remain at the proxy; workspace configuration can contain user-supplied secrets and scoped credentials
 
-Even if code running inside a workspace achieves root access, it is confined to that VM. It cannot reach other workspaces or platform infrastructure.
+Code running as root can read and modify that workspace’s files and credentials. Treat each workspace as a trust boundary and avoid placing mutually untrusted applications or credentials in the same workspace.
 
 ## App routing
 
@@ -43,7 +43,7 @@ flowchart LR
     PROXY --> CREDITS[Credits deducted]
 ```
 
-- Provider API keys never enter your VM - the proxy injects them at request time
+- Rigbox-managed upstream provider keys stay at the proxy. BYOK credentials you supply are available to your workspace code
 - Token usage is metered and deducted from your credit balance
 - Workspaces export `OPENROUTER_BASE_URL=http://172.16.0.1:9090/v1` and `OPENROUTER_API_KEY` at login so SDKs and CLI tools work out of the box; `rig proxy on` is available for shells/tools that need provider-native compatibility exports
 - The proxy fronts an OpenRouter gateway: `/v1/chat/completions`, `/v1/embeddings`, and `/v1/models` for OpenAI-shape clients, plus `/v1/messages` for the native Anthropic shape used by Claude Code; `/brave` exposes Brave Search when configured

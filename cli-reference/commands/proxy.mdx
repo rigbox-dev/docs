@@ -1,0 +1,76 @@
+---
+title: "rig proxy"
+sidebarTitle: "proxy"
+description: "Managed AI proxy helpers"
+---
+
+Available **workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Run this command in an authenticated local terminal or inside a workspace; see the availability above.
+
+## Examples
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig proxy --help
+```
+
+## Workspace syntax
+
+```text
+Usage: rigbox proxy [OPTIONS] <COMMAND>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Managed AI proxy helpers
+
+Usage: rigbox proxy [OPTIONS] <COMMAND>
+
+Commands:
+  status  Show proxy status, route, and credit balance
+  on      Print export statements to activate the proxy
+  off     Print unset statements to deactivate the proxy
+  env     Print export statements for scripting (alias for on)
+  dotenv  Write a .env file with proxy configuration
+  path    Print the path to the sourceable proxy.env file
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Subcommands
+
+- [dotenv](/cli-reference/commands/proxy/dotenv)
+- [env](/cli-reference/commands/proxy/env)
+- [off](/cli-reference/commands/proxy/off)
+- [on](/cli-reference/commands/proxy/on)
+- [path](/cli-reference/commands/proxy/path)
+- [status](/cli-reference/commands/proxy/status)

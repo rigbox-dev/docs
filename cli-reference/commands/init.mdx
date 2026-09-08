@@ -1,0 +1,156 @@
+---
+title: "rig init"
+sidebarTitle: "init"
+description: "Scaffold a rig.yaml for the current directory"
+---
+
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+
+Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+
+## Examples
+
+From your application directory, scaffold rig.yaml and review it before deploying.
+
+```bash
+rig init
+```
+
+Inspect the supported arguments before running this command. Help is offline and does not modify resources.
+
+```bash
+rig init --help
+```
+
+## Local syntax
+
+```text
+Usage: rigbox init [OPTIONS]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--from` | Directory to scaffold (defaults to current directory) | Value: FROM |
+| `-n, --name` | Override the app name (defaults to the directory name) | Value: NAME |
+| `-p, --port` | Port to expose [default: 3000] | Value: PORT; Default: 3000 |
+| `--force` | Overwrite an existing rig.yaml | Default: false |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
+| `--cli-input-yaml` | Read inputs from a YAML file or &#x27;-&#x27; (stdin) | Global; Value: FILE; Conflicts: cli_input_json |
+| `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Scaffold a rig.yaml for the current directory
+
+Usage: rigbox init [OPTIONS]
+
+Options:
+      --from <FROM>
+          Directory to scaffold (defaults to current directory)
+
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+  -n, --name <NAME>
+          Override the app name (defaults to the directory name)
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --cli-input-json <FILE>
+          Read inputs from a JSON file or '-' (stdin)
+
+  -p, --port <PORT>
+          Port to expose [default: 3000]
+          
+          [default: 3000]
+
+      --cli-input-yaml <FILE>
+          Read inputs from a YAML file or '-' (stdin)
+
+      --force
+          Overwrite an existing rig.yaml
+
+      --generate-cli-skeleton
+          Print a fillable input template, then exit
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox init [OPTIONS]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--from` | Directory to scaffold (defaults to current directory) | Value: FROM |
+| `-n, --name` | Override the app name (defaults to the directory name) | Value: NAME |
+| `-p, --port` | Port to expose [default: 3000] | Value: PORT; Default: 3000 |
+| `--force` | Overwrite an existing rig.yaml | Default: false |
+| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Scaffold a rig.yaml for the current directory
+
+Usage: rigbox init [OPTIONS]
+
+Options:
+      --from <FROM>
+          Directory to scaffold (defaults to current directory)
+
+      --output <OUTPUT>
+          Output format
+          
+          [default: human]
+          [possible values: human, json, yaml, text, table]
+
+  -n, --name <NAME>
+          Override the app name (defaults to the directory name)
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -p, --port <PORT>
+          Port to expose [default: 3000]
+          
+          [default: 3000]
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+
+      --force
+          Overwrite an existing rig.yaml
+
+  -h, --help
+          Print help
+```
+
+</Accordion>

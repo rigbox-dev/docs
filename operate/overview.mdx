@@ -1,0 +1,23 @@
+---
+title: "Operate and troubleshoot"
+description: "Find the failing stage and collect the evidence needed to recover."
+---
+
+Start with the resource that failed: workspace, install/build, release activation, running app, or external access. A successful workspace boot does not prove the app is healthy; a healthy app does not prove its URL is public.
+
+| Symptom | Start here |
+| --- | --- |
+| App stopped or returns errors | [Runtime logs](/operate/app-logs) |
+| Dependency installation or build failed | [Build and release logs](/operate/build-logs) |
+| Deployment times out waiting for readiness | [Health checks](/operate/health) |
+| Deploy rejects the manifest or target | [Deployment failures](/operate/deployment) |
+| Repository push does not deploy | [GitHub troubleshooting](/operate/github) |
+| SSH refuses the connection | [SSH troubleshooting](/operate/ssh) |
+| Out of memory or disk | [Resources](/operate/resources) |
+| Data missing after recovery | [Storage recovery](/operate/storage) |
+
+## Collect a useful report
+
+Record `rig --version`, the workspace/app/release IDs, the failing command, and the relevant error. Use `--verbose` for CLI diagnostics. Remove credentials and application secrets before sharing logs or traces.
+
+Inspect the current state before retrying. Avoid deleting workspaces, removing lock files, or opting into re-image as generic fixes; those actions can change the target or discard data.

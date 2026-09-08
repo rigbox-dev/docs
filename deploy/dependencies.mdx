@@ -1,0 +1,46 @@
+---
+title: "Dependencies and service discovery"
+description: "Order cooperating applications and connect them inside a workspace."
+---
+
+## Declare relationships
+
+In a multi-app manifest, set `dependsOn` to app map keys. Dependencies are deployed before dependents. Unknown dependencies and cycles are configuration errors.
+
+```yaml
+apps:
+  api:
+    path: ./api
+    port: 5100
+    install: npm ci
+    start: npm start
+    env: { PORT: "5100" }
+  web:
+    path: ./web
+    port: 5101
+    install: npm ci
+    start: npm start
+    env: { PORT: "5101" }
+    dependsOn: [api]
+    visibility: public
+```
+
+For the incremental release path, declare the backend URL explicitly in the dependent app's environment:
+
+```yaml
+env:
+  PORT: "5101"
+  RIGBOX_API_URL: http://127.0.0.1:5100
+```
+
+`dependsOn` orders applications; the reviewed incremental implementation does not automatically inject the catalog/image flow's service-discovery environment variables. Set the variable name your server code reads and keep the URL aligned with the backend port.
+
+## Connect from the server
+
+Read the declared variable in the frontend's server process and proxy requests to the API. Do not send a loopback URL to browser JavaScript: there it points to the visitor's computer. Keep the backend route private when only sibling services need it.
+
+## Verify
+
+Deploy from the root directory, inspect both app outcomes, and exercise a frontend operation that calls the backend. If it fails, check the dependency name, listening port, and server environment, then read the failing app's logs. The [todo example](https://github.com/rigbox-dev/rigbox-examples/tree/2612ffc9138d3b2f8169b10e3a54abd5495db8b8/todo-app) demonstrates this pattern.
+
+Dependencies between apps differ from [dependency cache inputs and outputs](/deploy/build-cache), which describe installed files.

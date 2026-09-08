@@ -1,224 +1,93 @@
 ---
-title: Snapshots
-description: Save and restore full workspace state for checkpointing, branching, and recovery.
+title: "Create a workspace snapshot"
+description: "Checkpoint the root disk of a stopped workspace."
 ---
 
-Snapshots capture the full disk state of a workspace - every file, installed package, database, and configuration. You can use them to checkpoint your work, experiment safely, or recover from mistakes.
+A snapshot captures the workspace's root filesystem. Use it before changing system packages or other files on that disk. It does not capture attached persistent volumes, memory, or running processes.
+
+<Warning>The current implementation retains one snapshot per workspace. Creating a new snapshot replaces the previous checkpoint. Back up application data separately.</Warning>
 
 ## How Snapshots Work
 
-A snapshot is a point-in-time copy of a workspace's entire filesystem. When you create a snapshot:
-
-1. The workspace must be **stopped** (not running)
-2. Rigbox copies the workspace's root filesystem image
-3. The snapshot is stored with sparse file optimization (only non-zero blocks are saved)
-4. You can restore the snapshot at any time to roll back the workspace to that exact state
-
-<Note>
-Snapshots capture disk state only - they do not capture running processes or in-memory state. Stop your workspace cleanly (let services shut down gracefully) before snapshotting.
-</Note>
+Stop the workspace, then snapshot its root disk. Restore is limited to the same workspace. Sparse copying avoids copying unallocated space, but the actual result size depends on filesystem usage; do not size backups using a fixed percentage.
 
 ## Create a Snapshot
 
-Stop the workspace first, then create a named snapshot.
-
-**Step 1 - Stop the workspace:**
+Run on your local machine after authenticating. Choose the intended workspace before stopping it:
 
 ```bash
-rig workspace stop --workspace {workspace_id}
+rig workspace ls
+rig workspace stop --workspace WORKSPACE
+rig snapshot create --workspace WORKSPACE --name before-migration
+rig snapshot ls --workspace WORKSPACE
+rig workspace start --workspace WORKSPACE
 ```
 
-**Step 2 - Create the snapshot:**
-
-```bash
-rig snapshot create --workspace {workspace_id} --name before-migration
-```
-
-This prints the new snapshot's `id` (e.g. `snap_abc123`) and `size_bytes`.
-
-See the [Create Snapshot API reference](/api-reference/snapshots/create) for the full response schema.
-
-<Warning>
-Creating a snapshot while a workspace is running will return an error. Always stop the workspace first.
-</Warning>
+Record the snapshot ID returned by the platform. Listing it verifies the checkpoint exists; a healthy running app verifies the workspace restarted successfully.
 
 ## List Snapshots
 
 ### For a Specific Workspace
 
 ```bash
-rig snapshot ls --workspace {workspace_id}
-```
-
-The JSON form (`--output json`) returns:
-
-```json
-[
-  {
-    "id": "snap_abc123",
-    "workspace_id": "ws_xyz789",
-    "name": "before-migration",
-    "size_bytes": 2147483648,
-    "created_at": "2026-04-07T10:30:00Z"
-  },
-  {
-    "id": "snap_def456",
-    "workspace_id": "ws_xyz789",
-    "name": "after-setup",
-    "size_bytes": 1073741824,
-    "created_at": "2026-04-06T15:00:00Z"
-  }
-]
+rig snapshot ls --workspace WORKSPACE
 ```
 
 ### All Your Snapshots
-
-To see snapshots across all your workspaces, omit the `--workspace` filter:
 
 ```bash
 rig snapshot ls
 ```
 
-See the [List Snapshots API reference](/api-reference/snapshots/list) for pagination and filtering options.
+Use the command's actual output envelope and size fields rather than assuming a bare JSON array or fixed unit. See [snapshot commands](/cli-reference/commands/snapshot).
 
 ## Restore a Snapshot
 
-Restoring a snapshot replaces the workspace's current disk state with the snapshot's saved state.
-
-```bash
-# Workspace must be stopped
-rig snapshot restore --workspace {workspace_id} --snapshot {snapshot_id}
-```
-
-<Warning>
-Restoring a snapshot **overwrites** the current workspace disk state. Any changes made since the snapshot was taken will be lost. If you want to keep the current state, create a new snapshot before restoring.
-</Warning>
-
-After restoring, start the workspace to boot into the restored state:
-
-```bash
-rig workspace start --workspace {workspace_id}
-```
+Follow [restore a workspace snapshot](/workspaces/snapshot-restore). Restoring overwrites the root disk but does not rewind volume-backed databases.
 
 ## Delete a Snapshot
 
 ```bash
-rig snapshot rm --workspace {workspace_id} --snapshot {snapshot_id}
+rig snapshot rm --workspace WORKSPACE --snapshot SNAPSHOT_ID
 ```
 
-<Note>
-Deleting a snapshot is permanent and frees the associated storage. This does not affect the workspace itself.
-</Note>
+Deletion permanently removes that checkpoint. Confirm the ID before running the command.
 
 ## Storage and Sizing
 
-Snapshots use **sparse file optimization**. This means only disk blocks that actually contain data are stored - empty space is not copied.
-
-| Workspace Disk Size | Typical Snapshot Size | Why |
-|---------------------|----------------------|-----|
-| 5 GB | 2-3 GB | OS and packages use ~2 GB, rest is empty space |
-| 10 GB | 3-5 GB | More data, but still sparse |
-| 20 GB | 5-10 GB | Depends on how much data you have stored |
-
-The actual size depends on how much data is written to the filesystem. A workspace with a 10 GB disk but only 3 GB of actual files will produce a snapshot close to 3 GB.
-
-<Tip>
-Check the `size_bytes` field in the snapshot response to see the actual storage used.
-</Tip>
+Use the reported size from the snapshot list/API. Root-disk size and persistent-volume capacity are different measurements. See [recovery boundaries](/workspaces/recovery-limits).
 
 ## Use Cases
 
 ### Pre-Demo Checkpoint
 
-Snapshot before a live demo so you can instantly roll back if something breaks.
-
-```bash
-# Before the demo
-rig workspace stop --workspace ws_demo
-rig snapshot create --workspace ws_demo --name pre-demo-2026-04-07
-rig workspace start --workspace ws_demo
-
-# ... run the demo ...
-
-# Something went wrong - restore and try again
-rig workspace stop --workspace ws_demo
-rig snapshot restore --workspace ws_demo --snapshot snap_predemo
-rig workspace start --workspace ws_demo
-```
+Capture a stopped workspace before changing its system environment. Test that the app and its current data remain compatible after restoration.
 
 ### Experiment Branching
 
-Try a risky change without fear. Snapshot first, experiment freely, restore if it fails.
-
-```bash
-# Checkpoint current state
-rig workspace stop --workspace ws_ml
-rig snapshot create --workspace ws_ml --name stable-model-v2
-rig workspace start --workspace ws_ml
-
-# ... experiment with new model architecture ...
-# ... results are worse, roll back ...
-
-rig workspace stop --workspace ws_ml
-rig snapshot restore --workspace ws_ml --snapshot snap_stable_v2
-rig workspace start --workspace ws_ml
-# Back to the known-good state
-```
+Use a checkpoint to undo root-filesystem changes in the same workspace. This endpoint is not a cross-workspace cloning workflow.
 
 ### Disaster Recovery
 
-Create regular snapshots as backups for critical workspaces.
-
-```bash
-#!/bin/bash
-# Run this on a schedule (e.g., daily via cron)
-WORKSPACE_ID="ws_production"
-DATE=$(date +%Y-%m-%d)
-
-# Stop, snapshot, start
-rig workspace stop --workspace "$WORKSPACE_ID"
-rig snapshot create --workspace "$WORKSPACE_ID" --name "daily-backup-$DATE"
-rig workspace start --workspace "$WORKSPACE_ID"
-```
-
-<Tip>
-If you automate snapshots, consider cleaning up old ones periodically to manage storage. Keep the last N snapshots and delete older ones.
-</Tip>
+Keep application-consistent data backups outside the workspace. A single replaceable root-disk checkpoint is not a multi-version backup archive.
 
 ### Reproducibility
 
-Share a known-good workspace state with your team. Create a snapshot at a stable point, and teammates can restore from it to start from the exact same environment.
+Use [workspace images](/deploy/reproducible-builds) to reproduce an installed runtime, and a snapshot to checkpoint this workspace's root disk.
 
 ## Complete Workflow Example
 
-Here is a full checkpoint-and-restore flow. `rig workspace stop` and `rig workspace start` poll status internally, so there's no manual wait loop.
-
-```bash
-WS_ID="ws_abc123"
-
-# Workflow: checkpoint -> experiment -> restore
-rig workspace stop --workspace "$WS_ID"
-SNAP_ID=$(rig snapshot create --workspace "$WS_ID" --name before-experiment --output json | jq -r .id)
-rig workspace start --workspace "$WS_ID"
-
-# ... make changes, run experiments ...
-
-# Something went wrong - roll back
-rig workspace stop --workspace "$WS_ID"
-rig snapshot restore --workspace "$WS_ID" --snapshot "$SNAP_ID"
-rig workspace start --workspace "$WS_ID"
-# Back to the checkpointed state
-```
+The create/list/start commands above checkpoint the root disk. For the restoration sequence and verification steps, follow [restore a snapshot](/workspaces/snapshot-restore).
 
 ## Limitations
 
-- **Workspace must be stopped** - you cannot snapshot or restore a running workspace
-- **Disk state only** - running processes and in-memory data are not captured
-- **Same workspace only** - you cannot restore a snapshot from workspace A into workspace B
-- **Storage costs** - snapshots consume storage proportional to their size; clean up old snapshots you no longer need
+- Stop the workspace before snapshot or restore.
+- Only the root filesystem is included, not attached volumes or memory.
+- Restore is scoped to the original workspace.
+- A new snapshot replaces the prior checkpoint.
 
 ## Next Steps
 
-- [Setup Scripts](/guides/setup-scripts) - automate the setup that leads to a snapshot-worthy state
-- [Service Specs](/guides/service-specs) - define services that auto-start after a snapshot restore
-- [Bring Your Own Keys](/guides/byok) - configure AI providers for workspaces you snapshot
+- [Persistent volumes](/guides/persistent-volumes)
+- [Recovery boundaries](/workspaces/recovery-limits)
+- [Troubleshoot storage](/operate/storage)

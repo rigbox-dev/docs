@@ -1,0 +1,35 @@
+---
+title: "Make your first API request"
+description: "Authenticate from your backend or local terminal and list workspaces."
+---
+
+## Prerequisites
+
+Create an API key in the Rigbox console, or use `rig login` for CLI-mediated requests. Keep the key outside source control. Run the following locally or on your backend; never embed the key in browser JavaScript.
+
+## Use the CLI
+
+```bash
+rig login
+rig api GET /v1/workspaces
+```
+
+This reuses the CLI's authentication and prints the response. Consult [CLI output](/cli-reference/configuration) before assuming every command emits a single JSON document.
+
+## Use HTTP directly
+
+Set `RIG_API_KEY` through your environment or secret manager, then run:
+
+```bash
+curl --fail-with-body https://api.rigbox.dev/api/v1/workspaces   -H "Authorization: Bearer $RIG_API_KEY"
+```
+
+Read the response envelope and pagination fields shown in [List Workspaces](/api-reference/workspaces/list). An empty collection is a valid result for a new account.
+
+## Resolve failures
+
+A 401 indicates missing or invalid credentials. A 403 indicates the caller cannot perform the operation. Check the request URL and authorization header rather than retrying indefinitely. See [authentication](/cli-reference/authentication) and [API conventions](/build/api-conventions).
+
+## Next step
+
+[Manage a workspace lifecycle](/build/workspace-lifecycle) and persist the returned IDs in your application's database.
