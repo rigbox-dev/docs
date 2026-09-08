@@ -200,6 +200,17 @@ health: { path: /healthz, timeoutSeconds: 30 }
 
 `dependencyInputs` lists exact files relative to the app source directory. Use it only when those files describe all installation inputs. Matching inputs and runtime allow safe reuse; missing or empty inputs run installation conservatively. Source-dependent work belongs in `build`, not a dependency-only installation step. Avoid mutable shared environments and globally installed dependencies; Python apps should use a release-local virtual environment.
 
+For an installation whose dependencies can remain read-only, declare the generated directories with `dependencyOutputs`. Rigbox retains these immutable outputs separately, so source-only updates reuse the same dependency environment instead of copying its entire file tree:
+
+```yaml
+install: npm ci --omit=dev
+dependencyInputs: [package.json, package-lock.json]
+dependencyOutputs: [node_modules]
+start: node server.js
+```
+
+This optional mode requires nonempty `install` and `dependencyInputs`, and currently cannot be combined with `build`, `configure`, or `reconfigure` hooks. Output paths must be safe, non-overlapping relative directories; they cannot overlap source files or dependency inputs. Runtime writes belong in `RIGBOX_APP_DATA_DIR`, not in cached dependencies. Omit `dependencyOutputs` to retain ordinary release-local copying. Each release keeps its dependency version for rollback; changing installation inputs can require another full installation and additional storage.
+
 Install/build commands run under an unprivileged app identity inside the guest. They cannot use sudo or modify arbitrary workspace paths. Services use that identity and receive `RIGBOX_APP_DATA_DIR`, a persistent app-owned directory outside release files. This data survives app updates and app rollback, but it is not a substitute for backups or a promise about workspace deletion. Declared workspace volumes must already exist; provisioning volumes and changing workspace resources are separate operations.
 
 CLI apps declare controlled entrypoints rather than writing global symlinks themselves:
