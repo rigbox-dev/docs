@@ -149,3 +149,19 @@
   letter-spacing: -.01em;
   margin-bottom: 8px;
 }
+
+/* Keep the outline near the viewport edge without shifting the article. */
+@media (min-width: 1440px) {
+  #table-of-contents {
+    position: fixed !important;
+    right: 32px;
+    top: calc(104px + var(--banner-height, 0px));
+    margin-top: 0;
+    padding-top: 0;
+    width: 208px;
+    height: calc(100vh - 128px - var(--banner-height, 0px));
+    max-height: calc(100vh - 128px - var(--banner-height, 0px));
+    overflow-y: auto;
+  }
+  #table-of-contents > [data-component-part="scroll-area-viewport"] { padding-top: 0; }
+}
