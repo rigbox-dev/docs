@@ -89,7 +89,7 @@ If you use BYOK across most of your workspaces, set an account default so new wo
 rig ai defaults --mode byok --provider anthropic --model claude-sonnet-4-20250514
 ```
 
-Account defaults cover mode, provider, and model only — the provider **key** is always set per workspace (with `rig workspace env set`), so it is never stored account-wide. See the [AI Defaults API reference](/api-reference/ai/update-defaults) for the full schema.
+Run `rig ai defaults` with no flags to see the current defaults. Account defaults cover mode, provider, and model only — the provider **key** is always set per workspace (with `rig workspace env set`), so it is never stored account-wide. See the [AI Defaults API reference](/api-reference/ai/update-defaults) for the full schema.
 
 ## Managed vs. BYOK Comparison
 

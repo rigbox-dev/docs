@@ -22,6 +22,10 @@ rig login --token          # paste a token at the prompt
 rig login --import-token   # read a token from stdin and validate it
 ```
 
+Without a terminal, for example in a script, `rig login` stops and names what works instead: set `RIG_API_KEY` for each command (it isn't saved), or pipe the key to `rig login --import-token`, which validates and saves it. Only a key the server rejects is reported as invalid; if the server can't be reached, the error says so.
+
+Signing in also sets up [SSH access](/guides/ssh-access) from this machine. Inside a workspace you don't sign in: the CLI there already acts as the workspace, and `rig login` and `rig logout` refuse.
+
 Once logged in, any command works without further setup, for example:
 
 ```bash
@@ -57,8 +61,11 @@ To hit any endpoint directly without managing headers, use `rig api`. It reuses 
 
 ```bash
 rig api GET /v1/workspaces
+rig api PATCH /v1/apps/APP_ID --body '{"name":"web"}'
 rig api POST /v1/snapshots --body snapshot.json
 ```
+
+`--body` takes inline JSON, a path to a JSON file, or `-` to read standard input; a body that isn't valid JSON fails before anything is sent. When the server returns an error, `rig api` prints the response body as the server sent it, reports the HTTP status, and exits non-zero. With `--output json`, the error event carries `status` and `body` alongside `code` and `message`. Inside a workspace, `rig api` sends requests through the workspace bridge, which serves only that workspace's routes.
 
 ## Bearer tokens (JWT)
 
