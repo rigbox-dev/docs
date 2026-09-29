@@ -1447,7 +1447,7 @@
     ]
   },
   "workspace/ssh-info": {
-    "description": "Use this command from your local terminal. Prints the workspace's SSH host and user, the short `ssh` alias when rig manages your SSH config, the full `ssh USER@HOST` command, and a `spawn link HOST --user USER` line for OpenRouter Spawn. It also sets up SSH access from this machine, as `rig ssh add` does. Inside a workspace it describes that workspace and takes no `--workspace`.",
+    "description": "Use this command from your local terminal. Prints the workspace's SSH host and user, the short `ssh` alias when rig manages your SSH config, and the full `ssh USER@HOST` command. It also sets up SSH access from this machine, as `rig ssh add` does. Inside a workspace it describes that workspace and takes no `--workspace`.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
