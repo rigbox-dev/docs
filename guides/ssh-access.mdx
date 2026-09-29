@@ -262,6 +262,8 @@ If you get `Permission denied (publickey)`:
 2. Push your keys to the workspace: `rig ssh sync --workspace my-project`.
 3. See which keys `ssh` offers: `ssh -v my-project`.
 
+The gateway waits up to about ten seconds for your workspace's keys while the platform restarts a service, so a login at that moment connects late instead of failing. A `Permission denied` that persists is about the key.
+
 ### Host key warnings
 
 The CLI keeps workspace host keys in `~/.config/rigbox/known_hosts`, separate from `~/.ssh/known_hosts`. When a new scan disagrees with a key already on file, the CLI adds nothing, and your SSH client reports the mismatch. Check the change through a trusted channel before editing that file, and don't turn off host key checking to get past it.

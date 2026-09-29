@@ -33,7 +33,7 @@ Verify that the offered public key is registered with `rig ssh ls`, and register
 rig ssh sync --workspace WORKSPACE
 ```
 
-Use `ssh -i` with the correct local private key when your agent offers several identities. Never send the private key to Rigbox.
+Use `ssh -i` with the correct local private key when your agent offers several identities. Never send the private key to Rigbox. The gateway retries the key lookup for about ten seconds while the platform restarts a service, so a persistent `Permission denied` points at the key rather than a brief outage.
 
 ## Port or agent forwarding fails
 
