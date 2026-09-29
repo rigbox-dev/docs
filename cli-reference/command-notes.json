@@ -1,6 +1,6 @@
 {
   "ai": {
-    "description": "Run this command on your local machine.",
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
     "examples": [
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -9,11 +9,15 @@
     ]
   },
   "ai/defaults": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "With no flags, shows your account's default AI mode, provider, and model. Passing `--mode`, `--provider`, or `--model` changes only those fields. Inside a workspace the defaults can be read but not changed.",
     "examples": [
       {
-        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "description": "Show the current defaults.",
         "command": "rig ai defaults"
+      },
+      {
+        "description": "Change the default provider and model; the mode is left as it is.",
+        "command": "rig ai defaults --provider anthropic --model claude-sonnet-4-20250514"
       },
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -35,11 +39,15 @@
     ]
   },
   "api": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Sends an authenticated request to the Rigbox API and prints the JSON response. `--body` takes inline JSON, a path to a JSON file, or `-` for standard input; a body that is not valid JSON fails before anything is sent. When the server answers with an error, the response body is printed as it was sent and the command exits non-zero; with `--output json`, the error event carries `status` and `body`. Inside a workspace, requests go through the workspace bridge, which serves only that workspace's routes.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
-        "command": "rig api GET /api/v1/workspaces"
+        "command": "rig api GET /v1/workspaces"
+      },
+      {
+        "description": "Send an inline JSON body. Replace APP_ID with an app ID from `rig app ls`.",
+        "command": "rig api PATCH /v1/apps/APP_ID --body '{\"name\":\"web\"}'"
       },
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -48,7 +56,7 @@
     ]
   },
   "api-key": {
-    "description": "Run this command on your local machine.",
+    "description": "Run this command on your local machine. Inside a workspace, `rig api-key` refuses with a one-line message; run it from your laptop.",
     "examples": [
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -97,7 +105,7 @@
     "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
   },
   "ci": {
-    "description": "Run this command on your local machine.",
+    "description": "Run this command on your local machine. Inside a workspace, `rig ci` refuses with a one-line message; run it from your laptop.",
     "examples": [
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -159,7 +167,7 @@
     ]
   },
   "config": {
-    "description": "Run this command on your local machine.",
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
     "examples": [
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -173,6 +181,10 @@
       {
         "description": "Use JSON output for subsequent commands.",
         "command": "rig config set output json"
+      },
+      {
+        "description": "Stop rig from setting up SSH access on this machine.",
+        "command": "rig config set ssh-setup false"
       },
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -221,11 +233,15 @@
     ]
   },
   "completions": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Prints a completion script for your shell, or installs it with `--install`. `--no-rc` only works with `--install`: it installs the script and prints the lines to add to your shell configuration instead of editing it. Works in your local terminal and inside a workspace.",
     "examples": [
       {
-        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "description": "Print the completion script for the shell you are using.",
         "command": "rig completions"
+      },
+      {
+        "description": "Install zsh completions without editing your shell configuration.",
+        "command": "rig completions zsh --install --no-rc"
       },
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -247,7 +263,7 @@
     ]
   },
   "login": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Signing in also sets up SSH access to your workspaces from this machine, as `rig ssh add` does. Without a terminal, set `RIG_API_KEY` for each command or pipe a key to `rig login --import-token`. Inside a workspace, this command refuses with a one-line message; run it from your laptop. The CLI there is already signed in as the workspace.",
     "examples": [
       {
         "description": "Authenticate from your local terminal; complete browser approval.",
@@ -260,7 +276,7 @@
     ]
   },
   "logout": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, this command refuses with a one-line message; run it from your laptop. The CLI in a workspace is signed in as that workspace and has no saved key to remove.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -295,7 +311,7 @@
     ]
   },
   "service-spec/create": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, it refuses with a one-line message because account service specs apply to your other workspaces too. `rig service-spec ls` works in both places.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -308,7 +324,7 @@
     ]
   },
   "service-spec/update": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, it refuses with a one-line message because account service specs apply to your other workspaces too. `rig service-spec ls` works in both places.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -321,7 +337,7 @@
     ]
   },
   "service-spec/rm": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, it refuses with a one-line message because account service specs apply to your other workspaces too. `rig service-spec ls` works in both places.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -357,7 +373,7 @@
     ]
   },
   "setup-script/create": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, it refuses with a one-line message because account setup scripts run in your other workspaces too. `rig setup-script ls` works in both places.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -370,7 +386,7 @@
     ]
   },
   "setup-script/update": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, it refuses with a one-line message because account setup scripts run in your other workspaces too. `rig setup-script ls` works in both places.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -383,7 +399,7 @@
     ]
   },
   "setup-script/rm": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, it refuses with a one-line message because account setup scripts run in your other workspaces too. `rig setup-script ls` works in both places.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -397,7 +413,7 @@
     "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
   },
   "ssh": {
-    "description": "Run this command on your local machine.",
+    "description": "Run this command on your local machine. Inside a workspace, `rig ssh` refuses with a one-line message; run it from your laptop. Account SSH keys are never managed from inside a workspace.",
     "examples": [
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -419,11 +435,15 @@
     ]
   },
   "ssh/add": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Registers a public key on your account and sets up `ssh <workspace>` on this machine: a `Host` entry per workspace in `~/.config/rigbox/ssh_config`, which `~/.ssh/config` includes. Without `--file` it uses `~/.ssh/id_ed25519.pub`, then `~/.ssh/id_rsa.pub`, and creates an ed25519 key when you have neither. Without `--name` the key is named `laptop-` followed by your host name. A key that is already on your account is reported, not added again.",
     "examples": [
       {
-        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
-        "command": "rig ssh add --name my-project"
+        "description": "Register your default key, creating one if needed, and set up `ssh <workspace>` for your workspaces.",
+        "command": "rig ssh add"
+      },
+      {
+        "description": "Register a specific public key under a name you choose.",
+        "command": "rig ssh add --name work-laptop --file ~/.ssh/work_ed25519.pub"
       },
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -432,7 +452,7 @@
     ]
   },
   "ssh/rm": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Removes a registered key; pass the name or ID that `rig ssh ls` shows.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -472,7 +492,7 @@
     ]
   },
   "uninstall": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, this command refuses with a one-line message; run it from your laptop. A workspace image manages its own CLI; update it there with `rig update`.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -486,11 +506,15 @@
     "warning": "This command removes the local CLI installation. Review its flags before running it."
   },
   "update": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Replaces the running `rig` binary with the latest published release, or with the release tag given to `--version`. It downloads this platform's build from the public release mirror, checks that the download runs, and swaps it in place: `~/.local/bin` after the standard install, `/usr/local/bin` inside a workspace. Set `RIG_INSTALL_DIR` to install into another directory.",
     "examples": [
       {
-        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
+        "description": "Update to the latest release.",
         "command": "rig update"
+      },
+      {
+        "description": "Install a specific release instead of the latest. VERSION is a release tag such as `v0.12.68`; the leading `v` is optional.",
+        "command": "rig update --version VERSION"
       },
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -534,7 +558,7 @@
     ]
   },
   "app/new": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Registers an app for a port in a workspace. Without `--workspace`, it uses the workspace the CLI runs in, or on your laptop the workspace this directory's `rig.yaml` deploys to (its `.rig.lock` binding). Put code on it with `rig deploy`.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -547,7 +571,7 @@
     ]
   },
   "app/logs": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal or inside a workspace. `--follow` prints new lines as they arrive until you press Ctrl-C; inside a workspace it polls every few seconds where the log stream is not available. `--install` shows the install log, which is where a CLI agent's install output goes.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -560,7 +584,7 @@
     ]
   },
   "app/expose-port": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal or inside a workspace. Inside a workspace, `--workspace` defaults to that workspace. `--name` without `--wrap` asks before creating the app route; where it cannot ask (no terminal, JSON output, or CI) it refuses and names `--wrap`. Pass `--wrap --name NAME` to create the route, or leave out both to only detect the listener.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -862,11 +886,15 @@
     "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
   },
   "init": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Scaffolds `rig.yaml` for the current directory. The app name comes from `--name`, or from the directory name, and is converted to lowercase letters, digits, and dashes (at most 48 characters) so that `rig deploy` accepts it. An existing `rig.yaml` is kept unless you pass `--force`.",
     "examples": [
       {
         "description": "From your application directory, scaffold rig.yaml and review it before deploying.",
         "command": "rig init"
+      },
+      {
+        "description": "Name the app and its port. This writes `name: my-app`.",
+        "command": "rig init --name \"My App\" --port 8080"
       },
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -938,7 +966,7 @@
     "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
   },
   "volume": {
-    "description": "Run this command on your local machine.",
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
     "examples": [
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -1001,7 +1029,7 @@
     "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
   },
   "build": {
-    "description": "Run this command on your local machine.",
+    "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
     "examples": [
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -1049,7 +1077,7 @@
     ]
   },
   "release": {
-    "description": "Run this command on your local machine.",
+    "description": "Run this command on your local machine. Inside a workspace, `rig release` refuses with a one-line message; run it from your laptop. Image releases replace the workspace.",
     "examples": [
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -1161,7 +1189,7 @@
     "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
   },
   "rollback": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, this command refuses with a one-line message; run it from your laptop. Rolling back replaces the workspace.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1184,7 +1212,7 @@
     ]
   },
   "tools/ls": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Lists the workspace's tools: whether each is available, its status (`running`, a launch state such as `starting`, or `idle`), and its URL while it is serving. Use it to read back a launched tool's URL.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1197,11 +1225,11 @@
     ]
   },
   "tools/launch": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Starts a tool: `architecture` (Architecture Explorer) or `virtual-browser`. The command fails when the server launches nothing. While the tool is still starting, `rig tools ls` shows its status and, once it serves, its URL.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
-        "command": "rig tools launch --tool TOOL --workspace WORKSPACE_ID"
+        "command": "rig tools launch --tool virtual-browser --workspace WORKSPACE_ID"
       },
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -1224,11 +1252,11 @@
     "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
   },
   "tools/install": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Installs a tool's dependencies: `architecture` or `virtual-browser`. It returns a job ID for `rig tools install-status`, and fails when the server installs nothing.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
-        "command": "rig tools install --workspace WORKSPACE_ID --tool TOOL"
+        "command": "rig tools install --workspace WORKSPACE_ID --tool architecture"
       },
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -1250,7 +1278,7 @@
     ]
   },
   "deploy": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Deploys the project from the directory containing `rig.yaml`. On your laptop it targets `--workspace`, else the workspace bound in `.rig.lock`, else a new one. Inside a workspace it deploys into that workspace only: naming another workspace, `--bluegreen`, `--promote`, `--reimage`, and image deploys refuse before any work starts.",
     "examples": [
       {
         "description": "Deploy the project from the local directory containing rig.yaml. Review the deployment strategy before running.",
@@ -1298,7 +1326,7 @@
     ]
   },
   "workspace/spawn": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Once the workspace is running, it also sets up SSH access from this machine and prints the short `ssh` alias next to the full command. Inside a workspace, this command refuses with a one-line message: workspace lifecycle runs from your laptop.",
     "examples": [
       {
         "description": "Create a development workspace from your local machine.",
@@ -1311,7 +1339,7 @@
     ]
   },
   "workspace/new": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, this command refuses with a one-line message: workspace lifecycle runs from your laptop.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1324,7 +1352,7 @@
     ]
   },
   "workspace/rm": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, this command refuses with a one-line message: workspace lifecycle runs from your laptop.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1338,7 +1366,7 @@
     "warning": "This command deletes a resource. Confirm the identifier and preserve any data you need before running the example."
   },
   "workspace/cancel": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, this command refuses with a one-line message: workspace lifecycle runs from your laptop.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1352,7 +1380,7 @@
     "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
   },
   "workspace/retry": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, this command refuses with a one-line message: workspace lifecycle runs from your laptop.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1365,7 +1393,7 @@
     ]
   },
   "workspace/restart": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. It stops the workspace, starts it again, and waits until it is running. Once the workspace is running, it also sets up SSH access from this machine and prints the short `ssh` alias next to the full command. Inside a workspace, this command refuses with a one-line message: workspace lifecycle runs from your laptop.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1379,7 +1407,7 @@
     "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
   },
   "workspace/start": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Once the workspace is running, it also sets up SSH access from this machine and prints the short `ssh` alias next to the full command. Inside a workspace, this command refuses with a one-line message: workspace lifecycle runs from your laptop.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1392,7 +1420,7 @@
     ]
   },
   "workspace/stop": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Inside a workspace, this command refuses with a one-line message: workspace lifecycle runs from your laptop.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1406,7 +1434,7 @@
     "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
   },
   "workspace/logs": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal or inside a workspace. `--follow` prints new lines as they arrive until you press Ctrl-C; inside a workspace it polls every few seconds where the log stream is not available. Inside a workspace the command reads that workspace's logs and takes no `--workspace`.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1419,11 +1447,15 @@
     ]
   },
   "workspace/ssh-info": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Prints the workspace's SSH host and user, the short `ssh` alias when rig manages your SSH config, the full `ssh USER@HOST` command, and a `spawn link HOST --user USER` line for OpenRouter Spawn. It also sets up SSH access from this machine, as `rig ssh add` does. Inside a workspace it describes that workspace and takes no `--workspace`.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
         "command": "rig workspace ssh-info --workspace WORKSPACE_ID"
+      },
+      {
+        "description": "Print the details as JSON for scripts; `ssh_target` is always present and `ssh_alias` appears once SSH access is set up.",
+        "command": "rig workspace ssh-info --workspace WORKSPACE_ID --output json"
       },
       {
         "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
@@ -1529,7 +1561,7 @@
     ]
   },
   "workspace/metrics": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal or inside a workspace. Inside a workspace, `--workspace` defaults to that workspace.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1542,7 +1574,7 @@
     ]
   },
   "workspace/services": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal or inside a workspace. Inside a workspace, `--workspace` defaults to that workspace.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1555,7 +1587,7 @@
     ]
   },
   "workspace/ports": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal or inside a workspace. Inside a workspace, `--workspace` defaults to that workspace.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1568,7 +1600,7 @@
     ]
   },
   "workspace/resize": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal or inside a workspace. Inside a workspace, `--workspace` defaults to that workspace.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1582,7 +1614,7 @@
     "warning": "This command changes an existing resource or its configuration and may affect a running application. Confirm the target and review the complete help before running the example."
   },
   "workspace/reconcile": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal or inside a workspace. Inside a workspace, `--workspace` defaults to that workspace.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1679,8 +1711,12 @@
     ]
   },
   "recipe/app/install": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Installs a recipe into an existing workspace. `--ref` takes an exact recipe ref such as `@vendor/slug@1.2.3`, or a built-in catalog ID such as `claude` to add a catalog app or coding agent. The command starts the install and returns. Inside a workspace, pass that workspace's own name or ID to `--workspace`.",
     "examples": [
+      {
+        "description": "Add Claude Code to an existing workspace.",
+        "command": "rig recipe app install --ref claude --workspace WORKSPACE_ID"
+      },
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
         "command": "rig recipe app install --ref DEPLOY_REF --workspace WORKSPACE_ID"
@@ -1821,7 +1857,7 @@
     ]
   },
   "proxy/off": {
-    "description": "Use this command inside a workspace.",
+    "description": "Use this command inside a workspace. Prints `unset` statements for the variables `rig proxy on` sets, but only those that still point at the managed proxy or hold its placeholder key; your own provider keys and base URLs are left alone. Apply the output with eval, as for `rig proxy on`.",
     "examples": [
       {
         "description": "Run inside a workspace. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",

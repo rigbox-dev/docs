@@ -4,16 +4,22 @@ sidebarTitle: "update"
 description: "Update the Rigbox CLI to the latest published release"
 ---
 
-Available **local**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Replaces the running `rig` binary with the latest published release, or with the release tag given to `--version`. It downloads this platform's build from the public release mirror, checks that the download runs, and swaps it in place: `~/.local/bin` after the standard install, `/usr/local/bin` inside a workspace. Set `RIG_INSTALL_DIR` to install into another directory.
 
 ## Examples
 
-Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+Update to the latest release.
 
 ```bash
 rig update
+```
+
+Install a specific release instead of the latest. VERSION is a release tag such as `v0.12.68`; the leading `v` is optional.
+
+```bash
+rig update --version VERSION
 ```
 
 Inspect the supported arguments before running this command. Help is offline and does not modify resources.
@@ -75,6 +81,54 @@ Options:
 
   -v, --verbose
           Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox update [OPTIONS]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `--version` | Install a specific release tag (e.g. v0.12.41) instead of the latest | Value: VERSION |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Update the Rigbox CLI to the latest published release
+
+Usage: rigbox update [OPTIONS]
+
+Options:
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --version <VERSION>
+          Install a specific release tag (e.g. v0.12.41) instead of the latest
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
 
   -h, --help
           Print help

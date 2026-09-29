@@ -4,7 +4,7 @@ sidebarTitle: "set"
 description: "Set a default: `rig config set output yaml`"
 ---
 
-Available **local**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
 Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
 
@@ -14,6 +14,12 @@ Use JSON output for subsequent commands.
 
 ```bash
 rig config set output json
+```
+
+Stop rig from setting up SSH access on this machine.
+
+```bash
+rig config set ssh-setup false
 ```
 
 Inspect the supported arguments before running this command. Help is offline and does not modify resources.
@@ -80,6 +86,59 @@ Options:
 
   -v, --verbose
           Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox config set [OPTIONS] <KEY> <VALUE>
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `key` | Setting key (e.g. output, pager) | Required; Value: KEY |
+| `value` | Value to store | Required; Value: VALUE |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Set a default: `rig config set output yaml`
+
+Usage: rigbox config set [OPTIONS] <KEY> <VALUE>
+
+Arguments:
+  <KEY>
+          Setting key (e.g. output, pager)
+
+  <VALUE>
+          Value to store
+
+Options:
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
 
   -h, --help
           Print help

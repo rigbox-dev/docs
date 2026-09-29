@@ -4,16 +4,16 @@ sidebarTitle: "install"
 description: "Install a tool into a workspace (async)"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Installs a tool's dependencies: `architecture` or `virtual-browser`. It returns a job ID for `rig tools install-status`, and fails when the server installs nothing.
 
 ## Examples
 
 Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
 
 ```bash
-rig tools install --workspace WORKSPACE_ID --tool TOOL
+rig tools install --workspace WORKSPACE_ID --tool architecture
 ```
 
 Inspect the supported arguments before running this command. Help is offline and does not modify resources.
@@ -33,7 +33,7 @@ Usage: rigbox tools install [OPTIONS] --workspace <WORKSPACE> --tool <TOOL>
 | Argument | Description | Details |
 | --- | --- | --- |
 | `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
-| `-t, --tool` | Tool id (e.g. architecture-explorer, virtual-browser) | Required; Value: TOOL |
+| `-t, --tool` | Tool id (e.g. architecture, virtual-browser) | Required; Value: TOOL |
 | `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
 | `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
@@ -63,7 +63,7 @@ Options:
           Filter output with a JMESPath expression
 
   -t, --tool <TOOL>
-          Tool id (e.g. architecture-explorer, virtual-browser)
+          Tool id (e.g. architecture, virtual-browser)
 
       --cli-input-json <FILE>
           Read inputs from a JSON file or '-' (stdin)
@@ -97,8 +97,9 @@ Usage: rigbox tools install [OPTIONS] --workspace <WORKSPACE> --tool <TOOL>
 | Argument | Description | Details |
 | --- | --- | --- |
 | `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
-| `-t, --tool` | Tool id (e.g. architecture-explorer, virtual-browser) | Required; Value: TOOL |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `-t, --tool` | Tool id (e.g. architecture, virtual-browser) | Required; Value: TOOL |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -112,19 +113,21 @@ Usage: rigbox tools install [OPTIONS] --workspace <WORKSPACE> --tool <TOOL>
 
 Options:
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
 
   -w, --workspace <WORKSPACE>
           Workspace name or id
 
-      --no-pager
-          Do not pipe help output through a pager
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
   -t, --tool <TOOL>
-          Tool id (e.g. architecture-explorer, virtual-browser)
+          Tool id (e.g. architecture, virtual-browser)
+
+      --no-pager
+          Do not pipe help output through a pager
 
   -v, --verbose
           Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)

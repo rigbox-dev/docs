@@ -4,9 +4,9 @@ sidebarTitle: "rm"
 description: "Remove a registered SSH public key"
 ---
 
-Available **local**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Use this command from your local terminal. Removes a registered key; pass the name or ID that `rig ssh ls` shows.
 
 ## Examples
 
@@ -38,7 +38,7 @@ Usage: rigbox ssh rm [OPTIONS] --name <NAME>
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-n, --name` | Key name | Required; Value: NAME |
+| `-n, --name` | Key name or id (see `rig ssh ls`) | Required; Value: NAME |
 | `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
 | `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
@@ -57,7 +57,7 @@ Usage: rigbox ssh rm [OPTIONS] --name <NAME>
 
 Options:
   -n, --name <NAME>
-          Key name
+          Key name or id (see `rig ssh ls`)
 
       --output <OUTPUT>
           Output format [default: human, or `rig config set output …`]

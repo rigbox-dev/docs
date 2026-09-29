@@ -4,9 +4,9 @@ sidebarTitle: "deploy"
 description: "Deploy the project from its rig.yaml"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Deploys the project from the directory containing `rig.yaml`. On your laptop it targets `--workspace`, else the workspace bound in `.rig.lock`, else a new one. Inside a workspace it deploys into that workspace only: naming another workspace, `--bluegreen`, `--promote`, `--reimage`, and image deploys refuse before any work starts.
 
 ## Examples
 
@@ -171,7 +171,8 @@ Usage: rigbox deploy [OPTIONS]
 | `--deployment-id` | Stable deployment attempt ID for retries (incremental releases only) | Value: DEPLOYMENT_ID |
 | `--bluegreen` | Stage a change before swinging production traffic at it; pair with `--promote` to swap atomically (zero-downtime). `&lt;suffix&gt;` stages an sibling app at `&lt;base&gt;-&lt;suffix&gt;` on its own subdomain. The special value `preview` instead clones the WHOLE workspace into a hidden preview (every app), overlays your new code, and serves it at `&lt;app&gt;-pv-&lt;id&gt;.rigbox.dev` — `--promote` then re-homes prod onto it.<br /><br />Pick by what the workspace IS: `preview` is for production SERVICE hosts (it swaps to a new workspace, so the old one is retired — open SSH sessions in it don&#x27;t follow the swap). For a workspace people actively work IN (SSH, shells, dev processes), deploy in place or use `&lt;suffix&gt;` (same workspace, ~1s app restart) so sessions and workspace state survive. | Value: BLUEGREEN |
 | `--promote` | After staging via `--bluegreen &lt;suffix&gt;`, swap the production subdomain to the staged sibling in one atomic DB transaction (zero-downtime). The previous production app is retained as a rollback target until you delete it.<br /><br />Requires `--bluegreen`. | Default: false |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help (see a summary with &#x27;-h&#x27;) |  |
@@ -190,13 +191,12 @@ Options:
           [aliases: --from]
 
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
 
-      --no-pager
-          Do not pipe help output through a pager
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
   -w, --workspace <WORKSPACE>
           Target workspace (name or id). When unset, reuses the single workspace bound in .rig.lock, or spawns a fresh one
@@ -204,11 +204,14 @@ Options:
   -n, --name <NAME>
           Workspace name when spawning a new workspace
 
-  -v, --verbose
-          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+      --no-pager
+          Do not pipe help output through a pager
 
       --app <APP>
           Deploy only the named app (multi-app projects)
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
 
       --watch
           Re-deploy on source changes (single-app projects only)

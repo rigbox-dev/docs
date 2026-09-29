@@ -4,9 +4,9 @@ sidebarTitle: "init"
 description: "Scaffold a rig.yaml for the current directory"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Scaffolds `rig.yaml` for the current directory. The app name comes from `--name`, or from the directory name, and is converted to lowercase letters, digits, and dashes (at most 48 characters) so that `rig deploy` accepts it. An existing `rig.yaml` is kept unless you pass `--force`.
 
 ## Examples
 
@@ -14,6 +14,12 @@ From your application directory, scaffold rig.yaml and review it before deployin
 
 ```bash
 rig init
+```
+
+Name the app and its port. This writes `name: my-app`.
+
+```bash
+rig init --name "My App" --port 8080
 ```
 
 Inspect the supported arguments before running this command. Help is offline and does not modify resources.
@@ -33,8 +39,8 @@ Usage: rigbox init [OPTIONS]
 | Argument | Description | Details |
 | --- | --- | --- |
 | `--from` | Directory to scaffold (defaults to current directory) | Value: FROM |
-| `-n, --name` | Override the app name (defaults to the directory name) | Value: NAME |
-| `-p, --port` | Port to expose [default: 3000] | Value: PORT; Default: 3000 |
+| `-n, --name` | Override the app name (defaults to the directory name); converted to lowercase letters, digits and dashes | Value: NAME |
+| `-p, --port` | Port to expose | Value: PORT; Default: 3000 |
 | `--force` | Overwrite an existing rig.yaml | Default: false |
 | `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
 | `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
@@ -62,7 +68,7 @@ Options:
           [possible values: human, json, yaml, text, table]
 
   -n, --name <NAME>
-          Override the app name (defaults to the directory name)
+          Override the app name (defaults to the directory name); converted to lowercase letters, digits and dashes
 
       --query <JMESPATH>
           Filter output with a JMESPath expression
@@ -71,7 +77,7 @@ Options:
           Read inputs from a JSON file or '-' (stdin)
 
   -p, --port <PORT>
-          Port to expose [default: 3000]
+          Port to expose
           
           [default: 3000]
 
@@ -107,10 +113,11 @@ Usage: rigbox init [OPTIONS]
 | Argument | Description | Details |
 | --- | --- | --- |
 | `--from` | Directory to scaffold (defaults to current directory) | Value: FROM |
-| `-n, --name` | Override the app name (defaults to the directory name) | Value: NAME |
-| `-p, --port` | Port to expose [default: 3000] | Value: PORT; Default: 3000 |
+| `-n, --name` | Override the app name (defaults to the directory name); converted to lowercase letters, digits and dashes | Value: NAME |
+| `-p, --port` | Port to expose | Value: PORT; Default: 3000 |
 | `--force` | Overwrite an existing rig.yaml | Default: false |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -127,27 +134,29 @@ Options:
           Directory to scaffold (defaults to current directory)
 
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
 
   -n, --name <NAME>
-          Override the app name (defaults to the directory name)
+          Override the app name (defaults to the directory name); converted to lowercase letters, digits and dashes
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
       --no-pager
           Do not pipe help output through a pager
 
   -p, --port <PORT>
-          Port to expose [default: 3000]
+          Port to expose
           
           [default: 3000]
 
-  -v, --verbose
-          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
-
       --force
           Overwrite an existing rig.yaml
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
 
   -h, --help
           Print help

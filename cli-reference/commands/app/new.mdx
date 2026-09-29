@@ -4,9 +4,9 @@ sidebarTitle: "new"
 description: "Create a new app in a workspace"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Registers an app for a port in a workspace. Without `--workspace`, it uses the workspace the CLI runs in, or on your laptop the workspace this directory's `rig.yaml` deploys to (its `.rig.lock` binding). Put code on it with `rig deploy`.
 
 ## Examples
 
@@ -115,7 +115,8 @@ Usage: rigbox app new [OPTIONS] --name <NAME>
 | `-p, --port` | Port the app listens on (default: 3000 for service apps; omit for cli apps) | Value: PORT |
 | `-k, --kind` | App kind | Value: KIND; Default: service; Choices: service, cli |
 | `-d, --description` | App description | Value: DESCRIPTION |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -132,16 +133,15 @@ Options:
           App name
 
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
-
-      --no-pager
-          Do not pipe help output through a pager
 
   -p, --port <PORT>
           Port the app listens on (default: 3000 for service apps; omit for cli apps)
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
   -k, --kind <KIND>
           App kind
@@ -149,11 +149,14 @@ Options:
           [default: service]
           [possible values: service, cli]
 
-  -v, --verbose
-          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+      --no-pager
+          Do not pipe help output through a pager
 
   -d, --description <DESCRIPTION>
           App description
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
 
   -h, --help
           Print help

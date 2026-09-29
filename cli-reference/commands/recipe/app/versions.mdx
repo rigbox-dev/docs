@@ -4,7 +4,7 @@ sidebarTitle: "versions"
 description: "List published versions, newest first"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
 Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
 
@@ -93,7 +93,8 @@ Usage: rigbox recipe app versions [OPTIONS] --ref <RECIPE_REF>
 | Argument | Description | Details |
 | --- | --- | --- |
 | `-r, --ref` | Version-less recipe ref, e.g. @vendor/slug or vendor/slug | Required; Value: RECIPE_REF |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -107,13 +108,15 @@ Usage: rigbox recipe app versions [OPTIONS] --ref <RECIPE_REF>
 
 Options:
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
 
   -r, --ref <RECIPE_REF>
           Version-less recipe ref, e.g. @vendor/slug or vendor/slug
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
       --no-pager
           Do not pipe help output through a pager

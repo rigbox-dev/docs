@@ -1,12 +1,12 @@
 ---
 title: "rig tools ls"
 sidebarTitle: "ls"
-description: "List tools running in a workspace"
+description: "List workspace tools with their status and URL"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Lists the workspace's tools: whether each is available, its status (`running`, a launch state such as `starting`, or `idle`), and its URL while it is serving. Use it to read back a launched tool's URL.
 
 ## Examples
 
@@ -45,7 +45,7 @@ Usage: rigbox tools ls [OPTIONS] --workspace <WORKSPACE>
 <Accordion title="Complete command help">
 
 ```text
-List tools running in a workspace
+List workspace tools with their status and URL
 
 Usage: rigbox tools ls [OPTIONS] --workspace <WORKSPACE>
 
@@ -93,7 +93,8 @@ Usage: rigbox tools ls [OPTIONS] --workspace <WORKSPACE>
 | Argument | Description | Details |
 | --- | --- | --- |
 | `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -101,19 +102,21 @@ Usage: rigbox tools ls [OPTIONS] --workspace <WORKSPACE>
 <Accordion title="Complete command help">
 
 ```text
-List tools running in a workspace
+List workspace tools with their status and URL
 
 Usage: rigbox tools ls [OPTIONS] --workspace <WORKSPACE>
 
 Options:
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
 
   -w, --workspace <WORKSPACE>
           Workspace name or id
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
       --no-pager
           Do not pipe help output through a pager
