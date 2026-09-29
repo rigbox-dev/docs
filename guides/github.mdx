@@ -32,6 +32,8 @@ A manifest `workspace.deployment.strategy` must match the reviewed repository se
 
 The repository's manifest remains the source of truth. Changes made in Rigbox are saved back to Git; review configuration changes before saving them. See [deployment configuration](/guides/deploying#the-rig-yaml-contract) for the manifest fields.
 
+Once the connection deploys the workspace's apps, it owns them, and `rig deploy` from your machine no longer deploys them. See [release ownership](/deploy/release-ownership).
+
 ## Runtime secrets
 
 A push deploys in Rigbox, not on your machine, so it never reads your shell or `.env` files. It resolves the manifest's `secrets` from the connection's **runtime secrets**: values stored encrypted in Rigbox for this connection and never committed to Git.
@@ -82,5 +84,6 @@ A [Deploy to Rigbox button](/guides/deploy-button) opens a guided flow for choos
 | Deployment fails | Inspect build and app logs in the workspace; verify the start command, port, and health path. |
 | Required secret has no value in this connection's runtime secrets | Store it as described in [Runtime secrets](#runtime-secrets), then retry the deployment. |
 | Optional secret was left out | The connection has no value for it. Store one, then push again. |
+| `rig deploy` says pushes deploy the apps | The connection owns them. Push to deploy; to deploy them with `rig deploy` again, see [release ownership](/deploy/release-ownership). |
 
 Automatic pull-request preview environments are not yet supported.
