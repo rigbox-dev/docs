@@ -24,12 +24,44 @@ Choose how you want GitHub to trigger a deployment:
 3. Create a workspace and select its GitHub repository, or open an existing workspace's **GitHub deployments** settings.
 4. Select the correct GitHub account and repository. Review the branch, project subdirectory, manifest, and deployment strategy. New connections default to incremental; existing connections retain their reviewed choice.
 5. If the repository has a `rig.yaml`, review the imported app settings. Otherwise, enter the app name, port, install/build/start commands, and memory settings, then review the generated YAML.
-6. Choose automatic GitHub App deployments and save the configuration directly or through a pull request. Protected branches require a pull request.
-7. Follow build and deployment progress in the workspace. Open the resulting app URL after the deployment succeeds.
+6. Choose automatic GitHub App deployments. If the manifest declares `secrets`, enter their values under **Runtime secrets**; see [Runtime secrets](#runtime-secrets).
+7. Save the configuration directly or through a pull request. Protected branches require a pull request.
+8. Follow build and deployment progress in the workspace. Open the resulting app URL after the deployment succeeds.
 
 A manifest `workspace.deployment.strategy` must match the reviewed repository setting. For image strategy, every Git app must declare `reproducible: true`. Changing strategy requires a fresh review and confirmation; editing YAML alone does not approve replacing the workspace filesystem.
 
 The repository's manifest remains the source of truth. Changes made in Rigbox are saved back to Git; review configuration changes before saving them. See [deployment configuration](/guides/deploying#the-rig-yaml-contract) for the manifest fields.
+
+## Runtime secrets
+
+A push deploys in Rigbox, not on your machine, so it never reads your shell or `.env` files. It resolves the manifest's `secrets` from the connection's **runtime secrets**: values stored encrypted in Rigbox for this connection and never committed to Git.
+
+The rig.yaml at the pushed commit decides what each entry looks up:
+
+```yaml
+secrets:
+  - name: TMDB_API_KEY      # the variable the app sees
+    from: TMDB_READ_API     # the runtime secret that holds its value
+  - name: SENTRY_DSN
+    optional: true
+```
+
+A value is stored under the entry's `from` name, or under its `name` when there is no `from`. A required secret without a value fails the push, and the deployment's status names it. An optional secret without a value is left out: the app deploys without that variable, and the deployment's status names the optional secrets it went without.
+
+Set runtime secrets in either place:
+
+- **Console**: open the connection's configuration and enter `NAME=value` lines under **Runtime secrets**, using each secret's `from` name. Values you enter replace saved ones; leave the field blank to keep them. Saving redeploys the branch head, unless the save opens a pull request.
+- **CLI**: run `rig deploy` in the project directory. For apps the connection deploys, it deploys nothing. It stores the values it resolves from your environment and `.env` files, for the names that rig.yaml on the connected branch declares, lists the names it stored and any still missing, and exits with an error saying that pushes deploy the apps. The next push deploys with the stored values.
+
+A secret must be declared on the connected branch before it can be stored. To add one, push the rig.yaml that declares it, then store its value. A required secret fails that push until its value is stored; then push again or retry the deployment. Declare the secret `optional: true` until then to avoid the failed push, or add both in the console, where saving commits the manifest and stores the value together.
+
+Check which declared secrets have a value, without showing any values:
+
+```bash
+rig ci status --repo OWNER/REPO
+```
+
+Each connection lists every secret declared in rig.yaml on its branch as `set`, `missing`, or `missing (optional)`. Stored values are encrypted; once deployed, each is an ordinary environment variable of the app inside the workspace.
 
 ## Deploy through your own CI workflow
 
@@ -48,5 +80,7 @@ A [Deploy to Rigbox button](/guides/deploy-button) opens a guided flow for choos
 | A push does not deploy | Confirm the connected branch and selected deployment method. |
 | Strategy mismatch | Match the manifest and reviewed connection strategy, then review the change again. |
 | Deployment fails | Inspect build and app logs in the workspace; verify the start command, port, and health path. |
+| Required secret has no value in this connection's runtime secrets | Store it as described in [Runtime secrets](#runtime-secrets), then retry the deployment. |
+| Optional secret was left out | The connection has no value for it. Store one, then push again. |
 
 Automatic pull-request preview environments are not yet supported.
