@@ -27,7 +27,7 @@ You manage installed Service-shape apps with the same endpoints you use for any 
 | Shape | What you get | What's missing | Typical use |
 | --- | --- | --- | --- |
 | **Service** | systemd unit, Caddy route, subdomain, health probe | — | VS Code, Jupyter, Streamlit, PGWeb, … |
-| **CLI** | Binary on `$PATH`, optional profile.d routing shim | systemd, route, subdomain, port, probe | `claude`, `codex`, `opencode`, `kilocode` |
+| **CLI** | Binary on `$PATH`, optional profile.d routing shim | systemd, route, subdomain, port, probe | `claude`, `codex`, `opencode`, `kilocode`, `junie`, `pi` |
 
 For CLI-shape apps the `install-app` job is finished as soon as `install.sh` exits — there is no service readiness to wait on. Once the job status is `completed`, SSH into the workspace and run the agent directly. See [AI Coding Tools](/guides/ai-coding-tools) for usage patterns once a recipe is installed, and [Managed AI Proxy](/guides/managed-proxy) for how credits are metered for the requests each agent makes.
 
@@ -37,7 +37,7 @@ User-created apps (those you `POST` to [`/apps`](/api-reference/apps/create) dir
 
 ## Available Apps
 
-Catalog apps are official **app recipes**, addressed as `@rigbox/<id>@builtin`. The Service-shape and CLI-shape reference tables below show common apps and their catalog IDs. Preview any one before installing:
+Catalog apps are official **app recipes**, addressed as `@rigbox/<id>@builtin` or simply by their catalog ID, such as `vscode`. The Service-shape and CLI-shape reference tables below show common apps and their catalog IDs. Preview any one before installing:
 
 ```bash
 rig recipe app info @rigbox/vscode@builtin
@@ -67,18 +67,20 @@ These recipes install an interactive AI coding agent into the workspace's `$PATH
 
 | Agent | Catalog ID | Invoke as | Routing notes |
 |-------|-----------|-----------|---------------|
-| Claude Code | `claude` | `claude` | `OPENROUTER_*` injected; `profile.d` shim adds Anthropic-compatible env |
+| Claude Code | `claude` | `claude` | `profile.d` shim sets `ANTHROPIC_BASE_URL` to the proxy root and `ANTHROPIC_AUTH_TOKEN` from `OPENROUTER_API_KEY`, only while you have no Claude login or key of your own |
 | Codex CLI | `codex` | `codex` | `OPENROUTER_*` → translated to `OPENAI_BASE_URL` / `OPENAI_API_KEY` by `profile.d` |
 | OpenCode | `opencode` | `opencode` | Reads `OPENROUTER_API_KEY` natively — no env translation needed |
 | Kilo Code | `kilocode` | `kilocode` | `OPENROUTER_*` → `KILO_OPEN_ROUTER_API_KEY` by `profile.d` |
+| Junie | `junie` | `junie` | `OPENROUTER_API_KEY` → `JUNIE_OPENROUTER_API_KEY` by `profile.d` |
+| Pi | `pi` | `pi` | Reads `OPENROUTER_API_KEY` natively — no env translation needed |
 
-Install one of them the same way as a Service-shape app:
+Install one into an existing workspace by its catalog ID:
 
 ```bash
-rig recipe app install -r @rigbox/claude@builtin -w <WORKSPACE_NAME>
+rig recipe app install --ref claude --workspace <WORKSPACE_NAME>
 ```
 
-Inside a workspace VM, drop the `--workspace` flag — `rig` infers it from the ambient identity. Then SSH in and run the agent — `rig workspace ssh-info --workspace <workspace>` will print the right `ssh` command.
+To install agents while creating a workspace instead, pass `--catalog claude` (repeatable) to `rig workspace spawn`. Inside a workspace, pass that workspace's own name or ID to `--workspace`. When the install finishes, SSH in with `ssh <WORKSPACE_NAME>` and run the agent. See [AI Coding Tools](/guides/ai-coding-tools#claude-code) for how Claude Code's routing leaves your own Claude login alone.
 
 <Note>
 CLI-shape recipes have no daemon or HTTP route to control with [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop), or visibility settings. To uninstall, delete the app row; the catalog's cleanup paths (e.g. `/etc/profile.d/codex-routing.sh`) are removed automatically.
@@ -92,7 +94,7 @@ Install an app by its catalog ID:
 rig recipe app install -r @rigbox/vscode@builtin -w <WORKSPACE_NAME>
 ```
 
-`rig recipe app install` blocks until the install job completes and returns the app's name and URL when it's done. From inside a workspace VM, omit `-w`/`--workspace`.
+`rig recipe app install` starts the install job and returns right away with the app's name, its URL for Service-shape apps, and the job ID; the app is ready once the job completes. Follow the install with `rig app logs --app <APP_NAME> --install`. From inside a workspace, pass that workspace's own name or ID to `-w`/`--workspace`.
 
 For programmatic installs that need to fire-and-forget or track the job ID separately, use [Install Catalog App](/api-reference/app-catalog/install) and [Get Job Status](/api-reference/app-catalog/job-status) directly.
 
@@ -108,9 +110,9 @@ After installation, catalog apps behave like any other app. Use the standard app
 ### Start and Stop
 
 ```bash
-rig app start <APP_NAME>
-rig app stop <APP_NAME>
-rig app restart <APP_NAME>
+rig app start --app <APP_NAME>
+rig app stop --app <APP_NAME>
+rig app restart --app <APP_NAME>
 ```
 
 See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop), and [Restart App](/api-reference/apps/restart) for the API form.
@@ -132,7 +134,7 @@ See [App Visibility](/guides/visibility) for the full set of options and [Update
 Deleting an installed app removes both the route and the systemd service inside the workspace:
 
 ```bash
-rig app rm <APP_NAME>
+rig app rm --app <APP_NAME>
 ```
 
 See [Delete App](/api-reference/apps/delete) for the API form.
@@ -194,7 +196,7 @@ rig recipe app install -r @rigbox/vscode@builtin -w my-project
 rig recipe app install -r @rigbox/jupyter@builtin -w my-project
 ```
 
-Each command blocks until the install completes and prints the app's URL. After both finish, the apps are accessible at `https://my-project-vscode.rigbox.dev` and `https://my-project-jupyter.rigbox.dev`.
+Each command starts an install and prints the app's URL. After both installs finish, the apps are accessible at `https://my-project-vscode.rigbox.dev` and `https://my-project-jupyter.rigbox.dev`.
 
 ## Verify and troubleshoot
 
