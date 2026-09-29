@@ -5,30 +5,35 @@ description: "Register, sync, and remove the public keys used to access workspac
 
 ## Prerequisites
 
-Run these commands on your local machine after `rig login`. Use a public key file ending in `.pub`; never upload its private-key counterpart.
+Run these commands on your local machine after `rig login`. Signing in already registers your default key (`~/.ssh/id_ed25519.pub`, created if you have none), so use these commands to add another key, check what is registered, or remove one. Upload a public key file ending in `.pub`; never upload its private-key counterpart.
 
 ## Register and inspect keys
 
 ```bash
+rig ssh add
 rig ssh add --name my-laptop --file ~/.ssh/id_ed25519.pub
 rig ssh ls
 ```
 
-Key registration is account-level; existing workspaces may require a sync before the key is available.
+Without flags, `rig ssh add` registers your default key as `laptop-<hostname>`. Registration is account-level: running workspaces pick up the key, and the command also sets up `ssh <workspace>` on this machine. See [SSH access](/guides/ssh-access) for what it writes.
 
 ## Sync to a workspace
+
+If a running workspace didn't pick up a new key, push your keys to it and check the connection details:
 
 ```bash
 rig ssh sync --workspace WORKSPACE
 rig workspace ssh-info --workspace WORKSPACE
 ```
 
-Use the connection details returned by the CLI. Verify the key by opening a new SSH session before removing an older working key.
+Verify the key by opening a new SSH session before removing an older working key.
 
 ## Remove a key
 
 ```bash
-rig ssh rm --help
+rig ssh rm --name KEY_NAME_OR_ID
 ```
 
-Select the key ID from `rig ssh ls`. Keep an alternate authorized key until you have verified access. See [SSH troubleshooting](/operate/ssh) if authentication fails.
+Take the key's name or ID from `rig ssh ls`. Keep an alternate authorized key until you have verified access. See [SSH troubleshooting](/operate/ssh) if authentication fails.
+
+These commands work on your local machine only. Inside a workspace, `rig ssh` refuses with a one-line message: account SSH keys are never managed from a workspace.

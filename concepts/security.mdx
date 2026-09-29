@@ -39,7 +39,9 @@ For programmatic access to a private route, use an authorized key as described i
 
 ## SSH authentication
 
-Register public keys and connect to the target returned by `rig workspace ssh-info`. The workspace SSH path and the separate SSH TUI gateway are different. Do not infer the host, username, or port from an old infrastructure diagram.
+Workspace SSH uses public keys registered on your account. `rig login` registers your local key and writes a host entry per workspace, and the target returned by `rig workspace ssh-info` is the one to use; see [SSH access](/guides/ssh-access). The workspace SSH path and the separate SSH TUI gateway are different. Do not infer the host, username, or port from an old infrastructure diagram.
+
+The CLI records the gateway's host keys in its own `~/.config/rigbox/known_hosts` and adds keys from a later scan only when they agree with a key already on file, so a changed host key still fails host-key checking. A workspace login runs a fixed command that connects you to your own VM. Port, agent, and X11 forwarding and tunnels are turned off for these logins, so an SSH session can't reach services on the host it passes through.
 
 ## Network model
 

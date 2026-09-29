@@ -51,6 +51,8 @@ rig whoami
 
 The CLI saves its credential in `~/.config/rigbox/config.json`, or `$XDG_CONFIG_HOME/rigbox/config.json` when that variable is set. See [Authentication](/cli-reference/authentication) for headless login and API keys.
 
+Signing in also sets up SSH access from this machine: the CLI registers your SSH key, creating one if you have none, and adds a `Host` entry for each workspace, so `ssh <workspace>` works. See [SSH access](/guides/ssh-access) for what it changes and how to turn it off.
+
 ## 3. Choose your next step
 
 <CardGroup cols={2}>

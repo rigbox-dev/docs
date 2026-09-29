@@ -1,27 +1,31 @@
 ---
 title: "Transfer files"
-description: "Copy files between your machine and a workspace using its SSH target."
+description: "Copy files between your machine and a workspace over SSH."
 ---
 
 ## Prerequisites
 
-Register an [SSH key](/workspaces/ssh-keys), start the workspace, and install `jq` locally. Work from your own terminal.
-
-## Find the target
-
-```bash
-TARGET=$(rig workspace ssh-info --workspace WORKSPACE --output json | jq -r .ssh_target)
-ssh "$TARGET"
-```
-
-Exit the SSH session before running the local transfer commands below. Use a development directory for manually copied source; incremental app releases manage their own directories.
+Sign in with `rig login` on your machine, which sets up [SSH access](/guides/ssh-access), and start the workspace. Work from your own terminal. The examples use a workspace named `my-project`; `rig workspace ssh-info --workspace my-project` shows the alias for yours.
 
 ## Copy files
 
+`scp`, `sftp`, and `rsync` accept the workspace alias:
+
 ```bash
-scp ./notes.txt "$TARGET:/home/developer/notes.txt"
-scp "$TARGET:/home/developer/notes.txt" ./notes.downloaded.txt
-rsync -av ./project/ "$TARGET:/home/developer/project/"
+scp ./notes.txt my-project:/home/developer/notes.txt
+scp my-project:/home/developer/notes.txt ./notes.downloaded.txt
+rsync -av ./project/ my-project:/home/developer/project/
 ```
 
-Compare the downloaded file with the original. If permissions fail, choose a path owned by the workspace user rather than using a system or managed release directory. Use [local deployment](/guides/deploying) when the goal is to update an app rather than transfer working files.
+Run `sftp my-project` for an interactive session. Editors that open remote files over SFTP can use the same alias.
+
+Compare the downloaded file with the original. If permissions fail, choose a path owned by the workspace user rather than a system or managed release directory. Use a development directory for manually copied source; incremental app releases manage their own directories. Use [local deployment](/guides/deploying) when the goal is to update an app rather than transfer working files.
+
+## Without the managed SSH config
+
+If you [turned off automatic SSH setup](/guides/ssh-access#turn-off-automatic-setup), use the full target instead of the alias. With `jq` installed:
+
+```bash
+TARGET=$(rig workspace ssh-info --workspace WORKSPACE --output json | jq -r .ssh_target)
+scp ./notes.txt "$TARGET:/home/developer/notes.txt"
+```

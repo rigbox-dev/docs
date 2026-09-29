@@ -71,9 +71,11 @@ rig workspace start --workspace <WORKSPACE_NAME_OR_ID>
 
 `rig workspace start` polls the workspace status internally and returns once the VM is up. If a stopped workspace is below its template or catalog resource floor, Rigbox raises the stored resources before booting. Add `--wait-for-apps` to wait for workspace apps to report active before the command returns. For scripting, `rig workspace ls` prints the current state. See [Start Workspace](/api-reference/workspaces/start) for the API form.
 
+`rig workspace restart` stops a running workspace, starts it again, and waits the same way.
+
 ### Workspace is ready
 
-Once `running`, you can SSH in, expose ports, install catalog apps, and more.
+Once `running`, you can SSH in, expose ports, install catalog apps, and more. `rig workspace spawn`, `start`, and `restart` set up [SSH access](/guides/ssh-access) from your machine when the workspace comes up and print the command, so `ssh <WORKSPACE_NAME>` connects.
 
 ## Stopping a Workspace
 
@@ -166,11 +168,13 @@ End-to-end with a single command - `rig workspace spawn` creates the workspace, 
 rig workspace spawn --name demo-workspace --template base --ram 512 --vcpu 1 --disk 3072
 ```
 
-When it returns, the workspace is running and SSH-reachable. Get the connection string with:
+When it returns, the workspace is running and the CLI has set up SSH access, so you can connect by name:
 
 ```bash
-rig workspace ssh-info --workspace demo-workspace
+ssh demo-workspace
 ```
+
+`rig workspace ssh-info --workspace demo-workspace` prints the full connection details.
 
 ## Verify and troubleshoot
 
