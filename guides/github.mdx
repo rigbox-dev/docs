@@ -55,7 +55,7 @@ Set runtime secrets in either place:
 - **Console**: open the connection's configuration and enter `NAME=value` lines under **Runtime secrets**, using each secret's `from` name. Values you enter replace saved ones; leave the field blank to keep them. Saving redeploys the branch head, unless the save opens a pull request.
 - **CLI**: run `rig deploy` in the project directory. For apps the connection deploys, it deploys nothing. It stores the values it resolves from your environment and `.env` files, for the names that rig.yaml on the connected branch declares, lists the names it stored and any still missing, and exits with an error saying that pushes deploy the apps. The next push deploys with the stored values.
 
-A secret must be declared on the connected branch before it can be stored. To add one, push the rig.yaml that declares it, then store its value. A required secret fails that push until its value is stored; then push again or retry the deployment. Declare the secret `optional: true` until then to avoid the failed push, or add both in the console, where saving commits the manifest and stores the value together.
+`rig deploy` stores only secrets that rig.yaml on the connected branch declares. To add a secret, push the rig.yaml that declares it, then store its value. If it is required, that push fails until the value is stored; push again or retry the deployment afterwards. To avoid the failed push, declare it `optional: true` until its value is stored, or add both in the console, where saving commits the manifest and stores the value together.
 
 Check which declared secrets have a value, without showing any values:
 
