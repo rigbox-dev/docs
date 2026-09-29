@@ -50,7 +50,7 @@ From a directory containing `rig.yaml`:
 rig deploy
 ```
 
-The CLI uses an explicitly selected workspace, reuses a workspace recorded in `.rig.lock`, or creates one when no target is bound. Follow [Deploy from your machine](/guides/deploying) to create and review the manifest first.
+The CLI uses an explicitly selected workspace, reuses a workspace recorded in `.rig.lock`, or creates one when no target is bound. Inside a workspace, it deploys into that workspace. Follow [Deploy from your machine](/guides/deploying) to create and review the manifest first.
 
 ## Use structured output
 
@@ -65,11 +65,13 @@ Use `--query` to select values from structured output, and consult [global flags
 
 ## Inside a workspace
 
-Inside a Rigbox workspace, the preinstalled CLI uses the workspace's identity. You do not need to run `rig login`. Account-level commands are not available in this mode.
+Every workspace has the CLI preinstalled, signed in as the workspace itself. You do not need to run `rig login`. The same commands work there as on your machine, acting on the current workspace, so an agent or script in the workspace can deploy, read logs, and query the API:
 
 ```bash
-rig --version
-rig --help
+rig whoami
+rig app ls
+rig deploy
+rig workspace logs --follow
 ```
 
-Use your local CLI for account-wide tasks such as creating workspaces and managing GitHub bindings. See [runtime modes](/cli-reference/cli#runtime-modes) for details.
+A few commands stay on your machine: signing in and out, API keys and SSH keys, GitHub bindings, image releases and rollbacks, uninstalling, workspace lifecycle, and changes to account setup scripts and service specs. Inside a workspace they refuse with one line that says where they work. Update the workspace's CLI with `rig update`. See [Local versus workspace CLI](/cli-reference/execution-modes) for the full list and how `rig deploy` behaves there.

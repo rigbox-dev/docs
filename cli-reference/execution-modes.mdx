@@ -4,7 +4,7 @@ sidebarTitle: Local versus workspace CLI
 description: Understand the two Rigbox command surfaces and where to run each command.
 ---
 
-Rigbox exposes a local command surface and an in-workspace surface. The generated command pages identify which modes support each command and show separate syntax when flags differ.
+Rigbox exposes a local command surface and an in-workspace surface. Most commands behave the same in both; a few stay on your machine. The generated command pages identify which modes support each command and show separate syntax when flags differ.
 
 ## Local terminal
 
@@ -20,7 +20,7 @@ When a command requires an identifier, use the identifier returned by the preced
 
 ## Inside a workspace
 
-The workspace CLI operates in the workspace environment. It has workspace-specific commands such as [proxy](/cli-reference/commands/proxy) and may infer context that the local CLI must receive explicitly.
+Every workspace has the CLI installed at `/usr/local/bin/rigbox`, with `rig` linked to it. It is signed in as the workspace and reaches Rigbox through the workspace bridge, so you don't run `rig login` there. Connect with [SSH](/guides/ssh-access) or the console terminal, then run commands as usual:
 
 ```bash
 rig whoami
@@ -28,10 +28,77 @@ rig app ls
 rig proxy status
 ```
 
-Run these after connecting through the console terminal or SSH. A local `rig deploy` uploads a project from your machine; run it from the directory containing `rig.yaml` unless you explicitly select a different source.
+These commands work inside a workspace:
+
+| Area | Commands |
+| --- | --- |
+| Apps and deploys | `rig app`, `rig app-release`, `rig deploy`, `rig init`, `rig publish` |
+| This workspace | `rig workspace ls`, `logs`, `ssh-info`, `env`, `ai`, `metrics`, `ports`, `services`, `resize`, `reconcile` |
+| Storage, builds, and tools | `rig snapshot`, `rig volume`, `rig build`, `rig tools` |
+| Recipes | `rig recipe`, `rig setup-script ls`, `rig service-spec ls` |
+| Account information | `rig whoami`, `rig status`, `rig ai defaults`, `rig ai usage`, `rig capacity`, `rig limits` |
+| The CLI itself | `rig update`, `rig api`, `rig config`, `rig completions` |
+| Managed AI proxy (workspace only) | [`rig proxy`](/cli-reference/commands/proxy) |
+
+### Commands that stay on your machine
+
+Run these from your local terminal. Inside a workspace, each one refuses before doing anything, with one line that says why and where it works:
+
+| Command | Why it stays on your machine |
+| --- | --- |
+| `rig login`, `rig logout` | The CLI in a workspace is already signed in as the workspace and has no saved key to remove. |
+| `rig api-key`, `rig ssh` | Account API keys and SSH keys are never managed from inside a workspace. |
+| `rig ci` | It needs your GitHub and Rigbox credentials. |
+| `rig release`, `rig rollback` | Image releases and their rollbacks replace the workspace. |
+| `rig uninstall` | The workspace image manages this install; update it with `rig update`. |
+| `rig workspace spawn`, `new`, `start`, `stop`, `restart`, `rm`, `cancel`, `retry` | Workspace lifecycle runs from your machine. |
+| `rig template deploy` | It creates a new workspace. |
+| `rig setup-script` and `rig service-spec` `create`, `update`, `rm` | Account setup scripts and service specs apply to your other workspaces too. Listing them works. |
+| `rig ai defaults` with `--mode`, `--provider`, or `--model` | Workspaces without a mode of their own inherit the account defaults. Showing them works. |
+
+For example:
+
+```text
+$ rig workspace stop -w my-project
+error[unsupported]: `rig workspace stop` isn't available inside a workspace: workspace lifecycle runs from your laptop (`rig workspace stop -w <workspace>`)
+```
+
+The command exits with status 1. With `--output json`, the refusal is a single error event with `"code":"unsupported"`, even when the flag comes after the command's own arguments. A command that reaches a route the bridge doesn't serve fails the same way, with one line that names the request.
+
+### Choose the workspace
+
+Inside a workspace, commands act on that workspace. `rig workspace logs`, `ssh-info`, `env`, and `ai` take no `--workspace` at all, and `rig workspace metrics`, `ports`, `services`, `resize`, and `reconcile` and `rig app expose-port` use the current workspace when you leave `--workspace` out. Commands that still require `--workspace`, such as `rig tools`, `rig volume`, `rig snapshot create`, `rig build image`, `rig app-release`, and `rig recipe app install`, need this workspace's own name or ID; the bridge serves no other workspace.
+
+### Deploy from inside a workspace
+
+`rig deploy` inside a workspace deploys the project into that workspace. It ignores workspaces bound in `.rig.lock` and never creates a new one:
+
+```bash
+cd ~/my-app
+rig deploy
+```
+
+Options that would clone, re-image, or replace the machine the command runs on refuse before any work starts: `--workspace` naming another workspace, `--bluegreen`, `--promote`, `--reimage`, and image deploys (`reproducible: true` or `strategy: image`). Run those from your machine.
+
+```text
+$ rig deploy --workspace staging
+error[unsupported]: inside workspace 'my-project', rig deploy can only deploy into it; deploy to 'staging' from your laptop
+```
+
+### Output, queries, and logs
+
+`--output json` (or `yaml`, `text`, `table`), `--query`, and the output default you save with `rig config set output` work inside a workspace too. `rig workspace logs --follow` and `rig app logs --app APP --follow` print new lines as they arrive; where the log stream isn't available inside the workspace, they poll every few seconds instead. Press Ctrl-C to stop following.
+
+### What a workspace can't change
+
+The bridge acts for the workspace's owner but serves only what code inside one workspace should be able to do. It doesn't serve API keys or account SSH keys, and it serves account-wide settings (AI defaults, setup scripts, and service specs) read-only. Code running in a workspace, including an AI agent, therefore can't add a key that reaches your other workspaces or change a script that runs in them.
+
+### Keep the CLI current
+
+`rig update` updates the CLI in a workspace in place, and workspaces also update it on their own every day. When a newer release is out, commands print a notice pointing at `rig update`. See [Update the CLI](/guides/install-cli#inside-a-workspace).
 
 ## Resolve a command mismatch
 
-Run `rig --version` and `rig COMMAND --help` in the terminal where the command failed. Check the mode section on that command's reference page. A workspace's installed version may differ from your local installation; this reference describes CLI revision `1880d04` (version 0.13.0-rc.4).
+Run `rig --version` and `rig COMMAND --help` in the terminal where the command failed. Check the mode section on that command's reference page. A workspace's installed version may differ from your local installation; run `rig update` in the workspace to bring it up to date. This reference describes CLI revision `1880d04` (version 0.13.0-rc.4).
 
 Continue with [authentication](/cli-reference/authentication) or [configuration and output](/cli-reference/configuration).

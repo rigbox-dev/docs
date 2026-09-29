@@ -4,7 +4,7 @@ sidebarTitle: Configuration and output
 description: Choose output formats, persisted defaults, and structured input for scripts.
 ---
 
-Run these commands from your local terminal after [installing the CLI](/guides/install-cli). Verify your identity with `rig whoami` before operating on resources.
+Run these commands from your local terminal after [installing the CLI](/guides/install-cli), or inside a workspace, where they work the same way. Verify your identity with `rig whoami` before operating on resources.
 
 ## Choose an output format
 
@@ -37,7 +37,9 @@ Save the completed template, then pass `--cli-input-json spawn.json` or `--cli-i
 
 ## Inspect persisted defaults
 
-The local configuration is stored in `$XDG_CONFIG_HOME/rigbox/config.json`, or `~/.config/rigbox/config.json` when XDG_CONFIG_HOME is unset. Use [config get](/cli-reference/commands/config/get), [config set](/cli-reference/commands/config/set), and [config unset](/cli-reference/commands/config/unset) to manage supported settings.
+The local configuration is stored in `$XDG_CONFIG_HOME/rigbox/config.json`, or `~/.config/rigbox/config.json` when XDG_CONFIG_HOME is unset. Use [config get](/cli-reference/commands/config/get), [config set](/cli-reference/commands/config/set), and [config unset](/cli-reference/commands/config/unset) to manage supported settings. `rig config list` shows each setting (`output`, `pager`, `verbose`, `telemetry`, `trace-bodies`, and `ssh-setup`) with its current value and what it controls.
+
+Set `ssh-setup` to `false` to stop the CLI from registering your key and writing SSH config for your workspaces; see [SSH access](/guides/ssh-access#turn-off-automatic-setup).
 
 ## Troubleshoot
 

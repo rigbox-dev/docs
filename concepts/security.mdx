@@ -19,6 +19,8 @@ Control-plane credentials are not required in ordinary workspace code. VM-local 
 
 The CLI inside a workspace uses this ambient identity for supported workspace-scoped commands. Use the [execution-mode reference](/cli-reference/execution-modes) for its actual command surface.
 
+The workspace bridge that carries those commands serves only the calling workspace's resources. It doesn't serve account API keys or SSH keys, and it serves account-wide settings (AI defaults, setup scripts, and service specs) read-only. Code in one workspace, including an AI agent, can't use it to add a key that reaches your other workspaces or to change a script that runs in them. Deploys from inside a workspace upload into that workspace only.
+
 ### AI provider keys
 
 [Managed AI](/guides/managed-proxy) routes requests through the platform proxy without requiring your provider key in application code. [BYOK](/guides/byok) means supplying credentials for your own provider. If a credential is injected into the guest or application's environment, code there can read it. Do not claim that environment injection makes a secret inaccessible or guarantees it never reaches disk.
