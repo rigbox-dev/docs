@@ -25,7 +25,7 @@ Every workspace can reach the proxy at `http://172.16.0.1:9090` from inside the 
 OpenRouter acts as a single gateway in front of every supported model family, so you only point your SDK at one endpoint regardless of which provider's model you ask for. Pick the upstream provider by choosing the model slug (e.g.&nbsp;`anthropic/claude-sonnet-4`, `openai/gpt-4o`, `google/gemini-2.5-pro`).
 
 <Tip>
-Managed workspaces inject `OPENROUTER_BASE_URL=http://172.16.0.1:9090/v1` and `OPENROUTER_API_KEY` at workspace boot, so SDKs and CLI tools that read OpenRouter env vars work out of the box. `rig proxy on` is still available inside the workspace shell to print equivalent `export` statements for use in scripts or CI.
+Managed workspaces inject `OPENROUTER_BASE_URL=http://172.16.0.1:9090/v1` and `OPENROUTER_API_KEY` at workspace boot, so SDKs and CLI tools that read OpenRouter env vars work out of the box. For tools that read the OpenAI variables instead, `rig proxy on` prints the matching `export` statements for your shell, scripts, or CI.
 </Tip>
 
 ## Endpoints
@@ -37,7 +37,7 @@ The proxy speaks two HTTP shapes — OpenAI-compatible (used by most SDKs and to
 | `http://172.16.0.1:9090/v1/chat/completions` | OpenAI | Default route for everything OpenAI-compatible. Pick the upstream model with the `model` field (`anthropic/...`, `openai/...`, `google/...`, etc.). |
 | `http://172.16.0.1:9090/v1/embeddings` | OpenAI | Embedding models. |
 | `http://172.16.0.1:9090/v1/models` | OpenAI | List models available to your account. |
-| `http://172.16.0.1:9090/v1/messages` | Anthropic | Native Anthropic Messages-API passthrough used by Claude Code. Streams via byte forwarding; credit metering for streaming responses on this endpoint is currently deferred. |
+| `http://172.16.0.1:9090/v1/messages` | Anthropic | Native Anthropic Messages-API passthrough used by Claude Code. Anthropic clients reach it with the proxy root as their base URL. Streams via byte forwarding; credit metering for streaming responses on this endpoint is currently deferred. |
 | `http://172.16.0.1:9090/rig/v1/usage` | Rigbox | Per-subject AI spend over a rolling window. See [Per-subject cost and budgets](#per-subject-cost-and-budgets). |
 | `http://172.16.0.1:9090/brave` | Brave Search | Web Search API when configured for your environment. |
 
@@ -48,6 +48,17 @@ OpenAI-shape responses now carry the settled rigbox-credit cost of each call (`X
 <Note>
 A small set of free-tier models is also exposed through a `free` alias when Rigbox has the matching managed key. They consume credits at zero rate but otherwise behave identically.
 </Note>
+
+## Base URLs for clients
+
+Clients take a base URL and add the endpoint path themselves, so the base URL depends on the API shape:
+
+| Client | Base URL variable | Value | The client adds |
+|--------|-------------------|-------|-----------------|
+| OpenAI-compatible SDKs and tools | `OPENAI_BASE_URL` (or `OPENROUTER_BASE_URL`) | `http://172.16.0.1:9090/v1` | `/chat/completions`, `/embeddings`, … |
+| Anthropic SDKs and Claude Code | `ANTHROPIC_BASE_URL` | `http://172.16.0.1:9090` | `/v1/messages` |
+
+Don't add `/v1` to an Anthropic base URL: the client would request `/v1/v1/messages`. The [Claude Code catalog item](/guides/ai-coding-tools#claude-code) sets `ANTHROPIC_BASE_URL` to the proxy root for you.
 
 ## Credit Tiers
 
@@ -65,11 +76,32 @@ Set a workspace to managed mode with `rig workspace ai mode`:
 rig workspace ai mode --workspace <workspace_id> managed
 ```
 
-Provider and model are account-level defaults — set them once with `rig ai defaults`:
+The command suggests the environment for agents that don't read the OpenRouter variables, with each client's base URL:
+
+```text
+✓ my-project → managed
+
+  Point your agent's provider env at the proxy (Rigbox credits). Suggested:
+    rig workspace env set OPENAI_BASE_URL=http://172.16.0.1:9090/v1 OPENAI_API_KEY=managed-by-rigbox -w my-project
+    rig workspace env set ANTHROPIC_BASE_URL=http://172.16.0.1:9090 ANTHROPIC_API_KEY=managed-by-rigbox -w my-project
+
+  OpenAI-compatible clients take the /v1 base; Anthropic clients add /v1/messages themselves.
+  The proxy intercepts and injects your real upstream key.
+
+  If you turn the proxy off inside the workspace (rigbox proxy off), calls fail until you turn it
+  back on or switch to byok with a real key.
+```
+
+Run inside the workspace, `rig workspace ai mode managed` changes that workspace and prints the same suggestions without `-w`.
+
+Provider and model are account-level defaults. `rig ai defaults` with no flags shows them; pass flags to change them:
 
 ```bash
+rig ai defaults
 rig ai defaults --provider google --model google/gemini-2.5-pro
 ```
+
+Inside a workspace, `rig ai defaults` shows the defaults but can't change them; change them from your machine.
 
 ### Inside a Workspace VM
 
@@ -79,10 +111,15 @@ Managed workspaces already inject `OPENROUTER_BASE_URL` and `OPENROUTER_API_KEY`
 eval "$(rig proxy on)"
 ```
 
-This command:
-- Prints shell `export` statements for `OPENROUTER_BASE_URL` and `OPENROUTER_API_KEY` (plus a small set of compatibility variables for SDKs that prefer provider-native names)
-- Uses `managed-by-rigbox` placeholder API keys where SDKs require a non-empty key and don't read `OPENROUTER_API_KEY`
-- Configures compatible tools that read those environment variables; explicit SDK settings may override them
+It prints `export` statements for the proxy's root and its OpenAI-compatible `/v1` base, with the `managed-by-rigbox` placeholder key that the proxy replaces:
+
+```text
+export OPENAI_API_KEY='managed-by-rigbox';
+export OPENAI_BASE_URL='http://172.16.0.1:9090/v1';
+export RIGBOX_AI_PROXY_URL='http://172.16.0.1:9090';
+```
+
+Tools that read those variables use the proxy; explicit SDK settings may override them. For Anthropic clients, set `ANTHROPIC_BASE_URL` to the proxy root as described in [Base URLs for clients](#base-urls-for-clients).
 
 <Tip>
 Use `rig proxy status` to see the configured endpoints, current shell state, and credit balance.
@@ -93,6 +130,8 @@ To deactivate:
 ```bash
 eval "$(rig proxy off)"
 ```
+
+`rig proxy off` unsets `RIGBOX_AI_PROXY_URL`, and unsets a provider variable only while it still points at the proxy: a base URL such as `OPENAI_BASE_URL` or `ANTHROPIC_BASE_URL` whose value is the proxy address, or a key such as `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` that holds the `managed-by-rigbox` placeholder. Your own keys and base URLs stay set, and so do the workspace's `OPENROUTER_BASE_URL` and `OPENROUTER_API_KEY`.
 
 ## Check Your Credit Balance
 
@@ -336,7 +375,7 @@ For failures, start with [runtime logs](/operate/app-logs), [health checks](/ope
 ## Next Steps
 
 - [AI Coding Tools](/guides/ai-coding-tools) - use Rigbox credits with Claude Code, Codex, OpenCode, and Kilocode
-- [App Catalog](/guides/catalog#cli-shape-catalog-reference) - one-click install of the four CLI-shape agent recipes
+- [App Catalog](/guides/catalog#cli-shape-catalog-reference) - install the built-in coding agents with one command
 - [Bring Your Own Keys](/guides/byok) - use your own API keys for unlimited usage
 - [Setup Scripts](/guides/setup-scripts) - automate SDK installation in new workspaces
 - [Service Specs](/guides/service-specs) - run AI-powered services as background daemons
