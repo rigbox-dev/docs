@@ -1,38 +1,31 @@
 ---
-title: "rig ssh sync"
-sidebarTitle: "sync"
-description: "Push your SSH keys into a workspace"
+title: "rig account"
+sidebarTitle: "account"
+description: "Manage your Rigbox account"
 ---
 
 Available **local**. Reference source: CLI `0.13.0-rc.5` (`824aefd6ad16`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Run this command on your local machine. It isn't available inside a workspace.
 
 ## Examples
-
-Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
-
-```bash
-rig ssh sync --workspace WORKSPACE_ID
-```
 
 Inspect the supported arguments before running this command. Help is offline and does not modify resources.
 
 ```bash
-rig ssh sync --help
+rig account --help
 ```
 
 ## Local syntax
 
 ```text
-Usage: rigbox ssh sync [OPTIONS] --workspace <WORKSPACE>
+Usage: rigbox account [OPTIONS] <COMMAND>
 ```
 
 ### Arguments and flags
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-w, --workspace` | Target workspace name or id | Required; Value: WORKSPACE |
 | `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
 | `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
@@ -45,18 +38,19 @@ Usage: rigbox ssh sync [OPTIONS] --workspace <WORKSPACE>
 <Accordion title="Complete command help">
 
 ```text
-Push your SSH keys into a workspace
+Manage your Rigbox account
 
-Usage: rigbox ssh sync [OPTIONS] --workspace <WORKSPACE>
+Usage: rigbox account [OPTIONS] <COMMAND>
+
+Commands:
+  delete  Permanently delete your account and everything it owns
+  help    Print this message or the help of the given subcommand(s)
 
 Options:
       --output <OUTPUT>
           Output format [default: human, or `rig config set output …`]
           
           [possible values: human, json, yaml, text, table]
-
-  -w, --workspace <WORKSPACE>
-          Target workspace name or id
 
       --query <JMESPATH>
           Filter output with a JMESPath expression
@@ -81,3 +75,7 @@ Options:
 ```
 
 </Accordion>
+
+## Subcommands
+
+- [delete](/cli-reference/commands/account/delete)

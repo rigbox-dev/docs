@@ -4,7 +4,7 @@ sidebarTitle: "api"
 description: "Send a raw authenticated request to the Rigbox API"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.5` (`824aefd6ad16`).
 
 Sends an authenticated request to the Rigbox API and prints the JSON response. `--body` takes inline JSON, a path to a JSON file, or `-` for standard input; a body that is not valid JSON fails before anything is sent. When the server answers with an error, the response body is printed as it was sent and the command exits non-zero; with `--output json`, the error event carries `status` and `body`. Inside a workspace, requests go through the workspace bridge, which serves only that workspace's routes.
 

@@ -1,4 +1,31 @@
 {
+  "account": {
+    "description": "Run this command on your local machine. It isn't available inside a workspace.",
+    "examples": [
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig account --help"
+      }
+    ]
+  },
+  "account/delete": {
+    "description": "Use this command from your local terminal; it isn't available inside a workspace. `--dry-run` lists what would be deleted and changes nothing. Without a terminal, `--confirm EMAIL` confirms with your account email instead of the interactive prompt.",
+    "examples": [
+      {
+        "description": "List what would be deleted, without deleting anything.",
+        "command": "rig account delete --dry-run"
+      },
+      {
+        "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation permanently deletes the account.",
+        "command": "rig account delete --confirm EMAIL"
+      },
+      {
+        "description": "Inspect the supported arguments before running this command. Help is offline and does not modify resources.",
+        "command": "rig account delete --help"
+      }
+    ],
+    "warning": "This command permanently deletes your account and everything it owns. Run it with `--dry-run` first and copy out anything you need."
+  },
   "ai": {
     "description": "Run this command in an authenticated local terminal or inside a workspace; see the availability above.",
     "examples": [
