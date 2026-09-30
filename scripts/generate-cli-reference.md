@@ -1,16 +1,8 @@
 # CLI reference maintenance
 
-The committed `cli-reference/command-surface.json` describes CLI revision
-1880d04137a5f0bb323170fe5ef0e634b7570f03 (version string 0.13.0-rc.4). It was not
-produced by the exporter: that revision was not built for documentation, so the file
-was reconstructed from the `--help` output of a build of it (local mode, and workspace
-mode via `RIGBOX_WORKSPACE_CONFIG`), with global options taken from the revision's
-`tests/snapshots/help_snapshots__*_root.snap` and argument metadata that help text
-does not show (ids, actions, conflicts, groups, hidden aliases) carried over from the
-previous export of v0.13.0-rc.2 (09bd4024dd729ef31ae62f0f6985849974a9651d). The
-reconstruction reproduced all 182 commands whose help had not changed byte for byte
-before it was applied to the rest. Replace it with a real export when that revision,
-or a release containing it, is exported.
+The committed `cli-reference/command-surface.json` is an export of CLI v0.13.0-rc.5
+(revision 824aefd6ad160fcefeaf23abaf8b5e3318be138e), made with the exporter below. Every
+example in `scripts/cli-examples.json` parses against that revision.
 
 Generate the export with `cargo run --example export_docs` from the CLI checkout. The
 exporter is a Cargo example, not a production command.

@@ -1,5 +1,12 @@
 [
   {
+    "group": "account",
+    "root": "cli-reference/commands/account",
+    "pages": [
+      "cli-reference/commands/account/delete"
+    ]
+  },
+  {
     "group": "ai",
     "root": "cli-reference/commands/ai",
     "pages": [

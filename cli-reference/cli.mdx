@@ -4,7 +4,7 @@ sidebarTitle: Overview
 description: Find Rigbox commands, flags, execution modes, and examples for Rigbox.
 ---
 
-The `rig` and `rigbox` commands run the same CLI. This reference is generated from CLI revision `1880d04`, which reports its version as **0.13.0-rc.4**.
+The `rig` and `rigbox` commands run the same CLI. This reference is generated from CLI revision `824aefd`, which reports its version as **0.13.0-rc.5**.
 
 Start with [installation](/guides/install-cli) and [authentication](/cli-reference/authentication). For a working application, follow the [quickstart](/quickstart).
 
@@ -12,6 +12,7 @@ Start with [installation](/guides/install-cli) and [authentication](/cli-referen
 
 Choose a command below, then follow its subcommand links. Each page includes its execution mode, example invocations, arguments, flags, and complete help.
 
+- [`rig account`](/cli-reference/commands/account)
 - [`rig ai`](/cli-reference/commands/ai)
 - [`rig api`](/cli-reference/commands/api)
 - [`rig api-key`](/cli-reference/commands/api-key)
@@ -48,7 +49,7 @@ Choose a command below, then follow its subcommand links. Each page includes its
 
 ## Source and coverage
 
-The command tree comes from the CLI's Clap definitions at revision `1880d04`, including both local and workspace modes. Inside a workspace, some commands parse but refuse with a one-line message saying where they work; their pages say so. Hidden internal commands and Clap's automatically generated `help` routing aliases are excluded; every documented command supports `--help`.
+The command tree comes from the CLI's Clap definitions at v0.13.0-rc.5 (revision `824aefd`), including both local and workspace modes. Inside a workspace, some commands parse but refuse with a one-line message saying where they work; their pages say so. Hidden internal commands and Clap's automatically generated `help` routing aliases are excluded; every documented command supports `--help`.
 
 Syntax and flags are generated independently of maintained examples. Examples containing uppercase placeholders require your values. Commands that create, change, or delete resources perform those operations when run; `--help` is always offline.
 

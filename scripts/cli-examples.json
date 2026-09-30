@@ -1,5 +1,45 @@
 [
   {
+    "key": "account:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "account",
+      "--help"
+    ]
+  },
+  {
+    "key": "account/delete:0",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "account",
+      "delete",
+      "--dry-run"
+    ]
+  },
+  {
+    "key": "account/delete:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "account",
+      "delete",
+      "--confirm",
+      "EMAIL"
+    ]
+  },
+  {
+    "key": "account/delete:2",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "account",
+      "delete",
+      "--help"
+    ]
+  },
+  {
     "key": "ai:0",
     "mode": "local",
     "argv": [

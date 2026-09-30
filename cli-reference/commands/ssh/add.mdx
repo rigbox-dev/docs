@@ -4,7 +4,7 @@ sidebarTitle: "add"
 description: "Register an SSH public key and set up `ssh <workspace>` on this machine"
 ---
 
-Available **local**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
+Available **local**. Reference source: CLI `0.13.0-rc.5` (`824aefd6ad16`).
 
 Use this command from your local terminal. Registers a public key on your account and sets up `ssh <workspace>` on this machine: a `Host` entry per workspace in `~/.config/rigbox/ssh_config`, which `~/.ssh/config` includes. Without `--file` it uses `~/.ssh/id_ed25519.pub`, then `~/.ssh/id_rsa.pub`, and creates an ed25519 key when you have neither. Without `--name` the key is named `laptop-` followed by your host name. A key that is already on your account is reported, not added again.
 

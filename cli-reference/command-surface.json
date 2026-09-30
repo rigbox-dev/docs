@@ -220,9 +220,447 @@
           "required": false
         }
       ],
-      "help": "Manage Rigbox workspaces, apps, and tools\n\nUsage: rigbox [OPTIONS] <COMMAND>\n\nCommands:\n  ai            Configure account-level AI defaults and view usage\n  api           Send a raw authenticated request to the Rigbox API\n  api-key       Manage account API keys\n  ci            Manage GitHub Actions deployment bindings\n  capacity      Show fleet workspace-slot capacity\n  config        View or set persisted CLI defaults (output, pager)\n  completions   Generate or install a shell completion script\n  limits        Show effective resource limits and current usage\n  login         Authenticate with Rigbox\n  logout        Remove saved credentials\n  service-spec  Manage account-level service specs\n  setup-script  Manage reusable workspace setup scripts\n  ssh           Manage SSH public keys for your account\n  status        Show dashboard summary for the current account\n  uninstall     Remove the local Rigbox CLI install\n  update        Update the Rigbox CLI to the latest published release\n  whoami        Show the current user and workspace\n  app           Manage apps inside a workspace\n  init          Scaffold a rig.yaml for the current directory\n  snapshot      Manage workspace snapshots\n  volume        Manage persistent volumes\n  build         Build reproducible images and view build logs\n  release       Manage workspace releases\n  app-release   List and roll back apps without replacing the workspace\n  rollback      Reverse a preview promotion, or activate a specific release\n  tools         Launch and manage workspace tools\n  deploy        Deploy the project from its rig.yaml\n  publish       Publish the project to the community registry\n  workspace     Manage workspace lifecycle and configuration\n  recipe        Publish and install community recipes\n  help          Print this message or the help of the given subcommand(s)\n\nOptions:\n      --output <OUTPUT>\n          Output format [default: human, or `rig config set output \u2026`]\n          \n          [possible values: human, json, yaml, text, table]\n\n      --query <JMESPATH>\n          Filter output with a JMESPath expression\n\n      --cli-input-json <FILE>\n          Read inputs from a JSON file or '-' (stdin)\n\n      --cli-input-yaml <FILE>\n          Read inputs from a YAML file or '-' (stdin)\n\n      --generate-cli-skeleton\n          Print a fillable input template, then exit\n\n      --no-pager\n          Do not pipe help output through a pager\n\n  -v, --verbose\n          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`\n\n  -h, --help\n          Print help\n\n  -V, --version\n          Print version\n",
+      "help": "Manage Rigbox workspaces, apps, and tools\n\nUsage: rigbox [OPTIONS] <COMMAND>\n\nCommands:\n  account       Manage your Rigbox account\n  ai            Configure account-level AI defaults and view usage\n  api           Send a raw authenticated request to the Rigbox API\n  api-key       Manage account API keys\n  ci            Manage GitHub Actions deployment bindings\n  capacity      Show fleet workspace-slot capacity\n  config        View or set persisted CLI defaults (output, pager)\n  completions   Generate or install a shell completion script\n  limits        Show effective resource limits and current usage\n  login         Authenticate with Rigbox\n  logout        Remove saved credentials\n  service-spec  Manage account-level service specs\n  setup-script  Manage reusable workspace setup scripts\n  ssh           Manage SSH public keys for your account\n  status        Show dashboard summary for the current account\n  uninstall     Remove the local Rigbox CLI install\n  update        Update the Rigbox CLI to the latest published release\n  whoami        Show the current user and workspace\n  app           Manage apps inside a workspace\n  init          Scaffold a rig.yaml for the current directory\n  snapshot      Manage workspace snapshots\n  volume        Manage persistent volumes\n  build         Build reproducible images and view build logs\n  release       Manage workspace releases\n  app-release   List and roll back apps without replacing the workspace\n  rollback      Reverse a preview promotion, or activate a specific release\n  tools         Launch and manage workspace tools\n  deploy        Deploy the project from its rig.yaml\n  publish       Publish the project to the community registry\n  workspace     Manage workspace lifecycle and configuration\n  recipe        Publish and install community recipes\n  help          Print this message or the help of the given subcommand(s)\n\nOptions:\n      --output <OUTPUT>\n          Output format [default: human, or `rig config set output \u2026`]\n          \n          [possible values: human, json, yaml, text, table]\n\n      --query <JMESPATH>\n          Filter output with a JMESPath expression\n\n      --cli-input-json <FILE>\n          Read inputs from a JSON file or '-' (stdin)\n\n      --cli-input-yaml <FILE>\n          Read inputs from a YAML file or '-' (stdin)\n\n      --generate-cli-skeleton\n          Print a fillable input template, then exit\n\n      --no-pager\n          Do not pipe help output through a pager\n\n  -v, --verbose\n          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`\n\n  -h, --help\n          Print help\n\n  -V, --version\n          Print version\n",
       "path": [],
       "usage": "Usage: rigbox [OPTIONS] <COMMAND>"
+    },
+    {
+      "about": "Manage your Rigbox account",
+      "aliases": [],
+      "arguments": [
+        {
+          "action": "Set",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [],
+          "global": true,
+          "help": "Output format [default: human, or `rig config set output \u2026`]",
+          "id": "output",
+          "long": "output",
+          "num_args": {
+            "max": 1,
+            "min": 1
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "OUTPUT"
+          ],
+          "values": [
+            "human",
+            "json",
+            "yaml",
+            "text",
+            "table"
+          ]
+        },
+        {
+          "action": "Set",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [],
+          "global": true,
+          "help": "Filter output with a JMESPath expression",
+          "id": "query",
+          "long": "query",
+          "num_args": {
+            "max": 1,
+            "min": 1
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "JMESPATH"
+          ],
+          "values": []
+        },
+        {
+          "action": "Set",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [],
+          "global": true,
+          "help": "Read inputs from a JSON file or '-' (stdin)",
+          "id": "cli_input_json",
+          "long": "cli-input-json",
+          "num_args": {
+            "max": 1,
+            "min": 1
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "FILE"
+          ],
+          "values": []
+        },
+        {
+          "action": "Set",
+          "aliases": [],
+          "conflicts": [
+            "cli_input_json"
+          ],
+          "defaults": [],
+          "global": true,
+          "help": "Read inputs from a YAML file or '-' (stdin)",
+          "id": "cli_input_yaml",
+          "long": "cli-input-yaml",
+          "num_args": {
+            "max": 1,
+            "min": 1
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "FILE"
+          ],
+          "values": []
+        },
+        {
+          "action": "SetTrue",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [
+            "false"
+          ],
+          "global": true,
+          "help": "Print a fillable input template, then exit",
+          "id": "generate_cli_skeleton",
+          "long": "generate-cli-skeleton",
+          "num_args": {
+            "max": 0,
+            "min": 0
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "GENERATE_CLI_SKELETON"
+          ],
+          "values": []
+        },
+        {
+          "action": "SetTrue",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [
+            "false"
+          ],
+          "global": true,
+          "help": "Do not pipe help output through a pager",
+          "id": "no_pager",
+          "long": "no-pager",
+          "num_args": {
+            "max": 0,
+            "min": 0
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "NO_PAGER"
+          ],
+          "values": []
+        },
+        {
+          "action": "SetTrue",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [
+            "false"
+          ],
+          "global": true,
+          "help": "Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`",
+          "id": "verbose",
+          "long": "verbose",
+          "num_args": {
+            "max": 0,
+            "min": 0
+          },
+          "required": false,
+          "short": "v",
+          "short_aliases": [],
+          "value_names": [
+            "VERBOSE"
+          ],
+          "values": []
+        },
+        {
+          "action": "Help",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [],
+          "global": false,
+          "help": "Print help",
+          "id": "help",
+          "long": "help",
+          "num_args": {
+            "max": 0,
+            "min": 0
+          },
+          "required": false,
+          "short": "h",
+          "short_aliases": [],
+          "value_names": [],
+          "values": []
+        }
+      ],
+      "groups": [],
+      "help": "Manage your Rigbox account\n\nUsage: rigbox account [OPTIONS] <COMMAND>\n\nCommands:\n  delete  Permanently delete your account and everything it owns\n  help    Print this message or the help of the given subcommand(s)\n\nOptions:\n      --output <OUTPUT>\n          Output format [default: human, or `rig config set output \u2026`]\n          \n          [possible values: human, json, yaml, text, table]\n\n      --query <JMESPATH>\n          Filter output with a JMESPath expression\n\n      --cli-input-json <FILE>\n          Read inputs from a JSON file or '-' (stdin)\n\n      --cli-input-yaml <FILE>\n          Read inputs from a YAML file or '-' (stdin)\n\n      --generate-cli-skeleton\n          Print a fillable input template, then exit\n\n      --no-pager\n          Do not pipe help output through a pager\n\n  -v, --verbose\n          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`\n\n  -h, --help\n          Print help\n",
+      "path": [
+        "account"
+      ],
+      "usage": "Usage: rigbox account [OPTIONS] <COMMAND>"
+    },
+    {
+      "about": "Permanently delete your account and everything it owns",
+      "aliases": [],
+      "arguments": [
+        {
+          "action": "Set",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [],
+          "global": false,
+          "help": "Your account email, to confirm without an interactive prompt",
+          "id": "confirm",
+          "long": "confirm",
+          "num_args": {
+            "max": 1,
+            "min": 1
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "EMAIL"
+          ],
+          "values": []
+        },
+        {
+          "action": "SetTrue",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [
+            "false"
+          ],
+          "global": false,
+          "help": "Show what would be deleted, then exit without deleting anything",
+          "id": "dry_run",
+          "long": "dry-run",
+          "num_args": {
+            "max": 0,
+            "min": 0
+          },
+          "required": false,
+          "short": "n",
+          "short_aliases": [],
+          "value_names": [
+            "DRY_RUN"
+          ],
+          "values": []
+        },
+        {
+          "action": "Set",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [],
+          "global": true,
+          "help": "Output format [default: human, or `rig config set output \u2026`]",
+          "id": "output",
+          "long": "output",
+          "num_args": {
+            "max": 1,
+            "min": 1
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "OUTPUT"
+          ],
+          "values": [
+            "human",
+            "json",
+            "yaml",
+            "text",
+            "table"
+          ]
+        },
+        {
+          "action": "Set",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [],
+          "global": true,
+          "help": "Filter output with a JMESPath expression",
+          "id": "query",
+          "long": "query",
+          "num_args": {
+            "max": 1,
+            "min": 1
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "JMESPATH"
+          ],
+          "values": []
+        },
+        {
+          "action": "Set",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [],
+          "global": true,
+          "help": "Read inputs from a JSON file or '-' (stdin)",
+          "id": "cli_input_json",
+          "long": "cli-input-json",
+          "num_args": {
+            "max": 1,
+            "min": 1
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "FILE"
+          ],
+          "values": []
+        },
+        {
+          "action": "Set",
+          "aliases": [],
+          "conflicts": [
+            "cli_input_json"
+          ],
+          "defaults": [],
+          "global": true,
+          "help": "Read inputs from a YAML file or '-' (stdin)",
+          "id": "cli_input_yaml",
+          "long": "cli-input-yaml",
+          "num_args": {
+            "max": 1,
+            "min": 1
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "FILE"
+          ],
+          "values": []
+        },
+        {
+          "action": "SetTrue",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [
+            "false"
+          ],
+          "global": true,
+          "help": "Print a fillable input template, then exit",
+          "id": "generate_cli_skeleton",
+          "long": "generate-cli-skeleton",
+          "num_args": {
+            "max": 0,
+            "min": 0
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "GENERATE_CLI_SKELETON"
+          ],
+          "values": []
+        },
+        {
+          "action": "SetTrue",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [
+            "false"
+          ],
+          "global": true,
+          "help": "Do not pipe help output through a pager",
+          "id": "no_pager",
+          "long": "no-pager",
+          "num_args": {
+            "max": 0,
+            "min": 0
+          },
+          "required": false,
+          "short": null,
+          "short_aliases": [],
+          "value_names": [
+            "NO_PAGER"
+          ],
+          "values": []
+        },
+        {
+          "action": "SetTrue",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [
+            "false"
+          ],
+          "global": true,
+          "help": "Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`",
+          "id": "verbose",
+          "long": "verbose",
+          "num_args": {
+            "max": 0,
+            "min": 0
+          },
+          "required": false,
+          "short": "v",
+          "short_aliases": [],
+          "value_names": [
+            "VERBOSE"
+          ],
+          "values": []
+        },
+        {
+          "action": "Help",
+          "aliases": [],
+          "conflicts": [],
+          "defaults": [],
+          "global": false,
+          "help": "Print help",
+          "id": "help",
+          "long": "help",
+          "num_args": {
+            "max": 0,
+            "min": 0
+          },
+          "required": false,
+          "short": "h",
+          "short_aliases": [],
+          "value_names": [],
+          "values": []
+        }
+      ],
+      "groups": [
+        {
+          "arguments": [
+            "confirm",
+            "dry_run"
+          ],
+          "id": "Delete",
+          "required": false
+        }
+      ],
+      "help": "Permanently delete your account and everything it owns\n\nUsage: rigbox account delete [OPTIONS]\n\nOptions:\n      --confirm <EMAIL>\n          Your account email, to confirm without an interactive prompt\n\n      --output <OUTPUT>\n          Output format [default: human, or `rig config set output \u2026`]\n          \n          [possible values: human, json, yaml, text, table]\n\n  -n, --dry-run\n          Show what would be deleted, then exit without deleting anything\n\n      --query <JMESPATH>\n          Filter output with a JMESPath expression\n\n      --cli-input-json <FILE>\n          Read inputs from a JSON file or '-' (stdin)\n\n      --cli-input-yaml <FILE>\n          Read inputs from a YAML file or '-' (stdin)\n\n      --generate-cli-skeleton\n          Print a fillable input template, then exit\n\n      --no-pager\n          Do not pipe help output through a pager\n\n  -v, --verbose\n          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`\n\n  -h, --help\n          Print help\n",
+      "path": [
+        "account",
+        "delete"
+      ],
+      "usage": "Usage: rigbox account delete [OPTIONS]"
     },
     {
       "about": "Configure account-level AI defaults and view usage",
@@ -2158,7 +2596,7 @@
         }
       ],
       "groups": [],
-      "help": "Manage GitHub Actions deployment bindings\n\nUsage: rigbox ci [OPTIONS] <COMMAND>\n\nCommands:\n  link    Bind a GitHub repository to an existing workspace\n  status  Show repository bindings and their pending or active state\n  unlink  Remove a repository binding and revoke its deploy credentials\n  help    Print this message or the help of the given subcommand(s)\n\nOptions:\n      --output <OUTPUT>\n          Output format [default: human, or `rig config set output \u2026`]\n          \n          [possible values: human, json, yaml, text, table]\n\n      --query <JMESPATH>\n          Filter output with a JMESPath expression\n\n      --cli-input-json <FILE>\n          Read inputs from a JSON file or '-' (stdin)\n\n      --cli-input-yaml <FILE>\n          Read inputs from a YAML file or '-' (stdin)\n\n      --generate-cli-skeleton\n          Print a fillable input template, then exit\n\n      --no-pager\n          Do not pipe help output through a pager\n\n  -v, --verbose\n          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`\n\n  -h, --help\n          Print help\n",
+      "help": "Manage GitHub Actions deployment bindings\n\nUsage: rigbox ci [OPTIONS] <COMMAND>\n\nCommands:\n  link    Bind a GitHub repository to an existing workspace\n  status  Show repository bindings, and GitHub connections with each declared secret's state\n  unlink  Remove a repository binding and revoke its deploy credentials\n  help    Print this message or the help of the given subcommand(s)\n\nOptions:\n      --output <OUTPUT>\n          Output format [default: human, or `rig config set output \u2026`]\n          \n          [possible values: human, json, yaml, text, table]\n\n      --query <JMESPATH>\n          Filter output with a JMESPath expression\n\n      --cli-input-json <FILE>\n          Read inputs from a JSON file or '-' (stdin)\n\n      --cli-input-yaml <FILE>\n          Read inputs from a YAML file or '-' (stdin)\n\n      --generate-cli-skeleton\n          Print a fillable input template, then exit\n\n      --no-pager\n          Do not pipe help output through a pager\n\n  -v, --verbose\n          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`\n\n  -h, --help\n          Print help\n",
       "path": [
         "ci"
       ],
@@ -2457,7 +2895,7 @@
       "usage": "Usage: rigbox ci link [OPTIONS] --repo <REPO> --workspace <WORKSPACE>"
     },
     {
-      "about": "Show repository bindings and their pending or active state",
+      "about": "Show repository bindings, and GitHub connections with each declared secret's state",
       "aliases": [],
       "arguments": [
         {
@@ -2671,7 +3109,7 @@
           "required": false
         }
       ],
-      "help": "Show repository bindings and their pending or active state\n\nUsage: rigbox ci status [OPTIONS]\n\nOptions:\n      --output <OUTPUT>\n          Output format [default: human, or `rig config set output \u2026`]\n          \n          [possible values: human, json, yaml, text, table]\n\n      --repo <REPO>\n          Filter by GitHub owner/repository\n\n      --query <JMESPATH>\n          Filter output with a JMESPath expression\n\n      --cli-input-json <FILE>\n          Read inputs from a JSON file or '-' (stdin)\n\n      --cli-input-yaml <FILE>\n          Read inputs from a YAML file or '-' (stdin)\n\n      --generate-cli-skeleton\n          Print a fillable input template, then exit\n\n      --no-pager\n          Do not pipe help output through a pager\n\n  -v, --verbose\n          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`\n\n  -h, --help\n          Print help\n",
+      "help": "Show repository bindings, and GitHub connections with each declared secret's state\n\nUsage: rigbox ci status [OPTIONS]\n\nOptions:\n      --output <OUTPUT>\n          Output format [default: human, or `rig config set output \u2026`]\n          \n          [possible values: human, json, yaml, text, table]\n\n      --repo <REPO>\n          Filter by GitHub owner/repository\n\n      --query <JMESPATH>\n          Filter output with a JMESPath expression\n\n      --cli-input-json <FILE>\n          Read inputs from a JSON file or '-' (stdin)\n\n      --cli-input-yaml <FILE>\n          Read inputs from a YAML file or '-' (stdin)\n\n      --generate-cli-skeleton\n          Print a fillable input template, then exit\n\n      --no-pager\n          Do not pipe help output through a pager\n\n  -v, --verbose\n          Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`\n\n  -h, --help\n          Print help\n",
       "path": [
         "ci",
         "status"
@@ -34159,9 +34597,9 @@
       "usage": "Usage: rigbox recipe app deprecate [OPTIONS] --ref <DEPLOY_REF>"
     }
   ],
-  "revision": "1880d04137a5f0bb323170fe5ef0e634b7570f03",
+  "revision": "824aefd6ad160fcefeaf23abaf8b5e3318be138e",
   "schema_version": 1,
-  "version": "0.13.0-rc.4",
+  "version": "0.13.0-rc.5",
   "workspace": [
     {
       "about": "Manage the current Rigbox workspace from inside it",
@@ -34304,6 +34742,7 @@
         {
           "arguments": [
             "output",
+            "query",
             "no_pager",
             "verbose"
           ],
