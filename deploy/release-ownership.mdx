@@ -1,0 +1,50 @@
+---
+title: "Release ownership"
+description: "Which deployment owns an app, why another deployment is refused, and how an app moves between rig deploy and a GitHub connection."
+---
+
+Every app deployed as an incremental app release belongs to one deployment: the one whose releases it runs. Only that deployment can release it again. Ownership is per app, so several deployments can share a workspace as long as they deploy different apps.
+
+## Who can own an app
+
+| Owner | Deploys through |
+| --- | --- |
+| A local project | `rig deploy` from the project directory. The project's identity is stored in `.rig.lock`; a Git checkout derives it from the repository and the manifest's path, so another clone of the same repository is the same project. |
+| A GitHub connection | Pushes to the connected branch, set up in the console. See [Deploy from GitHub](/guides/github). |
+| A GitHub Actions binding | The repository's workflow, linked with `rig ci link`. See [GitHub Actions](/guides/github-actions). |
+
+## Who can take an app over
+
+| The app belongs to | Who can deploy it |
+| --- | --- |
+| A local project | That project. Connecting the app's repository in the console, or linking it for Actions, takes it over on the first deployment. Another local project cannot. |
+| A GitHub connection or Actions binding that still exists | Only that connection or binding. |
+| A GitHub connection or binding that was disconnected or unlinked | Whichever deployment releases it next. |
+| No release yet, from an image-strategy or catalog `rig deploy` | A GitHub connection or Actions binding, on its first deployment. |
+| Nothing: created another way, such as in the console | No deployment. Deploy under a different app name, or to another workspace. |
+
+Taking an app over keeps its identity: the app ID, URL, volumes, and data stay. The previous owner's retained releases can no longer be activated for that app; [roll back](/deploy/app-rollback) through the new owner instead.
+
+## When a deployment is refused
+
+A release that would take over an app it may not is refused before anything changes. When a GitHub connection or binding owns the app, the error names it:
+
+```text
+App web is deployed by pushes to owner/repo@main through a GitHub connection, so only that connection can deploy it. Push to main to deploy it, or disconnect the repository in the workspace's GitHub deployment settings to deploy it another way.
+```
+
+Any other owner gives `App web belongs to another active deployment`: another local project, or an app no deployment can take over. Deploy under a different name or to another workspace, and keep `.rig.lock` so your project keeps its identity.
+
+When `rig deploy` from your machine is refused because a GitHub connection deploys the apps, it deploys nothing and exits with a `conflict` error. First it stores the values it resolved for the manifest's `secrets` - from your environment and `.env` files - in the connection's [runtime secrets](/guides/github#runtime-secrets), for the names that rig.yaml on the connected branch declares, and lists the names it stored. The next push deploys with them.
+
+## Move apps to a GitHub connection
+
+1. Connect the repository to the workspace in the console and choose incremental deployment. In the review, enter the manifest's secrets under **Runtime secrets**: a push never reads your `.env` files. See [Deploy from GitHub](/guides/github#runtime-secrets).
+2. Save the configuration. Its first deployment takes over the apps with the same names.
+3. Run `rig ci status --repo OWNER/REPO` and check that every declared secret shows `set`.
+
+If that first deployment fails because a required secret has no value, the apps still belong to your local project and `rig deploy` still deploys them. Open the connection's configuration, add the value under **Runtime secrets**, and save again; saving redeploys the branch head. Once the connection owns the apps, `rig deploy` from the project directory updates its runtime secrets from your `.env` files instead of deploying.
+
+## Move apps back to rig deploy
+
+Disconnect the repository in the workspace's GitHub deployment settings, or run `rig ci unlink --repo OWNER/REPO --workspace WORKSPACE` for a GitHub Actions binding. The next `rig deploy` from the project directory takes the apps back, and reads `secrets` from your environment and `.env` files again. Rigbox keeps the disconnected connection's runtime secrets for that workspace and repository, so reconnecting restores them.

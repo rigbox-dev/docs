@@ -23,7 +23,7 @@ areas=[
 area('Start here',[group('Get started',['introduction','quickstart','guides/install-cli','concepts/core'])]),
 area('Deploy applications',[
  group('Deploy',['deploy/overview','guides/deploying',group('GitHub',['guides/github-actions','guides/deploy-button'],'guides/github'),group('Multi-app projects',['deploy/dependencies','deploy/single-app'],'deploy/multi-app')]),
- group('App releases',['deploy/development-loop','deploy/stage-and-activate','deploy/app-rollback']),
+ group('App releases',['deploy/development-loop','deploy/stage-and-activate','deploy/app-rollback','deploy/release-ownership']),
  group('Workspace images',[group('Reproducible builds',['deploy/build-cache','deploy/reimage','guides/releases-and-rollback'],'deploy/reproducible-builds'),'guides/bluegreen'])]),
 area('Configure applications',[
  group('Configuration',['configure/overview','configure/environment','configure/secrets','configure/parameters','configure/commands','configure/health']),

@@ -20,7 +20,7 @@ Check whether the failure happened before submission, during preparation, or dur
 | Error category | Recovery |
 | --- | --- |
 | Unknown field or removed build shape | Compare with the [v0.13 manifest reference](/reference/rig-yaml) |
-| Existing app or port owned by another deployment | Choose a new target or explicitly plan migration; do not overwrite unrelated apps |
+| Existing app or port owned by another deployment | See [release ownership](/deploy/release-ownership): push when a GitHub connection deploys the app; otherwise choose a new target or explicitly plan migration, and do not overwrite unrelated apps |
 | App requires system packages | Provision the workspace image; incremental installers are unprivileged |
 | Invalid working directory | Use release-relative paths and move mutable data to a persistent volume |
 | Source exceeds upload limits | Remove generated output, caches, or large assets from deployment input |

@@ -11,6 +11,8 @@ The console GitHub integration reacts to repository events using a reviewed proj
 
 Check repository installation access, branch selection, manifest path, target workspace, and deployment strategy in the console. Verify that the commit belongs to the configured repository and that private source access is still available. A strategy change may require explicit review; image deployment requires root-disk replacement consent.
 
+A push resolves `secrets` only from the connection's [runtime secrets](/guides/github#runtime-secrets), never from `.env` files. The deployment's status names a required secret with no value, and any optional secrets it left out. Run `rig ci status --repo OWNER/REPO` to see which declared secrets have a value.
+
 ## GitHub Actions
 
 Check the workflow's `contents: read` and `id-token: write` permissions, the Rigbox repository binding, and the Action's working directory. The initial repository claim has a limited window; inspect the binding before retrying. Never solve an OIDC failure by copying personal credentials into the manifest.

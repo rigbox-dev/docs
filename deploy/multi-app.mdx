@@ -47,7 +47,7 @@ Check every app's health and the frontend's connection to the API. A successful 
 
 ## Ownership and changes
 
-A full incremental deploy replaces the managed application set within its deployment scope. Removing a managed app from that project's manifest can remove it from the active set. An unrelated project's apps are not part of that set. Existing unmanaged apps or apps owned by another scope cannot be silently adopted: resolve the name/port conflict or deploy to a new workspace.
+A full incremental deploy replaces the managed application set within its deployment scope. Removing a managed app from that project's manifest can remove it from the active set. An unrelated project's apps are not part of that set. Existing unmanaged apps or apps owned by another scope cannot be silently adopted: resolve the name/port conflict or deploy to a new workspace. See [release ownership](/deploy/release-ownership) for which deployment can take over an app.
 
 Preserve `.rig.lock` for local project identity. Git projects derive identity from repository and project path when no scope is stored. Use [deploy one app](/deploy/single-app) for a partial update; do not delete other entries merely to skip them.
 
