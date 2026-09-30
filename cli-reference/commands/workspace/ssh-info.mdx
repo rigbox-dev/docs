@@ -4,9 +4,9 @@ sidebarTitle: "ssh-info"
 description: "Print SSH connection info for a workspace"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Use this command from your local terminal. Prints the workspace's SSH host and user, the short `ssh` alias when rig manages your SSH config, and the full `ssh USER@HOST` command. It also sets up SSH access from this machine, as `rig ssh add` does. Inside a workspace it describes that workspace and takes no `--workspace`.
 
 ## Examples
 
@@ -14,6 +14,12 @@ Run from your local terminal. Replace uppercase placeholders with your own value
 
 ```bash
 rig workspace ssh-info --workspace WORKSPACE_ID
+```
+
+Print the details as JSON for scripts; `ssh_target` is always present and `ssh_alias` appears once SSH access is set up.
+
+```bash
+rig workspace ssh-info --workspace WORKSPACE_ID --output json
 ```
 
 Inspect the supported arguments before running this command. Help is offline and does not modify resources.
@@ -92,7 +98,8 @@ Usage: rigbox workspace ssh-info [OPTIONS]
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -106,10 +113,12 @@ Usage: rigbox workspace ssh-info [OPTIONS]
 
 Options:
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
       --no-pager
           Do not pipe help output through a pager

@@ -4,7 +4,7 @@ sidebarTitle: "tools"
 description: "Launch and manage workspace tools"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
 Run this command in an authenticated local terminal or inside a workspace; see the availability above.
 
@@ -43,7 +43,7 @@ Launch and manage workspace tools
 Usage: rigbox tools [OPTIONS] <COMMAND>
 
 Commands:
-  ls              List tools running in a workspace
+  ls              List workspace tools with their status and URL
   launch          Launch a tool
   stop            Stop a tool
   install         Install a tool into a workspace (async)
@@ -90,7 +90,8 @@ Usage: rigbox tools [OPTIONS] <COMMAND>
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -103,7 +104,7 @@ Launch and manage workspace tools
 Usage: rigbox tools [OPTIONS] <COMMAND>
 
 Commands:
-  ls              List tools running in a workspace
+  ls              List workspace tools with their status and URL
   launch          Launch a tool
   stop            Stop a tool
   install         Install a tool into a workspace (async)
@@ -112,10 +113,12 @@ Commands:
 
 Options:
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
       --no-pager
           Do not pipe help output through a pager

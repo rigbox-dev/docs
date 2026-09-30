@@ -48,6 +48,8 @@ Install Virtual Browser before launching it. This installs Playwright along with
 rig tools install --workspace $WORKSPACE --tool virtual-browser
 ```
 
+If the server installs nothing, the command fails with `tool_install_failed` and the server's message.
+
 <Note>
 Installation downloads browser binaries and their dependencies. This can take 3-5 minutes on a `base` image workspace depending on network speed.
 </Note>
@@ -72,6 +74,8 @@ Once installed, launch the browser.
 rig tools launch --workspace $WORKSPACE --tool virtual-browser
 ```
 
+The launch returns while the browser starts. `rig tools ls --workspace $WORKSPACE` shows its status, `running` once it serves, and its URL. If the server launches nothing, `rig tools launch` fails with `tool_unavailable` and the server's reason instead of reporting success.
+
 See [Launch Tool](/api-reference/tools/launch) for the response schema.
 
 ## Accessing the Browser
@@ -82,7 +86,7 @@ Once launched, Virtual Browser is accessible via noVNC on **port 8892** inside t
 https://browser-{workspace-id}.rigbox.dev
 ```
 
-Open this URL in your local browser. You'll see the remote browser's display and can interact with it using your mouse and keyboard.
+Open this URL in your local browser; `rig tools ls` prints it while the browser is running. You'll see the remote browser's display and can interact with it using your mouse and keyboard.
 
 <Note>
 The `browser-` prefixed subdomain is created automatically when you launch Virtual Browser. You don't need to create an app route manually.

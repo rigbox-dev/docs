@@ -9,6 +9,8 @@ Service specs define long-running background processes that run inside your work
 
 Use the [v0.13 CLI](/guides/install-cli) and [authenticate](/cli-reference/authentication). Run workspace-management and recipe commands from your local terminal. Commands identified as running inside a workspace require its console terminal or SSH session. Replace example resource IDs with the values returned for your account.
 
+Create, update, and delete service specs from your local terminal. Inside a workspace, `rig service-spec ls` works, but the commands that change a spec refuse: an account spec also applies to your other workspaces, so a workspace can't change one.
+
 ## How Service Specs Work
 
 When you attach a service spec to a workspace, Rigbox generates a systemd service unit file inside the VM:

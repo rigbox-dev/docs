@@ -4,7 +4,7 @@ sidebarTitle: "set"
 description: "Set a custom domain for an app"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
 Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
 
@@ -32,7 +32,7 @@ Usage: rigbox app domain set [OPTIONS] --app <APP> --domain <DOMAIN>
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-a, --app` | App id, name, or subdomain | Required; Value: APP |
+| `-a, --app` | App name, id, or subdomain | Required; Value: APP |
 | `-d, --domain` | Domain to attach (e.g. app.example.com) | Required; Value: DOMAIN |
 | `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
 | `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
@@ -52,7 +52,7 @@ Usage: rigbox app domain set [OPTIONS] --app <APP> --domain <DOMAIN>
 
 Options:
   -a, --app <APP>
-          App id, name, or subdomain
+          App name, id, or subdomain
 
       --output <OUTPUT>
           Output format [default: human, or `rig config set output …`]
@@ -96,9 +96,10 @@ Usage: rigbox app domain set [OPTIONS] --app <APP> --domain <DOMAIN>
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-a, --app` | App id, name, or subdomain | Required; Value: APP |
+| `-a, --app` | App name, id, or subdomain | Required; Value: APP |
 | `-d, --domain` | Domain to attach (e.g. app.example.com) | Required; Value: DOMAIN |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -112,16 +113,18 @@ Usage: rigbox app domain set [OPTIONS] --app <APP> --domain <DOMAIN>
 
 Options:
   -a, --app <APP>
-          App id, name, or subdomain
+          App name, id, or subdomain
 
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
 
   -d, --domain <DOMAIN>
           Domain to attach (e.g. app.example.com)
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
       --no-pager
           Do not pipe help output through a pager

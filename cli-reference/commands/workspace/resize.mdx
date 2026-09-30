@@ -4,9 +4,9 @@ sidebarTitle: "resize"
 description: "Resize workspace resources"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Use this command from your local terminal or inside a workspace. Inside a workspace, `--workspace` defaults to that workspace.
 
 ## Examples
 
@@ -101,18 +101,19 @@ Options:
 ## Workspace syntax
 
 ```text
-Usage: rigbox workspace resize [OPTIONS] --workspace <WORKSPACE>
+Usage: rigbox workspace resize [OPTIONS]
 ```
 
 ### Arguments and flags
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
+| `-w, --workspace` | Workspace name or id (default: this workspace) | Value: WORKSPACE |
 | `--ram` | New RAM allotment in MB | Value: RAM |
 | `--vcpu` | New vCPU count (minimum: 1) | Value: VCPU |
 | `--disk` | New disk size in MB | Value: DISK |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -122,32 +123,34 @@ Usage: rigbox workspace resize [OPTIONS] --workspace <WORKSPACE>
 ```text
 Resize workspace resources
 
-Usage: rigbox workspace resize [OPTIONS] --workspace <WORKSPACE>
+Usage: rigbox workspace resize [OPTIONS]
 
 Options:
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
 
   -w, --workspace <WORKSPACE>
-          Workspace name or id
+          Workspace name or id (default: this workspace)
 
-      --no-pager
-          Do not pipe help output through a pager
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
       --ram <RAM>
           New RAM allotment in MB
 
-  -v, --verbose
-          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
+      --no-pager
+          Do not pipe help output through a pager
 
       --vcpu <VCPU>
           New vCPU count (minimum: 1)
 
       --disk <DISK>
           New disk size in MB
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
 
   -h, --help
           Print help

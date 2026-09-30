@@ -19,7 +19,7 @@ rig app logs --app APP
 rig app logs --app APP --follow
 ```
 
-Use Ctrl+C to stop following; this does not stop the app. Check for exceptions, missing configuration, and whether the process binds the configured port. Runtime output can include application secrets, so review it before sharing.
+Use Ctrl+C to stop following; this does not stop the app. The same commands work inside the workspace, where `--follow` polls every few seconds if the log stream isn't available there. Check for exceptions, missing configuration, and whether the process binds the configured port. Runtime output can include application secrets, so review it before sharing.
 
 ## Distinguish the failing stage
 

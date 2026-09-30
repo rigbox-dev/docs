@@ -24,6 +24,19 @@
       "rig",
       "ai",
       "defaults",
+      "--provider",
+      "anthropic",
+      "--model",
+      "claude-sonnet-4-20250514"
+    ]
+  },
+  {
+    "key": "ai/defaults:2",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ai",
+      "defaults",
       "--help"
     ]
   },
@@ -53,11 +66,23 @@
       "rig",
       "api",
       "GET",
-      "/api/v1/workspaces"
+      "/v1/workspaces"
     ]
   },
   {
     "key": "api:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "api",
+      "PATCH",
+      "/v1/apps/APP_ID",
+      "--body",
+      "{\"name\":\"web\"}"
+    ]
+  },
+  {
+    "key": "api:2",
     "mode": "local",
     "argv": [
       "rig",
@@ -979,6 +1004,17 @@
     "argv": [
       "rig",
       "completions",
+      "zsh",
+      "--install",
+      "--no-rc"
+    ]
+  },
+  {
+    "key": "completions:2",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "completions",
       "--help"
     ]
   },
@@ -1048,6 +1084,17 @@
       "rig",
       "config",
       "set",
+      "ssh-setup",
+      "false"
+    ]
+  },
+  {
+    "key": "config/set:2",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "config",
+      "set",
       "--help"
     ]
   },
@@ -1098,6 +1145,18 @@
   },
   {
     "key": "init:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "init",
+      "--name",
+      "My App",
+      "--port",
+      "8080"
+    ]
+  },
+  {
+    "key": "init:2",
     "mode": "local",
     "argv": [
       "rig",
@@ -1439,13 +1498,27 @@
       "app",
       "install",
       "--ref",
-      "DEPLOY_REF",
+      "claude",
       "--workspace",
       "WORKSPACE_ID"
     ]
   },
   {
     "key": "recipe/app/install:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "recipe",
+      "app",
+      "install",
+      "--ref",
+      "DEPLOY_REF",
+      "--workspace",
+      "WORKSPACE_ID"
+    ]
+  },
+  {
+    "key": "recipe/app/install:2",
     "mode": "local",
     "argv": [
       "rig",
@@ -1999,13 +2072,24 @@
     "argv": [
       "rig",
       "ssh",
-      "add",
-      "--name",
-      "my-project"
+      "add"
     ]
   },
   {
     "key": "ssh/add:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "ssh",
+      "add",
+      "--name",
+      "work-laptop",
+      "--file",
+      "~/.ssh/work_ed25519.pub"
+    ]
+  },
+  {
+    "key": "ssh/add:2",
     "mode": "local",
     "argv": [
       "rig",
@@ -2111,7 +2195,7 @@
       "--workspace",
       "WORKSPACE_ID",
       "--tool",
-      "TOOL"
+      "architecture"
     ]
   },
   {
@@ -2157,7 +2241,7 @@
       "tools",
       "launch",
       "--tool",
-      "TOOL",
+      "virtual-browser",
       "--workspace",
       "WORKSPACE_ID"
     ]
@@ -2243,6 +2327,16 @@
   },
   {
     "key": "update:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "update",
+      "--version",
+      "VERSION"
+    ]
+  },
+  {
+    "key": "update:2",
     "mode": "local",
     "argv": [
       "rig",
@@ -2828,6 +2922,19 @@
   },
   {
     "key": "workspace/ssh-info:1",
+    "mode": "local",
+    "argv": [
+      "rig",
+      "workspace",
+      "ssh-info",
+      "--workspace",
+      "WORKSPACE_ID",
+      "--output",
+      "json"
+    ]
+  },
+  {
+    "key": "workspace/ssh-info:2",
     "mode": "local",
     "argv": [
       "rig",

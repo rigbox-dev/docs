@@ -4,9 +4,9 @@ sidebarTitle: "rm"
 description: "Delete a service spec"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Use this command from your local terminal. Inside a workspace, it refuses with a one-line message because account service specs apply to your other workspaces too. `rig service-spec ls` works in both places.
 
 ## Examples
 
@@ -97,7 +97,8 @@ Usage: rigbox service-spec rm [OPTIONS] --id <ID>
 | Argument | Description | Details |
 | --- | --- | --- |
 | `--id` | Service spec id (from `rig service-spec ls`) | Required; Value: ID |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -114,10 +115,12 @@ Options:
           Service spec id (from `rig service-spec ls`)
 
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
       --no-pager
           Do not pipe help output through a pager

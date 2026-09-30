@@ -42,19 +42,20 @@ If you know the port and want full control over the app name, create it directly
 rig app new --name <APP_NAME> --port 8080
 ```
 
-From outside the workspace, add `--workspace <WORKSPACE_NAME>` to target a specific VM. Pass `--kind cli` for interactive tools you'll invoke over SSH rather than expose as a public service.
+Inside a workspace, `rig app new` creates the app in that workspace. On your laptop, it uses the workspace the current directory's `rig.yaml` deploys to (its `.rig.lock` binding); add `--workspace <WORKSPACE_NAME>` to target another workspace, or when the directory has no deployed `rig.yaml`. Pass `--kind cli` for interactive tools you'll invoke over SSH rather than expose as a public service.
 
 See [Create App](/api-reference/apps/create) for the API form.
 
 ## Expose Port Shortcut
 
-`rig app expose-port` detects the process listening on the specified port and, with `--wrap`, creates an app route in one call. This is the easiest way to make a service public. Omit `--wrap` to only detect the process without creating the route.
+`rig app expose-port` detects the process listening on the specified port and, with `--wrap` and an app name, creates the app route in the same call. This is the easiest way to make a service public. Omit `--wrap` to only detect the process; the detection reports the process and a suggested app name.
 
 ```bash
-rig app expose-port --workspace $WORKSPACE_NAME --port 3000 --wrap
+rig app expose-port --workspace $WORKSPACE_NAME --port 3000
+rig app expose-port --workspace $WORKSPACE_NAME --port 3000 --name <APP_NAME> --wrap
 ```
 
-The command automatically detects the process name and uses it to generate a sensible app name.
+With `--name` but without `--wrap`, the command asks before creating the route. Where it can't ask (without a terminal, with `--output json`, or in CI), it stops and tells you to pass `--wrap`. Inside a workspace, `--workspace` defaults to that workspace.
 
 See [Expose Port](/api-reference/apps/expose-port) for details.
 
@@ -107,8 +108,10 @@ See [Start App](/api-reference/apps/start), [Stop App](/api-reference/apps/stop)
 You can rename an app or change its port. Renaming an app changes its public subdomain URL. There is no dedicated CLI subcommand for this, so use `rig api` to send the raw request:
 
 ```bash
-echo '{"name": "new-name"}' | rig api PATCH /v1/apps/$APP_ID --body -
+rig api PATCH /v1/apps/$APP_ID --body '{"name": "new-name"}'
 ```
+
+`--body` also accepts a JSON file path, or `-` to read the body from standard input.
 
 <Warning>
 Renaming an app changes its public URL. Any existing links to the old subdomain will stop working immediately.

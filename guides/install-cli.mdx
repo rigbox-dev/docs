@@ -51,6 +51,8 @@ rig whoami
 
 The CLI saves its credential in `~/.config/rigbox/config.json`, or `$XDG_CONFIG_HOME/rigbox/config.json` when that variable is set. See [Authentication](/cli-reference/authentication) for headless login and API keys.
 
+Signing in also sets up SSH access from this machine: the CLI registers your SSH key, creating one if you have none, and adds a `Host` entry for each workspace, so `ssh <workspace>` works. See [SSH access](/guides/ssh-access) for what it changes and how to turn it off.
+
 ## 3. Choose your next step
 
 <CardGroup cols={2}>
@@ -65,6 +67,16 @@ rig update
 rig --version
 ```
 
+`rig update` replaces the `rig` you ran with the latest published release. It downloads the build for your platform from the public release mirror, checks that the download runs, and swaps it in for the installed binary, following the `rig` link to the real file. To install a particular release instead, pass its tag:
+
+```bash
+rig update --version v0.12.68
+```
+
+To put the new binary somewhere else, set `RIG_INSTALL_DIR`; the CLI installs it there as `rigbox` and adds a `rig` link next to it. If the CLI can't write to the directory, it stops and says so without touching the installed binary; rerun it with write access or set `RIG_INSTALL_DIR`. Published builds cover macOS (Apple Silicon and Intel) and Linux x86-64.
+
+The CLI checks for a newer release at most once a day. While one is available, commands with human output end with a one-line notice on standard error pointing at `rig update`. Set `RIGBOX_NO_UPDATE_CHECK=1` to turn the check off.
+
 You can also rerun the installer. To install a specific published release, set `RIG_VERSION` on the Bash process that executes the installer:
 
 ```bash
@@ -72,6 +84,12 @@ curl -fsSL https://rigbox.dev/install.sh | RIG_VERSION=v0.12.68 bash
 ```
 
 Set `RIG_INSTALL_DIR` on the same process to choose another writable installation directory.
+
+### Inside a workspace
+
+Workspaces come with the CLI installed at `/usr/local/bin/rigbox`, with `rig` linked to it. Run `rig update` there to update it in place, the same as on your machine.
+
+Workspaces also keep it current on their own. A couple of minutes after boot, and about once a day after that, a workspace installs the latest release if it has changed. A workspace whose CLI is older than the oldest version Rigbox supports updates to the latest release even when no new one has come out. Either way, the new binary replaces the old one only after it runs, so a failed download leaves the working CLI in place.
 
 ## Build the CLI from source
 

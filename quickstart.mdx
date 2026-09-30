@@ -61,6 +61,8 @@ rig app-release ls --workspace my-first-app
 
 Replace `<APP_NAME>` with the name returned by the list command. Verify `live` and `port_open` are true, then open the actual URL returned by Rigbox. A private route may require authentication.
 
+To look around inside the workspace, connect with `ssh my-first-app`. Signing in and creating the workspace set up [SSH access](/guides/ssh-access) for you.
+
 ## Deploy a change
 
 Edit the example and run `rig deploy` again from the same directory. Activation briefly restarts the affected service; it does not replace the workspace filesystem. See [the development loop](/deploy/development-loop) and [app rollback](/deploy/app-rollback).

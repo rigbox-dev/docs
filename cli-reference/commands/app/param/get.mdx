@@ -4,7 +4,7 @@ sidebarTitle: "get"
 description: "Read a single parameter value"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
 Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
 
@@ -32,7 +32,7 @@ Usage: rigbox app param get [OPTIONS] --app <APP> <KEY>
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-a, --app` | App name or id | Required; Value: APP |
+| `-a, --app` | App name, id, or subdomain | Required; Value: APP |
 | `key` | Parameter key | Required; Value: KEY |
 | `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
 | `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
@@ -56,7 +56,7 @@ Arguments:
 
 Options:
   -a, --app <APP>
-          App name or id
+          App name, id, or subdomain
 
       --output <OUTPUT>
           Output format [default: human, or `rig config set output …`]
@@ -97,9 +97,10 @@ Usage: rigbox app param get [OPTIONS] --app <APP> <KEY>
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-a, --app` | App name or id | Required; Value: APP |
+| `-a, --app` | App name, id, or subdomain | Required; Value: APP |
 | `key` | Parameter key | Required; Value: KEY |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -117,13 +118,15 @@ Arguments:
 
 Options:
   -a, --app <APP>
-          App name or id
+          App name, id, or subdomain
 
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
       --no-pager
           Do not pipe help output through a pager

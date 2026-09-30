@@ -11,7 +11,7 @@ Install the v0.13 CLI, run `rig login`, and confirm your app has install/start c
 
 ## 1. Create the manifest
 
-Run `rig init` in your project, then review the generated values. Declare `workspace.deployment.strategy: incremental` for app releases. Check the [canonical manifest reference](/reference/rig-yaml) before deployment.
+Run `rig init` in your project, then review the generated values. The app name comes from `--name` or the directory name and is converted to lowercase letters, digits, and dashes, so the deploy accepts it; `rig init --name "My App"` writes `name: my-app`. Declare `workspace.deployment.strategy: incremental` for app releases. Check the [canonical manifest reference](/reference/rig-yaml) before deployment.
 
 ## 2. Deploy
 
@@ -42,6 +42,8 @@ Follow [Deploy from GitHub](/guides/github). The console retains a reviewed depl
 ## How rig deploy resolves a workspace
 
 An explicit `--workspace` targets a name or ID. Otherwise the CLI reuses the workspace binding in `.rig.lock` or creates a new workspace. Inspect bindings before reusing a checkout for another environment; specify the target explicitly when uncertain.
+
+Inside a workspace, `rig deploy` deploys into that workspace. It ignores `.rig.lock` bindings, never creates a workspace, and refuses options that would clone, re-image, or replace the workspace it runs in; see [deploying from inside a workspace](/cli-reference/execution-modes#deploy-from-inside-a-workspace).
 
 <span id="the-rig-yaml-contract" />
 

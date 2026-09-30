@@ -1,121 +1,127 @@
 ---
 title: SSH Access
-description: Connect to your workspaces via SSH for terminal access, file transfer, and management.
+description: Connect to your workspaces over SSH from a terminal, an editor, or the Claude desktop app.
 ---
 
-# SSH Access
+<span id="ssh-access" />
 
-Every Rigbox workspace is a full Linux VM with SSH access. Connect from any terminal to get a shell or transfer files.
+Every Rigbox workspace is a Linux VM you can reach over SSH. The CLI sets up access for you: after `rig login`, `ssh <workspace>` opens a shell in any running workspace, and the same name works with `scp`, `sftp`, `rsync`, and tools that read your SSH config.
 
 ## Prerequisites
 
-Before connecting via SSH, you need:
+- The [Rigbox CLI](/guides/install-cli), signed in with `rig login`.
+- OpenSSH on your machine (`ssh`, `ssh-keygen`, and `ssh-keyscan`). macOS and most Linux distributions include it.
+- A running workspace. List yours with `rig workspace ls`.
 
-1. An SSH key pair on your local machine (e.g., `~/.ssh/id_ed25519`)
-2. A Rigbox account with an API key
-3. At least one running workspace
+## How the CLI sets up SSH
 
-If you don't have an SSH key yet, generate one:
+`rig login`, `rig ssh add`, and the workspace commands that print an SSH command (`rig workspace spawn`, `start`, `restart`, and `ssh-info`) set up SSH access from the machine you run them on:
 
-```bash
-ssh-keygen -t ed25519 -C "your-email@example.com"
+1. **Your key.** The CLI uses `~/.ssh/id_ed25519.pub`, or `~/.ssh/id_rsa.pub` if that is the key you have. When you have neither, it creates an ed25519 key pair at `~/.ssh/id_ed25519`, without a passphrase. It registers the public key on your account as `laptop-<hostname>` unless the key is already there, and waits for running workspaces to pick it up.
+2. **A host entry per workspace.** The CLI writes `~/.config/rigbox/ssh_config` with one `Host` entry for each of your workspaces, and adds an `Include` line for that file, with a comment, to the top of `~/.ssh/config`. That is the only change it makes to your own SSH config.
+3. **Trusted host keys.** The first time the CLI sets up a host, it records the gateway's host keys in `~/.config/rigbox/known_hosts`, so SSH clients connect without a first-connect prompt. That matters for tools that can't answer one.
+
+The first time you sign in, the CLI reports what it set up:
+
+```text
+  → No SSH key found — generated /Users/you/.ssh/id_ed25519 for you
+  ⓘ Auto-registered /Users/you/.ssh/id_ed25519.pub as laptop-mbp (one-time setup for SSH-backed deploys)
+  ✓ Propagated to my-project
+  ⓘ Added `Include ~/.config/rigbox/ssh_config` to ~/.ssh/config — `ssh <workspace>` now works
 ```
 
----
+Each entry in `~/.config/rigbox/ssh_config` looks like this:
 
-## Register an SSH Key
-
-To connect via SSH, you first need to register your public key with Rigbox.
-
-Replace `<KEY_NAME>` with a label you'll recognize (for example, `laptop`).
-
-```bash
-rig ssh add --name <KEY_NAME>
+```ssh-config
+Host my-project my-project-ctbxi8lb
+    HostName eu-west-1.rigbox.dev
+    User my-project-ctbxi8lb
+    IdentityFile /Users/you/.ssh/id_ed25519
+    UserKnownHostsFile /Users/you/.config/rigbox/known_hosts
+    StrictHostKeyChecking accept-new
+    CheckHostIP no
+    ServerAliveInterval 30
+    ServerAliveCountMax 4
 ```
 
-This reads your default public key (`~/.ssh/id_ed25519.pub`) and registers it automatically under the name you provide. To register a key from a different path, pass `--file`:
+An entry answers to the workspace's name (lowercased, with anything other than letters, digits, and dashes turned into dashes) and to its login name, `<name>-<id suffix>`. When two workspaces share a name, or you already use that name for a host in your own SSH config, the entry keeps only the login name. `rig workspace ssh-info` shows which alias to use.
+
+The CLI rewrites the file from your workspace list, so edits to it are lost; `rig workspace ls` and `rig workspace rm` keep it current. Stopped workspaces have entries too.
+
+Nothing is set up inside a workspace, on a CI runner (`CI` or `GITHUB_ACTIONS` set), or when the CLI authenticates with a deploy token.
+
+## Connect to a workspace
+
+Use the workspace name:
 
 ```bash
-rig ssh add --name <KEY_NAME> --file ~/.ssh/my_rigbox_key.pub
+ssh my-project
 ```
 
-<Tip>
-  You can register multiple SSH keys for different machines - for example, one for your laptop and one for your desktop. Give each a descriptive name so you can identify them later.
-</Tip>
-
----
-
-## Sync Keys to a Workspace
-
-When you create a workspace, your registered SSH keys are typically synced automatically. If you add a new key while a workspace is already running, sync it manually:
+Run a single command, or ask for a terminal with `-t` when the command needs one, such as an interactive program or a `sudo` prompt:
 
 ```bash
-rig ssh sync --workspace <WORKSPACE_ID>
+ssh my-project 'cd ~/app && npm test'
+ssh -t my-project tmux attach
 ```
 
-This copies all your registered public keys into the workspace VM's `~/.ssh/authorized_keys` file.
+Editors and apps that read `~/.ssh/config`, including SSH connections in the Claude desktop app, can use the same alias. SFTP is available, so tools that browse or copy files over SFTP work too.
 
-<Note>
-  Keys are synced automatically on workspace start for most templates. You only need to run `rig ssh sync` if you add a key to an already-running workspace.
-</Note>
-
----
-
-## Connect to a Workspace
-
-When you create a workspace, Rigbox gives you an SSH command in this format:
+To print the connection details for a workspace:
 
 ```bash
-ssh <WORKSPACE_NAME>-<WORKSPACE_ID_SUFFIX>@<REGION>.rigbox.dev
+rig workspace ssh-info --workspace my-project
 ```
 
-To print the exact SSH target for a workspace at any time, run:
+```text
+SSH Info
 
-```bash
-rig workspace ssh-info --workspace <WORKSPACE_ID>
+  Workspace: my-project
+  Status:    running
+  Host:      eu-west-1.rigbox.dev
+  SSH:       ssh my-project
+             ssh my-project-ctbxi8lb@eu-west-1.rigbox.dev
+  Config:    /Users/you/.config/rigbox/ssh_config (Host my-project)
 ```
 
-`<WORKSPACE_ID_SUFFIX>` is the workspace ID with the leading `ws-` stripped, and `<REGION>` is the workspace's region (for example, `eu-west-1`).
-
-For example, if your workspace is named `my-project` with ID `ws-ctbxi8lb` in the `eu-west-1` region:
-
-```bash
-ssh my-project-ctbxi8lb@eu-west-1.rigbox.dev
-```
-
-The examples below continue with `my-project` / `ws-ctbxi8lb` / `eu-west-1`. Replace those with your own workspace name, ID suffix, and region.
-
-The SSH server identifies you by your registered key and routes the connection directly to your workspace VM.
-
-<Tip>
-  The SSH command is shown in the dashboard when you create a workspace. You can also construct it from the workspace name, ID (strip the `ws-` prefix), and region.
-</Tip>
+The second `ssh` line is the full command, which works without the managed config. For scripts, `--output json` returns the same details, including `ssh_target` and, once access is set up, `ssh_alias`.
 
 ### Connecting to the right region
 
-Each workspace runs on a compute node in a specific region (today: `eu-west-1`), and you connect to that region's hostname directly:
-
-```bash
-ssh my-project-ctbxi8lb@eu-west-1.rigbox.dev
-```
-
-The dashboard always shows the correct region in the SSH command it generates, and `rig ssh-info <workspace>` from the CLI prints the same target. As Rigbox expands to more regions, the hostname will change accordingly — there is no central `rigbox.dev:22` gateway to fall back on.
+The full SSH target is `<WORKSPACE_NAME>-<WORKSPACE_ID_SUFFIX>@<REGION>.rigbox.dev`: the workspace name, its ID without the leading `ws-`, and the host of the region the workspace runs in (today `eu-west-1`). The CLI takes the host from the workspace record, and the dashboard shows the same command. There is no central `rigbox.dev:22` gateway to fall back on.
 
 <Note>
-  Older `ssh <name>+rig@rigbox.dev` instructions referred to a gateway router that is no longer deployed. If a third-party guide or older script still uses that format, replace it with the region-direct hostname.
+  Older `ssh <name>+rig@rigbox.dev` instructions referred to a gateway router that is no longer deployed. If a third-party guide or older script still uses that format, replace it with the workspace alias or the region hostname.
 </Note>
+
+### Stopped workspaces
+
+A workspace accepts connections only while it is running. Connecting to a stopped workspace fails with a message on standard error that names the command to start it:
+
+```text
+Error: Workspace 'my-project-ctbxi8lb' is not running (status: stopped).
+Start it with: rig workspace start --workspace my-project
+or from https://rigbox.dev/workspaces
+```
+
+While a workspace is still starting, the message says so; try again in a few seconds. These messages never go to standard output, so a script or SFTP client sees a clean failure rather than stray text in its data.
+
+### Forwarding isn't available
+
+Workspace logins don't allow port forwarding (`-L`, `-R`, `-D`), agent forwarding (`-A`), X11 forwarding, or tunnels. Editors that reach their remote server through a forwarded port, such as VS Code Remote-SSH, can't use this connection. To reach a server running in the workspace, [expose it as an app](/guides/expose-and-route). For Git or other credentials inside the workspace, create them there instead of forwarding your local agent.
 
 ### Specify an identity file
 
-If your key is not in the default location, specify it explicitly:
+The managed entries name the key the CLI registered. To use a different key, register it first, then pass it to `ssh`:
 
 ```bash
-ssh -i ~/.ssh/my_rigbox_key my-project-ctbxi8lb@eu-west-1.rigbox.dev
+rig ssh add --name my-other-key --file ~/.ssh/my_rigbox_key.pub
+ssh -i ~/.ssh/my_rigbox_key my-project
 ```
 
 ### SSH config shortcut
 
-Add this to your `~/.ssh/config` for easier access:
+The CLI writes these entries for you (see [How the CLI sets up SSH](#how-the-cli-sets-up-ssh)). If you [turn that off](#turn-off-automatic-setup), add your own entry to `~/.ssh/config`:
 
 ```ssh-config
 Host my-project
@@ -124,45 +130,73 @@ Host my-project
   IdentityFile ~/.ssh/id_ed25519
 ```
 
-Then connect with:
-
-```bash
-ssh my-project
-```
-
 ---
 
 ## File Transfer
 
-Use `scp` to transfer files between your local machine and a workspace.
+`scp`, `sftp`, and `rsync` accept the workspace alias, just like `ssh`.
 
 ### Upload a file
 
 ```bash
-scp ./local-file.txt my-project-ctbxi8lb@eu-west-1.rigbox.dev:/home/developer/
+scp ./local-file.txt my-project:/home/developer/
 ```
 
 ### Download a file
 
 ```bash
-scp my-project-ctbxi8lb@eu-west-1.rigbox.dev:/home/developer/output.txt ./
+scp my-project:/home/developer/output.txt ./
 ```
 
 ### Upload a directory
 
 ```bash
-scp -r ./my-project my-project-ctbxi8lb@eu-west-1.rigbox.dev:/home/developer/
+scp -r ./my-project my-project:/home/developer/
 ```
+
+For an interactive session, run `sftp my-project`.
 
 ### Using rsync
 
-For larger transfers or syncing directories, `rsync` is more efficient:
+For larger transfers or repeated syncs, `rsync` copies only what changed:
 
 ```bash
-rsync -avz ./my-project/ my-project-ctbxi8lb@eu-west-1.rigbox.dev:/home/developer/my-project/
+rsync -avz ./my-project/ my-project:/home/developer/my-project/
 ```
 
+To update a deployed app, use [`rig deploy`](/guides/deploying) instead of copying files into its release directory.
+
 ---
+
+## Register an SSH Key
+
+`rig login` registers your default key, so you only need `rig ssh add` for another key or another machine:
+
+```bash
+rig ssh add
+```
+
+Without `--file`, it uses your default public key and creates one if you have none. Without `--name`, the key is named `laptop-<hostname>`. To register a specific key under a name you choose:
+
+```bash
+rig ssh add --name work-laptop --file ~/.ssh/work_ed25519.pub
+```
+
+`rig ssh add` also sets up the host entries on this machine. If the key is already on your account, rig says so and doesn't add it again.
+
+<Tip>
+  Register one key per machine and name it after the machine, so you can remove it on its own later.
+</Tip>
+
+## Sync Keys to a Workspace
+
+Running workspaces pick up a newly registered key automatically; `rig ssh add` and `rig login` wait for them and report each one. If a workspace didn't pick the key up in time, push your keys to it:
+
+```bash
+rig ssh sync --workspace my-project
+```
+
+This copies your registered public keys into the workspace's `~/.ssh/authorized_keys` file.
 
 ## Managing SSH Keys
 
@@ -172,10 +206,12 @@ rsync -avz ./my-project/ my-project-ctbxi8lb@eu-west-1.rigbox.dev:/home/develope
 rig ssh ls
 ```
 
+The list includes each key's ID.
+
 ### List keys synced to a workspace
 
 ```bash
-rig ssh ls --workspace <WORKSPACE_ID>
+rig ssh ls --workspace my-project
 ```
 
 This returns the keys currently in the workspace's `authorized_keys` file.
@@ -183,40 +219,60 @@ This returns the keys currently in the workspace's `authorized_keys` file.
 ### Remove a key
 
 ```bash
-rig ssh rm --name <KEY_NAME>
+rig ssh rm --name <KEY_NAME_OR_ID>
 ```
 
 <Warning>
   Removing a key with the CLI does not immediately remove it from running workspaces. The key will be removed the next time the workspace restarts or you run `rig ssh sync`.
 </Warning>
 
+## Turn off automatic setup
+
+To manage SSH yourself:
+
+```bash
+rig config set ssh-setup false
+```
+
+The CLI then stops registering keys and writing SSH config when you sign in, run `rig ssh add`, or run the workspace commands. Deploys that copy files over SSH still register your key when they need it. The files it already wrote stay in place: remove the `Include` line from `~/.ssh/config` and delete `~/.config/rigbox/ssh_config` if you don't want them. Turn setup back on with `rig config set ssh-setup true`.
+
 ---
 
 ## Troubleshooting
 
+### Could not resolve hostname
+
+`ssh my-project` needs the managed entry. Run `rig workspace ssh-info --workspace my-project` to write it, then check that `~/.ssh/config` includes `~/.config/rigbox/ssh_config`. If the CLI couldn't edit `~/.ssh/config`, it printed the line to add. When the plain name is taken, the alias is the login name (`my-project-ctbxi8lb`); `ssh-info` shows it.
+
 ### Connection refused
 
-If you get `Connection refused`, verify:
+If `ssh` reports that the workspace is not running, start it with the command in the message. For other connection failures:
 
-1. Your workspace is running (check with `rig workspace ls`)
-2. Your SSH key is registered and synced
-3. You're using the correct username format: `<WORKSPACE_NAME>-<WORKSPACE_ID_SUFFIX>@<REGION>.rigbox.dev`
+1. Check that the workspace is running with `rig workspace ls`.
+2. Connect to the host `rig workspace ssh-info` prints; don't hardcode one.
+3. Check that your network allows outbound SSH on port 22.
 
 ### Permission denied
 
 If you get `Permission denied (publickey)`:
 
-1. Check that your key is registered: `rig ssh ls`
-2. Sync keys to the workspace: `rig ssh sync --workspace <WORKSPACE_ID>`
-3. Verify you are using the correct identity file: `ssh -v my-project-ctbxi8lb@{region}.rigbox.dev`
+1. Check that your key is registered: `rig ssh ls`. If it isn't, run `rig ssh add`.
+2. Push your keys to the workspace: `rig ssh sync --workspace my-project`.
+3. See which keys `ssh` offers: `ssh -v my-project`.
+
+The gateway waits up to about ten seconds for your workspace's keys while the platform restarts a service, so a login at that moment connects late instead of failing. A `Permission denied` that persists is about the key.
+
+### Host key warnings
+
+The CLI keeps workspace host keys in `~/.config/rigbox/known_hosts`, separate from `~/.ssh/known_hosts`. When a new scan disagrees with a key already on file, the CLI adds nothing, and your SSH client reports the mismatch. Check the change through a trusted channel before editing that file, and don't turn off host key checking to get past it.
 
 ### Slow connection
 
 If connections feel slow:
 
-1. Check your network connection
-2. Try connecting with `-o ServerAliveInterval=60` to prevent timeouts
-3. For file transfers, prefer `rsync` over `scp` for large datasets
+1. Check your network connection.
+2. Managed entries already send keepalives (`ServerAliveInterval 30`). With the full `user@host` command, add `-o ServerAliveInterval=60`.
+3. For large transfers, prefer `rsync` over `scp`.
 
 ---
 

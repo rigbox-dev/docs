@@ -1,19 +1,25 @@
 ---
 title: "rig ssh add"
 sidebarTitle: "add"
-description: "Register a new SSH public key"
+description: "Register an SSH public key and set up `ssh <workspace>` on this machine"
 ---
 
-Available **local**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Use this command from your local terminal. Registers a public key on your account and sets up `ssh <workspace>` on this machine: a `Host` entry per workspace in `~/.config/rigbox/ssh_config`, which `~/.ssh/config` includes. Without `--file` it uses `~/.ssh/id_ed25519.pub`, then `~/.ssh/id_rsa.pub`, and creates an ed25519 key when you have neither. Without `--name` the key is named `laptop-` followed by your host name. A key that is already on your account is reported, not added again.
 
 ## Examples
 
-Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+Register your default key, creating one if needed, and set up `ssh <workspace>` for your workspaces.
 
 ```bash
-rig ssh add --name my-project
+rig ssh add
+```
+
+Register a specific public key under a name you choose.
+
+```bash
+rig ssh add --name work-laptop --file ~/.ssh/work_ed25519.pub
 ```
 
 Inspect the supported arguments before running this command. Help is offline and does not modify resources.
@@ -25,15 +31,15 @@ rig ssh add --help
 ## Local syntax
 
 ```text
-Usage: rigbox ssh add [OPTIONS] --name <NAME>
+Usage: rigbox ssh add [OPTIONS]
 ```
 
 ### Arguments and flags
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-n, --name` | Key name | Required; Value: NAME |
-| `-f, --file` | Path to public key file (default: ~/.ssh/id_ed25519.pub) | Value: FILE |
+| `-n, --name` | Key name (default: laptop-&lt;hostname&gt;) | Value: NAME |
+| `-f, --file` | Path to public key file (default: ~/.ssh/id_ed25519.pub, created if you have no key) | Value: FILE |
 | `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
 | `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--cli-input-json` | Read inputs from a JSON file or &#x27;-&#x27; (stdin) | Global; Value: FILE |
@@ -46,13 +52,13 @@ Usage: rigbox ssh add [OPTIONS] --name <NAME>
 <Accordion title="Complete command help">
 
 ```text
-Register a new SSH public key
+Register an SSH public key and set up `ssh <workspace>` on this machine
 
-Usage: rigbox ssh add [OPTIONS] --name <NAME>
+Usage: rigbox ssh add [OPTIONS]
 
 Options:
   -n, --name <NAME>
-          Key name
+          Key name (default: laptop-<hostname>)
 
       --output <OUTPUT>
           Output format [default: human, or `rig config set output …`]
@@ -60,7 +66,7 @@ Options:
           [possible values: human, json, yaml, text, table]
 
   -f, --file <FILE>
-          Path to public key file (default: ~/.ssh/id_ed25519.pub)
+          Path to public key file (default: ~/.ssh/id_ed25519.pub, created if you have no key)
 
       --query <JMESPATH>
           Filter output with a JMESPath expression

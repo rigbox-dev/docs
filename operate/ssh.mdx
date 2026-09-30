@@ -1,6 +1,6 @@
 ---
 title: "Troubleshoot SSH access"
-description: "Check workspace readiness, target details, and key propagation."
+description: "Check workspace readiness, the managed SSH config, and key propagation."
 ---
 
 Run these checks locally:
@@ -11,23 +11,37 @@ rig workspace ssh-info --workspace WORKSPACE
 rig ssh ls
 ```
 
+`ssh-info` also rewrites the managed entries in `~/.config/rigbox/ssh_config` and registers your key if it is missing, so run it first when `ssh WORKSPACE` stops working.
+
+## Workspace is not running
+
+A stopped workspace refuses connections with a message on standard error that names the start command, for example `rig workspace start --workspace my-project`. Run it, or start the workspace from the dashboard, then connect again. While the workspace is still starting, wait a few seconds and retry.
+
+## Could not resolve hostname
+
+The alias comes from `~/.config/rigbox/ssh_config`, which `~/.ssh/config` must include. Check that `~/.ssh/config` has an `Include ~/.config/rigbox/ssh_config` line before its first `Host` block; if the CLI couldn't add it, `ssh-info` prints the line. Use the alias `ssh-info` shows: when the workspace name is taken by another workspace or by one of your own hosts, only the full login name (`name-idsuffix`) works. Inside a workspace, on CI, or with `rig config set ssh-setup false`, the CLI writes no entries; use the full `ssh USER@HOST` command from `ssh-info` instead.
+
 ## Connection refused or timed out
 
-Ensure the workspace is running and use the host, user, and port returned by `ssh-info`. Do not hardcode a compute host or substitute the separate SSH TUI gateway port. Check your network's outbound SSH policy.
+Use the host, user, and port returned by `ssh-info`. Do not hardcode a compute host or substitute the separate SSH TUI gateway port. Check your network's outbound SSH policy.
 
 ## Permission denied
 
-Verify that the offered public key is registered. Sync it to the target workspace:
+Verify that the offered public key is registered with `rig ssh ls`, and register it with `rig ssh add` if it isn't. Then sync it to the target workspace:
 
 ```bash
 rig ssh sync --workspace WORKSPACE
 ```
 
-Use `ssh -i` with the correct local private key when your agent offers several identities. Never send the private key to Rigbox.
+Use `ssh -i` with the correct local private key when your agent offers several identities. Never send the private key to Rigbox. The gateway retries the key lookup for about ten seconds while the platform restarts a service, so a persistent `Permission denied` points at the key rather than a brief outage.
+
+## Port or agent forwarding fails
+
+Workspace logins don't allow port forwarding, agent forwarding, X11 forwarding, or tunnels, so `ssh -L`, `ssh -A`, and editors that tunnel to a remote server (such as VS Code Remote-SSH) fail. [Expose the port as an app](/guides/expose-and-route) to reach a service in the workspace.
 
 ## Host-key changes
 
-Compare the new host identity through a trusted channel before changing a known-hosts entry. Do not disable host-key checking globally to make a connection succeed.
+The CLI records workspace host keys in `~/.config/rigbox/known_hosts`, not `~/.ssh/known_hosts`. Compare a new host identity through a trusted channel before changing that file. Do not disable host-key checking globally to make a connection succeed.
 
 ## Verify
 

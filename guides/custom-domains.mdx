@@ -72,7 +72,7 @@ The initial request to your custom domain may be slightly slower while the certi
 If you no longer want a custom domain attached to your app, remove it from the Access tab in the dashboard, or clear `custom_domain` by setting it to an empty string. There's no dedicated remove command, so use a raw API call (the path drops the `/api/v1` prefix; `rig` is already authenticated via `rig login`):
 
 ```bash
-echo '{"custom_domain": ""}' | rig api PATCH /v1/apps/$APP_ID --body -
+rig api PATCH /v1/apps/$APP_ID --body '{"custom_domain": ""}'
 ```
 
 After removing the custom domain, your app is still accessible at its default `*.rigbox.dev` subdomain.

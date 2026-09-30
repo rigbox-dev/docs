@@ -4,9 +4,9 @@ sidebarTitle: "expose-port"
 description: "Detect or expose a workspace port as an app"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Use this command from your local terminal or inside a workspace. Inside a workspace, `--workspace` defaults to that workspace. `--name` without `--wrap` asks before creating the app route; where it cannot ask (no terminal, JSON output, or CI) it refuses and names `--wrap`. Pass `--wrap --name NAME` to create the route, or leave out both to only detect the listener.
 
 ## Examples
 
@@ -97,18 +97,19 @@ Options:
 ## Workspace syntax
 
 ```text
-Usage: rigbox app expose-port [OPTIONS] --workspace <WORKSPACE> --port <PORT>
+Usage: rigbox app expose-port [OPTIONS] --port <PORT>
 ```
 
 ### Arguments and flags
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
+| `-w, --workspace` | Workspace name or id (default: this workspace) | Value: WORKSPACE |
 | `-p, --port` | Port to detect or expose | Required; Value: PORT |
 | `-n, --name` | App name to use when wrapping the port | Value: NAME |
 | `--wrap` | Create the app route instead of only detecting the process | Default: false |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -118,26 +119,28 @@ Usage: rigbox app expose-port [OPTIONS] --workspace <WORKSPACE> --port <PORT>
 ```text
 Detect or expose a workspace port as an app
 
-Usage: rigbox app expose-port [OPTIONS] --workspace <WORKSPACE> --port <PORT>
+Usage: rigbox app expose-port [OPTIONS] --port <PORT>
 
 Options:
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
 
   -w, --workspace <WORKSPACE>
-          Workspace name or id
-
-      --no-pager
-          Do not pipe help output through a pager
+          Workspace name or id (default: this workspace)
 
   -p, --port <PORT>
           Port to detect or expose
 
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
   -n, --name <NAME>
           App name to use when wrapping the port
+
+      --no-pager
+          Do not pipe help output through a pager
 
   -v, --verbose
           Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)

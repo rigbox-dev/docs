@@ -4,9 +4,9 @@ sidebarTitle: "ssh"
 description: "Manage SSH public keys for your account"
 ---
 
-Available **local**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Run this command on your local machine.
+Run this command on your local machine. Inside a workspace, `rig ssh` refuses with a one-line message; run it from your laptop. Account SSH keys are never managed from inside a workspace.
 
 ## Examples
 
@@ -44,7 +44,7 @@ Usage: rigbox ssh [OPTIONS] <COMMAND>
 
 Commands:
   ls    List registered SSH public keys
-  add   Register a new SSH public key
+  add   Register an SSH public key and set up `ssh <workspace>` on this machine
   rm    Remove a registered SSH public key
   sync  Push your SSH keys into a workspace
   help  Print this message or the help of the given subcommand(s)

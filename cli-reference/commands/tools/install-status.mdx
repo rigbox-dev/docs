@@ -4,7 +4,7 @@ sidebarTitle: "install-status"
 description: "Poll the status of an async tool install"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
 Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
 
@@ -103,7 +103,8 @@ Usage: rigbox tools install-status [OPTIONS] --workspace <WORKSPACE> --tool <TOO
 | `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
 | `-t, --tool` | Tool id | Required; Value: TOOL |
 | `--job-id` | Job id returned by `rig tools install` | Required; Value: JOB_ID |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -117,22 +118,24 @@ Usage: rigbox tools install-status [OPTIONS] --workspace <WORKSPACE> --tool <TOO
 
 Options:
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
 
   -w, --workspace <WORKSPACE>
           Workspace name or id
 
-      --no-pager
-          Do not pipe help output through a pager
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
   -t, --tool <TOOL>
           Tool id
 
       --job-id <JOB_ID>
           Job id returned by `rig tools install`
+
+      --no-pager
+          Do not pipe help output through a pager
 
   -v, --verbose
           Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)

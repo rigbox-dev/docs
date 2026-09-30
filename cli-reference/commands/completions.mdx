@@ -4,16 +4,22 @@ sidebarTitle: "completions"
 description: "Generate or install a shell completion script"
 ---
 
-Available **local**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Prints a completion script for your shell, or installs it with `--install`. `--no-rc` only works with `--install`: it installs the script and prints the lines to add to your shell configuration instead of editing it. Works in your local terminal and inside a workspace.
 
 ## Examples
 
-Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
+Print the completion script for the shell you are using.
 
 ```bash
 rig completions
+```
+
+Install zsh completions without editing your shell configuration.
+
+```bash
+rig completions zsh --install --no-rc
 ```
 
 Inspect the supported arguments before running this command. Help is offline and does not modify resources.
@@ -86,6 +92,65 @@ Options:
 
   -v, --verbose
           Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
+
+  -h, --help
+          Print help
+```
+
+</Accordion>
+
+## Workspace syntax
+
+```text
+Usage: rigbox completions [OPTIONS] [SHELL]
+```
+
+### Arguments and flags
+
+| Argument | Description | Details |
+| --- | --- | --- |
+| `shell` | Shell to target (auto-detected from the invoking shell when omitted) | Value: SHELL; Choices: bash, elvish, fish, powershell, zsh |
+| `--install` | Install the script into your shell instead of printing it | Default: false |
+| `--no-rc` | With --install: don&#x27;t edit your shell rc; print the lines to add | Default: false |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
+| `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
+| `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
+| `-h, --help` | Print help |  |
+
+<Accordion title="Complete command help">
+
+```text
+Generate or install a shell completion script
+
+Usage: rigbox completions [OPTIONS] [SHELL]
+
+Arguments:
+  [SHELL]
+          Shell to target (auto-detected from the invoking shell when omitted)
+          
+          [possible values: bash, elvish, fish, powershell, zsh]
+
+Options:
+      --install
+          Install the script into your shell instead of printing it
+
+      --output <OUTPUT>
+          Output format [default: human, or `rig config set output …`]
+          
+          [possible values: human, json, yaml, text, table]
+
+      --no-rc
+          With --install: don't edit your shell rc; print the lines to add
+
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
+
+      --no-pager
+          Do not pipe help output through a pager
+
+  -v, --verbose
+          Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
 
   -h, --help
           Print help

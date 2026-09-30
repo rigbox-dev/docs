@@ -4,16 +4,16 @@ sidebarTitle: "launch"
 description: "Launch a tool"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Starts a tool: `architecture` (Architecture Explorer) or `virtual-browser`. The command fails when the server launches nothing. While the tool is still starting, `rig tools ls` shows its status and, once it serves, its URL.
 
 ## Examples
 
 Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
 
 ```bash
-rig tools launch --tool TOOL --workspace WORKSPACE_ID
+rig tools launch --tool virtual-browser --workspace WORKSPACE_ID
 ```
 
 Inspect the supported arguments before running this command. Help is offline and does not modify resources.
@@ -32,7 +32,7 @@ Usage: rigbox tools launch [OPTIONS] --tool <TOOL> --workspace <WORKSPACE>
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-t, --tool` | Tool id (e.g. architecture-explorer, virtual-browser) | Required; Value: TOOL |
+| `-t, --tool` | Tool id (e.g. architecture, virtual-browser) | Required; Value: TOOL |
 | `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
 | `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
 | `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
@@ -57,7 +57,7 @@ Options:
           [possible values: human, json, yaml, text, table]
 
   -t, --tool <TOOL>
-          Tool id (e.g. architecture-explorer, virtual-browser)
+          Tool id (e.g. architecture, virtual-browser)
 
       --query <JMESPATH>
           Filter output with a JMESPath expression
@@ -96,9 +96,10 @@ Usage: rigbox tools launch [OPTIONS] --tool <TOOL> --workspace <WORKSPACE>
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-t, --tool` | Tool id (e.g. architecture-explorer, virtual-browser) | Required; Value: TOOL |
+| `-t, --tool` | Tool id (e.g. architecture, virtual-browser) | Required; Value: TOOL |
 | `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
 | `-h, --help` | Print help |  |
@@ -112,19 +113,21 @@ Usage: rigbox tools launch [OPTIONS] --tool <TOOL> --workspace <WORKSPACE>
 
 Options:
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
 
   -t, --tool <TOOL>
-          Tool id (e.g. architecture-explorer, virtual-browser)
+          Tool id (e.g. architecture, virtual-browser)
 
-      --no-pager
-          Do not pipe help output through a pager
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
   -w, --workspace <WORKSPACE>
           Workspace name or id
+
+      --no-pager
+          Do not pipe help output through a pager
 
   -v, --verbose
           Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)

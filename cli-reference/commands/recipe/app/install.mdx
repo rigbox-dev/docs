@@ -4,11 +4,17 @@ sidebarTitle: "install"
 description: "Install an exact recipe ref into a workspace"
 ---
 
-Available **local and workspace**. Reference source: CLI `0.13.0-rc.2` (`09bd4024dd72`).
+Available **local and workspace**. Reference source: CLI `0.13.0-rc.4` (`1880d04137a5`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Installs a recipe into an existing workspace. `--ref` takes an exact recipe ref such as `@vendor/slug@1.2.3`, or a built-in catalog ID such as `claude` to add a catalog app or coding agent. The command starts the install and returns. Inside a workspace, pass that workspace's own name or ID to `--workspace`.
 
 ## Examples
+
+Add Claude Code to an existing workspace.
+
+```bash
+rig recipe app install --ref claude --workspace WORKSPACE_ID
+```
 
 Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.
 
@@ -32,7 +38,7 @@ Usage: rigbox recipe app install [OPTIONS] --ref <DEPLOY_REF> --workspace <WORKS
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-r, --ref` | Exact recipe ref to install, e.g. @vendor/slug@1.2.3 | Required; Value: DEPLOY_REF |
+| `-r, --ref` | Recipe ref to install: an exact @vendor/slug@1.2.3, or a built-in catalog id such as claude | Required; Value: DEPLOY_REF |
 | `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
 | `--param` | Recipe parameter in `key=value` form (repeatable) | Value: PARAMS |
 | `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
@@ -42,12 +48,14 @@ Usage: rigbox recipe app install [OPTIONS] --ref <DEPLOY_REF> --workspace <WORKS
 | `--generate-cli-skeleton` | Print a fillable input template, then exit | Global; Default: false |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy` | Global; Default: false |
-| `-h, --help` | Print help |  |
+| `-h, --help` | Print help (see a summary with &#x27;-h&#x27;) |  |
 
 <Accordion title="Complete command help">
 
 ```text
 Install an exact recipe ref into a workspace
+
+Also adds a built-in catalog app, such as a coding agent (claude, codex, opencode, …), to an existing workspace: pass its catalog id as the ref, e.g. `rig recipe app install --ref claude --workspace my-ws`. `rig workspace spawn --catalog` installs catalog apps only while creating a workspace.
 
 Usage: rigbox recipe app install [OPTIONS] --ref <DEPLOY_REF> --workspace <WORKSPACE>
 
@@ -58,7 +66,7 @@ Options:
           [possible values: human, json, yaml, text, table]
 
   -r, --ref <DEPLOY_REF>
-          Exact recipe ref to install, e.g. @vendor/slug@1.2.3
+          Recipe ref to install: an exact @vendor/slug@1.2.3, or a built-in catalog id such as claude
 
       --query <JMESPATH>
           Filter output with a JMESPath expression
@@ -85,7 +93,7 @@ Options:
           Verbose diagnostics on stderr: per-phase deploy tracing, job-poll status, and transport commands. Useful for debugging a slow or stuck `rig deploy`
 
   -h, --help
-          Print help
+          Print help (see a summary with '-h')
 ```
 
 </Accordion>
@@ -100,36 +108,41 @@ Usage: rigbox recipe app install [OPTIONS] --ref <DEPLOY_REF> --workspace <WORKS
 
 | Argument | Description | Details |
 | --- | --- | --- |
-| `-r, --ref` | Exact recipe ref to install, e.g. @vendor/slug@1.2.3 | Required; Value: DEPLOY_REF |
+| `-r, --ref` | Recipe ref to install: an exact @vendor/slug@1.2.3, or a built-in catalog id such as claude | Required; Value: DEPLOY_REF |
 | `-w, --workspace` | Workspace name or id | Required; Value: WORKSPACE |
 | `--param` | Recipe parameter in `key=value` form (repeatable) | Value: PARAMS |
-| `--output` | Output format | Global; Value: OUTPUT; Default: human; Choices: human, json, yaml, text, table |
+| `--output` | Output format [default: human, or `rig config set output …`] | Global; Value: OUTPUT; Choices: human, json, yaml, text, table |
+| `--query` | Filter output with a JMESPath expression | Global; Value: JMESPATH |
 | `--no-pager` | Do not pipe help output through a pager | Global; Default: false |
 | `-v, --verbose` | Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status) | Global; Default: false |
-| `-h, --help` | Print help |  |
+| `-h, --help` | Print help (see a summary with &#x27;-h&#x27;) |  |
 
 <Accordion title="Complete command help">
 
 ```text
 Install an exact recipe ref into a workspace
 
+Also adds a built-in catalog app, such as a coding agent (claude, codex, opencode, …), to an existing workspace: pass its catalog id as the ref, e.g. `rig recipe app install --ref claude --workspace my-ws`. `rig workspace spawn --catalog` installs catalog apps only while creating a workspace.
+
 Usage: rigbox recipe app install [OPTIONS] --ref <DEPLOY_REF> --workspace <WORKSPACE>
 
 Options:
       --output <OUTPUT>
-          Output format
+          Output format [default: human, or `rig config set output …`]
           
-          [default: human]
           [possible values: human, json, yaml, text, table]
 
   -r, --ref <DEPLOY_REF>
-          Exact recipe ref to install, e.g. @vendor/slug@1.2.3
+          Recipe ref to install: an exact @vendor/slug@1.2.3, or a built-in catalog id such as claude
 
-      --no-pager
-          Do not pipe help output through a pager
+      --query <JMESPATH>
+          Filter output with a JMESPath expression
 
   -w, --workspace <WORKSPACE>
           Workspace name or id
+
+      --no-pager
+          Do not pipe help output through a pager
 
       --param <PARAMS>
           Recipe parameter in `key=value` form (repeatable)
@@ -138,7 +151,7 @@ Options:
           Verbose diagnostics on stderr (per-phase deploy tracing, job-poll status)
 
   -h, --help
-          Print help
+          Print help (see a summary with '-h')
 ```
 
 </Accordion>
