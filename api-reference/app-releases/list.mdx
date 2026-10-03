@@ -4,3 +4,7 @@ openapi: "/openapi/app-releases-api.json GET /api/v1/workspaces/{id}/app-release
 ---
 
 Requires the v0.13 app-release capability for your account. See [app release workflows](/deploy/overview) for preparation, activation, and recovery.
+
+Results are ordered by creation time, newest first. Set `max_results` to request a page size; it defaults to 50 and is clamped to 1–200. Pass the response's opaque `next_cursor` as `cursor` to fetch the next page. When `next_cursor` is absent, the list is complete.
+
+Expired releases are deleted during [retention cleanup](/deploy/app-rollback#retention), including their records and logs. Pagination applies to the retained history.

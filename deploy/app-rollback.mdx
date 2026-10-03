@@ -14,6 +14,14 @@ rig app-release logs --workspace my-project --release <RELEASE_ID>
 
 Choose a known-good retained release that belongs to this workspace. Review its application set and configuration before activation.
 
+## Retention
+
+Each deployment owner keeps the newest successful release record for each of its three most recently used distinct artifacts. Repeated rollback records for the same artifact are removed. Releases being prepared or activated remain available while the operation runs; ready candidates and failed releases expire after 24 hours.
+
+Retention deletes expired release records, stored configuration, diagnostic logs, and obsolete deployment idempotency records. Cleanup runs after an operation finishes and every ten minutes on the owning compute node, including stopped workspaces. Guest artifact removal waits for the workspace to run. After collection, an expired release ID returns HTTP 404 from the release and logs APIs; deploy again with a new deployment ID when another attempt is needed.
+
+The [release list API](/api-reference/app-releases/list) returns up to 50 records by default, with a maximum page size of 200. Pass its opaque `next_cursor` back as `cursor` to continue. Results stay ordered by creation time, newest first. The CLI follows each page when running `rig app-release ls`.
+
 ## Roll back
 
 ```bash
