@@ -24,6 +24,8 @@ The [release list API](/api-reference/app-releases/list) returns up to 50 record
 
 ## Roll back
 
+The workspace must already be running. If it is inactive, rollback stops with a warning; start it explicitly with `rig workspace start --workspace my-project`, wait for it to be running, and submit rollback again. History and stored logs remain available while it is stopped. The UI also disables rollback and manual deployment retry while inactive.
+
 ```bash
 rig app-release rollback --workspace my-project --release <RELEASE_ID>
 ```

@@ -103,6 +103,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "Workspace is inactive or not ready, or another deployment owns an app in the release. When a GitHub connection owns it, `details` has `reason: github_connection`, the refused `apps`, and the `connection` (`id`, `repository`, `branch`, `mode`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -186,6 +196,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ReleaseResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Workspace is inactive or not ready, or the release cannot be activated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
                 }
               }
             }
@@ -704,6 +724,34 @@
           }
         },
         "additionalProperties": false
+      },
+      "ApiErrorBody": {
+        "type": "object",
+        "description": "JSON body returned for all errors.",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ApiErrorDetail"
+          }
+        }
+      },
+      "ApiErrorDetail": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "details": {},
+          "message": {
+            "type": "string"
+          }
+        }
       }
     }
   }

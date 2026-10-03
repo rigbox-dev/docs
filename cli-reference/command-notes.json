@@ -1162,7 +1162,7 @@
     ]
   },
   "app-release/activate": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below. The workspace must already be running. If it is inactive, the command stops with a warning. Start it explicitly with `rig workspace start --workspace WORKSPACE_ID`, then submit the release action again.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -1202,7 +1202,7 @@
     ]
   },
   "app-release/rollback": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below. The workspace must already be running. If it is inactive, the command stops with a warning. Start it explicitly with `rig workspace start --workspace WORKSPACE_ID`, then submit the release action again.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
