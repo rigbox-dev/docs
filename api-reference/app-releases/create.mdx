@@ -6,3 +6,5 @@ openapi: "/openapi/app-releases-api.json POST /api/v1/workspaces/{id}/app-releas
 Requires the v0.13 app-release capability for your account. See [app release workflows](/deploy/overview) for preparation, activation, and recovery.
 
 The handler can accept work asynchronously. Poll the release and inspect its status rather than treating an accepted request as a healthy deployment.
+
+The workspace must be running with an available network address. Otherwise, this endpoint returns HTTP 409 with an actionable message before accepting a release operation. Start the workspace explicitly, wait for it to be running, and submit the request again. Retained history and stored deployment logs remain available while it is stopped.

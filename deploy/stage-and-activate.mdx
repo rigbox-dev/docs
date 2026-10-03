@@ -5,7 +5,9 @@ description: "Prepare an incremental release without immediately changing runnin
 
 ## Prepare the release
 
-From your local project directory, target an existing workspace:
+From your local project directory, target an existing running workspace. If it is inactive, start it explicitly with `rig workspace start --workspace my-project` and wait until it is running before submitting the release. Incremental deployment and activation stop with a warning instead of starting it or queuing the action for later.
+
+Then prepare the release:
 
 ```bash
 rig deploy --workspace my-project --strategy incremental --sync-only
