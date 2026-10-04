@@ -197,6 +197,41 @@
           }
         ]
       }
+    },
+    "/api/v1/tunnels/{id}/record": {
+      "delete": {
+        "tags": [
+          "Tunnels"
+        ],
+        "description": "Delete inactive tunnel history. Stop an active tunnel first.",
+        "operationId": "delete_record",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          },
+          "409": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "tags": [

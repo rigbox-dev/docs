@@ -14,3 +14,5 @@ before sharing an app.
 Returns an owned tunnel and its current invitation email list. Read the returned policy epoch, connection generation, and target fingerprint before [changing access](/api-reference/tunnels/update-policy).
 
 The connector target stays fixed for the lifetime of this tunnel. To serve a different local target, start a new tunnel through the [CLI](/guides/local-tunnels#start-privately).
+
+After the owner [deletes this record](/api-reference/tunnels/delete-record), inspection returns `404`.

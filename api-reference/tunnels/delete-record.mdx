@@ -1,0 +1,20 @@
+---
+title: "Delete tunnel history"
+openapi: "/openapi/tunnels-api.json DELETE /api/v1/tunnels/{id}/record"
+playground: "none"
+---
+
+Removes an inactive tunnel record owned by the current account and returns `204`
+with no response body. This also removes its invitations, browser viewer grants,
+and pending login transactions. Deletion cannot be undone.
+
+A live tunnel or valid pending start returns `409` with error code
+`TUNNEL_RECORD_ACTIVE` and the message "Stop this tunnel before deleting its
+history". [Stop the tunnel](/api-reference/tunnels/stop) first, then delete the
+record. Stopped, expired, and already timed-out records can be removed.
+
+Deleted and other accounts' records return `404`. Deleted records no longer
+appear in [List local tunnels](/api-reference/tunnels/list) or
+[Inspect a local tunnel](/api-reference/tunnels/get).
+
+The existing `DELETE /api/v1/tunnels/{id}` remains Stop and keeps history.

@@ -34,9 +34,12 @@ rig tunnel --port 3000
 
 Review the first-use target and capability warning. The command prints its URL
 after the local service and an authenticated connector channel are ready. Open
-that URL and sign in using the owner's Rigbox browser account. A CLI API key does
-not mint a browser viewer session; browser access uses a fresh authenticated
-Rigbox login. Private and privileged tunnel traffic uses browser access only.
+that URL using the owner's Rigbox browser account. An existing active browser
+session can be reused; sign in if your session has ended. Rigbox verifies the
+current browser token and provider session before granting access, and you
+choose Continue to app. Opening a tunnel does not itself require a new password
+or MFA check. A CLI API key does not mint a browser viewer session.
+Private and privileged tunnel traffic uses browser access only.
 Keep Rigbox account API keys on the control API; never send them to a tunnel URL.
 Public native HTTP callers can use credentials issued by their local application,
 with the explicit client header described below.
@@ -126,7 +129,8 @@ Press Ctrl-C in the foreground command, or stop from another terminal:
 rig tunnel stop --tunnel TUNNEL_ID
 ```
 
-Stop revokes the session and connector. Changing access closes flows admitted
+Stop revokes the session and connector and keeps the record in your history.
+Changing access closes flows admitted
 under the old policy. The connector renews short authority leases and closes its
 local connections if renewal fails or expires. The 15-second bound runs from a
 gateway-observed change and valid lease issuance; it does not promise instant
@@ -136,8 +140,21 @@ A session has an eight-hour maximum lifetime. A service disappearing terminates
 the connector and requires an explicit new session. A fixed port does not identify
 a process: an undetected replacement on the same port can still be reached.
 Close the tunnel before restarting or replacing the local service. Expired
-leases and sessions that never started within 60 seconds are cleaned up when you
-create another tunnel; a live session requires explicit stop.
+leases and sessions that never started within 60 seconds cannot be revived.
+Starting another tunnel marks the previous stale record expired; it remains
+in your history until you delete it.
+
+### Delete history
+
+In the Console's Tunnels page, choose Delete history for a stopped or expired
+session and confirm its removal. This removes the record from your history and
+cannot be undone. Stop an active tunnel first; deletion does not stop it for you.
+
+The API provides the same cleanup through
+[`DELETE /api/v1/tunnels/{id}/record`](/api-reference/tunnels/delete-record).
+The existing `DELETE /api/v1/tunnels/{id}` remains Stop. A live tunnel or valid
+pending start returns `409 TUNNEL_RECORD_ACTIVE` when you try to delete its
+history.
 
 ## Identity deletion
 
