@@ -1,0 +1,18 @@
+---
+title: "Update tunnel access"
+openapi: "/openapi/tunnels-api.json PATCH /api/v1/tunnels/{id}/policy"
+playground: "none"
+---
+
+<Info>
+Tunnels are not available to customers yet. The production service is disabled
+pending browser-domain isolation, and the planned signed CLI 0.13.1 release is not
+yet published. This page documents the prepared API contract; it does not enable
+the service. See [local tunnels](/guides/local-tunnels) for planned use and risks.
+</Info>
+
+Choose `private` for the owner, `privileged` for the owner and invited verified email identities, or `public` for visitors without Rigbox sign-in. An admitted visitor receives the access your local application provides, including its write and administrative features.
+
+Submit the current policy epoch and connection generation from [inspect](/api-reference/tunnels/get). Public access also requires an affirmative acknowledgment of that exact target fingerprint, policy epoch, and generation. If the tunnel changes, reload and review its target before submitting another update.
+
+The invitation list replaces the previous list and is valid only with privileged access. A policy change invalidates existing viewer sessions and closes streams admitted under the previous policy. See [local tunnels](/guides/local-tunnels) for sharing behavior.

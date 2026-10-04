@@ -1,0 +1,18 @@
+---
+title: "Create a local tunnel"
+openapi: "/openapi/tunnels-api.json POST /api/v1/tunnels"
+playground: "none"
+---
+
+<Info>
+Tunnels are not available to customers yet. The production service is disabled
+pending browser-domain isolation, and the planned signed CLI 0.13.1 release is not
+yet published. This page documents the prepared API contract; it does not enable
+the service. See [local tunnels](/guides/local-tunnels) for planned use and risks.
+</Info>
+
+Requires an enabled tunnel capability and an account eligible to use tunnels. A new tunnel is private and points to one fixed literal loopback target. Its assigned website URL uses HTTPS; the local server can use HTTP or verified HTTPS.
+
+Creation returns the tunnel record and separate connector and lease credentials. Keep both credentials secret and out of logs. Creating the record does not connect your laptop or deploy an application. The foreground [tunnel command](/guides/local-tunnels#start-privately-when-available) creates a record and runs its connector together, managing the lease for you.
+
+See [local tunnels](/guides/local-tunnels) for access modes, local HTTPS setup, and operating limits.

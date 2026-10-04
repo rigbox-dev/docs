@@ -45,6 +45,16 @@
     ]
   },
   {
+    "group": "Local tunnels",
+    "pages": [
+      "api-reference/tunnels/list",
+      "api-reference/tunnels/create",
+      "api-reference/tunnels/get",
+      "api-reference/tunnels/update-policy",
+      "api-reference/tunnels/stop"
+    ]
+  },
+  {
     "group": "App Logs",
     "pages": [
       "api-reference/app-logs/get-logs",

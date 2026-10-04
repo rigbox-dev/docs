@@ -1,0 +1,16 @@
+---
+title: "Stop a local tunnel"
+openapi: "/openapi/tunnels-api.json DELETE /api/v1/tunnels/{id}"
+playground: "none"
+---
+
+<Info>
+Tunnels are not available to customers yet. The production service is disabled
+pending browser-domain isolation, and the planned signed CLI 0.13.1 release is not
+yet published. This page documents the prepared API contract; it does not enable
+the service. See [local tunnels](/guides/local-tunnels) for planned use and risks.
+</Info>
+
+Stops the owned tunnel, revokes its connector and lease credentials, and invalidates its viewer sessions. The relay closes active traffic after observing the stopped state.
+
+A stopped connection generation cannot be resumed. Start a new tunnel through the [CLI](/guides/local-tunnels#start-privately-when-available) when you want to serve the website again.

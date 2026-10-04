@@ -77,6 +77,7 @@
               "configure/health",
               "guides/visibility",
               "guides/expose-and-route",
+              "guides/local-tunnels",
               "guides/custom-domains",
               {
                 "group": "rig.yaml",
@@ -324,6 +325,16 @@
                   "api-reference/app-releases/get",
                   "api-reference/app-releases/activate",
                   "api-reference/app-releases/logs"
+                ]
+              },
+              {
+                "group": "Local tunnels",
+                "pages": [
+                  "api-reference/tunnels/list",
+                  "api-reference/tunnels/create",
+                  "api-reference/tunnels/get",
+                  "api-reference/tunnels/update-policy",
+                  "api-reference/tunnels/stop"
                 ]
               }
             ]

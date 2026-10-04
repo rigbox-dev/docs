@@ -1,0 +1,205 @@
+---
+title: "Local tunnels"
+description: "Planned local website tunnels, access controls, and exposure risks."
+---
+
+<Info>
+Tunnels are not available to customers yet. The production service is disabled
+pending browser-domain isolation, and the planned signed CLI 0.13.1 release is not
+yet published. The commands below describe prepared behavior and require both
+that matching CLI and an enabled tunnel service. Reading these instructions does
+not enable tunnels or expose your laptop.
+</Info>
+
+The planned tunnel keeps your service running on your laptop. Its foreground CLI
+connects outbound to Rigbox and gives one fixed loopback port a fresh HTTPS URL.
+Public HTTPS and verified outbound WSS are required from the first release.
+Keep the foreground command running while you use it.
+
+<Warning>
+Anyone admitted to the tunnel can invoke everything the local app exposes.
+That can include files, debug consoles, commands, and access to other services
+through an app vulnerability. Rigbox does not sandbox the app or your laptop.
+Review the service before sharing it, even when the tunnel is private.
+</Warning>
+
+## Start privately when available
+
+Start your HTTP service on `127.0.0.1:3000`, then run:
+
+```bash
+rig login
+rig tunnel --port 3000
+```
+
+Review the first-use target and capability warning. The command prints its URL
+after the local service and an authenticated connector channel are ready. Open
+that URL and sign in using the owner's Rigbox browser account. A CLI API key does
+not mint a browser viewer session; browser access uses a fresh authenticated
+Rigbox login. Private and privileged tunnel traffic uses browser access only.
+Keep Rigbox account API keys on the control API; never send them to a tunnel URL.
+Public native HTTP callers can use credentials issued by their local application,
+with the explicit client header described below.
+
+A private or privileged link opened from another website first shows a Rigbox
+Continue page. That page does not contact the local app. Click Continue to enter
+through the bound browser flow; sign in if needed. Every browser completes a
+cookie-boundary check before the local app or its assets load. Deliberate Public
+links complete that check automatically when the browser supplies the required
+evidence. Ambiguous navigation may require Continue.
+
+Browser access requires supported cookie isolation and Fetch Metadata headers.
+If those checks fail, the local app receives no request. Use a supported current
+browser and reopen the URL. Concurrent entry tabs can invalidate an earlier
+tab's binding and require it to restart the entry flow.
+
+An older account may sign in successfully but receive `recovery_required` when
+using tunnel controls. Complete the console's verified account recovery and old
+credential revocation first; retry after the displayed recovery delay. A signed
+email claim or API key does not bypass that ownership check.
+
+Creation always starts private. Each new local session receives a new hostname
+on a separate content domain with sibling cookie isolation. The destination
+remains literal `127.0.0.1` and the selected port; the connector has no remote destination,
+arbitrary TCP, shell, file-serving, or background daemon mode.
+
+## Choose who can reach it
+
+```bash
+rig tunnel ls
+rig tunnel status --tunnel TUNNEL_ID
+rig tunnel share --tunnel TUNNEL_ID --emails colleague@example.com
+rig tunnel share --tunnel TUNNEL_ID --private
+```
+
+Private access admits only the owner. Privileged access admits the owner and
+invites verified Rigbox email addresses. A viewer accepts the
+invitation with a verified email, and the permission is then bound to that
+immutable Rigbox user ID. Invitation acceptance does not prove that the person
+will continue owning the mailbox. Viewers can use the whole application; this is
+not a read-only permission or permission to manage the tunnel.
+
+Public access admits anyone on the internet, including anonymous native HTTP
+callers, and requires a separate confirmation
+for the current target and session:
+
+```bash
+rig tunnel share --tunnel TUNNEL_ID --public
+```
+
+The CLI binds public acknowledgment to the current target fingerprint,
+connection generation, and policy version. If those change before the update,
+the request fails and you must review the new status. It does not retry public
+sharing automatically. You can also select the initial policy before connecting:
+
+```bash
+rig tunnel --port 3000 --visibility privileged --allow-email colleague@example.com
+rig tunnel --port 3000 --visibility public
+```
+
+## Stop and restart
+
+Press Ctrl-C in the foreground command, or stop from another terminal:
+
+```bash
+rig tunnel stop --tunnel TUNNEL_ID
+```
+
+Stop revokes the session and connector. Changing access closes flows admitted
+under the old policy. The connector renews short authority leases and closes its
+local connections if renewal fails or expires. The 15-second bound runs from a
+gateway-observed change and valid lease issuance; it does not promise instant
+detection of an external identity-provider change.
+
+A session has an eight-hour maximum lifetime. A service disappearing terminates
+the connector and requires an explicit new session. A fixed port does not identify
+a process: an undetected replacement on the same port can still be reached.
+Close the tunnel before restarting or replacing the local service. Expired
+leases and sessions that never started within 60 seconds are cleaned up when you
+create another tunnel; a live session requires explicit stop.
+
+## Identity deletion
+
+The prepared Clerk identity-deletion handler revokes tunnel browser
+access created through the deleted identity after Rigbox verifies and commits
+the signed deletion event. Older browser grants whose sign-in identity is unknown
+are revoked for the affected Rigbox account and Clerk issuer.
+
+Your Rigbox account, native credentials and other linked identities remain
+intact. Another undeleted, verified Clerk identity can keep that account eligible
+for tunnels. If the owner loses its only eligible identity, new tunnel access
+and lease renewals are refused, including anonymous Public access. Existing
+short-lived authority keeps its expiry and polling bounds.
+
+Provider delivery can be delayed or missed, so provider deletion alone does not
+promise immediate revocation. This prepared contract does not establish real
+provider delivery or customer availability.
+
+## HTTPS and local certificates
+
+Public HTTPS and verified outbound WSS are required. The final hop may use HTTP
+on literal loopback. For a local HTTPS service, keep certificate validation on:
+
+```bash
+rig tunnel --port 3443 --https --tls-server-name localhost --ca-cert local-ca.pem
+```
+
+The CA file stays on your laptop. The connector verifies the certificate name
+while dialing the fixed loopback IP; it does not resolve that name to a different
+destination. There is no certificate-verification bypass flag. If a development
+server rejects the tunnel's Host header, allow the exact printed hostname in its
+configuration rather than disabling host checks globally.
+
+## Compatibility and limits
+
+Requests carrying `Origin` must name the exact HTTPS tunnel origin. Cross-origin
+browser API calls and embedding are rejected even in Public mode; setting CORS
+headers on the local app does not bypass the tunnel boundary. Public native HTTP
+requires exactly one explicit intent header and no Origin or Fetch Metadata headers:
+
+```bash
+curl -H 'X-Rigbox-Tunnel-Client: native' "$TUNNEL_URL/healthz"
+```
+
+This header is removed before forwarding. It does not authenticate the caller;
+Public mode still permits anonymous access. Webhook providers that cannot set
+the header are unsupported. Application WebSockets require the exact tunnel
+origin and a completed browser boundary check; native WebSockets are unsupported.
+Service workers, PWAs, and Web Workers are unsupported.
+
+The connector permits 16 concurrent flows with shared bandwidth of approximately
+10 Mbps per direction. Uploads are limited to 32 MiB and responses to 128 MiB.
+Ordinary HTTP has a 120-second total deadline and a 10-second idle deadline.
+An explicit `text/event-stream` response uses a 60-second idle deadline. WebSocket
+messages are limited to 256 KiB and compression is disabled. Exceeding a limit
+closes the stream; split large transfers and ensure event streams send heartbeats.
+
+## Automation and output
+
+Without an interactive terminal, accept exposure explicitly. Public mode needs
+both acknowledgments:
+
+```bash
+rig tunnel --port 3000 --acknowledge-exposure --output json
+rig tunnel --port 3000 --visibility public --acknowledge-exposure --acknowledge-public
+```
+
+Plain JSON streams readiness and terminal events as NDJSON. YAML, text, table,
+and queried output follow the CLI's document buffering rules and finish when the
+foreground command exits. Connector grants, traffic bodies, request URLs, query
+strings, cookies, and CA file contents are excluded from tunnel telemetry, even
+when HTTP body tracing is enabled. Rigbox terminates public TLS, so its gateway
+can process the plaintext HTTP traffic; this is not end-to-end encryption.
+
+## A small example
+
+The [planned local-tunnel example](https://github.com/rigbox-dev/rigbox-examples/tree/073522d4f0cca5e6426cd2afa1a002e3fe37ae2e/local-tunnel)
+serves fixed in-memory routes with Python and never provides directory browsing
+or arbitrary file serving. It can run locally
+without exposing a folder; sharing it still requires the enabled tunnel service
+and matching CLI.
+
+Python's general-purpose `http.server` serves files and follows symlinks. Its
+directory option is not a filesystem sandbox. Pointing it at a home directory or
+repository may expose credentials and private files to admitted visitors. See
+the [Python documentation](https://docs.python.org/3/library/http.server.html).

@@ -27,7 +27,7 @@ area('Deploy applications',[
  group('Workspace images',[group('Reproducible builds',['deploy/build-cache','deploy/reimage','guides/releases-and-rollback'],'deploy/reproducible-builds'),'guides/bluegreen'])]),
 area('Configure applications',[
  group('Configuration',['configure/overview','configure/environment','configure/secrets','configure/parameters','configure/commands','configure/health']),
- group('Networking',['guides/visibility','guides/expose-and-route','guides/custom-domains']),
+ group('Networking',['guides/visibility','guides/expose-and-route','guides/local-tunnels','guides/custom-domains']),
  group('Manifest reference',[group('rig.yaml',['reference/rig-yaml/application','reference/rig-yaml/workspace','reference/rig-yaml/source','reference/rig-yaml/configuration','reference/rig-yaml/deployment'],'reference/rig-yaml')])]),
 area('Workspaces and storage',[
  group('Workspaces',['workspaces/overview','guides/workspaces','concepts/limits',group('SSH',['workspaces/ssh-keys','workspaces/file-transfer'],'guides/ssh-access'),'guides/images-and-templates']),
@@ -48,7 +48,7 @@ area('Build on Rigbox',[
  group('Integrate',['build/overview','build/quickstart','build/workspace-lifecycle','build/deploy-monitor','guides/build-hosting-platform','build/api-conventions']),
  group('Platform',['concepts/architecture','concepts/security']),
  group('First-party integrations',['sandbox-api-surface','clawd-api-surface','clawd-runtime-services'])])]
-api_groups=[group('Start',['api-reference/overview']),group('Access',[api['API Keys'],api['Access Control']]),group('Workspaces',[api['Workspaces'],api['Workspace Services'],api['SSH Keys']]),group('Applications and releases',[api['Apps'],api['App Logs'],group('App releases',[f'api-reference/app-releases/{x}' for x in ['list','create','get','activate','logs']])]),group('Storage',[api['Snapshots']]),group('AI and tools',[api['AI'],api['Managed Proxy'],api['Tools']]),group('Registry',[api['App Catalog'],api['Templates'],api['Setup Scripts'],api['Service Specs']]),group('Account and platform',[api['User Settings'],api['Roadmap'],api['System']])]
+api_groups=[group('Start',['api-reference/overview']),group('Access',[api['API Keys'],api['Access Control']]),group('Workspaces',[api['Workspaces'],api['Workspace Services'],api['SSH Keys']]),group('Applications and releases',[api['Apps'],api['App Logs'],group('App releases',[f'api-reference/app-releases/{x}' for x in ['list','create','get','activate','logs']]),api['Local tunnels']]),group('Storage',[api['Snapshots']]),group('AI and tools',[api['AI'],api['Managed Proxy'],api['Tools']]),group('Registry',[api['App Catalog'],api['Templates'],api['Setup Scripts'],api['Service Specs']]),group('Account and platform',[api['User Settings'],api['Roadmap'],api['System']])]
 extra=Path('scripts/deployment-api-navigation.json')
 if extra.exists():
  for name,pages in json.loads(extra.read_text())['groups'].items():
