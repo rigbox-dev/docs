@@ -52,10 +52,13 @@ If those checks fail, the local app receives no request. Use a supported current
 browser and reopen the URL. Concurrent entry tabs can invalidate an earlier
 tab's binding and require it to restart the entry flow.
 
-An older account may sign in successfully but receive `recovery_required` when
-using tunnel controls. Complete the console's verified account recovery and old
-credential revocation first; retry after the displayed recovery delay. A signed
-email claim or API key does not bypass that ownership check.
+An older account can sign in but remain blocked from tunnel controls pending
+reviewed ownership recovery. If the CLI reports a conflict for an older account,
+[contact Rigbox support](mailto:support@rigbox.dev). The current recovery process
+requires independent ownership review, old-credential revocation, and a wait of
+at least 24 hours plus 60 seconds from the final revocation before approval.
+Signing in again, password linking, an email claim, or an API key does not bypass
+this review.
 
 Creation always starts private. Each new local session receives a new hostname
 under `rigbox.link`, separate from Rigbox's login and console domain. The destination
