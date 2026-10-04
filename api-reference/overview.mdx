@@ -10,6 +10,7 @@ Start with the [API quickstart](/build/quickstart) to make an authenticated requ
 - [Workspaces](/api-reference/workspaces/list): lifecycle and resources.
 - [Apps](/api-reference/apps/list): installed applications and runtime controls.
 - [App releases](/api-reference/app-releases/list): prepare and activate v0.13 deployments.
+- [Planned local tunnels](/api-reference/tunnels/list): prepared contracts for a service that is currently disabled; the signed CLI 0.13.0 release is not yet published.
 - [Snapshots](/api-reference/snapshots/list): stopped-workspace root-disk checkpoints.
 - [API keys](/api-reference/api-keys/list): account credentials.
 
@@ -18,3 +19,6 @@ Start with the [API quickstart](/build/quickstart) to make an authenticated requ
 The account API uses the public HTTPS endpoint and an authorized credential. The [managed AI proxy](/guides/managed-proxy) is a VM-local interface with different authentication and protocol semantics. First-party console and policy endpoints are grouped separately from the application deployment lifecycle.
 
 This is a v0.13 documentation preview. App-release functionality requires the matching server capability. Reading a generated schema does not establish that a feature is enabled for your account. See [API conventions](/build/api-conventions) for polling, pagination, and failure handling.
+
+The tunnel API pages are reference-only while production tunnels remain disabled
+pending browser-domain isolation. They do not offer a live request playground.

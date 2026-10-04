@@ -1,0 +1,464 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Rigbox Public API",
+    "description": "Gateway-owned public API for Rigbox. The gateway composes its local lifecycle API with service-owned exported specs.",
+    "contact": {
+      "name": "Rigbox",
+      "url": "https://rigbox.dev"
+    },
+    "license": {
+      "name": ""
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.rigbox.dev",
+      "description": "Production gateway"
+    }
+  ],
+  "paths": {
+    "/api/v1/tunnels": {
+      "get": {
+        "tags": [
+          "Tunnels"
+        ],
+        "operationId": "list",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TunnelList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Tunnels"
+        ],
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTunnelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateTunnelResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": ""
+          },
+          "503": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tunnels/{id}": {
+      "get": {
+        "tags": [
+          "Tunnels"
+        ],
+        "operationId": "get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TunnelDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Tunnels"
+        ],
+        "operationId": "stop",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tunnels/{id}/policy": {
+      "patch": {
+        "tags": [
+          "Tunnels"
+        ],
+        "operationId": "policy",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTunnelPolicyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TunnelDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Tunnels"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "CreateTunnelRequest": {
+        "type": "object",
+        "required": [
+          "target"
+        ],
+        "properties": {
+          "target": {
+            "$ref": "#/components/schemas/TunnelTarget"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateTunnelResponse": {
+        "type": "object",
+        "required": [
+          "tunnel",
+          "connector_token",
+          "lease_token",
+          "connect_url",
+          "lease_url",
+          "lease_ttl_seconds",
+          "max_slots"
+        ],
+        "properties": {
+          "connect_url": {
+            "type": "string"
+          },
+          "connector_token": {
+            "type": "string"
+          },
+          "lease_token": {
+            "type": "string"
+          },
+          "lease_ttl_seconds": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "lease_url": {
+            "type": "string"
+          },
+          "max_slots": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "tunnel": {
+            "$ref": "#/components/schemas/Tunnel"
+          }
+        }
+      },
+      "PublicAcknowledgment": {
+        "type": "object",
+        "required": [
+          "target_fingerprint",
+          "connection_generation",
+          "policy_epoch",
+          "acknowledged"
+        ],
+        "properties": {
+          "acknowledged": {
+            "type": "boolean"
+          },
+          "connection_generation": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "policy_epoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "target_fingerprint": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Tunnel": {
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "hostname",
+          "target",
+          "target_fingerprint",
+          "visibility",
+          "status",
+          "policy_epoch",
+          "connection_generation",
+          "expires_at",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "connection_generation": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "lease_expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "policy_epoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string"
+          },
+          "target": {
+            "$ref": "#/components/schemas/TunnelTarget"
+          },
+          "target_fingerprint": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string"
+          }
+        }
+      },
+      "TunnelDetails": {
+        "type": "object",
+        "required": [
+          "tunnel",
+          "allowed_emails"
+        ],
+        "properties": {
+          "allowed_emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tunnel": {
+            "$ref": "#/components/schemas/Tunnel"
+          }
+        }
+      },
+      "TunnelList": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tunnel"
+            }
+          }
+        }
+      },
+      "TunnelTarget": {
+        "type": "object",
+        "required": [
+          "local_ip",
+          "port",
+          "scheme"
+        ],
+        "properties": {
+          "http_host": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "local_ip": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "scheme": {
+            "type": "string"
+          },
+          "tls_server_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateTunnelPolicyRequest": {
+        "type": "object",
+        "required": [
+          "expected_policy_epoch",
+          "expected_connection_generation",
+          "visibility"
+        ],
+        "properties": {
+          "allowed_emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expected_connection_generation": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "expected_policy_epoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "public_acknowledgment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PublicAcknowledgment"
+              }
+            ]
+          },
+          "visibility": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
