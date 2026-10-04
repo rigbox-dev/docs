@@ -10,7 +10,7 @@ Start with the [API quickstart](/build/quickstart) to make an authenticated requ
 - [Workspaces](/api-reference/workspaces/list): lifecycle and resources.
 - [Apps](/api-reference/apps/list): installed applications and runtime controls.
 - [App releases](/api-reference/app-releases/list): prepare and activate v0.13 deployments.
-- [Planned local tunnels](/api-reference/tunnels/list): prepared contracts for a service that is currently disabled; the signed CLI 0.13.1 release is not yet published.
+- [Local tunnels](/api-reference/tunnels/list): HTTPS access to a local service, with private, invited, or public sharing.
 - [Snapshots](/api-reference/snapshots/list): stopped-workspace root-disk checkpoints.
 - [API keys](/api-reference/api-keys/list): account credentials.
 
@@ -20,5 +20,7 @@ The account API uses the public HTTPS endpoint and an authorized credential. The
 
 This is a v0.13 documentation preview. App-release functionality requires the matching server capability. Reading a generated schema does not establish that a feature is enabled for your account. See [API conventions](/build/api-conventions) for polling, pagination, and failure handling.
 
-The tunnel API pages are reference-only while production tunnels remain disabled
-pending browser-domain isolation. They do not offer a live request playground.
+The tunnel API pages are reference-only and do not offer a live request
+playground. Use the signed CLI 0.13.1 or later to run a connector, and read the
+[exposure and shared-browser-site risks](/guides/local-tunnels#shared-browser-site)
+before sharing an app.

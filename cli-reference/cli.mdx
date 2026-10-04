@@ -47,12 +47,17 @@ Choose a command below, then follow its subcommand links. Each page includes its
 
 [Configuration and output](/cli-reference/configuration) explains scripting options. [Local versus workspace CLI](/cli-reference/execution-modes) explains which command surface to use.
 
-## Planned local tunnels
+<span id="planned-local-tunnels" />
 
-[`rig tunnel`](/guides/local-tunnels) is prepared for the planned signed CLI
-0.13.1 release, which is not yet published. The production tunnel service is
-disabled pending browser-domain isolation. Its guide documents future commands
-and risks; these commands require both that matching CLI and an enabled service.
+## Local tunnels
+
+[`rig tunnel`](/guides/local-tunnels) requires the signed stable CLI 0.13.1 or
+later and an enabled tunnel service. It gives a fixed loopback service an HTTPS
+URL under `rigbox.link`. Start privately and review the whole-app exposure and
+[shared-browser-site limitation](/guides/local-tunnels#shared-browser-site)
+before sharing. Rigbox protects its own access cookies; another tunnel can still
+set parent-domain cookies that interfere with your app's cookies.
+
 The generated command reference above retains its existing source version.
 
 ## Source and coverage

@@ -1,19 +1,17 @@
 ---
 title: "Local tunnels"
-description: "Planned local website tunnels, access controls, and exposure risks."
+description: "Local website tunnels, access controls, and exposure risks."
 ---
 
 <Info>
-Tunnels are not available to customers yet. The production service is disabled
-pending browser-domain isolation, and the planned signed CLI 0.13.1 release is not
-yet published. The commands below describe prepared behavior and require both
-that matching CLI and an enabled tunnel service. Reading these instructions does
-not enable tunnels or expose your laptop.
+Use the signed CLI 0.13.1 or later. Tunnels give a local service an HTTPS URL under
+`rigbox.link` without deploying the app. Start privately and review what the app
+exposes before sharing it.
 </Info>
 
-The planned tunnel keeps your service running on your laptop. Its foreground CLI
+The tunnel keeps your service running on your laptop. Its foreground CLI
 connects outbound to Rigbox and gives one fixed loopback port a fresh HTTPS URL.
-Public HTTPS and verified outbound WSS are required from the first release.
+The public URL uses HTTPS and the connector uses verified outbound WSS.
 Keep the foreground command running while you use it.
 
 <Warning>
@@ -23,7 +21,9 @@ through an app vulnerability. Rigbox does not sandbox the app or your laptop.
 Review the service before sharing it, even when the tunnel is private.
 </Warning>
 
-## Start privately when available
+<span id="start-privately-when-available" />
+
+## Start privately
 
 Start your HTTP service on `127.0.0.1:3000`, then run:
 
@@ -41,27 +41,48 @@ Keep Rigbox account API keys on the control API; never send them to a tunnel URL
 Public native HTTP callers can use credentials issued by their local application,
 with the explicit client header described below.
 
-A private or privileged link opened from another website first shows a Rigbox
-Continue page. That page does not contact the local app. Click Continue to enter
-through the bound browser flow; sign in if needed. Every browser completes a
-cookie-boundary check before the local app or its assets load. Deliberate Public
-links complete that check automatically when the browser supplies the required
-evidence. Ambiguous navigation may require Continue.
+A link opened from another website first shows a Rigbox Continue page. That page
+does not contact the local app. Review its exposure and shared-cookie warning,
+then click Continue; sign in if needed. Public visitors also see this warning.
+Every browser completes a capability check before the local app or its assets
+load.
 
-Browser access requires supported cookie isolation and Fetch Metadata headers.
+Browser access requires support for Rigbox's protected cookies and Fetch Metadata headers.
 If those checks fail, the local app receives no request. Use a supported current
 browser and reopen the URL. Concurrent entry tabs can invalidate an earlier
 tab's binding and require it to restart the entry flow.
 
-An older account may sign in successfully but receive `recovery_required` when
-using tunnel controls. Complete the console's verified account recovery and old
-credential revocation first; retry after the displayed recovery delay. A signed
-email claim or API key does not bypass that ownership check.
+An older account can sign in but remain blocked from tunnel controls pending
+reviewed ownership recovery. If the CLI reports a conflict for an older account,
+[contact Rigbox support](mailto:support@rigbox.dev). Recovery requires an independent
+ownership review. If the review confirms that the original account and its
+credentials belong to the same person, support can migrate the account while
+preserving its credentials and workspaces. If ownership of old credentials remains
+unresolved, those credentials must be revoked, followed by a wait of at least
+24 hours plus 60 seconds from the final revocation before approval.
+Signing in again, password linking, an email claim, or an API key does not bypass
+this review.
 
 Creation always starts private. Each new local session receives a new hostname
-on a separate content domain with sibling cookie isolation. The destination
+under `rigbox.link`, separate from Rigbox's login and console domain. The destination
 remains literal `127.0.0.1` and the selected port; the connector has no remote destination,
 arbitrary TCP, shell, file-serving, or background daemon mode.
+
+## Shared browser site
+
+<Warning>
+All `*.rigbox.link` tunnels share a browser site. Another tunnel can set
+parent-domain cookies that interfere with your app's cookies. Rigbox's browser
+checks protect its own access cookies; they do not isolate application cookies
+or give each tunnel a separate browser site. Use a tunnel only if you accept this
+limitation for the app you are sharing.
+</Warning>
+
+Keep your app's authentication, authorization, CSRF protection, and exact-origin
+checks enabled. Use host-only session cookies, preferably with the `__Host-`
+prefix. These protections belong to your app and do not remove the shared-site
+limitation. Private or privileged Rigbox access controls who reaches the app;
+it does not replace the app's own security checks.
 
 ## Choose who can reach it
 
@@ -120,7 +141,7 @@ create another tunnel; a live session requires explicit stop.
 
 ## Identity deletion
 
-The prepared Clerk identity-deletion handler revokes tunnel browser
+The Clerk identity-deletion handler revokes tunnel browser
 access created through the deleted identity after Rigbox verifies and commits
 the signed deletion event. Older browser grants whose sign-in identity is unknown
 are revoked for the affected Rigbox account and Clerk issuer.
@@ -132,8 +153,7 @@ and lease renewals are refused, including anonymous Public access. Existing
 short-lived authority keeps its expiry and polling bounds.
 
 Provider delivery can be delayed or missed, so provider deletion alone does not
-promise immediate revocation. This prepared contract does not establish real
-provider delivery or customer availability.
+promise immediate revocation.
 
 ## HTTPS and local certificates
 
@@ -193,11 +213,9 @@ can process the plaintext HTTP traffic; this is not end-to-end encryption.
 
 ## A small example
 
-The [planned local-tunnel example](https://github.com/rigbox-dev/rigbox-examples/tree/073522d4f0cca5e6426cd2afa1a002e3fe37ae2e/local-tunnel)
+The [local-tunnel example](https://github.com/rigbox-dev/rigbox-examples/tree/366aff37bda4029bc15d84d9b3d4a7a3106368aa/local-tunnel)
 serves fixed in-memory routes with Python and never provides directory browsing
-or arbitrary file serving. It can run locally
-without exposing a folder; sharing it still requires the enabled tunnel service
-and matching CLI.
+or arbitrary file serving. It can run locally without exposing a folder.
 
 Python's general-purpose `http.server` serves files and follows symlinks. Its
 directory option is not a filesystem sandbox. Pointing it at a home directory or
