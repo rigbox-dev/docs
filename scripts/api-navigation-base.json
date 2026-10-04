@@ -51,7 +51,8 @@
       "api-reference/tunnels/create",
       "api-reference/tunnels/get",
       "api-reference/tunnels/update-policy",
-      "api-reference/tunnels/stop"
+      "api-reference/tunnels/stop",
+      "api-reference/tunnels/delete-record"
     ]
   },
   {
