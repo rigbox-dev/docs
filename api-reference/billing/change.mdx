@@ -1,0 +1,13 @@
+---
+title: Change plan or add-ons
+openapi: "/openapi/auth-api.json POST /api/v1/auth/billing/change"
+description: "Upcoming paid-v1 account billing operation, pending rollout."
+---
+
+<Warning>
+This is a draft paid-v1 reference generated from the auth service at the recorded source revision. It does not confirm live rollout. See [pricing and billing](/concepts/pricing-and-billing) and [source verification](/verification/paid-pricing).
+</Warning>
+
+Request a plan or add-on change using the authoritative loaded subscription and a durable UUID operation ID. Upgrades require verified payment; reductions must fit retained allocations. Pending changes leave the confirmed allowance in effect. A confirmed change does not resize, start, move, or restart a workspace.
+
+Account billing requires an authenticated account identity with appropriate billing permissions. Workspace bridge identity is not an account billing credential. See [managed wallet](/ai/managed-wallet) for the financial contract.

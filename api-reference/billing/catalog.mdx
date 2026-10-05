@@ -1,0 +1,13 @@
+---
+title: Billing catalog
+openapi: "/openapi/auth-api.json GET /api/v1/auth/billing/catalog"
+description: "Upcoming paid-v1 account billing operation, pending rollout."
+---
+
+<Warning>
+This is a draft paid-v1 reference generated from the auth service at the recorded source revision. It does not confirm live rollout. See [pricing and billing](/concepts/pricing-and-billing) and [source verification](/verification/paid-pricing).
+</Warning>
+
+Inspect the upcoming paid-v1 prices and account ceilings. Catalog visibility is not paid entitlement; `checkout_enabled` reflects configured availability. Price fields use USD cents. RAM and storage allowance amounts use MiB-sized units; CPU uses millicores. The source response schema is generic JSON, so use the confirmed account response rather than assuming missing fields.
+
+Account billing requires an authenticated account identity with appropriate billing permissions. Workspace bridge identity is not an account billing credential. See [managed wallet](/ai/managed-wallet) for the financial contract.

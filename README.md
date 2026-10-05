@@ -24,6 +24,7 @@ Existing routes and heading anchors are inventoried in `scripts/legacy-routes.js
 python3 scripts/generate-cli-reference.py --check
 python3 scripts/build-navigation.py --check
 python3 scripts/check-docs.py
+python3 scripts/sync-paid-schemas.py --check
 npx mintlify@4.2.375 validate
 npx mintlify@4.2.375 broken-links
 ```
@@ -46,3 +47,33 @@ openapi: /openapi/rigbox-api.json GET /api/v1/workspaces
 Do not add top-level `openapi` to `docs.json`: Mintlify 4.2.375's file categorizer misidentifies that configuration as an API specification. Explicit page references resolve the strict validation warning. Native endpoints and playground contracts remain unchanged. App-release and volume definitions are copied from the recorded server specification. Builds/image-release routes absent from that specification remain covered by CLI guides; do not invent generated API definitions.
 
 The existing `sync-openapi.yml` workflow updates production specs. Review its output against the targeted release before incorporating it into the docs; newly split specifications also need deliberate refresh and coverage review. Contract changes belong in the server source, not hand edits to documentation schemas.
+
+## Paid-v1 draft
+
+Paid-v1 pricing, pooling, and wallet pages are upcoming documentation, with rollout
+status in `verification/paid-pricing.mdx` and source provenance in
+`verification/paid-pricing.json`. This draft is not publication or production
+rollout evidence. Historical v0.13 verification remains unchanged.
+
+`verification/paid-v1-schemas.json` contains selected server-export components,
+not hand-authored contracts. `scripts/sync-paid-schemas.py` copies only those
+wallet and limits components into the existing gateway spec, preserving unrelated
+paths and schemas. The auth spec is the complete pure auth-service library export,
+verified against its recorded SHA256. Verify with `--check`. To compare a later
+gateway export:
+
+```bash
+python3 scripts/sync-paid-schemas.py --source /path/to/final-openapi.json --check
+```
+
+Both current exports use exact Rust 1.93.1 at primary revision
+`652120cb2273c0383158cdd15136542ab59b74f1`. The gateway has an offline
+`--print-openapi` branch; the auth export uses its pure `rig_auth::openapi()`
+library function without invoking auth-service startup. If the primary head
+changes, regenerate both sources, replace the recorded bundle/auth export and
+provenance, and revalidate against final hosted CI before publishing. Several
+billing responses remain generic JSON schemas in the server source. A production sync from older
+binaries can reintroduce obsolete monthly wallet promises: run the paid-schema
+check and review the sync diff before accepting it. Do not mark paid-v1 current
+until the deployed catalog, migration, financial and Linux runtime release gates
+are confirmed.

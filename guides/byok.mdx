@@ -6,6 +6,10 @@ description: Use your own AI provider API keys instead of Rigbox-managed credits
 Bring Your Own Keys (BYOK) mode lets you use your own AI provider API keys with Rigbox workspaces. You set the workspace to BYOK mode and provide your provider key as a workspace environment variable - provider requests are billed to your provider account and remain subject to its quotas, rate limits, and available balance.
 
 <Note>
+Under upcoming [paid-v1 pricing](/concepts/pricing-and-billing), every new compute tier supports BYOK and includes no AI grant. Provider billing is separate from your paid Rigbox compute subscription. Changing mode does not erase wallet funds, settle open managed holds, or automatically change an existing process's endpoint.
+</Note>
+
+<Note>
 [Managed mode](/guides/managed-proxy) routes traffic through Rigbox's OpenRouter gateway and meters it against your credit balance. In BYOK mode, configure your SDK or agent with your provider key and endpoint. The selected tool and endpoint determine the route; changing the workspace mode does not intercept or rewrite every outgoing SDK request.
 </Note>
 
@@ -97,9 +101,9 @@ Run `rig ai defaults` with no flags to see the current defaults. Account default
 |---------|---------|------|
 | API keys required | No | Yes |
 | Credit tracking | Automatic | N/A (billed by your provider) |
-| Cost | Your account’s managed credit balance | Your provider billing |
+| Cost | Optional $13 / 1,000-credit pack under paid-v1; no included new-tier AI | Your provider billing, separate from paid Rigbox compute |
 | Supported providers | Models and protocols exposed by the managed gateway | Providers supported by your SDK or agent |
-| Usage limits | Credit balance | Your provider's rate limits |
+| Usage limits | Available wallet funds after durable holds, plus applicable request limits | Your provider's balance, quotas, and rate limits |
 | Setup time | Instant | Need existing API key |
 | Best for | Quick start, prototyping, demos | Production, high volume, specific models |
 

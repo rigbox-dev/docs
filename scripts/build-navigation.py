@@ -20,7 +20,7 @@ else:
  original=old['groups'];Path('scripts/api-navigation-base.json').write_text(json.dumps(original,indent=2)+'\n')
 api={g['group']:g for g in original}
 areas=[
-area('Start here',[group('Get started',['introduction','quickstart','guides/install-cli','concepts/core'])]),
+area('Start here',[group('Get started',['introduction','quickstart','guides/install-cli','concepts/core','concepts/pricing-and-billing'])]),
 area('Deploy applications',[
  group('Deploy',['deploy/overview','guides/deploying',group('GitHub',['guides/github-actions','guides/deploy-button'],'guides/github'),group('Multi-app projects',['deploy/dependencies','deploy/single-app'],'deploy/multi-app')]),
  group('App releases',['deploy/development-loop','deploy/stage-and-activate','deploy/app-rollback','deploy/release-ownership']),
@@ -34,7 +34,7 @@ area('Workspaces and storage',[
  group('Storage',[group('Persistent volumes',['workspaces/volume-management'],'guides/persistent-volumes'),group('Snapshots',['workspaces/snapshot-restore','workspaces/recovery-limits'],'guides/snapshots')]),
  group('Environment',['guides/workspace-services','guides/setup-scripts','guides/service-specs'])]),
 area('AI and tools',[
- group('AI',['ai/overview','guides/ai-coding-tools','guides/managed-proxy','guides/byok']),
+ group('AI',['ai/overview','guides/ai-coding-tools','guides/managed-proxy','ai/managed-wallet','guides/byok']),
  group('Tools',['guides/catalog','ai/spawn','guides/virtual-browser','guides/firecrawl','guides/architecture-explorer'])]),
 area('Operate and troubleshoot',[
  group('Observe',['operate/overview','operate/app-logs','operate/build-logs','operate/telemetry']),
@@ -46,9 +46,10 @@ area('CLI reference',[
  group('Use the CLI',['cli-reference/cli','cli-reference/authentication','guides/using-cli','cli-reference/configuration','cli-reference/execution-modes'])]),
 area('Build on Rigbox',[
  group('Integrate',['build/overview','build/quickstart','build/workspace-lifecycle','build/deploy-monitor','guides/build-hosting-platform','build/api-conventions']),
- group('Platform',['concepts/architecture','concepts/security']),
+ group('Platform',['concepts/architecture','concepts/security','verification/paid-pricing']),
  group('First-party integrations',['sandbox-api-surface','clawd-api-surface','clawd-runtime-services'])])]
 api_groups=[group('Start',['api-reference/overview']),group('Access',[api['API Keys'],api['Access Control']]),group('Workspaces',[api['Workspaces'],api['Workspace Services'],api['SSH Keys']]),group('Applications and releases',[api['Apps'],api['App Logs'],group('App releases',[f'api-reference/app-releases/{x}' for x in ['list','create','get','activate','logs']]),api['Local tunnels']]),group('Storage',[api['Snapshots']]),group('AI and tools',[api['AI'],api['Managed Proxy'],api['Tools']]),group('Registry',[api['App Catalog'],api['Templates'],api['Setup Scripts'],api['Service Specs']]),group('Account and platform',[api['User Settings'],api['Roadmap'],api['System']])]
+api_groups[-1]['pages'].insert(0,group('Billing',[f'api-reference/billing/{name}' for name in ['catalog','subscription-status','create-checkout','change','credit-pack-checkout','wallet-history','operation-status','create-portal']]))
 extra=Path('scripts/deployment-api-navigation.json')
 if extra.exists():
  for name,pages in json.loads(extra.read_text())['groups'].items():

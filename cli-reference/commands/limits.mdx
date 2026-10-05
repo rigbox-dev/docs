@@ -6,7 +6,7 @@ description: "Show effective resource limits and current usage"
 
 Available **local and workspace**. Reference source: CLI `0.13.0-rc.5` (`824aefd6ad16`).
 
-Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.
+Use this command from your local terminal. Under upcoming paid-v1, limits are account-pooled and compute entitlement is separate from the plan label. Stopped workspaces retain their configured RAM, storage and slots. Inspect the authoritative limits response before explicitly retrying a blocked allocation; refreshing does not start a workspace. See /concepts/limits and /concepts/pricing-and-billing.
 
 ## Examples
 
