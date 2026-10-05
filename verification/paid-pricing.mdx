@@ -1,0 +1,31 @@
+---
+title: Paid-v1 rollout status
+description: Draft pricing documentation and the remaining source and release verification.
+---
+
+<Warning>
+Paid-v1 documentation is **pending rollout and publication review**. These pages do not confirm production checkout, pricing activation, or successful customer migration. Your account's live catalog, Billing state, and authenticated allowance remain authoritative.
+</Warning>
+
+## Documentation scope
+
+This draft covers [paid plans and add-ons](/concepts/pricing-and-billing), [account resource accounting](/concepts/limits), and [managed wallet behavior](/ai/managed-wallet). It removes monthly free-bucket promises from the staged wallet schema. New paid plans include no AI grant; existing funds and eligible transition access are described separately.
+
+## API source status
+
+The staged wallet and limits components come from an offline primary-server gateway export at **`652120cb2273c0383158cdd15136542ab59b74f1`**, using the exact repository and CI pin **Rust 1.93.1**. The complete auth-service schema comes from its pure library exporter at the same source revision and toolchain. Neither export starts a service, connects to a database, or fetches the live API.
+
+Only the selected wallet and limits components are synchronized into the existing gateway spec, preserving unrelated gateway definitions. `auth-api.json` is the complete actual auth-service export, replacing its historical duplicated gateway specification. Billing pages reference handler-exported paths and request schemas, not prose-inferred contracts. The combined gateway export omits subscription-status and the two existing checkout/portal paths; the auth export contains all eight documented billing operations.
+
+Several billing responses are generated as generic JSON objects because the source handlers return `serde_json::Value`. This is a schema typing limit, not permission to assume fields or grant access. Exact schemas may change before final release. The committed [provenance record](/verification/paid-pricing.json) lists both hashes, source revision, toolchain, and remaining release gates.
+
+## Before publication
+
+- Review final pricing, legacy allowances, preserved balances, and the actual durable transition timestamp.
+- If the primary head changes, regenerate both exports using the exact Rust 1.93.1 toolchain, and review schema references and endpoint coverage against final hosted CI.
+- Complete the financial migration, Stripe payment and renewal, webhook replay, wallet concurrency, and frontend state release gates.
+- Complete isolated Linux CPU and resource-admission validation, without using customer workspaces.
+- Verify native iOS Safari form focus, reduced Page Zoom, and orientation with the shared font-floor guard; JavaScript tests do not prove software-keyboard behavior.
+- Confirm the deployed revision and account-specific catalog before changing these pages from upcoming to current.
+
+Local documentation validation establishes navigation, links, generated reference consistency, and schema provenance. It does not establish live entitlement, provider settlement, capacity, or rollout success.

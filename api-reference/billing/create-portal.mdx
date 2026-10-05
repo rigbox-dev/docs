@@ -1,0 +1,13 @@
+---
+title: Create billing portal session
+openapi: "/openapi/auth-api.json POST /api/v1/auth/create-portal-session"
+description: "Upcoming paid-v1 account billing operation, pending rollout."
+---
+
+<Warning>
+This is a draft paid-v1 reference generated from the auth service at the recorded source revision. It does not confirm live rollout. See [pricing and billing](/concepts/pricing-and-billing) and [source verification](/verification/paid-pricing).
+</Warning>
+
+Open the configured portal for payment methods, invoices, or period-end cancellation. Capacity-sensitive plan and add-on changes use the Rigbox Billing flow. Portal creation does not change entitlement. Only a permitted return URL is accepted.
+
+Account billing requires an authenticated account identity with appropriate billing permissions. Workspace bridge identity is not an account billing credential. See [managed wallet](/ai/managed-wallet) for the financial contract.

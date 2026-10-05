@@ -3,3 +3,7 @@ title: Get AI Credits
 openapi: "/openapi/rigbox-api.json GET /api/v1/users/me/credits"
 description: "Get the authenticated user's AI credit balance and mode (managed or BYOK)."
 ---
+
+<Warning>
+The staged schema describes upcoming paid-v1 wallet semantics: `remaining` is available funds and `total` is balance before holds, not a monthly grant. Final server-artifact synchronization and rollout verification remain pending. See [managed wallet](/ai/managed-wallet) and [rollout status](/verification/paid-pricing).
+</Warning>

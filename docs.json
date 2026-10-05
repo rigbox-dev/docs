@@ -23,7 +23,8 @@
               "introduction",
               "quickstart",
               "guides/install-cli",
-              "concepts/core"
+              "concepts/core",
+              "concepts/pricing-and-billing"
             ]
           },
           {
@@ -137,6 +138,7 @@
               "ai/overview",
               "guides/ai-coding-tools",
               "guides/managed-proxy",
+              "ai/managed-wallet",
               "guides/byok",
               "guides/catalog",
               "ai/spawn",
@@ -197,6 +199,7 @@
               "build/api-conventions",
               "concepts/architecture",
               "concepts/security",
+              "verification/paid-pricing",
               "sandbox-api-surface",
               "clawd-api-surface",
               "clawd-runtime-services"
@@ -445,6 +448,19 @@
           {
             "group": "Account and platform",
             "pages": [
+              {
+                "group": "Billing",
+                "pages": [
+                  "api-reference/billing/catalog",
+                  "api-reference/billing/subscription-status",
+                  "api-reference/billing/create-checkout",
+                  "api-reference/billing/change",
+                  "api-reference/billing/credit-pack-checkout",
+                  "api-reference/billing/wallet-history",
+                  "api-reference/billing/operation-status",
+                  "api-reference/billing/create-portal"
+                ]
+              },
               {
                 "group": "User Settings",
                 "pages": [

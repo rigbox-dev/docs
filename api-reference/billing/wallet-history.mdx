@@ -1,0 +1,13 @@
+---
+title: Wallet history
+openapi: "/openapi/auth-api.json GET /api/v1/auth/billing/wallet/history"
+description: "Upcoming paid-v1 account billing operation, pending rollout."
+---
+
+<Warning>
+This is a draft paid-v1 reference generated from the auth service at the recorded source revision. It does not confirm live rollout. See [pricing and billing](/concepts/pricing-and-billing) and [source verification](/verification/paid-pricing).
+</Warning>
+
+Read the latest 100 account-owned ledger entries, newest first. Funding, charge, and hold changes have different meanings: `credits` changes wallet balance and `held_delta` changes reserved funds. Historical grant and purchase labels do not prove a remaining purchased-versus-included allocation. Fractional and negative values must be preserved. The generated response schema is generic JSON.
+
+Account billing requires an authenticated account identity with appropriate billing permissions. Workspace bridge identity is not an account billing credential. See [managed wallet](/ai/managed-wallet) for the financial contract.

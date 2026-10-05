@@ -1,13 +1,30 @@
 ---
 title: Resource Limits & Quotas
-description: Plan tiers, workspace limits, AI credits, and rate limits.
+description: Account-pooled resource ceilings, paid compute prerequisites, optional AI credits, and capacity.
 ---
 
-Every Rigbox account has limits on workspaces, resources, and AI credits based on your plan tier. This page covers what's available and how to check your usage.
+Every Rigbox account has resource ceilings. Managed AI uses a separate wallet, rather than being a resource allowance included in every compute plan.
+
+<Warning>
+The account-pooling and payment rules below describe the upcoming **paid-v1** rollout. They are not confirmation of live activation. Check your account's current reported allowance and [pricing and billing](/concepts/pricing-and-billing).
+</Warning>
 
 ## Plan tiers
 
-Plan limits cover workspace count, per-workspace CPU/RAM/disk, apps, snapshots, SSH keys, and managed AI credits. Use your account’s reported limits as the source of truth; limits can vary by plan and account configuration.
+Starter, Developer, and Pro offer account-pooled RAM, sustained CPU, retained storage, and stored workspace slots. See [the plan and add-on table](/concepts/pricing-and-billing#paid-compute-plans) for upcoming prices. Legacy subscriptions and explicit account configurations can have different allowances; the authenticated limits response is authoritative.
+
+| Resource | What consumes the account allowance |
+| --- | --- |
+| RAM | Configured RAM across stored workspaces, including stopped workspaces |
+| Sustained CPU | Running workspace and builder compute sharing the account's parent CPU budget |
+| Retained storage | Logical workspace roots, volumes, snapshots, and owned custom images, including stopped resources |
+| Workspace slots | Stored workspaces, including stopped workspaces |
+
+Image builds also reserve temporary RAM and disk against the account while the builder runs and cleanup remains pending. Those reservations count alongside stored resources; a build can need headroom beyond its target workspace's retained allocation.
+
+Workspace processor count is distinct from available host CPU time. A Developer account's two running workspaces share one sustained core; they do not receive one dedicated core each. Extra workspace slots and RAM do not increase sustained CPU. Active compute for one account must remain on one node until distributed account CPU enforcement is available.
+
+The CPU usage field represents admitted allocation, not a sampled utilization percentage. Use workspace metrics to observe actual activity. An already running workspace can retain its earlier child CPU ceiling after a plan change until you explicitly restart it; Billing does not restart it for you.
 
 ## Check your limits
 
@@ -17,13 +34,15 @@ Show your current plan limits and usage:
 rig limits
 ```
 
-The output includes both the maximum allowed and current usage for each resource type.
+The output includes maximum allowance and current usage. A current CLI may still display compatibility vCPU fields; inspect the JSON response for the sustained account budget and entitlement projection.
+
+Under paid-v1, the limits API additionally reports `compute_allowed`, `entitlement_status`, `pricing_transition_until`, `billing_paid_through`, and `billing_revision`. CPU fields are `limits.sustained_cpu_millis` and `usage.running_cpu_millis`; 1,000 millicores represent one core of sustained CPU time. A plan label alone is not permission to allocate resources.
 
 See [Get User Limits](/api-reference/ai/get-limits) for the full response schema.
 
 ## Workspace resources
 
-When creating a workspace, you specify RAM, vCPU, and disk allocation. These are validated against your plan limits:
+When creating a workspace, you specify RAM, guest vCPU count, and disk allocation. Template and recipe floors, account allowance, paid entitlement, and node capacity are checked before allocation:
 
 ```bash
 rig workspace spawn \
@@ -36,6 +55,8 @@ rig workspace spawn \
 
 Requests that exceed a resource limit are rejected with an error identifying the constraint. Do not assume every quota failure uses the same HTTP status.
 
+If payment, a transition deadline, an inactive workspace, cross-node compute, or missing capacity prevents an action, resolve that prerequisite and explicitly retry. Reading Billing or refreshing account state does not start workspaces or queue your original action. A pending invoice leaves the confirmed allowance in effect.
+
 ### Resizing
 
 You can resize a workspace after creation. The workspace must be stopped first:
@@ -46,9 +67,11 @@ rig workspace resize --workspace <WORKSPACE_ID> --ram 4096 --vcpu 4
 
 See [Update Workspace Resources](/api-reference/workspaces/update-resources) for details.
 
+Root disk shrinking is refused; metadata alone cannot prove a smaller filesystem. Reducing a plan or add-on must fit retained allocations first. Stopping a workspace does not free its retained RAM, storage, or slot allowance. Deletion releases storage only after backing-file cleanup succeeds.
+
 ## AI credits
 
-AI credits fund requests through the [managed AI proxy](/guides/managed-proxy). Each credit maps to approximately $0.01 of upstream provider cost, though the exact rate depends on the model and token count.
+AI credits fund requests through the [managed AI proxy](/guides/managed-proxy). New paid-v1 tiers include no AI grant. An optional $13 pack buys 1,000 credits, approximately $10 of upstream usage with a 30% managed service markup. One credit represents approximately $0.01 of upstream usage; the pack carries the markup, not an extra charge at settlement.
 
 ### Check your balance
 
@@ -60,9 +83,13 @@ rig api GET /v1/users/me/credits
 {
   "remaining": 1800,
   "total": 2000,
+  "remaining_micro": 1800000000,
+  "total_micro": 2000000000,
   "mode": "managed"
 }
 ```
+
+This abbreviated example has 200 credits held: `remaining` is available funds, and `total` is balance before holds. Neither is a monthly allowance. The [managed wallet](/ai/managed-wallet) defines compatibility fields, exact precision, preserved funds, verified legacy grants, and unresolved charges.
 
 ### View usage breakdown
 
@@ -74,9 +101,10 @@ Shows daily usage broken down by workspace, provider, and model.
 
 ### When credits run out
 
-- AI requests through the proxy return `402`
-- Non-AI services in your workspace continue running
+- New managed AI requests return `402` when available funds cannot cover the reservation
+- Wallet exhaustion alone does not stop non-AI services; compute entitlement and resource rules still apply
 - Switch to [BYOK mode](/guides/byok) to use your own provider account, subject to its limits
+- Buying a pack is separate from upgrading compute; a new-tier plan upgrade includes no AI grant
 
 ## Rate limits
 
@@ -108,6 +136,8 @@ rig capacity
 ```
 
 Inspect the returned availability before provisioning. Capacity is a point-in-time observation, not a reservation.
+
+Plans and add-ons are ceilings on shared hosts, not dedicated capacity promises. Admission checks node memory, sustained CPU, storage commitments, and fresh capacity observations. A full host or stale observation can refuse allocation even while your account has unused allowance. Renewing an existing subscription does not itself allocate a full plan's resources.
 
 Rigbox also tracks per-node runtime capacity internally, including bridge IP leases for running VMs. Each compute node has 253 active VM bridge IPs available (`172.16.0.2` through `172.16.0.254`), and stopped or deleted workspaces release their active IP lease.
 
