@@ -277,7 +277,7 @@
     ]
   },
   "limits": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Use this command from your local terminal. Under upcoming paid-v1, limits are account-pooled and compute entitlement is separate from the plan label. Stopped workspaces retain their configured RAM, storage and slots. Inspect the authoritative limits response before explicitly retrying a blocked allocation; refreshing does not start a workspace. See /concepts/limits and /concepts/pricing-and-billing.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",
@@ -506,7 +506,7 @@
     ]
   },
   "status": {
-    "description": "Use this command from your local terminal. Workspace-mode syntax, when available, is listed separately below.",
+    "description": "Shows account or workspace status in the mode listed below. Under upcoming paid-v1, remaining managed credits means available wallet funds and total means balance before holds, not a monthly allowance. Older CLI labels and rounded displays can lag the contract; exact API microcredits and Billing are authoritative. New paid tiers include no AI grant. See /ai/managed-wallet.",
     "examples": [
       {
         "description": "Run from your local terminal. Replace uppercase placeholders with your own values. This invocation performs the operation described above.",

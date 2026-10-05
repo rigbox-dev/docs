@@ -1,0 +1,13 @@
+---
+title: Billing operation status
+openapi: "/openapi/auth-api.json GET /api/v1/auth/billing/operations/{operation_id}"
+description: "Upcoming paid-v1 account billing operation, pending rollout."
+---
+
+<Warning>
+This is a draft paid-v1 reference generated from the auth service at the recorded source revision. It does not confirm live rollout. See [pricing and billing](/concepts/pricing-and-billing) and [source verification](/verification/paid-pricing).
+</Warning>
+
+Read an operation owned by the authenticated account. Operations may be creating, pending_payment, pending_period_end, applied, expired, or failed. Verify the server-confirmed operation and relevant subscription or wallet projection; a browser marker is not a financial receipt. The generated response schema is generic JSON.
+
+Account billing requires an authenticated account identity with appropriate billing permissions. Workspace bridge identity is not an account billing credential. See [managed wallet](/ai/managed-wallet) for the financial contract.

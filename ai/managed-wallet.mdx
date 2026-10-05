@@ -1,0 +1,83 @@
+---
+title: Managed AI wallet
+description: Upcoming paid-v1 balance, durable reservations, exact charges, and verified renewal behavior.
+---
+
+<Warning>
+This is the upcoming **paid-v1** wallet contract, pending rollout and final API synchronization. Check [pricing and billing](/concepts/pricing-and-billing) and your account's confirmed Billing state before purchasing or integrating.
+</Warning>
+
+Managed AI uses an account wallet shared by your workspaces. New paid compute tiers include no AI grant. **1,000 credits represent approximately $10 of upstream usage.** An active paid subscriber may buy those credits as a **$13 pack**, whose price includes a 30% managed service markup on that upstream usage. [BYOK](/guides/byok) uses separate provider billing.
+
+## Read the wallet
+
+| Value | Meaning |
+| --- | --- |
+| Balance | Funds remaining after completed grants, charges, and adjustments, before open holds |
+| Reserved | Funds held for requests whose financial outcome is not yet finalized |
+| Available | Balance minus reserved funds; the amount available for new reservations |
+
+For example, a 100-credit balance with 12 credits reserved has 88 available credits. A reservation is not a final charge. When confirmed usage settles to 3 credits, the 12-credit hold is removed, the balance becomes 97, and available funds become 97 if no other holds exist.
+
+Billing shows the three values and the latest 100 ledger entries. Entries distinguish pack purchases, preserved opening funds, verified legacy paid-period grants, reservations, settled usage, cancellations, and adjustments. This is a combined wallet: historical labels do not establish a remaining purchased-versus-included spending split.
+
+Use the [credits API](/api-reference/ai/get-credits) or CLI for the available balance and balance before holds:
+
+```bash
+rig status
+rig api GET /v1/users/me/credits
+```
+
+`remaining` means available funds; `total` means balance before holds. Neither is a monthly allowance. Use the exact `remaining_micro` and `total_micro` integers for calculations: **1,000,000 microcredits = 1 credit**. Compatibility fields `free` and `free_micro` are zero; `pro` and `pro_micro` alias the available fields. They do not identify funding provenance.
+
+Older CLI versions can use historical bucket labels or round small values. The authenticated wallet projection and microcredit fields are authoritative. Do not use rounded text to authorize spending or hide a negative balance.
+
+## Reserve before forwarding
+
+Before forwarding a managed request, Rigbox atomically reserves an estimated cost in the primary wallet. Concurrent requests across workspaces cannot spend the same available funds. Missing output limits receive a compatible bound used for reservation and forwarding. Unknown pricing or unsupported bounded admission is refused before forwarding.
+
+A reservation estimates potential usage, not a quoted final price. A request can be refused because its estimate exceeds available funds even when a typical response would cost less. Lower the request's output bound, select a cheaper supported model, buy credits, or deliberately configure BYOK.
+
+When provider cost is confirmed, settlement removes the hold and records the actual debit exactly once. USD usage is converted to microcredits using `ceil(cost_usd × 100 × 1,000,000)`, preserving small nonzero charges. The pack's markup is not added again during settlement.
+
+Provider-confirmed zero usage settles to zero. A model named `free`, missing cost fields, an empty response, or a browser error is not proof of zero cost.
+
+## Interrupted or uncertain requests
+
+| Outcome | Wallet behavior |
+| --- | --- |
+| Confirmed completed usage | Settle the actual charge and remove the hold |
+| Explicit upstream rejection | Release the hold without charging that rejected request |
+| Interrupted stream, ambiguous transport failure, or incomplete usage | Keep the durable hold while the outcome is investigated |
+| Completed generation metadata recovered later | Settle once from confirmed usage |
+| Missing recoverable evidence | Retain the unresolved hold for operator review |
+
+The proxy retains bounded generation and usage metadata for reconciliation, not prompts, response content, search text, or credentials. Recovery is bounded and uses backoff; it has no promised completion deadline. A missing upstream generation identity may require operator investigation.
+
+Closing the connection or switching AI mode does not cancel a charge already incurred. Avoid automatically repeating a request after an uncertain outcome: the provider may have completed the first request, and a new request can incur another charge. Inspect Billing and your application logs first.
+
+Native Anthropic streaming follows this reservation and reconciliation contract too. Managed speech requires a supported bounded pricing model; binary response headers alone do not prove its charge. Use BYOK deliberately when the managed endpoint refuses unsupported pricing.
+
+## Debt, refunds, and disputes
+
+Confirmed usage that exceeds the reservation remains a debit. Refund or dispute adjustments can also make the balance or available funds negative. The ledger preserves that debt instead of truncating it to zero or discarding usage. New managed requests are refused when the wallet cannot fund their reservation.
+
+Refund and dispute records adjust the financial projection cumulatively and idempotently. A bank refund is not a fresh AI grant. If an adjustment or open hold looks incorrect, provide the affected operation or request identifier to support; do not assume a retry or new calendar month will clear it.
+
+Adjustment of a subscription payment can also revoke compute eligibility for the affected paid period while retaining resources. Winning a dispute can reverse its wallet adjustment cumulatively, but compute eligibility is not automatically restored: that requires operator review. Wallet funds and permission to run compute are separate projections.
+
+## Purchases and legacy renewals
+
+Credit-pack funds appear only after the purchase is verified and its durable operation is applied. A success URL alone does not confirm a grant. There is no automatic refill.
+
+At cutover, previously held funds are preserved as a non-expiring opening grant. Paid-v1 new tiers receive no included AI. Legacy Pro Managed retains a 2,000-credit grant for each uniquely verified paid subscription period. Duplicate or reordered payment events do not create duplicate grants. Failed or unfunded renewal does not create a grant; later verified payment can reconcile the eligible period once.
+
+Only eligible non-proration initial subscription or renewal periods with positive, verified provider-funded invoice evidence create that legacy grant. Zero-total or out-of-band paid labels are review-pending, not evidence of a grant.
+
+Wallet funds do not reset at the beginning of a calendar month. Unspent preserved and purchased funds remain in the wallet. Plan and mode changes do not erase them, and switching to BYOK does not release pending managed holds.
+
+## Exhausted credits
+
+Insufficient available funds produce HTTP `402` for new managed requests. Buy a pack while your paid plan is active or explicitly configure your provider endpoint and key for BYOK. Upgrading a new compute plan alone does not add credits.
+
+An AI wallet failure does not itself stop non-AI services. Separate compute entitlement, capacity, policy, or resource failures can still affect the workspace. [Resource limits](/concepts/limits) explains those prerequisites.

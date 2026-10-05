@@ -1,0 +1,69 @@
+{
+  "target": "paid-v1",
+  "status": "draft-pending-rollout",
+  "publication_authorized": false,
+  "docs_base_revision": "3900f32601cd008f4e4bf4010c78842588e24d76",
+  "primary_source": {
+    "repository": "jona62/rig-mvp",
+    "revision": "652120cb2273c0383158cdd15136542ab59b74f1",
+    "runtime_schema_source_matches_commit": true,
+    "concurrent_worktree_changes": "cfg(test)-only auth fixtures; excluded from exports",
+    "models_sha256": "e5e68fed1e36a82de29239f221f6b2d73d58b0938d9e06f1fde509fce48dd671",
+    "cargo_lock_sha256": "b090e4d587ad3dbf8c832679fe422ddd71ceb3764ee9be8fcb525b05c8232d59"
+  },
+  "api_source": {
+    "kind": "offline-gateway-print-openapi",
+    "actual_toolchain": "rustc 1.93.1 (01f6ddf75 2026-02-11)",
+    "repository_toolchain": "1.93.1",
+    "export_sha256": "f32fd24d869dc562f53257209251d6636daaa97a2e6b42e4a9a2f7af609436cf",
+    "export_bytes": 459272,
+    "selected_components": [
+      "AiCredits",
+      "EffectiveLimits",
+      "LimitsUsage",
+      "GetUserLimitsResponse"
+    ],
+    "component_bundle_sha256": "91f3230116329725c05b3b590ac8e413204b1cba3d7d3140ecebe89ad87d91ee",
+    "targets": [
+      "openapi/rigbox-api.json"
+    ],
+    "unrelated_gateway_paths_and_components_preserved": true,
+    "source_head_export_verified": true,
+    "hosted_final_CI_proof": false
+  },
+  "auth_source": {
+    "kind": "offline-pure-rig_auth-openapi-library-harness",
+    "actual_toolchain": "rustc 1.93.1 (01f6ddf75 2026-02-11)",
+    "revision": "652120cb2273c0383158cdd15136542ab59b74f1",
+    "export_sha256": "9081d4a096bae9980fe58c381e0d4cda2d017e2377dbc5909d4b86d6490d977a",
+    "export_bytes": 101784,
+    "path_count": 51,
+    "schema_count": 80,
+    "target": "openapi/auth-api.json",
+    "replacement": "Complete actual auth service export replaces historical duplicated gateway spec",
+    "billing_paths": [
+      "/api/v1/auth/billing/catalog",
+      "/api/v1/auth/billing/change",
+      "/api/v1/auth/billing/credit-packs/checkout",
+      "/api/v1/auth/billing/operations/{operation_id}",
+      "/api/v1/auth/billing/wallet/history",
+      "/api/v1/auth/create-checkout-session",
+      "/api/v1/auth/create-portal-session",
+      "/api/v1/auth/subscription-status"
+    ],
+    "responses": "Several billing handlers export generic serde_json::Value response schemas; no invented typed shapes",
+    "gateway_billing_coverage_gap": [
+      "/api/v1/auth/create-checkout-session",
+      "/api/v1/auth/create-portal-session",
+      "/api/v1/auth/subscription-status"
+    ],
+    "runtime_services_started": false,
+    "database_or_provider_connections": false
+  },
+  "pending_gates": [
+    "Final-head hosted CI export comparison if primary revision advances",
+    "Production migration/payment/replay/wallet and Linux runtime gates",
+    "Native Safari keyboard, Page Zoom and orientation verification; no available simulator runtimes",
+    "Explicit documentation publication review after rollout status confirmation"
+  ]
+}

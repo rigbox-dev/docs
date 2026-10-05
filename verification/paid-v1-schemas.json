@@ -1,0 +1,199 @@
+{
+  "components": {
+    "schemas": {
+      "AiCredits": {
+        "type": "object",
+        "required": [
+          "remaining",
+          "total",
+          "remaining_micro",
+          "total_micro",
+          "free",
+          "pro",
+          "free_micro",
+          "pro_micro",
+          "mode"
+        ],
+        "properties": {
+          "free": {
+            "type": "number",
+            "format": "double",
+            "description": "Deprecated compatibility field; always zero. Preserved legacy balances\nbelong to the canonical wallet and are not reset or expired here."
+          },
+          "free_micro": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Deprecated compatibility field; always zero."
+          },
+          "mode": {
+            "type": "string"
+          },
+          "pro": {
+            "type": "number",
+            "format": "double",
+            "description": "Deprecated compatibility alias of `remaining`; this is not a separate\npurchased or included credit bucket."
+          },
+          "pro_micro": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Deprecated compatibility alias of `remaining_micro`."
+          },
+          "remaining": {
+            "type": "number",
+            "format": "double",
+            "description": "Available managed credits: canonical wallet balance minus outstanding\nrequest holds. May be negative after a refund or dispute. New plans have\nno automatic AI credit grant."
+          },
+          "remaining_micro": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Exact available wallet credits in microcredits: 1,000,000 per credit."
+          },
+          "total": {
+            "type": "number",
+            "format": "double",
+            "description": "Canonical wallet balance before outstanding holds. Includes preserved\nopening balances, purchased credit packs and verified legacy paid-period\ngrants. This is not a monthly allowance and has no calendar reset."
+          },
+          "total_micro": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Exact wallet balance before holds in microcredits: 1,000,000 per credit."
+          }
+        }
+      },
+      "EffectiveLimits": {
+        "type": "object",
+        "required": [
+          "max_vms",
+          "max_ram_per_vm_mb",
+          "max_ram_total_mb",
+          "max_disk_total_mb",
+          "max_vcpu_per_vm",
+          "max_running_vcpus",
+          "sustained_cpu_millis"
+        ],
+        "properties": {
+          "max_disk_total_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "max_ram_per_vm_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "max_ram_total_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "max_running_vcpus": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "max_vcpu_per_vm": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "max_vms": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "sustained_cpu_millis": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "LimitsUsage": {
+        "type": "object",
+        "required": [
+          "workspace_count",
+          "running_vcpus",
+          "total_disk_mb",
+          "total_ram_mb",
+          "running_cpu_millis"
+        ],
+        "properties": {
+          "running_cpu_millis": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "running_vcpus": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "total_disk_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "total_ram_mb": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "workspace_count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "GetUserLimitsResponse": {
+        "type": "object",
+        "required": [
+          "plan",
+          "custom",
+          "limits",
+          "usage",
+          "compute_allowed",
+          "entitlement_status",
+          "billing_revision"
+        ],
+        "properties": {
+          "billing_paid_through": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "billing_revision": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "compute_allowed": {
+            "type": "boolean"
+          },
+          "custom": {
+            "type": "boolean"
+          },
+          "entitlement_status": {
+            "type": "string"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/EffectiveLimits"
+          },
+          "plan": {
+            "type": "string"
+          },
+          "pricing_transition_until": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "usage": {
+            "$ref": "#/components/schemas/LimitsUsage"
+          }
+        }
+      }
+    }
+  }
+}

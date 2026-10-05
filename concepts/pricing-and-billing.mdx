@@ -1,0 +1,80 @@
+---
+title: Pricing and billing
+description: Upcoming paid-v1 plans, account allowances, optional AI credits, and subscription changes.
+---
+
+<Warning>
+This page describes the upcoming **paid-v1** rollout. It is draft documentation, not confirmation that these prices or controls are live. Use the catalog and confirmed allowance shown in your account's Billing page. Publication requires the release checks in [paid-v1 verification](/verification/paid-pricing).
+</Warning>
+
+## Paid compute plans
+
+New accounts will need a paid subscription before creating or starting compute. Paid-v1 removes the new-account free trial. All prices below are monthly, in USD.
+
+| Plan | Subscription | Account RAM | Sustained account CPU | Retained account storage | Stored workspace slots |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Starter | $5 | 1 GiB | 0.5 core | 10 GiB | 1 |
+| Developer | $15 | 4 GiB | 1 core | 30 GiB | 2 |
+| Pro | $25 | 8 GiB | 2 cores | 60 GiB | 4 |
+
+These are account ceilings on shared hosts. Every workspace has an isolated kernel and filesystem, but the subscription does not reserve dedicated physical capacity. Creation, start, build, and expansion require available fleet capacity as well as account allowance. See [resource limits](/concepts/limits) for what counts.
+
+An app's template or recipe may require more RAM or disk than Starter provides. Review those minimums before choosing a plan. A higher guest vCPU count does not raise the account's sustained CPU budget.
+
+## Recurring add-ons
+
+| Add-on | Monthly price | Added account allowance |
+| --- | ---: | --- |
+| Storage | $4 | 25 GiB retained storage |
+| RAM | $3 | 1 GiB allocated RAM |
+| Workspace slot | $1 | 1 stored workspace |
+
+Add-ons require a paid base subscription. Extra slots or RAM do not add CPU. An add-on increases an account ceiling; it does not provision a disk, start a workspace, or guarantee space on a full host.
+
+Retained storage includes workspace root disks, volumes, snapshots, and owned custom images, including those belonging to stopped workspaces. Stopping a workspace releases its running compute allocation but retains its RAM configuration, storage commitment, and workspace slot. Shrinking a root filesystem is not supported. Review your retained resources before requesting a reduction.
+
+Image builders temporarily reserve additional RAM and disk until process exit and cleanup are confirmed. Leave room for builds as well as stored workspaces; buying a larger ceiling still requires available node capacity.
+
+## Optional managed AI
+
+Starter, Developer, and Pro include **no AI credits**. You can use [BYOK](/guides/byok), or buy a managed credit pack separately while your paid subscription is active.
+
+**$13 buys 1,000 managed credits**, representing approximately **$10 of upstream provider usage**. The $3 difference is the managed service charge: a 30% markup on upstream usage. One credit represents approximately $0.01 of upstream usage; the pack price carries the markup, so settlement does not add it again. Model, routing, and token usage determine actual consumption.
+
+Packs are one-time purchases, not an automatic refill or monthly AI allowance. Changing compute plans does not create an AI grant. Purchased balances and preserved opening balances have no calendar reset or scheduled expiry under paid-v1. [Managed wallet](/ai/managed-wallet) explains holds, charges, adjustments, and remaining funds.
+
+BYOK requests use your provider account and its billing, quotas, rate limits, and available balance. Rigbox compute still requires its own paid entitlement; BYOK does not make compute free.
+
+## Existing accounts
+
+Eligible existing accounts receive a **30-day transition from the durable rollout timestamp**. Billing shows your actual deadline. Account creation does not begin a new trial, and this draft page does not start the transition clock.
+
+Previously held AI balances become a non-expiring opening grant. Existing paid subscriptions retain their legacy subscription and resource allowance until the customer explicitly changes plan. Legacy Pro Managed receives **2,000 credits for each uniquely verified paid subscription period**; there is no additional recurring 250-credit free grant or calendar reset. A subscription status label or month boundary alone does not prove a funded renewal.
+
+Eligible grants come from non-proration initial subscription or renewal periods with positive, verified provider-funded invoice evidence. Zero-total or out-of-band paid labels remain subject to financial review and do not automatically create grants.
+
+Choose a paid plan before your transition deadline to retain paid compute access. When entitlement expires, compute can stop and new compute actions are refused. The pricing transition does not delete your retained disks or volumes. Normal retention, account deletion, and enforcement rules still apply.
+
+## Subscribe or change your allowance
+
+Open Billing to inspect your confirmed plan, add-ons, paid-through date, transition deadline, pending changes, wallet, and recent financial activity.
+
+1. Choose a plan or edit the add-ons loaded from your confirmed subscription.
+2. Review the displayed price and resulting account allowance.
+3. Complete any required payment.
+4. Wait until Billing confirms the operation and the account's new allowance.
+5. Return to your workspace and explicitly retry the desired action.
+
+A checkout redirect, browser success message, or pending invoice does not grant access, extra quota, or credits. Upgrades remain pending until payment is verified. Reductions must fit retained allocations; release resources yourself or choose a sufficient allowance. Do not assume a successful checkout also started or resized a workspace.
+
+An already running workspace can retain an earlier CPU ceiling until an explicit restart. A plan change does not silently restart it, move it to another node, or change its configured RAM and disk.
+
+Use the billing portal to manage payment methods, invoices, or cancellation. Capacity-sensitive plan and add-on changes use Rigbox's Billing flow. Cancellation is scheduled for period end, with the confirmed paid-through date shown in Billing. Renewal failure can prevent an extension of paid access; resolve payment and check the confirmed projection rather than relying on the next calendar month.
+
+## Integration and retry behavior
+
+Paid-v1 billing writes use a UUID `operation_id`. Retry an ambiguous request with the **same ID and same intended purchase**; a different ID represents another operation. Inspect the authenticated operation status rather than inferring completion from return parameters. Financial operations may be `creating`, `pending_payment`, `pending_period_end`, `applied`, `expired`, or `failed`.
+
+Catalog, subscription status, wallet history, and operation status are account-scoped authenticated reads. Workspace bridge identity is not an account billing credential. The draft [billing API reference](/api-reference/billing/catalog) uses the actual auth-service export at the recorded source revision; several response schemas are still generic JSON objects. Use the confirmed response rather than inventing missing types, and review [verification](/verification/paid-pricing) before relying on rollout availability.
+
+If account permissions, payment state, or capacity cannot be verified, the app explains the missing prerequisite. Refresh or complete payment, then choose to retry. Billing refresh does not start inactive workspaces, create missing apps, queue the original action, or silently change customer resources.

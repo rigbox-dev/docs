@@ -1,0 +1,13 @@
+---
+title: Subscription status
+openapi: "/openapi/auth-api.json GET /api/v1/auth/subscription-status"
+description: "Upcoming paid-v1 account billing operation, pending rollout."
+---
+
+<Warning>
+This is a draft paid-v1 reference generated from the auth service at the recorded source revision. It does not confirm live rollout. See [pricing and billing](/concepts/pricing-and-billing) and [source verification](/verification/paid-pricing).
+</Warning>
+
+Read the confirmed plan, paid-through deadline, transition deadline, pending change, add-ons, and wallet projection. A pending plan or browser checkout success does not increase confirmed quota. Compute authorization comes from the limits projection, not a status label alone. The generated response schema is generic JSON.
+
+Account billing requires an authenticated account identity with appropriate billing permissions. Workspace bridge identity is not an account billing credential. See [managed wallet](/ai/managed-wallet) for the financial contract.
