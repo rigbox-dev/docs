@@ -26,7 +26,13 @@ A persistent volume survives **app redeploys**, **app restarts**, and **stop→s
 
 The canonical path is to declare durable disks once under `workspace.volumes`, then opt each app into the mount with `volumes: [data]`. Only apps that reference a volume receive the mount.
 
-A deploy doesn't create volumes. A workspace that has no volumes gets a 1024 MiB `data` volume at `/home/developer/data` when it first boots. Any other volume has to exist before you deploy an app that uses it, because volumes attach when the workspace boots: stop the workspace, create the volume with [`rig volume create`](#manage-volumes-with-the-cli), then start it and deploy. A deploy that references a volume the workspace doesn't have is refused with the volume's name.
+`rig deploy` creates the volumes `rig.yaml` declares. Volumes attach when a workspace boots, so when they're created depends on the workspace:
+
+- **A workspace the deploy creates** gets the declared volumes before it first starts. A declared `data` volume replaces the default one, so its size and path are the ones you wrote.
+- **An existing workspace that isn't running** gets any missing volume straight away.
+- **An existing workspace that is running** has to stop and start again to attach a new volume, which restarts its apps. The deploy refuses until you pass `--add-volumes` to allow that.
+
+A declared volume at a different mount path from the workspace's volume of that name is refused, because mounted volumes can't move. If only the size differs, app releases use the volume as it is, while image deploys refuse until the sizes match. Volumes only grow, with [`rig volume resize`](#manage-volumes-with-the-cli).
 
 ```yaml
 name: markdown-notes
