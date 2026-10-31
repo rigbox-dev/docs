@@ -24,7 +24,9 @@ A persistent volume survives **app redeploys**, **app restarts**, and **stop→s
 
 ## Declare a volume in rig.yaml
 
-The canonical path is to declare durable disks once under `workspace.volumes`, then opt each app into the mount with `volumes: [data]`. The volume is created or reattached on deploy, and only apps that reference it receive the mount.
+The canonical path is to declare durable disks once under `workspace.volumes`, then opt each app into the mount with `volumes: [data]`. Only apps that reference a volume receive the mount.
+
+A deploy doesn't create volumes. A workspace that has no volumes gets a 1024 MiB `data` volume at `/home/developer/data` when it first boots. Any other volume has to exist before you deploy an app that uses it, because volumes attach when the workspace boots: stop the workspace, create the volume with [`rig volume create`](#manage-volumes-with-the-cli), then start it and deploy. A deploy that references a volume the workspace doesn't have is refused with the volume's name.
 
 ```yaml
 name: markdown-notes
@@ -70,6 +72,12 @@ apps:
     dependsOn: [api]
     visibility: public
 ```
+
+## Each app gets its own directory
+
+A volume is shared by name, not by contents. Each app that references it sees its own private directory at the mount path, owned by that app's user. On the volume that directory is `<mountPath>/.rigbox-apps/<app id>`, which is where you'll find it over SSH. Two apps that both list `volumes: [data]` don't see each other's files.
+
+To share data between apps, let one app own it and have the others reach that app on its port inside the workspace, as described in [dependencies and service discovery](/deploy/dependencies). A database app that keeps its files on the volume and accepts connections from the other apps is the usual shape.
 
 App references can be written as `volumes: [data]` or `volumes: [{ name: data }]`. App-local full specs are still supported for single-app or one-off cases:
 
