@@ -3,11 +3,13 @@ title: Managed AI Proxy
 description: Use optional managed AI credits without placing provider API keys in your workspace.
 ---
 
+import PaidPricingStatus from '/snippets/paid-pricing.mdx';
+
 The managed AI proxy lets your workspace code call supported AI providers without putting provider API keys in the VM. Rigbox holds managed provider keys on your behalf, injects them at request time, and tracks usage against your credit balance.
 
-<Warning>
-The financial rules on this page describe upcoming **paid-v1**, pending rollout. New paid plans include no AI credits. See [pricing and billing](/concepts/pricing-and-billing) and the [managed wallet](/ai/managed-wallet) for purchases, holds, legacy balances, and verified renewals. Check your account's current Billing state before relying on rollout-specific behavior.
-</Warning>
+<PaidPricingStatus />
+
+Paid plans include no AI credits. See [pricing and billing](/concepts/pricing-and-billing) and the [managed wallet](/ai/managed-wallet) for purchases, holds, legacy balances, and verified renewals.
 
 ## Before you begin
 
@@ -41,7 +43,7 @@ The proxy speaks two HTTP shapes — OpenAI-compatible (used by most SDKs and to
 | `http://172.16.0.1:9090/v1/chat/completions` | OpenAI | Default route for everything OpenAI-compatible. Pick the upstream model with the `model` field (`anthropic/...`, `openai/...`, `google/...`, etc.). |
 | `http://172.16.0.1:9090/v1/embeddings` | OpenAI | Embedding models. |
 | `http://172.16.0.1:9090/v1/models` | OpenAI | List models available to your account. |
-| `http://172.16.0.1:9090/v1/messages` | Anthropic | Native Anthropic Messages-API passthrough used by Claude Code. Anthropic clients reach it with the proxy root as their base URL. Paid-v1 streams reserve funds and settle confirmed completed usage; interrupted or uncertain usage retains a durable hold for reconciliation. |
+| `http://172.16.0.1:9090/v1/messages` | Anthropic | Native Anthropic Messages-API passthrough used by Claude Code. Anthropic clients reach it with the proxy root as their base URL. Streams reserve funds and settle confirmed completed usage; interrupted or uncertain usage retains a durable hold for reconciliation. |
 | `http://172.16.0.1:9090/rig/v1/usage` | Rigbox | Per-subject AI spend over a rolling window. See [Per-subject cost and budgets](#per-subject-cost-and-budgets). |
 | `http://172.16.0.1:9090/brave` | Brave Search | Web Search API when configured for your environment. |
 

@@ -48,32 +48,35 @@ Do not add top-level `openapi` to `docs.json`: Mintlify 4.2.375's file categoriz
 
 The existing `sync-openapi.yml` workflow updates production specs. Review its output against the targeted release before incorporating it into the docs; newly split specifications also need deliberate refresh and coverage review. Contract changes belong in the server source, not hand edits to documentation schemas.
 
-## Paid-v1 draft
+## Paid pricing pages
 
-Paid-v1 pricing, pooling, and wallet pages are upcoming documentation, with rollout
-status in `verification/paid-pricing.mdx` and source provenance in
-`verification/paid-pricing.json`. This draft is not publication or production
-rollout evidence. Historical v0.13 verification remains unchanged.
+The pricing, limits, managed wallet and billing reference pages describe paid plans
+in the present tense. Whether paid pricing is live is decided in one place:
+`snippets/paid-pricing.mdx`, which every one of those pages imports and shows as
+`<PaidPricingStatus />`. It holds a comment and one `<Warning>` line, the rollout
+banner. **Going live is a one-line change: delete that `<Warning>` line.** No other
+page text needs to change. Keep the banner on one line, and don't wrap it in a
+condition: Mintlify 4.2.375 doesn't render an expression that contains a component
+inside an imported snippet, so `{live && <Warning>…}` silently shows nothing.
 
-`verification/paid-v1-schemas.json` contains selected server-export components,
-not hand-authored contracts. `scripts/sync-paid-schemas.py` copies only those
-wallet and limits components into the existing gateway spec, preserving unrelated
-paths and schemas. The auth spec is the complete pure auth-service library export,
-verified against its recorded SHA256. Verify with `--check`. To compare a later
-gateway export:
+`verification/paid-v1-schemas.json` holds the wallet and limits components copied
+from a gateway export, and `scripts/sync-paid-schemas.py` copies only those into
+`openapi/rigbox-api.json`, preserving unrelated gateway paths and schemas.
+`openapi/auth-api.json` is the complete auth-service export, checked against the
+SHA-256 recorded in `verification/paid-pricing.json`. Verify with `--check`.
+
+To refresh both from a rig-mvp revision, using its pinned toolchain (`rust-toolchain`):
 
 ```bash
-python3 scripts/sync-paid-schemas.py --source /path/to/final-openapi.json --check
+# in rig-mvp/server; the example is a two-line harness around rig_auth::openapi(),
+# not committed there
+cargo run -p rig-gateway -- --print-openapi > /tmp/gateway.json
+cargo run -p rig-auth --example print_openapi > /tmp/auth-api.json
 ```
 
-Both current exports use exact Rust 1.93.1 at primary revision
-`652120cb2273c0383158cdd15136542ab59b74f1`. The gateway has an offline
-`--print-openapi` branch; the auth export uses its pure `rig_auth::openapi()`
-library function without invoking auth-service startup. If the primary head
-changes, regenerate both sources, replace the recorded bundle/auth export and
-provenance, and revalidate against final hosted CI before publishing. Several
-billing responses remain generic JSON schemas in the server source. A production sync from older
-binaries can reintroduce obsolete monthly wallet promises: run the paid-schema
-check and review the sync diff before accepting it. Do not mark paid-v1 current
-until the deployed catalog, migration, financial and Linux runtime release gates
-are confirmed.
+Then copy the four components into `verification/paid-v1-schemas.json`, replace
+`openapi/auth-api.json`, update the revision and hashes in
+`verification/paid-pricing.json`, and run `python3 scripts/sync-paid-schemas.py`.
+Several billing responses are generic JSON objects in the server source; don't
+invent typed shapes for them. A production sync from older binaries can bring back
+obsolete monthly-wallet wording: run the paid-schema check and review the diff.

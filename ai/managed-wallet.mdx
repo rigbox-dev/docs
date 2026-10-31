@@ -1,13 +1,13 @@
 ---
 title: Managed AI wallet
-description: Upcoming paid-v1 balance, durable reservations, exact charges, and verified renewal behavior.
+description: Managed AI wallet balance, durable reservations, exact charges, and verified renewal behavior.
 ---
 
-<Warning>
-This is the upcoming **paid-v1** wallet contract, pending rollout and final API synchronization. Check [pricing and billing](/concepts/pricing-and-billing) and your account's confirmed Billing state before purchasing or integrating.
-</Warning>
+import PaidPricingStatus from '/snippets/paid-pricing.mdx';
 
-Managed AI uses an account wallet shared by your workspaces. New paid compute tiers include no AI grant. **1,000 credits represent approximately $10 of upstream usage.** An active paid subscriber may buy those credits as a **$13 pack**, whose price includes a 30% managed service markup on that upstream usage. [BYOK](/guides/byok) uses separate provider billing.
+<PaidPricingStatus />
+
+Managed AI uses an account wallet shared by your workspaces. Paid compute plans include no AI credits. **1,000 credits represent approximately $10 of upstream usage.** An active paid subscriber may buy those credits as a **$13 pack**, whose price includes a 30% managed service markup on that upstream usage. [BYOK](/guides/byok) uses separate provider billing.
 
 ## Read the wallet
 
@@ -70,7 +70,7 @@ Adjustment of a subscription payment can also revoke compute eligibility for the
 
 Credit-pack funds appear only after the purchase is verified and its durable operation is applied. A success URL alone does not confirm a grant. There is no automatic refill.
 
-At cutover, previously held funds are preserved as a non-expiring opening grant. Paid-v1 new tiers receive no included AI. Legacy Pro Managed retains a 2,000-credit grant for each uniquely verified paid subscription period. Duplicate or reordered payment events do not create duplicate grants. Failed or unfunded renewal does not create a grant; later verified payment can reconcile the eligible period once.
+At cutover, previously held funds are preserved as a non-expiring opening grant. Paid plans include no AI credits. Legacy Pro Managed retains a 2,000-credit grant for each uniquely verified paid subscription period. Duplicate or reordered payment events do not create duplicate grants. Failed or unfunded renewal does not create a grant; later verified payment can reconcile the eligible period once.
 
 Only eligible non-proration initial subscription or renewal periods with positive, verified provider-funded invoice evidence create that legacy grant. Zero-total or out-of-band paid labels are review-pending, not evidence of a grant.
 

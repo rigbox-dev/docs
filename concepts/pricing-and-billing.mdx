@@ -1,15 +1,15 @@
 ---
 title: Pricing and billing
-description: Upcoming paid-v1 plans, account allowances, optional AI credits, and subscription changes.
+description: Paid plans, account allowances, optional AI credits, and subscription changes.
 ---
 
-<Warning>
-This page describes the upcoming **paid-v1** rollout. It is draft documentation, not confirmation that these prices or controls are live. Use the catalog and confirmed allowance shown in your account's Billing page. Publication requires the release checks in [paid-v1 verification](/verification/paid-pricing).
-</Warning>
+import PaidPricingStatus from '/snippets/paid-pricing.mdx';
+
+<PaidPricingStatus />
 
 ## Paid compute plans
 
-New accounts will need a paid subscription before creating or starting compute. Paid-v1 removes the new-account free trial. All prices below are monthly, in USD.
+A new account needs a paid subscription before it can create or start compute; there is no free trial. All prices below are monthly, in USD.
 
 | Plan | Subscription | Account RAM | Sustained account CPU | Retained account storage | Stored workspace slots |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -41,13 +41,13 @@ Starter, Developer, and Pro include **no AI credits**. You can use [BYOK](/guide
 
 **$13 buys 1,000 managed credits**, representing approximately **$10 of upstream provider usage**. The $3 difference is the managed service charge: a 30% markup on upstream usage. One credit represents approximately $0.01 of upstream usage; the pack price carries the markup, so settlement does not add it again. Model, routing, and token usage determine actual consumption.
 
-Packs are one-time purchases, not an automatic refill or monthly AI allowance. Changing compute plans does not create an AI grant. Purchased balances and preserved opening balances have no calendar reset or scheduled expiry under paid-v1. [Managed wallet](/ai/managed-wallet) explains holds, charges, adjustments, and remaining funds.
+Packs are one-time purchases, not an automatic refill or monthly AI allowance. Changing compute plans does not create an AI grant. Purchased balances and preserved opening balances have no calendar reset or scheduled expiry. [Managed wallet](/ai/managed-wallet) explains holds, charges, adjustments, and remaining funds.
 
 BYOK requests use your provider account and its billing, quotas, rate limits, and available balance. Rigbox compute still requires its own paid entitlement; BYOK does not make compute free.
 
 ## Existing accounts
 
-Eligible existing accounts receive a **30-day transition from the durable rollout timestamp**. Billing shows your actual deadline. Account creation does not begin a new trial, and this draft page does not start the transition clock.
+Accounts that existed before paid plans launched keep their access until **25 November 2026 at 08:01 UTC**, 30 days after the rollout. Billing, `rig limits` and `rig whoami` show your own deadline. A new account gets neither a transition nor a trial.
 
 Previously held AI balances become a non-expiring opening grant. Existing paid subscriptions retain their legacy subscription and resource allowance until the customer explicitly changes plan. Legacy Pro Managed receives **2,000 credits for each uniquely verified paid subscription period**; there is no additional recurring 250-credit free grant or calendar reset. A subscription status label or month boundary alone does not prove a funded renewal.
 
@@ -71,10 +71,18 @@ An already running workspace can retain an earlier CPU ceiling until an explicit
 
 Use the billing portal to manage payment methods, invoices, or cancellation. Capacity-sensitive plan and add-on changes use Rigbox's Billing flow. Cancellation is scheduled for period end, with the confirmed paid-through date shown in Billing. Renewal failure can prevent an extension of paid access; resolve payment and check the confirmed projection rather than relying on the next calendar month.
 
+## From the CLI
+
+`rig limits` and `rig whoami` show a **Billing** block in human and `--output json` output: your plan, whether compute is allowed, the paid-through and transition dates, the subscription with its add-ons and any pending change, the managed wallet, and a link to Billing. Any command the platform refuses for payment (`402`) says what went over and links to [Billing settings](https://rigbox.dev/settings/billing), keeping the `payment_required` error code. These need a CLI newer than 0.13.2.
+
+Subscribing, changing a plan or add-on, buying credits and opening the billing portal happen in the console. The CLI doesn't change billing.
+
 ## Integration and retry behavior
 
-Paid-v1 billing writes use a UUID `operation_id`. Retry an ambiguous request with the **same ID and same intended purchase**; a different ID represents another operation. Inspect the authenticated operation status rather than inferring completion from return parameters. Financial operations may be `creating`, `pending_payment`, `pending_period_end`, `applied`, `expired`, or `failed`.
+Billing writes (checkout, the billing portal, plan and add-on changes, and credit-pack checkout) are **console-only**: they need a signed-in console session, and an API key gets `404` from them. Account billing reads stay API-key readable: the catalog, subscription status, operation status and wallet history.
 
-Catalog, subscription status, wallet history, and operation status are account-scoped authenticated reads. Workspace bridge identity is not an account billing credential. The draft [billing API reference](/api-reference/billing/catalog) uses the actual auth-service export at the recorded source revision; several response schemas are still generic JSON objects. Use the confirmed response rather than inventing missing types, and review [verification](/verification/paid-pricing) before relying on rollout availability.
+Billing writes use a UUID `operation_id`. Retry an ambiguous request with the **same ID and same intended purchase**; a different ID represents another operation. Inspect the authenticated operation status rather than inferring completion from return parameters. Financial operations may be `creating`, `pending_payment`, `pending_period_end`, `applied`, `expired`, or `failed`.
+
+Catalog, subscription status, wallet history, and operation status are account-scoped authenticated reads. Workspace bridge identity is not an account billing credential. The [billing API reference](/api-reference/billing/catalog) is generated from the auth service ([source provenance](/verification/paid-pricing)); several response schemas are generic JSON objects, so rely on the fields a response actually carries.
 
 If account permissions, payment state, or capacity cannot be verified, the app explains the missing prerequisite. Refresh or complete payment, then choose to retry. Billing refresh does not start inactive workspaces, create missing apps, queue the original action, or silently change customer resources.

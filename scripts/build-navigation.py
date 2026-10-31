@@ -49,7 +49,7 @@ area('Build on Rigbox',[
  group('Platform',['concepts/architecture','concepts/security','verification/paid-pricing']),
  group('First-party integrations',['sandbox-api-surface','clawd-api-surface','clawd-runtime-services'])])]
 api_groups=[group('Start',['api-reference/overview']),group('Access',[api['API Keys'],api['Access Control']]),group('Workspaces',[api['Workspaces'],api['Workspace Services'],api['SSH Keys']]),group('Applications and releases',[api['Apps'],api['App Logs'],group('App releases',[f'api-reference/app-releases/{x}' for x in ['list','create','get','activate','logs']]),api['Local tunnels']]),group('Storage',[api['Snapshots']]),group('AI and tools',[api['AI'],api['Managed Proxy'],api['Tools']]),group('Registry',[api['App Catalog'],api['Templates'],api['Setup Scripts'],api['Service Specs']]),group('Account and platform',[api['User Settings'],api['Roadmap'],api['System']])]
-api_groups[-1]['pages'].insert(0,group('Billing',[f'api-reference/billing/{name}' for name in ['catalog','subscription-status','create-checkout','change','credit-pack-checkout','wallet-history','operation-status','create-portal']]))
+api_groups[-1]['pages'].insert(0,group('Billing',[f'api-reference/billing/{name}' for name in ['catalog','subscription-status','create-checkout','change','cancel-scheduled','credit-pack-checkout','wallet-history','operation-status','create-portal']]))
 extra=Path('scripts/deployment-api-navigation.json')
 if extra.exists():
  for name,pages in json.loads(extra.read_text())['groups'].items():

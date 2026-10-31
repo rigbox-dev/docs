@@ -3,15 +3,15 @@ title: Resource Limits & Quotas
 description: Account-pooled resource ceilings, paid compute prerequisites, optional AI credits, and capacity.
 ---
 
+import PaidPricingStatus from '/snippets/paid-pricing.mdx';
+
 Every Rigbox account has resource ceilings. Managed AI uses a separate wallet, rather than being a resource allowance included in every compute plan.
 
-<Warning>
-The account-pooling and payment rules below describe the upcoming **paid-v1** rollout. They are not confirmation of live activation. Check your account's current reported allowance and [pricing and billing](/concepts/pricing-and-billing).
-</Warning>
+<PaidPricingStatus />
 
 ## Plan tiers
 
-Starter, Developer, and Pro offer account-pooled RAM, sustained CPU, retained storage, and stored workspace slots. See [the plan and add-on table](/concepts/pricing-and-billing#paid-compute-plans) for upcoming prices. Legacy subscriptions and explicit account configurations can have different allowances; the authenticated limits response is authoritative.
+Starter, Developer, and Pro offer account-pooled RAM, sustained CPU, retained storage, and stored workspace slots. See [the plan and add-on table](/concepts/pricing-and-billing#paid-compute-plans) for prices. Legacy subscriptions and explicit account configurations can have different allowances; the authenticated limits response is authoritative.
 
 | Resource | What consumes the account allowance |
 | --- | --- |
@@ -34,9 +34,9 @@ Show your current plan limits and usage:
 rig limits
 ```
 
-The output includes maximum allowance and current usage. A current CLI may still display compatibility vCPU fields; inspect the JSON response for the sustained account budget and entitlement projection.
+The output includes maximum allowance and current usage, and, from a CLI newer than 0.13.2, a **Billing** block with your plan, transition date, subscription and wallet. `rig limits --output json` carries the same as a `billing` object.
 
-Under paid-v1, the limits API additionally reports `compute_allowed`, `entitlement_status`, `pricing_transition_until`, `billing_paid_through`, and `billing_revision`. CPU fields are `limits.sustained_cpu_millis` and `usage.running_cpu_millis`; 1,000 millicores represent one core of sustained CPU time. A plan label alone is not permission to allocate resources.
+The limits API also reports `compute_allowed`, `entitlement_status`, `pricing_transition_until`, `billing_paid_through`, and `billing_revision`. CPU fields are `limits.sustained_cpu_millis` and `usage.running_cpu_millis`; 1,000 millicores represent one core of sustained CPU time. A plan label alone is not permission to allocate resources.
 
 See [Get User Limits](/api-reference/ai/get-limits) for the full response schema.
 
@@ -71,7 +71,7 @@ Root disk shrinking is refused; metadata alone cannot prove a smaller filesystem
 
 ## AI credits
 
-AI credits fund requests through the [managed AI proxy](/guides/managed-proxy). New paid-v1 tiers include no AI grant. An optional $13 pack buys 1,000 credits, approximately $10 of upstream usage with a 30% managed service markup. One credit represents approximately $0.01 of upstream usage; the pack carries the markup, not an extra charge at settlement.
+AI credits fund requests through the [managed AI proxy](/guides/managed-proxy). Paid plans include no AI credits. An optional $13 pack buys 1,000 credits, approximately $10 of upstream usage with a 30% managed service markup. One credit represents approximately $0.01 of upstream usage; the pack carries the markup, not an extra charge at settlement.
 
 ### Check your balance
 

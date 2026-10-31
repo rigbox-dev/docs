@@ -455,6 +455,7 @@
                   "api-reference/billing/subscription-status",
                   "api-reference/billing/create-checkout",
                   "api-reference/billing/change",
+                  "api-reference/billing/cancel-scheduled",
                   "api-reference/billing/credit-pack-checkout",
                   "api-reference/billing/wallet-history",
                   "api-reference/billing/operation-status",
