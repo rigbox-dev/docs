@@ -38,7 +38,11 @@ docs/
 web/.data/
 ```
 
-Run `rig deploy -v` to list what each app left out and why. Workspace image deployments (`reproducible: true`) sync code with their own exclude list and don't read `.rigignore`.
+A `!pattern` in a `.rigignore` undoes a pattern from a `.rigignore` further up. It can't bring back what `.gitignore` or the list above leaves out.
+
+Run `rig deploy -v` to list what each app left out and why.
+
+Workspace image deployments (`reproducible: true`) follow the same `.gitignore` and `.rigignore` rules when they sync local code to the workspace, except that the credential files in the first item above sync unless `.gitignore` or `.rigignore` lists them. A path left out locally is also left alone on the workspace, so a git-ignored data directory there is neither overwritten nor deleted. An image built from a Git source drops the committed files its committed `.rigignore` files list.
 
 If the API answers an upload or a status check with a temporary error (502, 503 or 504), or a connection drops, the CLI retries it a few times. If an upload still fails, nothing has been released or activated and the files already uploaded are kept, so running `rig deploy` again is safe and uploads only what is still missing.
 
