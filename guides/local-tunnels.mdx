@@ -191,17 +191,22 @@ configuration rather than disabling host checks globally.
 
 Requests carrying `Origin` must name the exact HTTPS tunnel origin. Cross-origin
 browser API calls and embedding are rejected even in Public mode; setting CORS
-headers on the local app does not bypass the tunnel boundary. Public native HTTP
-requires exactly one explicit intent header and no Origin or Fetch Metadata headers:
+headers on the local app does not bypass the tunnel boundary.
+
+Public tunnels accept webhooks and API clients directly. A request with no
+`Origin` and no Fetch Metadata (`Sec-Fetch-*`) headers goes straight to the
+local app, without the browser check:
 
 ```bash
-curl -H 'X-Rigbox-Tunnel-Client: native' "$TUNNEL_URL/healthz"
+curl "$TUNNEL_URL/healthz"
+curl -X POST -H 'Content-Type: application/json' -d '{"event":"test"}' "$TUNNEL_URL/webhook"
 ```
 
-This header is removed before forwarding. It does not authenticate the caller;
-Public mode still permits anonymous access. Webhook providers that cannot set
-the header are unsupported. Application WebSockets require the exact tunnel
-origin and a completed browser boundary check; native WebSockets are unsupported.
+Public mode permits anonymous access, so verify webhook signatures in your app.
+Private and invited tunnels accept only signed-in browsers. The older
+`X-Rigbox-Tunnel-Client: native` header is still accepted and is removed before
+forwarding. Application WebSockets require the exact tunnel origin and a
+completed browser boundary check; native WebSockets are unsupported.
 Service workers, PWAs, and Web Workers are unsupported.
 
 The connector permits 16 concurrent flows with shared bandwidth of approximately
