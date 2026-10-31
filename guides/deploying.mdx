@@ -21,6 +21,29 @@ rig deploy --name my-project
 
 The CLI prepares a release, installs/builds its code, activates it, and checks affected apps. Keep `.rig.lock` so later deployments retain project identity and workspace bindings.
 
+### What the release uploads
+
+An incremental release uploads each app's source directory as it is on disk, skipping files the workspace already holds. It leaves out:
+
+- credentials such as `.env`, `.env.*`, `.npmrc` and `.netrc`, dependency and build output such as `node_modules`, `.venv`, `target` and `dist`, and VCS metadata;
+- whatever `.gitignore` ignores. In a git work tree git decides, so a file you have committed still ships. Outside one, for example in a `git archive` export, the `.gitignore` files are read directly;
+- whatever a `.rigignore` lists.
+
+A `.rigignore` uses `.gitignore` syntax and applies to its own directory and everything below it, so one at the project root covers every app. Unlike `.gitignore`, it also leaves out files you have committed:
+
+```gitignore .rigignore
+# Committed, but not needed at runtime
+docs/
+**/*.test.ts
+web/.data/
+```
+
+Run `rig deploy -v` to list what each app left out and why. Workspace image deployments (`reproducible: true`) sync code with their own exclude list and don't read `.rigignore`.
+
+If the API answers an upload or a status check with a temporary error (502, 503 or 504), or a connection drops, the CLI retries it a few times. If an upload still fails, nothing has been released or activated and the files already uploaded are kept, so running `rig deploy` again is safe and uploads only what is still missing.
+
+<Note>`.rigignore`, the `-v` list of left-out files, and these retries need a CLI newer than 0.13.2. Earlier versions already skip git-ignored files inside a work tree.</Note>
+
 ## 3. Check the result
 
 ```bash
