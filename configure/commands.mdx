@@ -23,6 +23,16 @@ Put environment assignments in `env`. The incremental runtime executes its start
 
 Incremental releases run in managed release directories. Use relative application paths and remove `workingDirectory`; that field is rejected for incremental deployment. Write mutable data to an explicit [volume](/guides/persistent-volumes), outside the managed code directory.
 
+## How app commands run
+
+Incremental deployment runs each app's `install`, `build`, `configure` and `start` commands under the same restrictions. Each of these has cost a deploy cycle to discover, so plan for them:
+
+- **No sudo.** Commands run with `NoNewPrivileges`, so `sudo` and setuid programs can't raise privileges. Install system packages with a [setup script](/guides/setup-scripts), which runs as `developer` with sudo, and keep app commands to app-local work.
+- **Each app is its own Linux user.** An app runs as a dedicated system user, not `developer`, with its own home directory. Anything that authenticates by the OS user, such as Postgres peer authentication over the local socket, won't match. Connect with a password or a connection URL from [secrets](/configure/secrets) instead.
+- **Resource limits apply to install and build too.** `limits.memoryMaxMb` and the CPU cap cover every step, not just the running service. A build that needs more memory than the service, such as `next build`, is killed when it reaches the limit, so size the limit for the build. Each command also has 30 minutes to finish.
+- **A build can't link outside its release.** A build is rejected if it leaves a symlink pointing outside the release directory, or a hardlink to a file outside it. Common causes are a virtual environment linked to a Python installed elsewhere, and package-manager hardlinks from a shared cache. Keep the toolchain inside the app: for uv, set `UV_PYTHON_INSTALL_DIR="$PWD/.python"` and `UV_LINK_MODE=copy`.
+- **Volumes are per app.** Each app sees only its own slice of a workspace volume at the mount path, so apps can't share files through a volume. See [persistent volumes](/guides/persistent-volumes).
+
 ## Verify preparation and startup
 
 Deploy locally, inspect the release logs, and check app health. A successful install does not establish that `start` exists or listens on the right port. Missing binaries, incompatible base images, and insufficient workspace resources need correction before retrying.
