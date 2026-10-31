@@ -12,6 +12,7 @@ description: "Define a service or a command-line application."
 | `build` | Optional command string after install |
 | `health` | `path`, `timeoutSeconds`; `command` for command verification |
 | `restartPolicy` | `always`, `on-failure`, or `no` |
+| `stopTimeoutSeconds` | Seconds the app gets to exit after SIGTERM when a deploy stops or replaces it, 1–3600 (default 15). Incremental deployment only |
 | `visibility` | `private` by default, `public`, or `{ emails: [...] }` |
 | `customDomain` | Hostname only; requires public visibility |
 | `volumes` | Volume declarations or references to workspace-declared volumes |
