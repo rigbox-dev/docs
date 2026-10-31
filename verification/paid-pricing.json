@@ -1,0 +1,78 @@
+{
+  "target": "paid-pricing",
+  "live_toggle": "snippets/paid-pricing.mdx: delete its <Warning> line to go live",
+  "docs_base_revision": "13e7523358805d02703d575476ac6479b69a8694",
+  "primary_source": {
+    "repository": "jona62/rig-mvp",
+    "revision": "689feb5b8d2b2efcb0ae7b49704db42299de8ab8",
+    "exported_at": "2026-10-31",
+    "toolchain": "rustc 1.93.1 (01f6ddf75 2026-02-11)",
+    "cargo_lock_sha256": "e90acddd07eae98161f2b59e73d617cf9f0dfb4a22776340b1732b337fecd2c2"
+  },
+  "api_source": {
+    "kind": "rig-gateway --print-openapi",
+    "export_sha256": "c853f9da59effc69b2fc6de7000d7ee651abc09002f1f55bbfe2c32b3ff2a54a",
+    "export_bytes": 464317,
+    "selected_components": [
+      "AiCredits",
+      "EffectiveLimits",
+      "LimitsUsage",
+      "GetUserLimitsResponse"
+    ],
+    "component_bundle_sha256": "91f3230116329725c05b3b590ac8e413204b1cba3d7d3140ecebe89ad87d91ee",
+    "components_changed_since_previous_export": false,
+    "targets": [
+      "openapi/rigbox-api.json"
+    ],
+    "unrelated_gateway_paths_and_components_preserved": true,
+    "public_billing_paths": [
+      "/api/v1/auth/billing/catalog",
+      "/api/v1/auth/billing/operations/{operation_id}",
+      "/api/v1/auth/billing/wallet/history"
+    ]
+  },
+  "auth_source": {
+    "kind": "rig_auth::openapi() via an uncommitted print_openapi example",
+    "export_sha256": "42169420f990d4ab259ee474db02e5ad51bc2bd44bb5334fec5d7d93c51530eb",
+    "export_bytes": 102363,
+    "path_count": 52,
+    "schema_count": 80,
+    "target": "openapi/auth-api.json",
+    "billing_paths": [
+      "/api/v1/auth/billing/catalog",
+      "/api/v1/auth/billing/change",
+      "/api/v1/auth/billing/change/cancel-scheduled",
+      "/api/v1/auth/billing/credit-packs/checkout",
+      "/api/v1/auth/billing/operations/{operation_id}",
+      "/api/v1/auth/billing/wallet/history",
+      "/api/v1/auth/create-checkout-session",
+      "/api/v1/auth/create-portal-session",
+      "/api/v1/auth/subscription-status"
+    ],
+    "responses": "Several billing handlers return serde_json::Value, so their response schemas are generic JSON"
+  },
+  "access": {
+    "console_only": [
+      "/api/v1/auth/create-checkout-session",
+      "/api/v1/auth/create-portal-session",
+      "/api/v1/auth/switch-plan",
+      "/api/v1/auth/billing/change",
+      "/api/v1/auth/billing/credit-packs/checkout"
+    ],
+    "console_only_rule": "rig-api-gateway routing.rs CONSOLE_ONLY_PATHS (prefix match, so billing/change/cancel-scheduled is included): a non-console-session request gets 404, and the paths are stripped from the public spec",
+    "api_key_readable": [
+      "/api/v1/auth/subscription-status",
+      "/api/v1/auth/billing/catalog",
+      "/api/v1/auth/billing/operations/{operation_id}",
+      "/api/v1/auth/billing/wallet/history"
+    ]
+  },
+  "checked_claims": {
+    "plans": "rig-common paid_plans.rs: Starter $5 (1 GiB, 0.5 CPU, 10 GiB, 1 slot), Developer $15 (4 GiB, 1 CPU, 30 GiB, 2 slots), Pro $25 (8 GiB, 2 CPU, 60 GiB, 4 slots)",
+    "addons": "rig-auth billing/handlers.rs catalog: storage $4 per 25 GiB, RAM $3 per GiB, workspace slot $1",
+    "credit_pack": "rig-auth billing/handlers.rs catalog: $13 per 1,000 credits",
+    "transition": "users.pricing_transition_until = paid-v1 activation + 30 days (migration 20261005150000): 2026-11-25 08:01:06 UTC for every pre-rollout account",
+    "legacy_pro_managed": "rig-auth billing/invoice.rs: 2,000 credits per verified non-proration subscription_create or subscription_cycle period after cutover",
+    "cli": "rigbox-dev/cli main: limits and whoami billing block (41dad56), every 402 points at the billing page (0f4aceb); not in a released CLI yet (latest v0.13.2)"
+  }
+}

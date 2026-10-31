@@ -3,3 +3,9 @@ title: Get AI Credits
 openapi: "/openapi/rigbox-api.json GET /api/v1/users/me/credits"
 description: "Get the authenticated user's AI credit balance and mode (managed or BYOK)."
 ---
+
+import PaidPricingStatus from '/snippets/paid-pricing.mdx';
+
+<PaidPricingStatus />
+
+`remaining` is the funds available for requests and `total` is the balance before holds; neither is a monthly grant. The `_micro` fields carry exact microcredits. See [managed wallet](/ai/managed-wallet).

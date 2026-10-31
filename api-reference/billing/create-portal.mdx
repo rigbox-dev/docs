@@ -1,0 +1,17 @@
+---
+title: Create billing portal session
+openapi: "/openapi/auth-api.json POST /api/v1/auth/create-portal-session"
+description: "Open the billing portal for payment methods, invoices and cancellation. Console only."
+---
+
+import PaidPricingStatus from '/snippets/paid-pricing.mdx';
+
+<PaidPricingStatus />
+
+<Note>
+**Console only.** This operation needs a signed-in console session; an API key or CLI login gets `404`. Use Billing in the console. See [pricing and billing](/concepts/pricing-and-billing#integration-and-retry-behavior).
+</Note>
+
+Open the configured portal for payment methods, invoices, or period-end cancellation. Capacity-sensitive plan and add-on changes use the Rigbox Billing flow. Portal creation does not change entitlement. Only a permitted return URL is accepted.
+
+Account billing requires an authenticated account identity with appropriate billing permissions. Workspace bridge identity is not an account billing credential. See [managed wallet](/ai/managed-wallet) for the financial contract.

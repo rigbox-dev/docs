@@ -24,6 +24,7 @@ Existing routes and heading anchors are inventoried in `scripts/legacy-routes.js
 python3 scripts/generate-cli-reference.py --check
 python3 scripts/build-navigation.py --check
 python3 scripts/check-docs.py
+python3 scripts/sync-paid-schemas.py --check
 npx mintlify@4.2.375 validate
 npx mintlify@4.2.375 broken-links
 ```
@@ -46,3 +47,36 @@ openapi: /openapi/rigbox-api.json GET /api/v1/workspaces
 Do not add top-level `openapi` to `docs.json`: Mintlify 4.2.375's file categorizer misidentifies that configuration as an API specification. Explicit page references resolve the strict validation warning. Native endpoints and playground contracts remain unchanged. App-release and volume definitions are copied from the recorded server specification. Builds/image-release routes absent from that specification remain covered by CLI guides; do not invent generated API definitions.
 
 The existing `sync-openapi.yml` workflow updates production specs. Review its output against the targeted release before incorporating it into the docs; newly split specifications also need deliberate refresh and coverage review. Contract changes belong in the server source, not hand edits to documentation schemas.
+
+## Paid pricing pages
+
+The pricing, limits, managed wallet and billing reference pages describe paid plans
+in the present tense. Whether paid pricing is live is decided in one place:
+`snippets/paid-pricing.mdx`, which every one of those pages imports and shows as
+`<PaidPricingStatus />`. It holds a comment and one `<Warning>` line, the rollout
+banner. **Going live is a one-line change: delete that `<Warning>` line.** No other
+page text needs to change. Keep the banner on one line, and don't wrap it in a
+condition: Mintlify 4.2.375 doesn't render an expression that contains a component
+inside an imported snippet, so `{live && <Warning>…}` silently shows nothing.
+
+`verification/paid-v1-schemas.json` holds the wallet and limits components copied
+from a gateway export, and `scripts/sync-paid-schemas.py` copies only those into
+`openapi/rigbox-api.json`, preserving unrelated gateway paths and schemas.
+`openapi/auth-api.json` is the complete auth-service export, checked against the
+SHA-256 recorded in `verification/paid-pricing.json`. Verify with `--check`.
+
+To refresh both from a rig-mvp revision, using its pinned toolchain (`rust-toolchain`):
+
+```bash
+# in rig-mvp/server; the example is a two-line harness around rig_auth::openapi(),
+# not committed there
+cargo run -p rig-gateway -- --print-openapi > /tmp/gateway.json
+cargo run -p rig-auth --example print_openapi > /tmp/auth-api.json
+```
+
+Then copy the four components into `verification/paid-v1-schemas.json`, replace
+`openapi/auth-api.json`, update the revision and hashes in
+`verification/paid-pricing.json`, and run `python3 scripts/sync-paid-schemas.py`.
+Several billing responses are generic JSON objects in the server source; don't
+invent typed shapes for them. A production sync from older binaries can bring back
+obsolete monthly-wallet wording: run the paid-schema check and review the diff.

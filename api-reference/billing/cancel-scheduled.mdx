@@ -1,0 +1,17 @@
+---
+title: Cancel a scheduled change
+openapi: "/openapi/auth-api.json POST /api/v1/auth/billing/change/cancel-scheduled"
+description: "Cancel a plan or add-on change scheduled for period end. Console only."
+---
+
+import PaidPricingStatus from '/snippets/paid-pricing.mdx';
+
+<PaidPricingStatus />
+
+<Note>
+**Console only.** This operation needs a signed-in console session; an API key or CLI login gets `404`. Use Billing in the console. See [pricing and billing](/concepts/pricing-and-billing#integration-and-retry-behavior).
+</Note>
+
+Cancel a plan or add-on change that is scheduled for the end of the current period, so the confirmed subscription continues unchanged. A change that is no longer cancellable, because it already applied or nothing is scheduled, answers `409`. Cancelling does not resize, start, move, or restart a workspace.
+
+Account billing requires an authenticated account identity with appropriate billing permissions. Workspace bridge identity is not an account billing credential. See [managed wallet](/ai/managed-wallet) for the financial contract.

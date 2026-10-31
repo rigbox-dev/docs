@@ -17,7 +17,8 @@ def anchors(text):
  for h in re.findall(r'^#{1,6}\s+(.+)$',clean(text),re.M):result.add(slug(h))
  return result
 
-pages={str(p.relative_to(ROOT))[:-4]:p.read_text() for p in ROOT.rglob('*.mdx') if not any(x.startswith('.') for x in p.relative_to(ROOT).parts)}
+# Mintlify never renders snippets/ as pages; pages import them.
+pages={str(p.relative_to(ROOT))[:-4]:p.read_text() for p in ROOT.rglob('*.mdx') if not any(x.startswith('.') for x in p.relative_to(ROOT).parts) and p.relative_to(ROOT).parts[0]!='snippets'}
 nav=[]
 def walk(x):
  if isinstance(x,list):
