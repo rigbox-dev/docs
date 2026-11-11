@@ -5,7 +5,7 @@ description: Serve a Rigbox app on your own domains, with automatic TLS.
 
 Every app you expose through Rigbox gets a subdomain at `*.rigbox.dev`. To serve it under your own brand, or under your customers' domains, add **custom hostnames** to it. Each hostname works alongside the `.rigbox.dev` subdomain, so every URL stays active at the same time.
 
-Custom hostnames work only on public apps.
+Custom hostnames work on public, private and invite-only apps. On a private or invite-only app, visitors sign in with Rigbox first; see [Private and invite-only apps](#private-and-invite-only-apps).
 
 ## How many hostnames an app can have
 
@@ -124,7 +124,19 @@ rig app hostname rm --app $APP --hostname shop.example.com
 
 The command asks before removing; `--force` skips the question. The hostname stops serving at once. Your app keeps its other hostnames and its `*.rigbox.dev` subdomain. Delete the DNS records afterwards.
 
-To make an app private or shared, remove its hostnames first: custom hostnames work only on public apps.
+## Private and invite-only apps
+
+A hostname on a private or invite-only (`privileged`) app asks visitors to sign in. A signed-out visitor goes to rigbox.dev to sign in, then comes straight back to the page they opened. The same people get in as on the app's `*.rigbox.dev` address: only you on a private app, and you plus the emails you invited on an invite-only one. Anyone else gets the same refusal as on the subdomain.
+
+A sign-in lasts an hour, on that one hostname. It ends sooner when:
+
+- you remove the hostname, make the app public, or delete the app
+- the visitor signs out of Rigbox, which ends their sign-ins on every custom hostname
+- the visitor's account is disabled or deleted
+
+Your app gets the visitor's identity in the `X-Rigbox-Email` and `X-Rigbox-UserID` headers, as on the subdomain. Rigbox removes its sign-in cookies before a request reaches your app, and it answers `/__rigbox/login/callback` on each hostname itself, so your app never sees that path.
+
+You can change an app's visibility without removing its hostnames.
 
 ## Troubleshooting
 

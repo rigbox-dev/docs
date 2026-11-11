@@ -14,7 +14,7 @@ description: "Define a service or a command-line application."
 | `restartPolicy` | `always`, `on-failure`, or `no` |
 | `stopTimeoutSeconds` | Seconds the app gets to exit after SIGTERM when a deploy stops or replaces it, 1–3600 (default 15). Incremental deployment only |
 | `visibility` | `private` by default, `public`, or `{ emails: [...] }` |
-| `customDomain` | Hostname only; requires public visibility |
+| `hostnames` | Custom hostnames, such as `[shop.example.com]`. Any visibility; on a private or invite-only app, visitors sign in with Rigbox. See [Custom hostnames](/guides/custom-domains) |
 | `volumes` | Volume declarations or references to workspace-declared volumes |
 | `executables` | Map of command names to application-relative executable paths |
 | `workingDirectory` | Legacy/image setting; rejected by incremental deployment |
