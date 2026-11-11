@@ -128,7 +128,7 @@ The command asks before removing; `--force` skips the question. The hostname sto
 
 A hostname on a private or invite-only (`privileged`) app asks visitors to sign in. A signed-out visitor goes to rigbox.dev to sign in, then comes straight back to the page they opened. The same people get in as on the app's `*.rigbox.dev` address: only you on a private app, and you plus the emails you invited on an invite-only one. Anyone else gets the same refusal as on the subdomain.
 
-The first time a visitor signs in on a hostname, rigbox.dev asks them to confirm it, because the site will see their email address. It asks again if the hostname is verified again, for example after it moves to another app. Sign-in works only once the hostname is **Active**.
+The first time a visitor signs in on a hostname, rigbox.dev asks them to confirm it, because the site will see their email address. It asks again after 30 days, or sooner if the hostname is verified again, for example after it moves to another app. Sign-in works only once the hostname is **Active**, and Rigbox checks the hostname's DNS again each time someone signs in. If the DNS no longer points to Rigbox, sign-in stops and the hostname shows *no longer points to Rigbox* until you fix it.
 
 A sign-in lasts an hour, on that one hostname. It ends sooner when:
 
