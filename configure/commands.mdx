@@ -31,7 +31,7 @@ Incremental deployment runs each app's `install`, `build`, `configure` and `star
 - **Each app is its own Linux user.** An app runs as a dedicated system user, not `developer`, with its own home directory. Anything that authenticates by the OS user, such as Postgres peer authentication over the local socket, won't match. Connect with a password or a connection URL from [secrets](/configure/secrets) instead.
 - **Resource limits apply to install and build too.** `limits.memoryMaxMb` and the CPU cap cover every step, not just the running service. A build that needs more memory than the service, such as `next build`, is killed when it reaches the limit, so size the limit for the build. Each command also has 30 minutes to finish.
 - **A build can't link outside its release.** A build is rejected if it leaves a symlink pointing outside the release directory, or a hardlink to a file outside it. Common causes are a virtual environment linked to a Python installed elsewhere, and package-manager hardlinks from a shared cache. Keep the toolchain inside the app: for uv, set `UV_PYTHON_INSTALL_DIR="$PWD/.python"` and `UV_LINK_MODE=copy`.
-- **Volumes are per app.** Each app sees only its own slice of a workspace volume at the mount path, so apps can't share files through a volume. See [persistent volumes](/guides/persistent-volumes).
+- **Volumes are per app unless shared.** Each app sees only its own folder on a workspace volume at the mount path. To let apps work on the same files, list them in the volume's `shared:`. See [share a volume between apps](/guides/persistent-volumes#share-a-volume-between-apps).
 
 ## Verify preparation and startup
 

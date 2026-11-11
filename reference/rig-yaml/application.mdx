@@ -15,7 +15,7 @@ description: "Define a service or a command-line application."
 | `stopTimeoutSeconds` | Seconds the app gets to exit after SIGTERM when a deploy stops or replaces it, 1–3600 (default 15). Incremental deployment only |
 | `visibility` | `private` by default, `public`, or `{ emails: [...] }` |
 | `customDomain` | Hostname only; requires public visibility |
-| `volumes` | Volume declarations or references to workspace-declared volumes |
+| `volumes` | Volume declarations or references to workspace-declared volumes. Only the apps a [shared](/reference/rig-yaml/workspace#volumes) volume lists can reference it |
 | `executables` | Map of command names to application-relative executable paths |
 | `workingDirectory` | Legacy/image setting; rejected by incremental deployment |
 | `requirements` | Minimum resources and incompatible images/templates |

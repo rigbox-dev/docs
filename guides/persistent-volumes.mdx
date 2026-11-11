@@ -73,12 +73,6 @@ apps:
     visibility: public
 ```
 
-## Each app gets its own directory
-
-A volume is shared by name, not by contents. Each app that references it sees its own private directory at the mount path, owned by that app's user. On the volume that directory is `<mountPath>/.rigbox-apps/<app id>`, which is where you'll find it over SSH. Two apps that both list `volumes: [data]` don't see each other's files.
-
-To share data between apps, let one app own it and have the others reach that app on its port inside the workspace, as described in [dependencies and service discovery](/deploy/dependencies). A database app that keeps its files on the volume and accepts connections from the other apps is the usual shape.
-
 App references can be written as `volumes: [data]` or `volumes: [{ name: data }]`. App-local full specs are still supported for single-app or one-off cases:
 
 ```yaml
@@ -87,6 +81,73 @@ volumes:
     mountPath: /home/developer/data
     sizeMb: 1024
 ```
+
+## Each app gets its own folder
+
+A volume is private to each app by default. Each app that mounts it sees its own folder at the mount path, owned by that app's user, and other apps can't see it. On the volume that folder is `<mountPath>/.rigbox-apps/<app id>`, which is where you'll find it over SSH. Two apps that both list `volumes: [data]` don't see each other's files.
+
+## Share a volume between apps
+
+To let apps work on the same files, list them under `shared:` on the volume's `workspace.volumes` entry. Each listed app must also mount the volume in its own `volumes:`.
+
+<Note>`shared:` needs the next CLI release.</Note>
+
+Here `console`, `render` and `clips` share `uploads`, and `mail` can't mount it:
+
+```yaml
+workspace:
+  volumes:
+    - name: uploads
+      mountPath: /home/developer/uploads
+      sizeMb: 2048
+      shared: [console, render, clips]
+
+apps:
+  console:
+    path: ./console
+    port: 5100
+    start: npm start
+    volumes: [uploads]
+    visibility: public
+
+  render:
+    path: ./render
+    port: 5101
+    start: python3 render.py
+    volumes: [uploads]
+
+  clips:
+    path: ./clips
+    port: 5102
+    start: npm start
+    volumes: [uploads]
+
+  mail:
+    path: ./mail
+    port: 5103
+    start: npm start
+```
+
+`uploads` isn't the default `data` volume, so [create it](#declare-a-volume-in-rigyaml) on the stopped workspace before the first deploy.
+
+### How access works
+
+The listed apps see one shared folder at the mount path: `<mountPath>/.rigbox-shared` on the volume. Their app users join a group for that volume. The folder is group-writable (mode `2770`), and new files and folders in it are group-readable and group-writable whatever the app's umask. The folder isn't world-writable, new files in it aren't either, and apps that aren't listed can't reach it.
+
+To take an app off the volume, remove it from `shared:` and remove the volume from its `volumes:`. The app loses access at the next deploy.
+
+### Turning sharing on doesn't move data
+
+Files an app wrote to its private folder stay there, at `<mountPath>/.rigbox-apps/<app id>` on the workspace, and the app no longer sees them at the mount path. Files already in the shared folder, `<mountPath>/.rigbox-shared`, get the volume's group the first time the volume is shared.
+
+### Validation errors
+
+The CLI refuses a `rig.yaml` that breaks these rules, and the error names the volume and the app:
+
+- `shared:` lists at least one app, every app in it exists in this `rig.yaml`, and none is listed twice.
+- Every listed app mounts the volume in its own `volumes:`.
+- An app that isn't listed can't mount the volume.
+- Only `workspace.volumes` entries can be shared. An app's own inline volume can't set `shared:`.
 
 ## Manage volumes with the CLI
 

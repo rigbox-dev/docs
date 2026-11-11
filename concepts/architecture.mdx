@@ -10,7 +10,7 @@ Rigbox separates platform operations from user code. Workspaces run in micro-VMs
 Each workspace is a micro-VM - not a container. This gives you:
 
 - **Dedicated kernel** - each VM boots its own Linux kernel, fully independent from other workspaces
-- **Own filesystem** - isolated ext4 disk with no shared volumes
+- **Own filesystem** - isolated ext4 disk; no volume is shared with another workspace
 - **VM networking** - each VM uses a private interface, with platform routing and network controls governing traffic
 - **systemd init** - full Linux userspace with service management
 - **Scoped credentials** - managed upstream provider keys remain at the proxy; workspace configuration can contain user-supplied secrets and scoped credentials
