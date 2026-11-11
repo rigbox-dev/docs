@@ -128,13 +128,17 @@ The command asks before removing; `--force` skips the question. The hostname sto
 
 A hostname on a private or invite-only (`privileged`) app asks visitors to sign in. A signed-out visitor goes to rigbox.dev to sign in, then comes straight back to the page they opened. The same people get in as on the app's `*.rigbox.dev` address: only you on a private app, and you plus the emails you invited on an invite-only one. Anyone else gets the same refusal as on the subdomain.
 
+The first time a visitor signs in on a hostname, rigbox.dev asks them to confirm it, because the site will see their email address. It asks again if the hostname is verified again, for example after it moves to another app. Sign-in works only once the hostname is **Active**.
+
 A sign-in lasts an hour, on that one hostname. It ends sooner when:
 
 - you remove the hostname, make the app public, or delete the app
-- the visitor signs out of Rigbox, which ends their sign-ins on every custom hostname
+- the visitor signs out of Rigbox in the browser they signed in with, or that Rigbox session ends another way, such as a password reset
 - the visitor's account is disabled or deleted
 
-Your app gets the visitor's identity in the `X-Rigbox-Email` and `X-Rigbox-UserID` headers, as on the subdomain. Rigbox removes its sign-in cookies before a request reaches your app, and it answers `/__rigbox/login/callback` on each hostname itself, so your app never sees that path.
+Only a page load starts a sign-in. A signed-out `fetch` or image request on the hostname gets a `401` instead, so an app that calls its own API should handle `401` by reloading the page.
+
+Your app gets the visitor's identity in the `X-Rigbox-Email` and `X-Rigbox-UserID` headers, as on the subdomain. Rigbox removes its sign-in cookies before a request reaches your app and ignores any cookie your app sets whose name starts with `__Host-rigbox_`. It answers `/__rigbox/login/callback` on each hostname itself, so your app never sees that path.
 
 You can change an app's visibility without removing its hostnames.
 
