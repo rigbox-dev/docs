@@ -54,7 +54,6 @@
   "api-reference/apps/update-status": [],
   "api-reference/apps/update-visibility": [],
   "api-reference/apps/update": [],
-  "api-reference/apps/verify-domain": [],
   "api-reference/managed-proxy/chat-completions": [],
   "api-reference/managed-proxy/get-subject-usage": [],
   "api-reference/other/capacity": [
@@ -310,16 +309,11 @@
     "next-steps"
   ],
   "guides/custom-domains": [
-    "prerequisites",
-    "setting-a-custom-domain",
-    "using-the-dashboard",
-    "using-the-cli",
-    "configuring-dns",
-    "verifying-your-domain",
-    "using-the-dashboard",
-    "using-the-cli",
-    "tls-certificates",
-    "removing-a-custom-domain",
+    "how-many-hostnames-an-app-can-have",
+    "add-a-hostname",
+    "check-its-status",
+    "declare-hostnames-in-rigyaml",
+    "remove-a-hostname",
     "troubleshooting",
     "next-steps"
   ],

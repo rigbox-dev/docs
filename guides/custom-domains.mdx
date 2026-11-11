@@ -1,98 +1,151 @@
 ---
-title: Custom Domains
-description: Point your own domain at a Rigbox app with automatic TLS.
+title: Custom Hostnames
+description: Serve a Rigbox app on your own domains, with automatic TLS.
 ---
 
-Every app you expose through Rigbox gets a subdomain at `*.rigbox.dev`. That works great for development, but when you want to share something under your own brand, you can attach a **custom domain** instead.
+Every app you expose through Rigbox gets a subdomain at `*.rigbox.dev`. To serve it under your own brand, or under your customers' domains, add **custom hostnames** to it. Each hostname works alongside the `.rigbox.dev` subdomain, so every URL stays active at the same time.
 
-Each app supports one custom domain. The custom domain works alongside the default `.rigbox.dev` subdomain, so both URLs stay active at the same time.
+Custom hostnames work only on public apps.
 
-## Prerequisites
+## How many hostnames an app can have
 
-Before you begin, make sure you have:
+| Plan | Hostnames per app |
+|------|-------------------|
+| Free | 1 |
+| Starter | 1 |
+| Developer | 10 |
+| Pro | 100 |
 
-- **A domain you own** (e.g., `app.yourcompany.com`)
-- **Access to your DNS settings** (through your registrar or DNS provider)
-- **An existing Rigbox app** that you want to map the domain to
+They're included in your plan. For more than 100 on one app, email support@rigbox.dev.
 
-## Setting a Custom Domain
+An account can add 50 new hostnames per hour. Every Rigbox account shares one Let's Encrypt certificate quota, and the hourly cap keeps one large import from holding up everyone else's certificates.
 
-You can set a custom domain from the Rigbox dashboard or with the CLI.
-
-### Using the Dashboard
-
-Open your app, go to the **Access** tab, and enter your domain in the Custom Domain field.
-
-### Using the CLI
+## Add a hostname
 
 ```bash
-rig app domain set --app $APP --domain app.yourcompany.com
+rig app hostname add --app $APP --hostname shop.example.com
 ```
 
-The `--app` value can be an app id, name, or subdomain.
+The `--app` value can be an app id or name. The command prints the DNS records to add with your DNS provider.
 
-## Configuring DNS
+**A subdomain** such as `shop.example.com` needs one CNAME record, pointing at a target that belongs to your app alone:
 
-After setting the custom domain, you need to point it at the Rigbox infrastructure. Add an **A record** in your DNS provider:
+```text
+✓ Added shop.example.com to app web.
+  Add this record with your DNS provider:
+    CNAME shop.example.com
+          3f9a0c1be27d4a5f8e6b1c2d3e4f5a6b.hosts.rigbox.dev
+  Rigbox checks DNS about every minute. To see the status, run:
+    rig app hostname ls --app web
+```
 
-| Record Type | Name | Value |
-|-------------|------|-------|
-| A | `app.yourcompany.com` | `51.255.194.99` |
+**An apex** such as `example.com` can't hold a CNAME, so it needs an A record plus a TXT record that proves you own the domain:
+
+```text
+✓ Added example.com to app web.
+  Add these records with your DNS provider:
+    A     example.com
+          51.255.194.99
+    TXT   _rigbox-verify.example.com
+          rbv_8d1e0f3a2b4c5d6e7f8091a2b3c4d5e6
+  Rigbox checks DNS about every minute. To see the status, run:
+    rig app hostname ls --app web
+```
+
+| Hostname | Record | Name | Value |
+|----------|--------|------|-------|
+| Subdomain | CNAME | `shop.example.com` | Your app's target, ending `.hosts.rigbox.dev` |
+| Apex | A | `example.com` | `51.255.194.99` |
+| Apex | TXT | `_rigbox-verify.example.com` | The hostname's token, starting `rbv_` |
+
+Each app's CNAME target is never given to another app, and each hostname gets a new TXT token. A record left over from a deleted app never verifies a new one. To move a hostname between apps, add it to the new app and point its DNS there: it moves once DNS no longer names the old app.
 
 <Warning>
-If you use Cloudflare, you must turn off the proxy (set it to **DNS only** / grey cloud). Cloudflare's proxy intercepts TLS and prevents Rigbox from issuing a certificate for your domain.
+If your DNS provider proxies traffic (Cloudflare's orange cloud), set the record to **DNS only**. A proxy hides the CNAME and intercepts TLS, so Rigbox can neither verify the hostname nor get its certificate.
 </Warning>
 
-DNS changes can take a few minutes to propagate. In most cases, the record is live within 1 to 5 minutes.
+## Check its status
 
-## Verifying Your Domain
-
-Once the DNS record is in place, you need to verify that it resolves correctly. Verification checks that your domain points to `51.255.194.99`.
-
-### Using the Dashboard
-
-Click the **Verify** button next to the custom domain field in the Access tab.
-
-### Using the CLI
+Rigbox checks DNS about every minute after you add a hostname. Once the records are in place, it gets a TLS certificate from Let's Encrypt, usually within a minute.
 
 ```bash
-rig app verify-domain --app $APP
+rig app hostname ls --app $APP
 ```
 
-## TLS Certificates
+```text
+shop.example.com
+  active: Serving https://shop.example.com.
 
-You do not need to set up TLS manually. When the first request arrives on your custom domain, Rigbox automatically provisions a certificate through **Let's Encrypt**. This happens transparently and only takes a moment.
+example.com
+  waiting for DNS: The A record is in place. Add the TXT record to prove you own
+  example.com.
+    A     example.com
+          51.255.194.99
+    TXT   _rigbox-verify.example.com
+          rbv_8d1e0f3a2b4c5d6e7f8091a2b3c4d5e6
 
-<Tip>
-The initial request to your custom domain may be slightly slower while the certificate is being issued. All subsequent requests use the cached certificate and are fast as usual.
-</Tip>
+2 of 10 hostnames on this app.
+```
 
-## Removing a Custom Domain
+| Status | Meaning |
+|--------|---------|
+| waiting for DNS | The records aren't in place yet. The reason says which one is missing. |
+| getting certificate | DNS is verified and the hostname is routed. Rigbox is getting its certificate. |
+| active | The hostname serves your app over HTTPS. |
+| error | Something needs your attention. The reason says what to change. |
 
-If you no longer want a custom domain attached to your app, remove it from the Access tab in the dashboard, or clear `custom_domain` by setting it to an empty string. There's no dedicated remove command, so use a raw API call (the path drops the `/api/v1` prefix; `rig` is already authenticated via `rig login`):
+The app's **Access** tab in the console shows the same list.
+
+Once verified, a hostname stays routed. Keep its CNAME, or its A record, pointing at Rigbox: if DNS moves away, its status changes to error until you point it back. You can delete an apex's TXT record after verification.
+
+To list hostnames in scripts, use `--output json`, or call [`GET /apps/{id}/hostnames`](/api-reference/apps/list-hostnames). [`POST /apps/{id}/hostnames`](/api-reference/apps/add-hostname) adds one from your own code, for example when your customers connect their domains to your SaaS.
+
+## Declare hostnames in rig.yaml
+
+List an app's hostnames in its `rig.yaml`, and every `rig deploy` adds the ones the app doesn't have yet and prints their DNS records:
+
+```yaml
+name: web
+port: 3000
+start: npm start
+visibility: public
+hostnames:
+  - shop.example.com
+  - example.com
+```
+
+A deploy never removes a hostname, so hostnames you add with `rig app hostname add` or the API stay when you redeploy. To remove one, use `rig app hostname rm`. The single `customDomain` key is replaced by `hostnames`.
+
+## Remove a hostname
 
 ```bash
-rig api PATCH /v1/apps/$APP_ID --body '{"custom_domain": ""}'
+rig app hostname rm --app $APP --hostname shop.example.com
 ```
 
-After removing the custom domain, your app is still accessible at its default `*.rigbox.dev` subdomain.
+The command asks before removing; `--force` skips the question. The hostname stops serving at once. Your app keeps its other hostnames and its `*.rigbox.dev` subdomain. Delete the DNS records afterwards.
+
+To make an app private or shared, remove its hostnames first: custom hostnames work only on public apps.
 
 ## Troubleshooting
 
-If verification fails or your custom domain isn't working, check these common issues:
+The reason under each hostname says what to change. The ones you might see:
 
-| Problem | Solution |
-|---------|----------|
-| DNS not propagated yet | Wait a few minutes and try verifying again. You can use `dig app.yourcompany.com` to check if the record is live. |
-| Cloudflare proxy enabled | Make sure the proxy toggle is set to **DNS only** (grey cloud). The orange cloud means the proxy is active, which blocks certificate issuance. |
-| Verification failing | Confirm your A record points to `51.255.194.99`. If you see a different IP, update the record and verify again. |
-| Certificate not issuing | Verification must pass first. Make sure the domain resolves to the correct IP and that no proxy is intercepting traffic. |
+| Reason starts with | What to do |
+|--------------------|------------|
+| *points somewhere else* | The hostname resolves, but not to Rigbox. Set the record to the value shown and turn off any DNS proxy. Check it with `dig shop.example.com`. |
+| *Replace … A record with the CNAME* | A subdomain needs the CNAME, not an A record. |
+| *The A record is in place. Add the TXT record* | Add the TXT record. Check it with `dig TXT _rigbox-verify.example.com`. |
+| *The TXT record is in place. Point … A record* | Set the apex's A record to `51.255.194.99`. |
+| *A CAA record … doesn't allow Let's Encrypt* | Your domain limits which authorities may issue certificates. Add `0 issue "letsencrypt.org"` to its CAA records. |
+| *… no longer points to Rigbox* | DNS changed after verification. Set the record back to the value shown. |
+| *Let's Encrypt hasn't issued a certificate … after an hour* | Rigbox keeps retrying. Check for a CAA record or a proxy in front of the hostname. |
+| *… still points to another Rigbox app* | Another app serves this hostname. Point its CNAME (or, for an apex, the TXT value) at this app as shown, and it moves here. |
+| *… now points to another Rigbox app, which serves it* | The hostname moved to the app its DNS names. Remove it from this app. |
+| *The app isn't public* | Make the app public with `rig app share --app $APP --public`. |
 
-<Note>
-If you recently changed DNS settings, it can take up to a few minutes for the change to propagate globally. Be patient and retry verification after waiting.
-</Note>
+DNS changes can take a few minutes to reach every resolver. Rigbox keeps checking, so there's nothing to re-run.
 
 ## Next Steps
 
-- [App Visibility](/guides/visibility) - control who can access your app through authentication and access modes
-- [Expose Ports & Route Apps](/guides/expose-and-route) - learn how routing and subdomains work under the hood
+- [App Visibility](/guides/visibility) - control who can access your app
+- [Expose Ports & Route Apps](/guides/expose-and-route) - how routing and subdomains work

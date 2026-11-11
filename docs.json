@@ -306,7 +306,10 @@
                   "api-reference/apps/expose-port",
                   "api-reference/apps/reconcile",
                   "api-reference/apps/listening-ports",
-                  "api-reference/apps/verify-domain"
+                  "api-reference/apps/list-hostnames",
+                  "api-reference/apps/add-hostname",
+                  "api-reference/apps/remove-hostname",
+                  "api-reference/apps/check-hostname"
                 ]
               },
               {
