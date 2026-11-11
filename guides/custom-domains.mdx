@@ -13,7 +13,7 @@ Before you begin, make sure you have:
 
 - **A domain you own** (e.g., `app.yourcompany.com`)
 - **Access to your DNS settings** (through your registrar or DNS provider)
-- **An existing Rigbox app** that you want to map the domain to
+- **An existing public Rigbox app** that you want to map the domain to. Custom domains work only on public apps.
 
 ## Setting a Custom Domain
 
@@ -29,25 +29,39 @@ Open your app, go to the **Access** tab, and enter your domain in the Custom Dom
 rig app domain set --app $APP --domain app.yourcompany.com
 ```
 
-The `--app` value can be an app id, name, or subdomain.
+The `--app` value can be an app id, name, or subdomain. The command prints the two DNS records to add:
+
+```text
+✓ Custom domain set to app.yourcompany.com for app web.
+  Add these DNS records with your DNS provider:
+    TXT  _rigbox-verify.app.yourcompany.com
+         rbv_3f9c…
+    A    app.yourcompany.com
+         51.255.194.99
+  Then run: rig app verify-domain --app ar-1a2b3c4d5e6f7a8b
+  DNS changes can take a few minutes to appear.
+```
 
 ## Configuring DNS
 
-After setting the custom domain, you need to point it at the Rigbox infrastructure. Add an **A record** in your DNS provider:
+Add both records with your DNS provider. Until the domain is verified, the dashboard's **Access** tab and `rig app verify-domain` show the same two records, with your token.
 
-| Record Type | Name | Value |
-|-------------|------|-------|
-| A | `app.yourcompany.com` | `51.255.194.99` |
+| Record Type | Name | Value | Why |
+|-------------|------|-------|-----|
+| TXT | `_rigbox-verify.app.yourcompany.com` | Your app's token, starting `rbv_` | Proves you own the domain |
+| A | `app.yourcompany.com` | `51.255.194.99` | Routes the domain to Rigbox |
+
+Each time an app claims a domain it gets a new token, so a TXT record left over from an earlier app never verifies a new claim.
 
 <Warning>
 If you use Cloudflare, you must turn off the proxy (set it to **DNS only** / grey cloud). Cloudflare's proxy intercepts TLS and prevents Rigbox from issuing a certificate for your domain.
 </Warning>
 
-DNS changes can take a few minutes to propagate. In most cases, the record is live within 1 to 5 minutes.
+DNS changes can take a few minutes to propagate. In most cases, the records are live within 1 to 5 minutes.
 
 ## Verifying Your Domain
 
-Once the DNS record is in place, you need to verify that it resolves correctly. Verification checks that your domain points to `51.255.194.99`.
+Once both records are in place, verify the domain. Verification checks that the TXT record holds your app's token and that the A record points to `51.255.194.99`. Only then does Rigbox route the domain and issue its certificate.
 
 ### Using the Dashboard
 
@@ -59,9 +73,24 @@ Click the **Verify** button next to the custom domain field in the Access tab.
 rig app verify-domain --app $APP
 ```
 
+If a record is missing or holds another value, the output marks it:
+
+```text
+Domain: app.yourcompany.com → pending
+    ✗ TXT  _rigbox-verify.app.yourcompany.com  doesn't hold this value yet
+           rbv_3f9c…
+    ✓ A    app.yourcompany.com
+           51.255.194.99
+  Fix the marked records with your DNS provider, then run:
+    rig app verify-domain --app ar-1a2b3c4d5e6f7a8b
+  DNS changes can take a few minutes to appear.
+```
+
+Once verified, a domain stays verified. You can remove the TXT record afterwards, but keep the A record: the domain reaches your app only while it points at Rigbox.
+
 ## TLS Certificates
 
-You do not need to set up TLS manually. When the first request arrives on your custom domain, Rigbox automatically provisions a certificate through **Let's Encrypt**. This happens transparently and only takes a moment.
+You do not need to set up TLS manually. When the first request arrives on your verified custom domain, Rigbox automatically provisions a certificate through **Let's Encrypt**. This happens transparently and only takes a moment.
 
 <Tip>
 The initial request to your custom domain may be slightly slower while the certificate is being issued. All subsequent requests use the cached certificate and are fast as usual.
@@ -69,10 +98,10 @@ The initial request to your custom domain may be slightly slower while the certi
 
 ## Removing a Custom Domain
 
-If you no longer want a custom domain attached to your app, remove it from the Access tab in the dashboard, or clear `custom_domain` by setting it to an empty string. There's no dedicated remove command, so use a raw API call (the path drops the `/api/v1` prefix; `rig` is already authenticated via `rig login`):
+If you no longer want a custom domain attached to your app, remove it from the Access tab in the dashboard, or set it to an empty string:
 
 ```bash
-rig api PATCH /v1/apps/$APP_ID --body '{"custom_domain": ""}'
+rig app domain set --app $APP --domain ""
 ```
 
 After removing the custom domain, your app is still accessible at its default `*.rigbox.dev` subdomain.
@@ -83,9 +112,10 @@ If verification fails or your custom domain isn't working, check these common is
 
 | Problem | Solution |
 |---------|----------|
-| DNS not propagated yet | Wait a few minutes and try verifying again. You can use `dig app.yourcompany.com` to check if the record is live. |
+| DNS not propagated yet | Wait a few minutes and try verifying again. Check both records with `dig TXT _rigbox-verify.app.yourcompany.com` and `dig app.yourcompany.com`. |
 | Cloudflare proxy enabled | Make sure the proxy toggle is set to **DNS only** (grey cloud). The orange cloud means the proxy is active, which blocks certificate issuance. |
-| Verification failing | Confirm your A record points to `51.255.194.99`. If you see a different IP, update the record and verify again. |
+| Verification failing | Run `rig app verify-domain --app $APP`: it marks the missing record. Check the TXT record with `dig TXT _rigbox-verify.app.yourcompany.com` and the A record with `dig app.yourcompany.com`. The TXT value must be exactly your app's token. |
+| HTTPS fails with `tlsv1 alert internal error` | The domain isn't verified yet, so Rigbox has no certificate for it. Verify the domain first; HTTPS works on the next request. |
 | Certificate not issuing | Verification must pass first. Make sure the domain resolves to the correct IP and that no proxy is intercepting traffic. |
 
 <Note>
